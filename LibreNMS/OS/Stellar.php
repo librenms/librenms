@@ -17,7 +17,7 @@ class Stellar extends OS implements
         $device = $this->getDeviceArray();
 
         $ssid = [];
-        $ssid_data = $this->getCacheTable('apWlanEssid', $device['hardware']);
+        $getCacheTable1 = SnmpQuery::hideMib()->walk("$device['hardware']::oid")->table(1);$ssid_data = $getCacheTable1;
 
         foreach ($ssid_data as $ssid_entry) {
             if ($ssid_entry['apWlanEssid'] == 'athmon2') {
@@ -29,7 +29,7 @@ class Stellar extends OS implements
             }
         }
 
-        $client_ws_data = $this->getCacheTable('apClientWlanService', $device['hardware']);
+        $getCacheTable = SnmpQuery::hideMib()->walk("$device['hardware']::oid")->table(1);$client_ws_data = $getCacheTable;
 
         if (empty($client_ws_data)) {
             $total_clients = 0;
@@ -70,7 +70,7 @@ class Stellar extends OS implements
         if (! empty($sensors)) {
             $device = $this->getDeviceArray();
 
-            $client_ws_data = $this->getCacheTable('apClientWlanService', $device['hardware']);
+            $getCacheTable = SnmpQuery::hideMib()->walk("$device['hardware']::oid")->table(1);$client_ws_data = $getCacheTable;
 
             if (empty($client_ws_data)) {
                 $total_clients = 0;

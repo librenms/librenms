@@ -61,7 +61,7 @@ class Comware extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
         if (empty($procdata)) {
             return $processors;
         }
-        $entity_data = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
+        $entity_data = SnmpQuery::cache()->walk("ENTITY-MIB::entPhysicalName")->pluck();
 
         foreach ($procdata as $index => $usage) {
             if ($usage['hh3cEntityExtCpuUsage'] != 0) {
@@ -92,8 +92,8 @@ class Comware extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
         }
 
         $data = snmpwalk_group($this->getDeviceArray(), 'hh3cEntityExtMemSize', 'HH3C-ENTITY-EXT-MIB', 1, $data);
-        $entity_name = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
-        $entity_class = $this->getCacheByIndex('entPhysicalClass', 'ENTITY-MIB');
+        $entity_name = SnmpQuery::cache()->walk("ENTITY-MIB::entPhysicalName")->pluck();
+        $entity_class = SnmpQuery::cache()->walk("ENTITY-MIB::entPhysicalClass")->pluck();
 
         foreach ($data as $index => $entry) {
             if ($entity_class[$index] == 'module' && $entry['hh3cEntityExtMemUsage'] > 0) {

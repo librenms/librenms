@@ -148,15 +148,15 @@ class Ciscowlc extends Cisco implements
      */
     public function discoverWirelessClients()
     {
-        $counts = $this->getCacheByIndex('bsnDot11EssNumberOfMobileStations', 'AIRESPACE-WIRELESS-MIB');
+        $counts = SnmpQuery::cache()->walk("AIRESPACE-WIRELESS-MIB::bsnDot11EssNumberOfMobileStations")->pluck();
         if (empty($counts)) {
             return []; // no counts to be had
         }
 
-        $ssids = $this->getCacheByIndex('bsnDot11EssSsid', 'AIRESPACE-WIRELESS-MIB');
+        $ssids = SnmpQuery::cache()->walk("AIRESPACE-WIRELESS-MIB::bsnDot11EssSsid")->pluck();
         if (empty($ssids)) {
             //  Try to check the LWAPP mib
-            $ssids = $this->getCacheByIndex('cLWlanSsid', 'CISCO-LWAPP-WLAN-MIB');
+            $ssids = SnmpQuery::cache()->walk("CISCO-LWAPP-WLAN-MIB::cLWlanSsid")->pluck();
         }
 
         $sensors = [];

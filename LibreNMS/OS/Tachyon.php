@@ -69,7 +69,7 @@ class Tachyon extends OS implements
     public function discoverWirelessFrequency()
     {
         $sensors = [];
-        $data = $this->getCacheTable('TACHYON-MIB::wirelessRadioTable');
+        $data = SnmpQuery::hideMib()->walk("null::oid")->table(1);
 
         foreach ($data as $index => $entry) {
             if (! empty($entry['wirelessRadioFrequency'])) {
@@ -100,7 +100,7 @@ class Tachyon extends OS implements
     public function discoverWirelessPower()
     {
         $sensors = [];
-        $data = $this->getCacheTable('TACHYON-MIB::wirelessRadioTable');
+        $data = SnmpQuery::hideMib()->walk("null::oid")->table(1);
 
         foreach ($data as $index => $entry) {
             if (! empty($entry['wirelessRadioTxPower'])) {
@@ -131,7 +131,7 @@ class Tachyon extends OS implements
     public function discoverWirelessRssi()
     {
         $sensors = [];
-        $data = $this->getCacheTable('TACHYON-MIB::wirelessPeersTable');
+        $data = SnmpQuery::hideMib()->walk("null::oid")->table(1);
 
         foreach ($data as $index => $entry) {
             if (! empty($entry['wirelessPeerRxPower'])) {
@@ -162,7 +162,7 @@ class Tachyon extends OS implements
     public function discoverWirelessRate()
     {
         $sensors = [];
-        $data = $this->getCacheTable('TACHYON-MIB::wirelessPeersTable');
+        $data = SnmpQuery::hideMib()->walk("null::oid")->table(1);
 
         foreach ($data as $index => $entry) {
             if (! empty($entry['wirelessPeerTxRate'])) {
@@ -207,7 +207,7 @@ class Tachyon extends OS implements
     public function discoverWirelessDistance()
     {
         $sensors = [];
-        $data = $this->getCacheTable('TACHYON-MIB::wirelessPeersTable');
+        $data = SnmpQuery::hideMib()->walk("null::oid")->table(1);
 
         foreach ($data as $index => $entry) {
             if (! empty($entry['wirelessPeerLinkDistance'])) {
@@ -238,7 +238,7 @@ class Tachyon extends OS implements
     public function discoverWirelessSnr()
     {
         $sensors = [];
-        $data = $this->getCacheTable('TACHYON-MIB::wirelessPeersTable');
+        $data = SnmpQuery::hideMib()->walk("null::oid")->table(1);
 
         foreach ($data as $index => $entry) {
             if (! empty($entry['wirelessPeerSnr'])) {

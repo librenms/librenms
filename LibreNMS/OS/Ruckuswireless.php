@@ -15,8 +15,8 @@ class Ruckuswireless extends OS implements
     {
         // Find Per SSID Client Count
         $sensors = [];
-        $ssids = $this->getCacheByIndex('ruckusZDWLANSSID', 'RUCKUS-ZD-WLAN-MIB');
-        $counts = $this->getCacheByIndex('ruckusZDWLANNumSta', 'RUCKUS-ZD-WLAN-MIB');
+        $ssids = SnmpQuery::cache()->walk("RUCKUS-ZD-WLAN-MIB::ruckusZDWLANSSID")->pluck();
+        $counts = SnmpQuery::cache()->walk("RUCKUS-ZD-WLAN-MIB::ruckusZDWLANNumSta")->pluck();
 
         $total_oids = [];
         $total = 0;

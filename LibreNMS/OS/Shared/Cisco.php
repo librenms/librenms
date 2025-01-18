@@ -164,7 +164,7 @@ class Cisco extends OS implements
         foreach (Arr::wrap($cemp) as $index => $entry) {
             if (is_numeric($entry['cempMemPoolUsed']) && $entry['cempMemPoolValid'] == 'true') {
                 [$entPhysicalIndex] = explode('.', $index);
-                $entPhysicalName = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
+                $entPhysicalName = SnmpQuery::cache()->walk("ENTITY-MIB::entPhysicalName")->pluck();
                 $descr = ucwords((isset($entPhysicalName[$entPhysicalIndex]) ? "{$entPhysicalName[$entPhysicalIndex]} - " : '') . $entry['cempMemPoolName']);
                 $descr = trim(str_replace(['Cisco ', 'Network Processing Engine'], '', $descr), ' -');
 
@@ -209,13 +209,13 @@ class Cisco extends OS implements
             return $mempools;
         }
 
-        $cpm = $this->getCacheTable('cpmCPUTotalTable', 'CISCO-PROCESS-MIB');
+        $cpm = SnmpQuery::hideMib()->walk("CISCO-PROCESS-MIB::oid")->table(1);
 
         $count = 0;
         foreach (Arr::wrap($cpm) as $index => $entry) {
             $count++;
             if (isset($entry['cpmCPUMemoryFree']) && is_numeric($entry['cpmCPUMemoryFree'])) {
-                $cpu = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entry['cpmCPUTotalPhysicalIndex'] ?? 'none'] ?? "Processor $index";
+                $cpu = (SnmpQuery::cache()->walk("ENTITY-MIB::entPhysicalName")->pluck())[$entry['cpmCPUTotalPhysicalIndex'] ?? 'none'] ?? "Processor $index";
 
                 $mempools->push((new Mempool([
                     'mempool_index' => $index,
@@ -305,7 +305,7 @@ class Cisco extends OS implements
      */
     public function discoverProcessors()
     {
-        $processors_data = $this->getCacheTable('cpmCPUTotalTable', 'CISCO-PROCESS-MIB');
+        $processors_data = SnmpQuery::hideMib()->walk("CISCO-PROCESS-MIB::oid")->table(1);
         $processors_data = snmpwalk_group($this->getDeviceArray(), 'cpmCoreTable', 'CISCO-PROCESS-MIB', 1, $processors_data);
         $processors = [];
 
@@ -321,7 +321,7 @@ class Cisco extends OS implements
             }
 
             if (isset($entry['cpmCPUTotalPhysicalIndex'])) {
-                $descr = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entry['cpmCPUTotalPhysicalIndex']] ?? null;
+                $descr = (SnmpQuery::cache()->walk("ENTITY-MIB::entPhysicalName")->pluck())[$entry['cpmCPUTotalPhysicalIndex']] ?? null;
             }
 
             if (empty($descr)) {
@@ -381,7 +381,7 @@ class Cisco extends OS implements
             $qfp_usage = $entry['fiveMinute'] ?? null;
 
             if ($entQfpPhysicalIndex) {
-                $qfp_descr = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entQfpPhysicalIndex];
+                $qfp_descr = (SnmpQuery::cache()->walk("ENTITY-MIB::entPhysicalName")->pluck())[$entQfpPhysicalIndex];
             }
 
             $processors[] = Processor::discover(

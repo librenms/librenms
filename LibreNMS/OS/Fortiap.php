@@ -84,7 +84,7 @@ class Fortiap extends Fortinet implements
         if (empty($fapVapStaInfoCounts)) {
             return [];
         }
-        $fapVapSSIDs = $this->getCacheByIndex('fapVapSSID', 'FORTINET-FORTIAP-MIB');
+        $fapVapSSIDs = SnmpQuery::cache()->walk("FORTINET-FORTIAP-MIB::fapVapSSID")->pluck();
 
         $ssids = [];
         foreach ($fapVapStaInfoCounts as $index => $entry) {
@@ -123,7 +123,7 @@ class Fortiap extends Fortinet implements
 
     public function discoverWirelessFrequency()
     {
-        $fapRadioChannelOper = $this->getCacheByIndex('fapRadioChannelOper', 'FORTINET-FORTIAP-MIB');
+        $fapRadioChannelOper = SnmpQuery::cache()->walk("FORTINET-FORTIAP-MIB::fapRadioChannelOper")->pluck();
 
         $sensors = [];
 
@@ -149,7 +149,7 @@ class Fortiap extends Fortinet implements
 
     public function discoverWirelessPower()
     {
-        $fapRadioTxPowerOper = $this->getCacheByIndex('fapRadioTxPowerOper', 'FORTINET-FORTIAP-MIB');
+        $fapRadioTxPowerOper = SnmpQuery::cache()->walk("FORTINET-FORTIAP-MIB::fapRadioTxPowerOper")->pluck();
 
         $sensors = [];
 

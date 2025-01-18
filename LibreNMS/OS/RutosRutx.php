@@ -41,11 +41,11 @@ class RutosRutx extends OS implements
 {
     public function discoverWirelessRssi()
     {
-        $data = $this->getCacheTable('TELTONIKA-RUTX-MIB::modemTable');
+        $data = SnmpQuery::hideMib()->walk("null::oid")->table(1);
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('TELTONIKA-RUTX-MIB::mIndex');
+            $name = SnmpQuery::cache()->walk("null::TELTONIKA-RUTX-MIB::mIndex")->pluck();
             $sensors[] = new WirelessSensor(
                 'rssi',
                 $this->getDeviceId(),
@@ -62,11 +62,11 @@ class RutosRutx extends OS implements
 
     public function discoverWirelessRsrp()
     {
-        $data = $this->getCacheTable('TELTONIKA-RUTX-MIB::modemTable');
+        $data = SnmpQuery::hideMib()->walk("null::oid")->table(1);
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('TELTONIKA-RUTX-MIB::mIndex');
+            $name = SnmpQuery::cache()->walk("null::TELTONIKA-RUTX-MIB::mIndex")->pluck();
             $sensors[] = new WirelessSensor(
                 'rsrp',
                 $this->getDeviceId(),
@@ -83,11 +83,11 @@ class RutosRutx extends OS implements
 
     public function discoverWirelessRsrq()
     {
-        $data = $this->getCacheTable('TELTONIKA-RUTX-MIB::modemTable');
+        $data = SnmpQuery::hideMib()->walk("null::oid")->table(1);
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('TELTONIKA-RUTX-MIB::mIndex');
+            $name = SnmpQuery::cache()->walk("null::TELTONIKA-RUTX-MIB::mIndex")->pluck();
             $sensors[] = new WirelessSensor(
                 'rsrq',
                 $this->getDeviceId(),
@@ -104,11 +104,11 @@ class RutosRutx extends OS implements
 
     public function discoverWirelessSinr()
     {
-        $data = $this->getCacheTable('TELTONIKA-RUTX-MIB::modemTable');
+        $data = SnmpQuery::hideMib()->walk("null::oid")->table(1);
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('TELTONIKA-RUTX-MIB::mIndex');
+            $name = SnmpQuery::cache()->walk("null::TELTONIKA-RUTX-MIB::mIndex")->pluck();
             $sensors[] = new WirelessSensor(
                 'sinr',
                 $this->getDeviceId(),
@@ -125,11 +125,11 @@ class RutosRutx extends OS implements
 
     public function discoverWirelessCell()
     {
-        $data = $this->getCacheTable('TELTONIKA-RUTX-MIB::modemTable');
+        $data = SnmpQuery::hideMib()->walk("null::oid")->table(1);
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('TELTONIKA-RUTX-MIB::mIndex');
+            $name = SnmpQuery::cache()->walk("null::TELTONIKA-RUTX-MIB::mIndex")->pluck();
             $sensors[] = new WirelessSensor(
                 'cell',
                 $this->getDeviceId(),

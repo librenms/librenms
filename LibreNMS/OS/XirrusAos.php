@@ -176,7 +176,7 @@ class XirrusAos extends OS implements
 
     private function discoverSensor($type, $oid, $oid_num_prefix)
     {
-        $names = $this->getCacheByIndex('realtimeMonitorIfaceName', 'XIRRUS-MIB');
+        $names = SnmpQuery::cache()->walk("XIRRUS-MIB::realtimeMonitorIfaceName")->pluck();
         $nf = snmpwalk_cache_oid($this->getDeviceArray(), $oid, [], 'XIRRUS-MIB');
 
         $sensors = [];

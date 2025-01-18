@@ -37,7 +37,7 @@ if (isset($sIndex)) {
     echo "Mikrotik VLANs \n";
     $vlanversion = 1;
     $data = SnmpQuery::get('MIKROTIK-MIB::mtxrScriptRunOutput.' . $sIndex)->value();
-    $ifNames = array_flip($os->getCacheByIndex('ifName', 'IF-MIB'));
+    $ifNames = array_flip(SnmpQuery::cache()->walk("IF-MIB::ifName")->pluck());
     $oldId = 0;
 
     foreach (preg_split("/((\r?\n)|(\r\n?))/", $data) as $line) {

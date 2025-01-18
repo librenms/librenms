@@ -104,18 +104,14 @@ trait HostResources
         Log::info('Host Resources: ');
         $processors = [];
 
-        try {
-            $hrProcessorLoad = $this->getCacheByIndex('hrProcessorLoad', 'HOST-RESOURCES-MIB');
+        $hrProcessorLoad = SnmpQuery::walk("HOST-RESOURCES-MIB::hrProcessorLoad")->pluck();
 
-            if (empty($hrProcessorLoad)) {
-                // no hr data, return
-                return [];
-            }
-
-            $hrDeviceDescr = $this->getCacheByIndex('hrDeviceDescr', 'HOST-RESOURCES-MIB');
-        } catch (Exception $e) {
+        if (empty($hrProcessorLoad)) {
+            // no hr data, return
             return [];
         }
+
+        $hrDeviceDescr = SnmpQuery::cache()->walk("HOST-RESOURCES-MIB::hrDeviceDescr")->pluck();
 
         foreach ($hrProcessorLoad as $index => $usage) {
             $usage_oid = '.1.3.6.1.2.1.25.3.3.1.2.' . $index;

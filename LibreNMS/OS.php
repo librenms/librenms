@@ -29,7 +29,6 @@ use App\Models\Device;
 use App\Models\DeviceGraph;
 use DeviceCache;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
@@ -98,7 +97,6 @@ class OS implements
     public $stpTimeFactor; // for stp time quirks
     private $device; // annoying use of references to make sure this is in sync with global $device variable
     private $graphs; // stores device graphs
-    private $cache; // data cache
     private $pre_cache; // pre-fetch data cache
 
     protected ?string $entityVendorTypeMib = null;
@@ -175,68 +173,6 @@ class OS implements
         }
 
         return $this->pre_cache;
-    }
-
-    /**
-     * Snmpwalk the specified oid and return an array of the data indexed by the oid index.
-     * If the data is cached, return the cached data.
-     * DO NOT use numeric oids with this function! The snmp result must contain only one oid.
-     *
-     * @param  string  $oid  textual oid
-     * @param  string  $mib  mib for this oid
-     * @param  string  $snmpflags  snmpflags for this oid
-     * @return array|null array indexed by the snmp index with the value as the data returned by snmp
-     */
-    public function getCacheByIndex($oid, $mib = null, $snmpflags = '-OQUs')
-    {
-        if (Str::contains($oid, '.')) {
-            echo "Error: don't use this with numeric oids!\n";
-
-            return null;
-        }
-
-        if (! isset($this->cache['cache_oid'][$oid])) {
-            $data = snmpwalk_cache_oid($this->getDeviceArray(), $oid, [], $mib, null, $snmpflags);
-            $this->cache['cache_oid'][$oid] = array_map('current', $data);
-        }
-
-        return $this->cache['cache_oid'][$oid];
-    }
-
-    /**
-     * Snmpwalk the specified oid table and return an array of the data indexed by the oid index.
-     * If the data is cached, return the cached data.
-     * DO NOT use numeric oids with this function! The snmp result must contain only one oid.
-     *
-     * @param  string  $oid  textual oid
-     * @param  string  $mib  mib for this oid (optional)
-     * @param  int  $depth  depth for snmpwalk_group (optional)
-     * @return array|null array indexed by the snmp index with the value as the data returned by snmp
-     */
-    public function getCacheTable($oid, $mib = null, $depth = 1)
-    {
-        if (Str::contains($oid, '.')) {
-            echo "Error: don't use this with numeric oids!\n";
-
-            return null;
-        }
-
-        if (! isset($this->cache['group'][$depth][$oid])) {
-            $this->cache['group'][$depth][$oid] = snmpwalk_group($this->getDeviceArray(), $oid, $mib, $depth);
-        }
-
-        return $this->cache['group'][$depth][$oid];
-    }
-
-    /**
-     * Check if an OID has been cached
-     *
-     * @param  string  $oid
-     * @return bool
-     */
-    public function isCached($oid)
-    {
-        return isset($this->cache['cache_oid'][$oid]);
     }
 
     /**
