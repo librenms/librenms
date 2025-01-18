@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Cache;
 
+use App\Facades\DeviceCache;
 use App\Models\Ipv4Address;
 use App\Models\Ipv6Address;
 use Illuminate\Support\Facades\Log;
@@ -106,25 +107,26 @@ class Port
 
         $device_id = $this->deviceToId($device);
         $ip_string = $ip->uncompressed();
+        $context_name = (string) $context_name;
 
         if (! array_key_exists($device_id, $this->ipMaps) || ! array_key_exists($ip_string, $this->ipMaps[$device_id])) {
             if ($ip->getFamily() == 'ipv4') {
-                $this->ipMaps[$device_id][$ip_string] = Ipv4Address::query()
-                    ->when($device, fn ($q) => $q->where('device_id', $device_id))
+                $query = $device ? DeviceCache::get($device_id)->ipv4() : Ipv4Address::query();
+                $this->ipMaps[$device_id][$context_name][$ip_string] = $query
                     ->where('ipv4_address', $ip_string)
                     ->where('context_name', $context_name)
-                    ->value('port_id');
+                    ->value('ipv4_addresses.port_id');
             } else {
-                $this->ipMaps[$device_id][$ip_string] = Ipv6Address::query()
-                    ->when($device, fn ($q) => $q->where('device_id', $device_id))
+                $query = $device ? DeviceCache::get($device_id)->ipv6() : Ipv6Address::query();
+                $this->ipMaps[$device_id][$context_name][$ip_string] = $query
                     ->where('ipv6_address', $ip_string)
                     ->where('context_name', $context_name)
-                    ->value('port_id');
+                    ->value('ipv6_addresses.port_id');
             }
         }
 
-        if (isset($this->ipMaps[$device_id][$ip_string])) {
-            return $this->ipMaps[$device_id][$ip_string];
+        if (isset($this->ipMaps[$device_id][$context_name][$ip_string])) {
+            return $this->ipMaps[$device_id][$context_name][$ip_string];
         }
 
         return null;
