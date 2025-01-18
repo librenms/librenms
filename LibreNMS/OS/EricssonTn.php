@@ -43,7 +43,7 @@ class EricssonTn extends OS implements
         $sensors = [];
 
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'xfModemEntry', [], 'XF-RADIOLINK-PTP-MODEM-MIB');
-        $ifname = SnmpQuery::hideMib()->walk("ENTITY-MIB::oid")->table(1);
+        $ifname = SnmpQuery::hideMib()->walk('ENTITY-MIB::oid')->table(1);
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'mse',
@@ -66,7 +66,7 @@ class EricssonTn extends OS implements
         $sensors = [];
 
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'xfTermBitPipeCapacity', [], 'XF-RADIOLINK-PTP-TERMINAL-MIB');
-        $carrier = SnmpQuery::hideMib()->walk("XF-RADIOLINK-PTP-TERMINAL-MIB::oid")->table(1);
+        $carrier = SnmpQuery::hideMib()->walk('XF-RADIOLINK-PTP-TERMINAL-MIB::oid')->table(1);
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'rate',
@@ -90,7 +90,7 @@ class EricssonTn extends OS implements
 
         $data_tx = snmpwalk_cache_oid($this->getDeviceArray(), 'xfRFBaseTxFrequency', [], 'XF-RADIOLINK-PTP-RADIO-MIB');
         $data_rx = snmpwalk_cache_oid($this->getDeviceArray(), 'xfRFBaseRxFrequency', [], 'XF-RADIOLINK-PTP-RADIO-MIB');
-        $ifname = SnmpQuery::hideMib()->walk("IF-MIB::oid")->table(1);
+        $ifname = SnmpQuery::hideMib()->walk('IF-MIB::oid')->table(1);
         foreach ($data_tx as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'frequency',
@@ -127,7 +127,7 @@ class EricssonTn extends OS implements
 
         $data_tx = snmpwalk_cache_oid($this->getDeviceArray(), 'xfRFCurrentOutputPower', [], 'XF-RADIOLINK-PTP-RADIO-MIB');
         $data_rx = snmpwalk_cache_oid($this->getDeviceArray(), 'xfRFCurrentInputPower', [], 'XF-RADIOLINK-PTP-RADIO-MIB');
-        $ifname = SnmpQuery::hideMib()->walk("IF-MIB::oid")->table(1);
+        $ifname = SnmpQuery::hideMib()->walk('IF-MIB::oid')->table(1);
         foreach ($data_tx as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'power',

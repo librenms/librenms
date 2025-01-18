@@ -29,8 +29,8 @@ class RuckuswirelessSz extends OS implements
     {
         // clients - Discover Per SSID Client Count
         $sensors = [];
-        $ssids = SnmpQuery::cache()->walk("RUCKUS-SZ-WLAN-MIB::ruckusSZWLANSSID")->pluck();
-        $counts = SnmpQuery::cache()->walk("RUCKUS-SZ-WLAN-MIB::ruckusSZWLANNumSta")->pluck();
+        $ssids = SnmpQuery::cache()->walk('RUCKUS-SZ-WLAN-MIB::ruckusSZWLANSSID')->pluck();
+        $counts = SnmpQuery::cache()->walk('RUCKUS-SZ-WLAN-MIB::ruckusSZWLANNumSta')->pluck();
 
         $total_oids = [];
         $total = 0;
@@ -65,7 +65,7 @@ class RuckuswirelessSz extends OS implements
 
     public function discoverWirelessApCount()
     {
-        $apconnected = SnmpQuery::cache()->walk("RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeNumApConnected")->pluck();
+        $apconnected = SnmpQuery::cache()->walk('RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeNumApConnected')->pluck();
         $dbindex = 0;
         $apstatus = [];
         foreach ($apconnected as $index => $connect) {

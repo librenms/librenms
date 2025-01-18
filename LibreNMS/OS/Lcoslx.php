@@ -187,7 +187,7 @@ class Lcoslx extends OS implements
     {
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'lcosLXStatusWLANStationEntryPhySignal', [], 'LCOS-LX-MIB');
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'lcosLXStatusWLANStationEntryNetworkName', $data, 'LCOS-LX-MIB');
-        $ipv4addresses = SnmpQuery::cache()->walk("LCOS-LX-MIB::lcosLXStatusWLANStationEntryIPv4Address")->pluck();
+        $ipv4addresses = SnmpQuery::cache()->walk('LCOS-LX-MIB::lcosLXStatusWLANStationEntryIPv4Address')->pluck();
 
         $sensors = [];
         foreach ($data as $index => $entry) {
@@ -221,7 +221,7 @@ class Lcoslx extends OS implements
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'lcosLXStatusWLANStationEntryEffTxRate', [], 'LCOS-LX-MIB');
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'lcosLXStatusWLANStationEntryEffRxRate', $data, 'LCOS-LX-MIB');
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'lcosLXStatusWLANStationEntryNetworkName', $data, 'LCOS-LX-MIB');
-        $ipv4addresses = SnmpQuery::cache()->walk("LCOS-LX-MIB::lcosLXStatusWLANStationEntryIPv4Address")->pluck();
+        $ipv4addresses = SnmpQuery::cache()->walk('LCOS-LX-MIB::lcosLXStatusWLANStationEntryIPv4Address')->pluck();
 
         $sensors = [];
         foreach ($data as $index => $entry) {
@@ -269,7 +269,7 @@ class Lcoslx extends OS implements
     {
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'lcosLXStatusWLANCompetingNetworksEntrySignalLevel', [], 'LCOS-LX-MIB');
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'lcosLXStatusWLANCompetingNetworksEntryInterpointPeerName', $data, 'LCOS-LX-MIB');
-        $bssids = SnmpQuery::cache()->walk("LCOS-LX-MIB::lcosLXStatusWLANCompetingNetworksEntryBssid")->pluck();
+        $bssids = SnmpQuery::cache()->walk('LCOS-LX-MIB::lcosLXStatusWLANCompetingNetworksEntryBssid')->pluck();
 
         $sensors = [];
 

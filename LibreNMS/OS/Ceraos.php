@@ -68,7 +68,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
 
     public function discoverWirelessXpi()
     {
-        $ifNames = SnmpQuery::cache()->walk("IF-MIB::ifName")->pluck();
+        $ifNames = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
 
         $sensors = [];
         $divisor = 100;
@@ -140,7 +140,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
      */
     public function discoverWirelessRate()
     {
-        $ifNames = SnmpQuery::cache()->walk("IF-MIB::ifName")->pluck();
+        $ifNames = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
 
         $sensors = [];
 
@@ -183,7 +183,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
      */
     public function discoverWirelessErrors()
     {
-        $ifNames = SnmpQuery::cache()->walk("IF-MIB::ifName")->pluck();
+        $ifNames = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
 
         $sensors = [];
 
@@ -211,7 +211,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
      */
     public function discoverWirelessMse()
     {
-        $ifNames = SnmpQuery::cache()->walk("IF-MIB::ifName")->pluck();
+        $ifNames = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
 
         $sensors = [];
         $divisor = 100;
@@ -242,7 +242,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
      */
     public function discoverWirelessPower()
     {
-        $ifNames = SnmpQuery::cache()->walk("IF-MIB::ifName")->pluck();
+        $ifNames = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
 
         $sensors = [];
 

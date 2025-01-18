@@ -107,7 +107,7 @@ class Ewc extends OS implements
         ];
 
         $apstats = snmpwalk_cache_oid($this->getDeviceArray(), 'apStatsMuCounts', [], 'HIPATH-WIRELESS-HWC-MIB');
-        $apnames = SnmpQuery::cache()->walk("HIPATH-WIRELESS-HWC-MIB::apName")->pluck();
+        $apnames = SnmpQuery::cache()->walk('HIPATH-WIRELESS-HWC-MIB::apName')->pluck();
 
         foreach ($apstats as $index => $entry) {
             $apStatsMuCounts = $entry['apStatsMuCounts'];
@@ -124,7 +124,7 @@ class Ewc extends OS implements
         }
 
         $wlanstats = snmpwalk_cache_oid($this->getDeviceArray(), 'wlanStatsAssociatedClients', [], 'HIPATH-WIRELESS-HWC-MIB');
-        $wlannames = SnmpQuery::cache()->walk("HIPATH-WIRELESS-HWC-MIB::wlanName")->pluck();
+        $wlannames = SnmpQuery::cache()->walk('HIPATH-WIRELESS-HWC-MIB::wlanName')->pluck();
 
         foreach ($wlanstats as $index => $entry) {
             $name = $wlannames[$index];
@@ -150,7 +150,7 @@ class Ewc extends OS implements
     public function discoverWirelessErrors()
     {
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'apPerfRadioPktRetx', [], 'HIPATH-WIRELESS-HWC-MIB');
-        $ap_interfaces = SnmpQuery::cache()->walk("HIPATH-WIRELESS-HWC-MIB::apName")->pluck();
+        $ap_interfaces = SnmpQuery::cache()->walk('HIPATH-WIRELESS-HWC-MIB::apName')->pluck();
 
         $sensors = [];
         foreach ($oids as $index => $entry) {
@@ -177,7 +177,7 @@ class Ewc extends OS implements
     public function discoverWirelessFrequency()
     {
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'apRadioStatusChannel', [], 'HIPATH-WIRELESS-HWC-MIB');
-        $ap_interfaces = SnmpQuery::cache()->walk("IF-MIB::ifName")->pluck();
+        $ap_interfaces = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
 
         $sensors = [];
         foreach ($oids as $index => $entry) {
@@ -204,7 +204,7 @@ class Ewc extends OS implements
     public function discoverWirelessNoiseFloor()
     {
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'dot11ExtRadioMaxNfCount', [], 'HIPATH-WIRELESS-DOT11-EXTNS-MIB');
-        $ap_interfaces = SnmpQuery::cache()->walk("IF-MIB::ifName")->pluck();
+        $ap_interfaces = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
 
         $sensors = [];
         foreach ($oids as $index => $entry) {
@@ -238,7 +238,7 @@ class Ewc extends OS implements
     public function discoverWirelessRssi()
     {
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'apPerfRadioCurrentRSS', [], 'HIPATH-WIRELESS-HWC-MIB');
-        $ap_interfaces = SnmpQuery::cache()->walk("HIPATH-WIRELESS-HWC-MIB::apName")->pluck();
+        $ap_interfaces = SnmpQuery::cache()->walk('HIPATH-WIRELESS-HWC-MIB::apName')->pluck();
 
         $sensors = [];
         foreach ($oids as $index => $entry) {
@@ -265,7 +265,7 @@ class Ewc extends OS implements
     public function discoverWirelessSnr()
     {
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'apPerfRadioCurrentSNR', [], 'HIPATH-WIRELESS-HWC-MIB');
-        $ap_interfaces = SnmpQuery::cache()->walk("HIPATH-WIRELESS-HWC-MIB::apName")->pluck();
+        $ap_interfaces = SnmpQuery::cache()->walk('HIPATH-WIRELESS-HWC-MIB::apName')->pluck();
 
         $sensors = [];
         foreach ($oids as $index => $entry) {
@@ -292,7 +292,7 @@ class Ewc extends OS implements
     public function discoverWirelessUtilization()
     {
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'apPerfRadioCurrentChannelUtilization', [], 'HIPATH-WIRELESS-HWC-MIB');
-        $ap_interfaces = SnmpQuery::cache()->walk("HIPATH-WIRELESS-HWC-MIB::apName")->pluck();
+        $ap_interfaces = SnmpQuery::cache()->walk('HIPATH-WIRELESS-HWC-MIB::apName')->pluck();
 
         $sensors = [];
         foreach ($oids as $index => $entry) {
