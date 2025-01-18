@@ -29,6 +29,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Dnos extends OS implements ProcessorDiscovery
 {

@@ -21,6 +21,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS\Shared\Fortinet;
+use SnmpQuery;
 
 class Fortiap extends Fortinet implements
     OSDiscovery,

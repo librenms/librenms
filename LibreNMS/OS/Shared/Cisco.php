@@ -209,7 +209,7 @@ class Cisco extends OS implements
             return $mempools;
         }
 
-        $cpm = SnmpQuery::hideMib()->walk('CISCO-PROCESS-MIB::oid')->table(1);
+        $cpm = SnmpQuery::hideMib()->walk('CISCO-PROCESS-MIB::cpmCPUTotalTable')->table(1);
 
         $count = 0;
         foreach (Arr::wrap($cpm) as $index => $entry) {
@@ -305,7 +305,7 @@ class Cisco extends OS implements
      */
     public function discoverProcessors()
     {
-        $processors_data = SnmpQuery::hideMib()->walk('CISCO-PROCESS-MIB::oid')->table(1);
+        $processors_data = SnmpQuery::hideMib()->walk('CISCO-PROCESS-MIB::cpmCPUTotalTable')->table(1);
         $processors_data = snmpwalk_group($this->getDeviceArray(), 'cpmCoreTable', 'CISCO-PROCESS-MIB', 1, $processors_data);
         $processors = [];
 

@@ -31,6 +31,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSinrDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class RutosRutx extends OS implements
     WirelessRssiDiscovery,
@@ -41,11 +42,11 @@ class RutosRutx extends OS implements
 {
     public function discoverWirelessRssi()
     {
-        $data = SnmpQuery::hideMib()->walk('null::oid')->table(1);
+        $data = SnmpQuery::hideMib()->cache()->walk('TELTONIKA-RUTX-MIB::modemTable')->table(1);
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = SnmpQuery::cache()->walk('null::TELTONIKA-RUTX-MIB::mIndex')->pluck();
+            $name = SnmpQuery::cache()->walk('TELTONIKA-RUTX-MIB::mIndex')->pluck();
             $sensors[] = new WirelessSensor(
                 'rssi',
                 $this->getDeviceId(),
@@ -62,11 +63,11 @@ class RutosRutx extends OS implements
 
     public function discoverWirelessRsrp()
     {
-        $data = SnmpQuery::hideMib()->walk('null::oid')->table(1);
+        $data = SnmpQuery::hideMib()->cache()->walk('TELTONIKA-RUTX-MIB::modemTable')->table(1);
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = SnmpQuery::cache()->walk('null::TELTONIKA-RUTX-MIB::mIndex')->pluck();
+            $name = SnmpQuery::cache()->walk('TELTONIKA-RUTX-MIB::mIndex')->pluck();
             $sensors[] = new WirelessSensor(
                 'rsrp',
                 $this->getDeviceId(),
@@ -83,11 +84,11 @@ class RutosRutx extends OS implements
 
     public function discoverWirelessRsrq()
     {
-        $data = SnmpQuery::hideMib()->walk('null::oid')->table(1);
+        $data = SnmpQuery::hideMib()->cache()->walk('TELTONIKA-RUTX-MIB::modemTable')->table(1);
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = SnmpQuery::cache()->walk('null::TELTONIKA-RUTX-MIB::mIndex')->pluck();
+            $name = SnmpQuery::cache()->walk('TELTONIKA-RUTX-MIB::mIndex')->pluck();
             $sensors[] = new WirelessSensor(
                 'rsrq',
                 $this->getDeviceId(),
@@ -104,11 +105,11 @@ class RutosRutx extends OS implements
 
     public function discoverWirelessSinr()
     {
-        $data = SnmpQuery::hideMib()->walk('null::oid')->table(1);
+        $data = SnmpQuery::hideMib()->cache()->walk('TELTONIKA-RUTX-MIB::modemTable')->table(1);
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = SnmpQuery::cache()->walk('null::TELTONIKA-RUTX-MIB::mIndex')->pluck();
+            $name = SnmpQuery::cache()->walk('TELTONIKA-RUTX-MIB::mIndex')->pluck();
             $sensors[] = new WirelessSensor(
                 'sinr',
                 $this->getDeviceId(),
@@ -125,11 +126,11 @@ class RutosRutx extends OS implements
 
     public function discoverWirelessCell()
     {
-        $data = SnmpQuery::hideMib()->walk('null::oid')->table(1);
+        $data = SnmpQuery::hideMib()->cache()->walk('TELTONIKA-RUTX-MIB::modemTable')->table(1);
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = SnmpQuery::cache()->walk('null::TELTONIKA-RUTX-MIB::mIndex')->pluck();
+            $name = SnmpQuery::cache()->walk('TELTONIKA-RUTX-MIB::mIndex')->pluck();
             $sensors[] = new WirelessSensor(
                 'cell',
                 $this->getDeviceId(),

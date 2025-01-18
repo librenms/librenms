@@ -31,6 +31,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Ericsson6600 extends OS implements
     WirelessFrequencyDiscovery,
@@ -43,7 +44,7 @@ class Ericsson6600 extends OS implements
         $sensors = [];
 
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'xfCarrierTermSNIR', [], 'XF-RADIOLINK-RLT-MIB');
-        $carrier = SnmpQuery::hideMib()->walk('XF-RADIOLINK-RLT-MIB::oid')->table(1);
+        $carrier = SnmpQuery::hideMib()->walk('XF-RADIOLINK-RLT-MIB::xfCarrierTermDistinguishedName')->table(1);
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'snr',
@@ -66,7 +67,7 @@ class Ericsson6600 extends OS implements
         $sensors = [];
 
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'xfCarrierTermActualCapacity', [], 'XF-RADIOLINK-RLT-MIB');
-        $carrier = SnmpQuery::hideMib()->walk('XF-RADIOLINK-RLT-MIB::oid')->table(1);
+        $carrier = SnmpQuery::hideMib()->walk('XF-RADIOLINK-RLT-MIB::xfCarrierTermDistinguishedName')->table(1);
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'rate',
@@ -90,7 +91,7 @@ class Ericsson6600 extends OS implements
 
         $data_tx = snmpwalk_cache_oid($this->getDeviceArray(), 'xfRFBaseTxFrequency', [], 'XF-RADIOLINK-PTP-RADIO-MIB');
         $data_rx = snmpwalk_cache_oid($this->getDeviceArray(), 'xfRFBaseRxFrequency', [], 'XF-RADIOLINK-PTP-RADIO-MIB');
-        $ifname = SnmpQuery::hideMib()->walk('IF-MIB::oid')->table(1);
+        $ifname = SnmpQuery::cache()->walk('IF-MIB::ifName')->table(1);
         foreach ($data_tx as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'frequency',
@@ -98,7 +99,7 @@ class Ericsson6600 extends OS implements
                 '.1.3.6.1.4.1.193.81.3.4.3.1.2.1.1.' . $index,
                 'ericsson-6600',
                 $index . 'tx',
-                'TX Frequency: ' . $ifname[$index]['ifName'],
+                'TX Frequency: ' . $ifname[$index]['IF-MIB::ifName'],
                 null,
                 1,
                 1000
@@ -111,7 +112,7 @@ class Ericsson6600 extends OS implements
                 '.1.3.6.1.4.1.193.81.3.4.3.1.2.1.2.' . $index,
                 'ericsson-6600',
                 $index . 'rx',
-                'RX Frequency: ' . $ifname[$index]['ifName'],
+                'RX Frequency: ' . $ifname[$index]['IF-MIB::ifName'],
                 null,
                 1,
                 1000
@@ -127,7 +128,7 @@ class Ericsson6600 extends OS implements
 
         $data_tx = snmpwalk_cache_oid($this->getDeviceArray(), 'xfRfCurrentOutputPower', [], 'XF-RADIOLINK-PTP-RADIO-MIB');
         $data_rx = snmpwalk_cache_oid($this->getDeviceArray(), 'xfRfCurrentInputPower', [], 'XF-RADIOLINK-PTP-RADIO-MIB');
-        $ifname = SnmpQuery::hideMib()->walk('IF-MIB::oid')->table(1);
+        $ifname = SnmpQuery::cache()->walk('IF-MIB::ifName')->table(1);
         foreach ($data_tx as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'power',
@@ -135,7 +136,7 @@ class Ericsson6600 extends OS implements
                 '.1.3.6.1.4.1.193.81.3.4.3.1.8.1.3.' . $index,
                 'ericsson-6600',
                 $index . 'tx',
-                'Output power: ' . $ifname[$index]['ifName'],
+                'Output power: ' . $ifname[$index]['IF-MIB::ifName'],
             );
         }
         foreach ($data_rx as $index => $entry) {
@@ -145,7 +146,7 @@ class Ericsson6600 extends OS implements
                 '.1.3.6.1.4.1.193.81.3.4.3.1.8.1.7.' . $index,
                 'ericsson-6600',
                 $index . 'rx',
-                'Input power: ' . $ifname[$index]['ifName'],
+                'Input power: ' . $ifname[$index]['IF-MIB::ifName'],
                 null,
                 1,
                 10

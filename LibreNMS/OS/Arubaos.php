@@ -86,7 +86,7 @@ class Arubaos extends OS implements
     public function discoverWirelessApCount()
     {
         $mib = 'WLSX-SWITCH-MIB';
-        $data = SnmpQuery::hideMib()->walk("$mib::oid")->table(1);
+        $data = SnmpQuery::hideMib()->walk("$mib::wlsxSwitchTotalNumAccessPoints")->table(1);
         $sensors = [];
 
         foreach ($data as $key => $value) {

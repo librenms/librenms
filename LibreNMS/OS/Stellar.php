@@ -6,6 +6,7 @@ use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessClientsPolling;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Stellar extends OS implements
     WirelessClientsDiscovery,
@@ -14,10 +15,10 @@ class Stellar extends OS implements
     public function discoverWirelessClients()
     {
         $sensors = [];
-        $device = $this->getDeviceArray();
+        $hardware = $this->getDevice()->hardware;
 
         $ssid = [];
-        $getCacheTable1 = SnmpQuery::hideMib()->walk("$device['hardware']::oid")->table(1);$ssid_data = $getCacheTable1;
+        $ssid_data = SnmpQuery::hideMib()->mibs([$hardware])->walk('apWlanEssid')->table(1);;
 
         foreach ($ssid_data as $ssid_entry) {
             if ($ssid_entry['apWlanEssid'] == 'athmon2') {
@@ -29,7 +30,7 @@ class Stellar extends OS implements
             }
         }
 
-        $getCacheTable = SnmpQuery::hideMib()->walk("$device['hardware']::oid")->table(1);$client_ws_data = $getCacheTable;
+        $client_ws_data = SnmpQuery::hideMib()->mibs([$hardware])->walk('apClientWlanService')->table(1);
 
         if (empty($client_ws_data)) {
             $total_clients = 0;
@@ -37,7 +38,7 @@ class Stellar extends OS implements
             $total_clients = count($client_ws_data);
         }
 
-        $combined_oid = sprintf('%s::%s', $device['hardware'], 'apClientWlanService');
+        $combined_oid = sprintf('%s::%s', $hardware, 'apClientWlanService');
         $oid = snmp_translate($combined_oid, 'ALL', 'nokia/stellar', '-On');
 
         if (empty($oid)) {
@@ -68,9 +69,9 @@ class Stellar extends OS implements
     {
         $data = [];
         if (! empty($sensors)) {
-            $device = $this->getDeviceArray();
+            $hardware = $this->getDevice()->hardware;
 
-            $getCacheTable = SnmpQuery::hideMib()->walk("$device['hardware']::oid")->table(1);$client_ws_data = $getCacheTable;
+            $client_ws_data = SnmpQuery::hideMib()->mibs([$hardware])->walk('apClientWlanService')->table(1);
 
             if (empty($client_ws_data)) {
                 $total_clients = 0;

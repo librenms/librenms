@@ -7,6 +7,7 @@ use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class RuckuswirelessSz extends OS implements
     WirelessClientsDiscovery,

@@ -35,6 +35,7 @@ use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Comware extends OS implements MempoolsDiscovery, ProcessorDiscovery, TransceiverDiscovery
 {

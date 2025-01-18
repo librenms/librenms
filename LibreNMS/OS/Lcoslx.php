@@ -36,6 +36,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
 use LibreNMS\Util\Mac;
+use SnmpQuery;
 
 class Lcoslx extends OS implements
     WirelessFrequencyDiscovery,
