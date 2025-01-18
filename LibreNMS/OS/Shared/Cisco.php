@@ -696,7 +696,7 @@ class Cisco extends OS implements
             $ifIndex = $ent['ifIndex'] ?? null;
 
             return new Transceiver([
-                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
+                'port_id' => (int) PortCache::getIdFromIfIndex((int) $ifIndex, $this->getDevice()),
                 'index' => $index,
                 'type' => $ent['entPhysicalDescr'] ?? null,
                 'vendor' => $ent['entPhysicalMfgName'] ?? null,
@@ -784,7 +784,7 @@ class Cisco extends OS implements
 
                 $qos->push(new Qos([
                     'device_id' => $this->getDeviceId(),
-                    'port_id' => $parent ? null : PortCache::getIdFromIfIndex($servicePolicies[$policyId]['cbQosIfIndex'], $this->getDevice()),
+                    'port_id' => $parent ? null : PortCache::getIdFromIfIndex((int) $servicePolicies[$policyId]['cbQosIfIndex'], $this->getDevice()),
                     'type' => $dbtype,
                     'title' => $title,
                     'tooltip' => $tooltip,
