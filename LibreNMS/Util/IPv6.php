@@ -76,8 +76,7 @@ class IPv6 extends IP
     {
         $filter = FILTER_FLAG_IPV6;
         if ($exclude_reserved) {
-            $filter |= FILTER_FLAG_NO_RES_RANGE;
-            $filter |= FILTER_FLAG_GLOBAL_RANGE;
+            $filter |= FILTER_FLAG_NO_RES_RANGE | FILTER_FLAG_GLOBAL_RANGE;
         }
 
         return filter_var($ipv6, FILTER_VALIDATE_IP, $filter) !== false;
