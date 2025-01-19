@@ -186,12 +186,6 @@ function ifclass($ifOperStatus, $ifAdminStatus)
     return \LibreNMS\Util\Url::portLinkDisplayClass((object) ['ifOperStatus' => $ifOperStatus, 'ifAdminStatus' => $ifAdminStatus]);
 }
 
-function ifclass($ifOperStatus, $ifAdminStatus)
-{
-    // fake a port model
-    return \LibreNMS\Util\Url::portLinkDisplayClass((object) ['ifOperStatus' => $ifOperStatus, 'ifAdminStatus' => $ifAdminStatus]);
-}
-
 function device_by_name($name)
 {
     return device_by_id_cache(getidbyname($name));
