@@ -36,6 +36,7 @@ use LibreNMS\OS;
 use SnmpQuery;
 
 class Edgecos extends OS implements TransceiverDiscovery, MempoolsDiscovery, ProcessorDiscovery
+
 {	
     public function discoverTransceivers(): Collection
     {
