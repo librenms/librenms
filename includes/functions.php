@@ -27,8 +27,12 @@ function parse_modules($type, $options)
     $override = false;
 
     if (! empty($options['m'])) {
+        // parse options and ensure order of modules
+        // https://github.com/librenms/librenms/pull/16856 for why the below is here
+        $modules = array_intersect(array_keys(Config::get("{$type}_modules", [])), explode(',', $options['m']));
+
         Config::set("{$type}_modules", []);
-        foreach (explode(',', $options['m']) as $module) {
+        foreach ($modules as $module) {
             // parse submodules (only supported by some modules)
             if (Str::contains($module, '/')) {
                 [$module, $submodule] = explode('/', $module, 2);
@@ -70,34 +74,6 @@ function logfile($string)
 
     fputs($fd, $string . "\n");
     fclose($fd);
-}
-
-/**
- * @param  $device
- * @return string the path to the icon image for this device.  Close to square.
- */
-function getIcon($device)
-{
-    return 'images/os/' . getImageName($device);
-}
-
-/**
- * @param  $device
- * @return string an image tag with the icon for this device.  Close to square.
- */
-function getIconTag($device)
-{
-    return '<img src="' . getIcon($device) . '" title="' . getImageTitle($device) . '"/>';
-}
-
-function getImageTitle($device)
-{
-    return $device['icon'] ? str_replace(['.svg', '.png'], '', $device['icon']) : $device['os'];
-}
-
-function getImageName($device, $use_database = true, $dir = 'images/os/')
-{
-    return \LibreNMS\Util\Url::findOsImage($device['os'], $device['features'] ?? '', $use_database ? $device['icon'] : null, $dir);
 }
 
 function renamehost($id, $new, $source = 'console')
@@ -205,7 +181,7 @@ function snmp2ipv6($ipv6_snmp)
     $ipv6_2 = [];
 
     for ($i = 0; $i <= 15; $i++) {
-        $ipv6[$i] = zeropad(dechex($ipv6[$i]));
+        $ipv6[$i] = Str::padLeft(dechex($ipv6[$i]), 2, '0');
     }
     for ($i = 0; $i <= 15; $i += 2) {
         $ipv6_2[] = $ipv6[$i] . $ipv6[$i + 1];

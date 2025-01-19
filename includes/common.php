@@ -191,13 +191,6 @@ function device_by_name($name)
     return device_by_id_cache(getidbyname($name));
 }
 
-function accesspoint_by_id($ap_id, $refresh = '0')
-{
-    $ap = dbFetchRow('SELECT * FROM `access_points` WHERE `accesspoint_id` = ?', [$ap_id]);
-
-    return $ap;
-}
-
 function device_by_id_cache($device_id, $refresh = false)
 {
     $model = $refresh ? DeviceCache::refresh((int) $device_id) : DeviceCache::get((int) $device_id);
@@ -235,19 +228,9 @@ function getidbyname($hostname)
     return DeviceCache::getByHostname($hostname)->device_id;
 }
 
-function zeropad($num, $length = 2)
-{
-    return str_pad($num, $length, '0', STR_PAD_LEFT);
-}
-
 function set_dev_attrib($device, $attrib_type, $attrib_value)
 {
     return DeviceCache::get((int) $device['device_id'])->setAttrib($attrib_type, $attrib_value);
-}
-
-function get_dev_attribs($device_id)
-{
-    return DeviceCache::get((int) $device_id)->getAttribs();
 }
 
 function get_dev_attrib($device, $attrib_type)
@@ -383,22 +366,6 @@ function is_customoid_graph($type, $subtype)
 
     return false;
 } // is_customoid_graph
-
-/**
- * Parse location field for coordinates
- *
- * @param string location The location field to look for coords in.
- * @return array|bool Containing the lat and lng coords
- **/
-function parse_location($location)
-{
-    preg_match('/\[(-?[0-9. ]+), *(-?[0-9. ]+)\]/', $location, $tmp_loc);
-    if (is_numeric($tmp_loc[1]) && is_numeric($tmp_loc[2])) {
-        return ['lat' => $tmp_loc[1], 'lng' => $tmp_loc[2]];
-    }
-
-    return false;
-}//end parse_location()
 
 /**
  * Convert a MySQL binary v4 (4-byte) or v6 (16-byte) IP address to a printable string.

@@ -27,6 +27,7 @@ namespace LibreNMS\Device;
 
 use App\View\SimpleTemplate;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
@@ -144,7 +145,7 @@ class YamlDiscovery
     }
 
     /**
-     * @param  \LibreNMS\OS  $os  OS/device we areworking on
+     * @param  \LibreNMS\OS  $os  OS/device we are working on
      * @param  array  $data  Array derived from YAML
      * @return string
      *
@@ -215,14 +216,15 @@ class YamlDiscovery
                             return IP::fromHexString(static::getValueFromData($inetaddr[1], $index, $def, $pre_cache), true);
                         }
                     }
-                    \Log::warning('YamlDiscovery: No variable available to replace ' . $matches[1] . ' index: ' . $index);
+                    Log::warning('YamlDiscovery: No variable available to replace ' . $matches[1] . ' index: ' . $index);
 
                     return ''; // remove the unavailable variable
                 }
 
                 return $replace;
             });
-            $value = (string) $template;
+
+            return (string) $template;
         }
 
         return $value;
@@ -245,11 +247,17 @@ class YamlDiscovery
         }
 
         if (isset($discovery_data['oid']) && ! is_array($discovery_data['oid']) && isset($pre_cache[$discovery_data['oid']][$index]) && isset($pre_cache[$discovery_data['oid']][$index][$name])) {
-            return $pre_cache[$discovery_data['oid']][$index][$name];
+            $value = $pre_cache[$discovery_data['oid']][$index][$name];
+            Log::debug("Using $value from \$pre_cache[\$discovery_data['oid']][$index][$name] for $name");
+
+            return $value;
         }
 
         if (isset($pre_cache[$index][$name])) {
-            return $pre_cache[$index][$name];
+            $value = $pre_cache[$index][$name];
+            Log::debug("Using $value from \$pre_cache[$index][$name] for $name");
+
+            return $value;
         }
 
         // parse sub_index options name with trailing colon and index
@@ -270,14 +278,26 @@ class YamlDiscovery
         if (isset($pre_cache[$name]) && ! is_numeric($name)) {
             if (is_array($pre_cache[$name])) {
                 if (isset($pre_cache[$name][$index][$name])) {
-                    return $pre_cache[$name][$index][$name];
+                    $value = $pre_cache[$name][$index][$name];
+                    Log::debug("Using $value from \$pre_cache[$name][$index][$name] for $name");
+
+                    return $value;
                 } elseif (isset($pre_cache[$name][$index])) {
-                    return $pre_cache[$name][$index];
+                    $value = $pre_cache[$name][$index];
+                    Log::debug("Using $value from \$pre_cache[$name][$index] for $name");
+
+                    return $value;
                 } elseif (count($pre_cache[$name]) === 1 && ! is_array(current($pre_cache[$name]))) {
-                    return current($pre_cache[$name]);
+                    $value = current($pre_cache[$name]);
+                    Log::debug("Using sole entry $value from \$pre_cache[$name] array for $name");
+
+                    return $value;
                 }
             } else {
-                return $pre_cache[$name];
+                $value = $pre_cache[$name];
+                Log::debug("Using $value from from \$pre_cache[$name] for $name");
+
+                return $value;
             }
         }
 
@@ -285,7 +305,10 @@ class YamlDiscovery
         if (str_contains($name, '::')) {
             foreach ($pre_cache as $table_name => $table) {
                 if (is_array($table) && isset($table[$index][$name])) {
-                    return $table[$index][$name];
+                    $value = $table[$index][$name];
+                    Log::debug("Using $value from walked $table_name[$index][$name] for $name");
+
+                    return $value;
                 }
             }
         }

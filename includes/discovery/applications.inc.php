@@ -88,7 +88,7 @@ foreach ($results as $extend => $result) {
             }
             $app_obj->discovered = 1;
             $app_obj->save();
-            Eventlog::log("Application enabled by discovery: $app", $device, 'application', Severity::Ok);
+            Eventlog::log("Application enabled by discovery: $app", $device['device_id'], 'application', Severity::Ok);
         }
     }
 }

@@ -1,0 +1,11 @@
+os: esphome
+text: 'ESP-Home'
+type: appliance
+icon: esphome
+snmp_bulk: false
+over:
+    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_dbm, text: 'Wifi RSSI' }
+discovery:
+    - sysDescr:
+          - 'ESPHome'

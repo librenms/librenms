@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Package;
+use LibreNMS\Util\Number;
 
 $pkgs_id = [];
 $pkgs_db_id = [];
@@ -33,7 +34,7 @@ $managers = [
                 'arch' => $arch,
                 'version' => $version,
                 'build' => '',
-                'size' => cast_number($size) * 1024,
+                'size' => Number::cast($size) * 1024,
                 'status' => 1,
             ]);
         },
