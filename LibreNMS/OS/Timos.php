@@ -184,6 +184,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             'TIMETRA-MPLS-MIB::vRtrMplsLspPathLastChange',
         ])->mapTable(function ($value, $vrf_oid, $lsp_oid, $path_oid) use ($lsps) {
             $lsp_id = $lsps->where('lsp_oid', $lsp_oid)->firstWhere('vrf_oid', $vrf_oid)->lsp_id;
+
             return new MplsLspPath([
                 'lsp_id' => $lsp_id,
                 'path_oid' => $path_oid,
@@ -633,7 +634,6 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'sapLastMgmtChange' => round($value['sapLastMgmtChange'] / 100),
                 'sapLastStatusChange' => round($value['sapLastStatusChange'] / 100),
             ]);
-
         });
     }
 
