@@ -763,17 +763,19 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $data = SnmpQuery::walk('TIMETRA-CELLULAR-MIB::tmnxCellPortSinr')->valuesByIndex($carrier);
 
         foreach ($data as $index => $entry) {
-            $sensors[] = new WirelessSensor(
-                'snr',
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.12.' . $index,
-                'timos',
-                $index,
-                'SNR: ' . $entry['IF-MIB::ifName'],
-                $entry['TIMETRA-CELLULAR-MIB::tmnxCellPortSinr'] / 10,
-                1,
-                10
-            );
+            if (isset($entry['TIMETRA-CELLULAR-MIB::tmnxCellPortSinr'])) {
+                $sensors[] = new WirelessSensor(
+                    'snr',
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.12.' . $index,
+                    'timos',
+                    $index,
+                    'SNR: ' . $entry['IF-MIB::ifName'],
+                    $entry['TIMETRA-CELLULAR-MIB::tmnxCellPortSinr'] / 10,
+                    1,
+                    10
+                );
+            }
         }
 
         return $sensors;
@@ -787,15 +789,17 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $data = SnmpQuery::walk('TIMETRA-CELLULAR-MIB::tmnxCellPortRsrq')->valuesByIndex($carrier);
 
         foreach ($data as $index => $entry) {
-            $sensors[] = new WirelessSensor(
-                'rsrq',
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.11.' . $index,
-                'timos',
-                $index,
-                'RSRQ: ' . $entry['IF-MIB::ifName'],
-                $entry['TIMETRA-CELLULAR-MIB::tmnxCellPortRsrq']
-            );
+            if (isset($entry['TIMETRA-CELLULAR-MIB::tmnxCellPortRsrq'])) {
+                $sensors[] = new WirelessSensor(
+                    'rsrq',
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.11.' . $index,
+                    'timos',
+                    $index,
+                    'RSRQ: ' . $entry['IF-MIB::ifName'],
+                    $entry['TIMETRA-CELLULAR-MIB::tmnxCellPortRsrq']
+                );
+            }
         }
 
         return $sensors;
@@ -809,15 +813,17 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $data = SnmpQuery::walk('TIMETRA-CELLULAR-MIB::tmnxCellPortRssi')->valuesByIndex($carrier);
 
         foreach ($data as $index => $entry) {
-            $sensors[] = new WirelessSensor(
-                'rssi',
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.8.' . $index,
-                'timos',
-                $index,
-                'RSSI: ' . $entry['IF-MIB::ifName'],
-                $entry['TIMETRA-CELLULAR-MIB::tmnxCellPortRssi'],
-            );
+            if (isset($entry['TIMETRA-CELLULAR-MIB::tmnxCellPortRssi'])) {
+                $sensors[] = new WirelessSensor(
+                    'rssi',
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.8.' . $index,
+                    'timos',
+                    $index,
+                    'RSSI: ' . $entry['IF-MIB::ifName'],
+                    $entry['TIMETRA-CELLULAR-MIB::tmnxCellPortRssi'],
+                );
+            }
         }
 
         return $sensors;
@@ -831,15 +837,17 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $data = SnmpQuery::walk('TIMETRA-CELLULAR-MIB::tmnxCellPortRsrp')->valuesByIndex($carrier);
 
         foreach ($data as $index => $entry) {
-            $sensors[] = new WirelessSensor(
-                'rsrp',
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.9.' . $index,
-                'timos',
-                $index,
-                'RSRP: ' . $entry['IF-MIB::ifName'],
-                $entry['TIMETRA-CELLULAR-MIB::tmnxCellPortRsrp'],
-            );
+            if (isset($entry['TIMETRA-CELLULAR-MIB::tmnxCellPortRsrp'])) {
+                $sensors[] = new WirelessSensor(
+                    'rsrp',
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.9.' . $index,
+                    'timos',
+                    $index,
+                    'RSRP: ' . $entry['IF-MIB::ifName'],
+                    $entry['TIMETRA-CELLULAR-MIB::tmnxCellPortRsrp'],
+                );
+            }
         }
 
         return $sensors;
@@ -853,15 +861,17 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $data = SnmpQuery::walk('TIMETRA-CELLULAR-MIB::tmnxCellPortChannelNumber')->valuesByIndex($carrier);
 
         foreach ($data as $index => $entry) {
-            $sensors[] = new WirelessSensor(
-                'channel',
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.5.' . $index,
-                'timos',
-                $index,
-                'CHANNEL: ' . $entry['IF-MIB::ifName'],
-                $entry['TIMETRA-CELLULAR-MIB::tmnxCellPortChannelNumber']
-            );
+            if (isset($entry['TIMETRA-CELLULAR-MIB::tmnxCellPortChannelNumber'])) {
+                $sensors[] = new WirelessSensor(
+                    'channel',
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.5.' . $index,
+                    'timos',
+                    $index,
+                    'CHANNEL: ' . $entry['IF-MIB::ifName'],
+                    $entry['TIMETRA-CELLULAR-MIB::tmnxCellPortChannelNumber']
+                );
+            }
         }
 
         return $sensors;
