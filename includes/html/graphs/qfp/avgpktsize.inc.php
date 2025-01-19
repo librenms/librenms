@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Str;
-
 /**
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -14,6 +12,9 @@ use Illuminate\Support\Str;
  * @copyright  2019 LibreNMS
  * @author     Pavle Obradovic <pobradovic08@gmail.com>
  */
+
+use App\Facades\Rrd;
+
 $colour_area_in = 'AA66AA';
 $colour_line_in = '330033';
 
@@ -39,9 +40,9 @@ if (! isset($in_text)) {
     $in_text = 'In';
 }
 
-$unit_text = Str::of($unit_text)->limit($length, '')->padRight($length);
-$in_text = Str::of($in_text)->limit($length, '')->padRight($length);
-$out_text = Str::of($out_text)->limit($length, '')->padRight($length);
+$unit_text = Rrd::fixedSafeDescr($unit_text, $unitlen);
+$in_text = Rrd::fixedSafeDescr($in_text, $unitlen);
+$out_text = Rrd::fixedSafeDescr($out_text, $unitlen);
 
 $rrd_options .= ' DEF:in_packets=' . $rrd_filename . ':InTotalPps:AVERAGE';
 $rrd_options .= ' DEF:out_packets=' . $rrd_filename . ':OutTotalPps:AVERAGE';
