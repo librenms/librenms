@@ -18,7 +18,7 @@ class Stellar extends OS implements
         $hardware = $this->getDevice()->hardware;
 
         $ssid = [];
-        $ssid_data = SnmpQuery::hideMib()->mibs([$hardware])->walk('apWlanEssid')->table(1);;
+        $ssid_data = SnmpQuery::hideMib()->mibs([$hardware])->walk('apWlanEssid')->table(1);
 
         foreach ($ssid_data as $ssid_entry) {
             if ($ssid_entry['apWlanEssid'] == 'athmon2') {
