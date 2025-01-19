@@ -26,7 +26,6 @@
 // get all virtual router ports and statistics
 $timos_vrf_stats = SnmpQuery::enumStrings()->abortOnFailure()->walk([
     'TIMETRA-VRTR-MIB::vRtrIfName',
-    'TIMETRA-VRTR-MIB::vRtrIfAlias',
     'TIMETRA-VRTR-MIB::vRtrIfDescription',
     'TIMETRA-VRTR-MIB::vRtrIfSpeed',
     'TIMETRA-VRTR-MIB::vRtrIfType',
@@ -35,6 +34,7 @@ $timos_vrf_stats = SnmpQuery::enumStrings()->abortOnFailure()->walk([
     'TIMETRA-VRTR-MIB::vRtrIfTxBytes',
     'TIMETRA-VRTR-MIB::vRtrIfRxPkts',
     'TIMETRA-VRTR-MIB::vRtrIfTxPkts',
+    'TIMETRA-VRTR-MIB::vRtrIfAlias',
 ])->table(2);
 
 // Merge all virtual routing ports into one
@@ -62,7 +62,7 @@ $translate = [
 $timos_ports = [];
 foreach ($timos_stats as $index => $value) {
     foreach ($translate as $ifEntry => $ifVrtrEntry) {
-        $timos_ports[$index][$ifEntry] = $timos_stats[$index][$ifVrtrEntry];
+        $timos_ports[$index][$ifEntry] = $value[$ifVrtrEntry];
     }
     if (empty($timos_ports[$index]['ifDescr'])) {
         $timos_ports[$index]['ifDescr'] = $timos_ports[$index]['ifName'];
