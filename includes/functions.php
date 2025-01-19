@@ -76,34 +76,6 @@ function logfile($string)
     fclose($fd);
 }
 
-/**
- * @param  $device
- * @return string the path to the icon image for this device.  Close to square.
- */
-function getIcon($device)
-{
-    return 'images/os/' . getImageName($device);
-}
-
-/**
- * @param  $device
- * @return string an image tag with the icon for this device.  Close to square.
- */
-function getIconTag($device)
-{
-    return '<img src="' . getIcon($device) . '" title="' . getImageTitle($device) . '"/>';
-}
-
-function getImageTitle($device)
-{
-    return $device['icon'] ? str_replace(['.svg', '.png'], '', $device['icon']) : $device['os'];
-}
-
-function getImageName($device, $use_database = true, $dir = 'images/os/')
-{
-    return \LibreNMS\Util\Url::findOsImage($device['os'], $device['features'] ?? '', $use_database ? $device['icon'] : null, $dir);
-}
-
 function renamehost($id, $new, $source = 'console')
 {
     $host = gethostbyid($id);

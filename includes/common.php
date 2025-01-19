@@ -379,22 +379,6 @@ function is_customoid_graph($type, $subtype)
 } // is_customoid_graph
 
 /**
- * Parse location field for coordinates
- *
- * @param string location The location field to look for coords in.
- * @return array|bool Containing the lat and lng coords
- **/
-function parse_location($location)
-{
-    preg_match('/\[(-?[0-9. ]+), *(-?[0-9. ]+)\]/', $location, $tmp_loc);
-    if (is_numeric($tmp_loc[1]) && is_numeric($tmp_loc[2])) {
-        return ['lat' => $tmp_loc[1], 'lng' => $tmp_loc[2]];
-    }
-
-    return false;
-}//end parse_location()
-
-/**
  * Convert a MySQL binary v4 (4-byte) or v6 (16-byte) IP address to a printable string.
  *
  * @param  string  $ip  A binary string containing an IP address, as returned from MySQL's INET6_ATON function
