@@ -347,7 +347,8 @@ Please ensure that you set the `authlog_purge` value to be
 greater than `radius.users_purge` otherwise old users
 won't be removed.
 
-## HTTP Authentication
+## <a name="http-auth"> HTTP Authentication</a>
+
 
 Config option: `http-auth`
 
