@@ -26,6 +26,7 @@
 
 namespace LibreNMS\OS\Shared;
 
+use App\Facades\PortCache;
 use App\Models\Component;
 use App\Models\Device;
 use App\Models\EntPhysical;
@@ -52,6 +53,7 @@ use LibreNMS\OS;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\Mac;
 
 class Cisco extends OS implements
     OSDiscovery,
@@ -461,17 +463,14 @@ class Cisco extends OS implements
                 return [$key => ['method' => $key_parts[2], 'authc_status' => $item['cafSessionMethodState']]];
             });
 
-            // cache port ifIndex -> port_id map
-            $ifIndex_map = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
-
             // update the DB
             foreach ($portAuthSessionEntry as $index => $portAuthSessionEntryParameters) {
                 [$ifIndex, $auth_id] = explode('.', str_replace("'", '', $index));
                 $session_info = $cafSessionMethodsInfoEntry->get($ifIndex . '.' . $auth_id);
-                $mac_address = strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['cafSessionClientMacAddress'] ?? null))));
+                $mac_address = Mac::parse($portAuthSessionEntryParameters['cafSessionClientMacAddress'])->hex();
 
                 $nac->put($mac_address, new PortsNac([
-                    'port_id' => $ifIndex_map->get($ifIndex, 0),
+                    'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
                     'mac_address' => $mac_address,
                     'auth_id' => $auth_id,
                     'domain' => $portAuthSessionEntryParameters['cafSessionDomain'] ?? '',
@@ -693,13 +692,11 @@ class Cisco extends OS implements
             });
         }
 
-        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
-
-        return $data->map(function ($ent, $index) use ($ifIndexToPortId) {
+        return $data->map(function ($ent, $index) {
             $ifIndex = $ent['ifIndex'] ?? null;
 
             return new Transceiver([
-                'port_id' => $ifIndexToPortId->get($ifIndex, 0),
+                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
                 'index' => $index,
                 'type' => $ent['entPhysicalDescr'] ?? null,
                 'vendor' => $ent['entPhysicalMfgName'] ?? null,
@@ -715,9 +712,6 @@ class Cisco extends OS implements
     {
         $this->qosIdxToParent = new Collection();
         $qos = new Collection();
-
-        // Map QoS index to port
-        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
 
         // SNMP lookup tables
         $servicePolicies = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosServicePolicyTable')->table(1);
@@ -790,7 +784,7 @@ class Cisco extends OS implements
 
                 $qos->push(new Qos([
                     'device_id' => $this->getDeviceId(),
-                    'port_id' => $parent ? null : $ifIndexToPortId->get($servicePolicies[$policyId]['cbQosIfIndex'], null),
+                    'port_id' => $parent ? null : PortCache::getIdFromIfIndex($servicePolicies[$policyId]['cbQosIfIndex'], $this->getDevice()),
                     'type' => $dbtype,
                     'title' => $title,
                     'tooltip' => $tooltip,

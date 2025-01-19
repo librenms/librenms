@@ -52,8 +52,6 @@ function sensor_precache($device, $type)
 
 function poll_sensor($device, $class)
 {
-    global $agent_sensors;
-
     $sensors = [];
     $misc_sensors = [];
     $all_sensors = [];

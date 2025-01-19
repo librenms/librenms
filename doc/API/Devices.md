@@ -467,7 +467,7 @@ sensor_id value is provided then you will be sent a stacked sensor graph.
 Route: `/api/v0/devices/:hostname/graphs/health/:type(/:sensor_id)`
 
 - hostname can be either the device hostname or id
-- type is the name of the health graph as returned by [`list_available_health_graphs`](#function-list_available_health_graphs)
+- type is the name of the health graph as returned by [`list_available_health_graphs`](#list_available_health_graphs)
 - sensor_id (optional) restricts the graph to return a particular health sensor graph.
 
 Input:
@@ -503,7 +503,7 @@ sensor_id value is provided then you will be sent a stacked wireless graph.
 Route: `/api/v0/devices/:hostname/graphs/wireless/:type(/:sensor_id)`
 
 - hostname can be either the device hostname or id
-- type is the name of the wireless graph as returned by [`list_available_wireless_graphs`](#function-list_available_wireless_graphs)
+- type is the name of the wireless graph as returned by [`list_available_wireless_graphs`](#list_available_wireless_graphs)
 - sensor_id (optional) restricts the graph to return a particular
   wireless sensor graph.
 
@@ -539,7 +539,7 @@ Route: `/api/v0/devices/:hostname/:type`
 
 - hostname can be either the device hostname or id
 - type is the type of graph you want, use
-  [`get_graphs`](#function-get_graphs to see the graphs
+  [`get_graphs`](#get_graphs to see the graphs
   available. Defaults to device uptime.
 
 Input:
@@ -972,7 +972,7 @@ Route: `/api/v0/devices/:hostname/ports/:ifname`
 - hostname can be either the device hostname or id
 - ifname can be any of the interface names for the device which can be
   obtained using
-  [`get_port_graphs`](#function-get_port_graphs). Please ensure that
+  [`get_port_graphs`](#get_port_graphs). Please ensure that
   the ifname is urlencoded if it needs to be (i.e Gi0/1/0 would need to be urlencoded.
 
 Input:
@@ -1009,11 +1009,11 @@ Route: `/api/v0/devices/:hostname/ports/:ifname/:type`
 - hostname can be either the device hostname or id
 - ifname can be any of the interface names for the device which can be
   obtained using
-  [`get_port_graphs`](#function-get_port_graphs). Please ensure that
+  [`get_port_graphs`](#get_port_graphs). Please ensure that
   the ifname is urlencoded if it needs to be (i.e Gi0/1/0 would need
   to be urlencoded.
 - type is the port type you want the graph for, you can request a list
-  of ports for a device with [`get_port_graphs`](#function-get_port graphs).
+  of ports for a device with [`get_port_graphs`](#get_port_graphs).
 
 Input:
 
