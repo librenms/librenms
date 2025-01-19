@@ -175,18 +175,18 @@ class SnmpResponse
 
     /**
      * Create a key to value pair for an OID
-     * Only works for single indexed tables
      * You may omit $oid if there is only one $oid in the walk
      */
     public function pluck(?string $oid = null): array
     {
         $output = [];
         $oid = $oid ?? '[a-zA-Z0-9:.-]+';
-        $regex = "/^{$oid}[[.](\d+)]?$/";
+        $regex = "/^{$oid}[[.]([\d.[\]]+?)]?$/";
 
         foreach ($this->values() as $key => $value) {
             if (preg_match($regex, $key, $matches)) {
-                $output[$matches[1]] = $value;
+                $output_key = str_replace('][', '.', $matches[1]);
+                $output[$output_key] = $value;
             }
         }
 
