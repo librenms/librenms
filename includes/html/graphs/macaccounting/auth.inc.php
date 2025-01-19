@@ -1,7 +1,6 @@
 <?php
 
 use App\Facades\PortCache;
-use App\Models\Port;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Util\Debug;
