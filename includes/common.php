@@ -245,11 +245,6 @@ function getidbyname($hostname)
     return DeviceCache::getByHostname($hostname)->device_id;
 }
 
-function zeropad($num, $length = 2)
-{
-    return str_pad($num, $length, '0', STR_PAD_LEFT);
-}
-
 function set_dev_attrib($device, $attrib_type, $attrib_value)
 {
     return DeviceCache::get((int) $device['device_id'])->setAttrib($attrib_type, $attrib_value);

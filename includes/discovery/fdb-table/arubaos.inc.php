@@ -24,6 +24,9 @@
  * @author     Ken Lui <tmpest1@yahoo.com>
  */
 
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Util\Mac;
+
 // Try Q-BRIDGE-MIB::dot1qTpFdbPort first
 
 $fdbPort_table = snmpwalk_group($device, 'dot1qTpFdbPort', 'Q-BRIDGE-MIB');
@@ -46,7 +49,7 @@ if (! empty($fdbPort_table)) {
     $dot1dBasePortIfIndex = snmpwalk_group($device, 'dot1dBasePortIfIndex', 'BRIDGE-MIB');
 
     foreach ($fdbPort_table as $vlan => $data) {
-        d_echo("VLAN: $vlan\n");
+        Log::debug("VLAN: $vlan\n");
         $dot1dBasePortIfIndex = SnmpQuery::context($vlan, 'vlan-')
             ->walk('BRIDGE-MIB::dot1dBasePortIfIndex')
             ->table(1, $dot1dBasePortIfIndex);
@@ -61,12 +64,12 @@ if (! empty($fdbPort_table)) {
     foreach ($fdbPort_table as $vlan => $data) {
         foreach ($data[$data_oid] as $mac => $dot1dBasePort) {
             if ($dot1dBasePort == 0) {
-                d_echo("No port known for $mac\n");
+                Log::debug("No port known for $mac\n");
                 continue;
             }
-            $mac_address = implode(array_map('zeropad', explode(':', $mac)));
+            $mac_address = Mac::parse($mac)->hex();
             if (strlen($mac_address) != 12) {
-                d_echo("MAC address padding failed for $mac\n");
+                Log::debug("MAC address padding failed for $mac\n");
                 continue;
             }
 
@@ -77,7 +80,7 @@ if (! empty($fdbPort_table)) {
             $vlan_id = isset($vlans_dict[$vlan]) ? $vlans_dict[$vlan] : 0;
 
             $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
-            d_echo("vlan $vlan mac $mac_address port ($dot1dBasePort) $port_id\n");
+            Log::debug("vlan $vlan mac $mac_address port ($dot1dBasePort) $port_id\n");
         }
     }
 }
