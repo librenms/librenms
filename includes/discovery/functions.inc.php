@@ -449,7 +449,7 @@ function discover_process_ipv4(&$valid_v4, $device, int $ifIndex, $ipv4_address,
     $ipv4_network = $ipv4->getNetworkAddress() . '/' . $ipv4->cidr;
 
     if ($ipv4_address != '0.0.0.0' && $ifIndex > 0) {
-        $port_id = get_port_by_index_cache($device['device_id'], $ifIndex)['port_id'];
+        $port_id = \App\Facades\PortCache::getIdFromIfIndex($ifIndex, $device['device_id']);
 
         if (is_numeric($port_id)) {
             $dbIpv4Net = Ipv4Network::updateOrCreate([

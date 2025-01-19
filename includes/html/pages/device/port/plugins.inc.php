@@ -23,6 +23,6 @@ $no_refresh = true;
 <hr>
 <?php
 echo \LibreNMS\Plugins::call('port_container', [$device, $port]);
-foreach (PluginManager::call(PortTabHook::class, ['port' => $portModel]) as $view) {
+foreach (PluginManager::call(PortTabHook::class, ['port' => $port]) as $view) {
     echo $view;
 };
