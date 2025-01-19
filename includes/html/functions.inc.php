@@ -11,6 +11,7 @@
  */
 
 use App\Facades\DeviceCache;
+use App\Facades\PortCache;
 use App\Models\Port;
 use LibreNMS\Config;
 use LibreNMS\Enum\ImageFormat;
@@ -91,7 +92,7 @@ function bill_permitted($bill_id)
 function port_permitted($port_id, $device_id = null)
 {
     if (! is_numeric($device_id)) {
-        $device_id = Port::where('port_id', $port_id)->value('device_id');
+        $device_id = PortCache::get($port_id)->value('device_id');
     }
 
     if (device_permitted($device_id)) {
