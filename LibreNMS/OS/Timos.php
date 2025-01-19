@@ -634,7 +634,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'sapLastMgmtChange' => round($value['sapLastMgmtChange'] / 100),
                 'sapLastStatusChange' => round($value['sapLastStatusChange'] / 100),
             ]);
-        });
+        })->filter();
     }
 
     /**
