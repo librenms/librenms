@@ -101,7 +101,7 @@ trait BridgeMib
         $ports = new Collection;
 
         // prep base port to port_id map if we have instances
-        $baseIfIndex = $stpInstances->isEmpty() ? [] : $this->getCacheByIndex('BRIDGE-MIB::dot1dBasePortIfIndex');
+        $baseIfIndex = $stpInstances->isEmpty() ? [] : SnmpQuery::walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
         $basePortIdMap = array_map(function ($ifIndex) {
             return PortCache::getIdFromIfIndex($ifIndex, $this->getDevice());
         }, $baseIfIndex);
