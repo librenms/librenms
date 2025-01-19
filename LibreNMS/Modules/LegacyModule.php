@@ -107,7 +107,6 @@ class LegacyModule implements Module
 
         $device = &$os->getDeviceArray();
         Debug::disableErrorReporting(); // ignore errors in legacy code
-        global $agent_data;
 
         include_once base_path('includes/datastore.inc.php');
         include_once base_path('includes/dbFacile.php');
