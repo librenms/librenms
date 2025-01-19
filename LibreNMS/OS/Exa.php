@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\Transceiver;
 use Illuminate\Support\Collection;
@@ -53,9 +54,7 @@ class Exa extends OS implements OSDiscovery, TransceiverDiscovery
 
     public function discoverTransceivers(): Collection
     {
-        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
-
-        return \SnmpQuery::cache()->walk('E7-Calix-MIB::e7OltPonPortTable')->mapTable(function ($data, $shelf, $card, $port) use ($ifIndexToPortId) {
+        return \SnmpQuery::cache()->walk('E7-Calix-MIB::e7OltPonPortTable')->mapTable(function ($data, $shelf, $card, $port) {
             if ($data['E7-Calix-MIB::e7OltPonPortStatus'] == 0) {
                 return null;
             }
@@ -63,7 +62,7 @@ class Exa extends OS implements OSDiscovery, TransceiverDiscovery
             $ifIndex = self::getIfIndex($shelf, $card, $port, 'gpon');
 
             return new Transceiver([
-                'port_id' => $ifIndexToPortId->get($ifIndex),
+                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
                 'index' => "$shelf.$card.$port",
                 'entity_physical_index' => $ifIndex,
             ]);

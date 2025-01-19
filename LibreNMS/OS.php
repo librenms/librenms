@@ -50,7 +50,6 @@ use LibreNMS\OS\Traits\BridgeMib;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\OS\Traits\HostResources;
 use LibreNMS\OS\Traits\NetstatsPolling;
-use LibreNMS\OS\Traits\ResolvesPortIds;
 use LibreNMS\OS\Traits\UcdResources;
 use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
@@ -83,7 +82,6 @@ class OS implements
     use YamlOSDiscovery;
     use YamlMempoolsDiscovery;
     use NetstatsPolling;
-    use ResolvesPortIds;
     use BridgeMib;
     use EntityMib;
 

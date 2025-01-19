@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\PortsNac;
 use App\Models\Transceiver;
 use Illuminate\Support\Carbon;
@@ -67,7 +68,6 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling, Transceive
         }
 
         $rowSet = [];
-        $ifIndex_map = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
 
         $table = SnmpQuery::mibDir('hp')->mibs(['HP-DOT1X-EXTENSIONS-MIB'])->hideMib()->enumStrings()->walk('hpicfDot1xSMAuthConfigTable')->table(2);
 
@@ -107,7 +107,7 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling, Transceive
                 default => $row['dot1xAuthAuthControlledPortStatus']
             };
 
-            $rowSet[$ifIndex]['port_id'] = $ifIndex_map->get($ifIndex, 0);
+            $rowSet[$ifIndex]['port_id'] = (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice());
         }
 
         $table = SnmpQuery::mibs(['HP-DOT1X-EXTENSIONS-MIB'])->mibDir('hp')->hideMib()->enumStrings()->walk('hpicfDot1xAuthSessionStatsTable')->table(2);
@@ -141,11 +141,9 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling, Transceive
 
     public function discoverTransceivers(): Collection
     {
-        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
-
-        return SnmpQuery::cache()->walk('HP-ICF-TRANSCEIVER-MIB::hpicfXcvrInfoTable')->mapTable(function ($data, $ifIndex) use ($ifIndexToPortId) {
+        return SnmpQuery::cache()->walk('HP-ICF-TRANSCEIVER-MIB::hpicfXcvrInfoTable')->mapTable(function ($data, $ifIndex) {
             return new Transceiver([
-                'port_id' => $ifIndexToPortId->get($ifIndex, 0),
+                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
                 'index' => $ifIndex,
                 'entity_physical_index' => $ifIndex,
                 'type' => $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrType'] ?? null,

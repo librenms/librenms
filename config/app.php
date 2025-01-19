@@ -208,6 +208,7 @@ return [
         // LibreNMS
         'DeviceCache' => \App\Facades\DeviceCache::class,
         'Permissions' => \App\Facades\Permissions::class,
+        'PortCache' => \App\Facades\PortCache::class,
         'PluginManager' => \App\Facades\PluginManager::class,
         'Rrd' => \App\Facades\Rrd::class,
         'SnmpQuery' => \App\Facades\FacadeAccessorSnmp::class,

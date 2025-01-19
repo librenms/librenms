@@ -23,6 +23,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\PortsNac;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Polling\NacPolling;
@@ -37,10 +38,9 @@ class ArubaosCx extends \LibreNMS\OS implements NacPolling
         $nac = new Collection();
 
         $rowSet = [];
-        $ifIndex_map = $this->getDevice()->ports()->pluck('port_id', 'ifName');
         $table = SnmpQuery::hideMib()->enumStrings()->walk('ARUBAWIRED-PORT-ACCESS-MIB::arubaWiredPortAccessClientTable')->table(2);
 
-        foreach ($table as $ifIndex => $entry) {
+        foreach ($table as $ifName => $entry) {
             foreach ($entry as $macKey => $macEntry) {
                 $rowSet[$macKey] = [
                     'domain' => '',
@@ -56,8 +56,8 @@ class ArubaosCx extends \LibreNMS\OS implements NacPolling
                 $rowSet[$macKey]['authz_status'] = '';
                 $rowSet[$macKey]['username'] = $macEntry['arubaWiredPacUserName'] ?? '';
                 $rowSet[$macKey]['vlan'] = $macEntry['arubaWiredPacVlanId'] ?? null;
-                $rowSet[$macKey]['port_id'] = $ifIndex_map->get($ifIndex, 0);
-                $rowSet[$macKey]['auth_id'] = $ifIndex;
+                $rowSet[$macKey]['port_id'] = (int) PortCache::getIdFromIfName($ifName, $this->getDevice());
+                $rowSet[$macKey]['auth_id'] = $ifName;
                 $rowSet[$macKey]['method'] = $macEntry['arubaWiredPacOnboardedMethods'] ?? '';
             }
         }

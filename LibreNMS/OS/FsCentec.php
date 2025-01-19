@@ -2,6 +2,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\Transceiver;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
@@ -12,9 +13,7 @@ class FsCentec extends OS implements TransceiverDiscovery
 {
     public function discoverTransceivers(): Collection
     {
-        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
-
-        return SnmpQuery::cache()->walk('FS-SWITCH-V2-MIB::transbasicinformationTable')->mapTable(function ($data, $ifIndex) use ($ifIndexToPortId) {
+        return SnmpQuery::cache()->walk('FS-SWITCH-V2-MIB::transbasicinformationTable')->mapTable(function ($data, $ifIndex) {
             if ($data['FS-SWITCH-V2-MIB::transceiveStatus'] == 'inactive') {
                 return null;
             }
@@ -39,7 +38,7 @@ class FsCentec extends OS implements TransceiverDiscovery
             }
 
             return new Transceiver([
-                'port_id' => $ifIndexToPortId->get($ifIndex),
+                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
                 'index' => $ifIndex,
                 'vendor' => $data['FS-SWITCH-V2-MIB::transceiveVender'] ?? null,
                 'type' => $data['FS-SWITCH-V2-MIB::transceiveType'] ?? null,

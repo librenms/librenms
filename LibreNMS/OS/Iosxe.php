@@ -26,7 +26,11 @@
 
 namespace LibreNMS\OS;
 
+<<<<<<< HEAD
 use App\Models\Device;
+=======
+use App\Facades\PortCache;
+>>>>>>> a8d40d5cfe (Implement PortCache (#17002))
 use App\Models\IsisAdjacency;
 use App\Models\Port;
 use Illuminate\Database\Eloquent\Collection as Eloq_Collection;
@@ -97,7 +101,7 @@ class Iosxe extends Ciscowlc implements
                         'device_id' => $this->getDeviceId(),
                         'index' => "[$circuit_index][$adjacency_index]",
                         'ifIndex' => $circuits[$circuit_index]['CISCO-IETF-ISIS-MIB::ciiCircIfIndex'],
-                        'port_id' => $this->ifIndexToId($circuits[$circuit_index]['CISCO-IETF-ISIS-MIB::ciiCircIfIndex']),
+                        'port_id' => PortCache::getIdFromIfIndex($circuits[$circuit_index]['CISCO-IETF-ISIS-MIB::ciiCircIfIndex'], $this->getDevice()),
                         'isisCircAdminState' => $circuits[$circuit_index]['CISCO-IETF-ISIS-MIB::ciiCircAdminState'] ?? 'down',
                         'isisISAdjState' => $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjState'] ?? 'down',
                         'isisISAdjNeighSysType' => Arr::get($this->isis_codes, $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjNeighSysType'] ?? '', 'unknown'),

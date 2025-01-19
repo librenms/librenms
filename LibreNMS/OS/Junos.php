@@ -25,9 +25,9 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\EntPhysical;
-use App\Models\Port;
 use App\Models\Sla;
 use App\Models\Transceiver;
 use Carbon\Carbon;
@@ -297,17 +297,16 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
 
     public function discoverTransceivers(): Collection
     {
-        $ifIndexToPortId = Port::query()->where('device_id', $this->getDeviceId())->select(['port_id', 'ifIndex', 'ifName'])->get()->keyBy('ifIndex');
         $entPhysical = SnmpQuery::walk('ENTITY-MIB::entityPhysical')->table(1);
 
-        $jnxDomCurrentTable = SnmpQuery::cache()->walk('JUNIPER-DOM-MIB::jnxDomCurrentTable')->mapTable(function ($data, $ifIndex) use ($ifIndexToPortId, $entPhysical) {
-            $ent = $this->findTransceiverEntityByPortName($entPhysical, $ifIndexToPortId->get($ifIndex)?->ifName);
+        $jnxDomCurrentTable = SnmpQuery::cache()->walk('JUNIPER-DOM-MIB::jnxDomCurrentTable')->mapTable(function ($data, $ifIndex) use ($entPhysical) {
+            $ent = $this->findTransceiverEntityByPortName($entPhysical, PortCache::getNameFromIfIndex($ifIndex, $this->getDevice()));
             if (empty($ent)) {
                 return null; // no module
             }
 
             return new Transceiver([
-                'port_id' => $ifIndexToPortId->get($ifIndex)->port_id,
+                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
                 'index' => $ifIndex,
                 'type' => $ent['ENTITY-MIB::entPhysicalName'] ?? null,
                 'vendor' => $ent['ENTITY-MIB::entPhysicalMfgName'] ?? null,
@@ -325,9 +324,9 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
 
         // could use improvement by mapping JUNIPER-IFOPTICS-MIB::jnxOpticsConfigTable for a tiny bit more info
         return SnmpQuery::cache()->walk('JUNIPER-IFOPTICS-MIB::jnxOpticsPMCurrentTable')
-            ->mapTable(function ($data, $ifIndex) use ($ifIndexToPortId) {
+            ->mapTable(function ($data, $ifIndex) {
                 return new Transceiver([
-                    'port_id' => $ifIndexToPortId->get($ifIndex)->port_id,
+                    'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex),
                     'index' => $ifIndex,
                     'entity_physical_index' => $ifIndex,
                 ]);

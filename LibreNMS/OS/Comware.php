@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\Mempool;
 use App\Models\Transceiver;
@@ -112,11 +113,9 @@ class Comware extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
 
     public function discoverTransceivers(): Collection
     {
-        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
-
-        return \SnmpQuery::cache()->enumStrings()->walk('HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverInfoTable')->mapTable(function ($data, $ifIndex) use ($ifIndexToPortId) {
+        return \SnmpQuery::cache()->enumStrings()->walk('HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverInfoTable')->mapTable(function ($data, $ifIndex) {
             return new Transceiver([
-                'port_id' => $ifIndexToPortId->get($ifIndex, 0),
+                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
                 'index' => $ifIndex,
                 'type' => $data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverType'] ?? null,
                 'vendor' => $data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverVendorName'] ?? null,
