@@ -1,29 +1,24 @@
 <?php
 
+use App\Facades\DeviceCache;
+use LibreNMS\Config;
+
 $valid_storage = [];
 
 // Include all discovery modules
-$include_dir = 'includes/discovery/storage';
-require 'includes/include-dir.inc.php';
-
-// Remove storage which weren't redetected here
-$sql = "SELECT * FROM `storage` WHERE `device_id`  = '" . $device['device_id'] . "'";
-
-d_echo($valid_storage);
-
-foreach (dbFetchRows($sql) as $test_storage) {
-    $storage_index = $test_storage['storage_index'];
-    $storage_mib = $test_storage['storage_mib'];
-    d_echo($storage_index . ' -> ' . $storage_mib . "\n");
-
-    if (! $valid_storage[$storage_mib][$storage_index]) {
-        echo '-';
-        dbDelete('storage', '`storage_id` = ?', [$test_storage['storage_id']]);
-    }
-
-    unset($storage_index);
-    unset($storage_mib);
+foreach (glob(Config::get('install_dir') . '/includes/discovery/storage/*.inc.php') as $file) {
+    include $file;
 }
 
-unset($valid_storage);
+Log::debug($valid_storage);
+
+// Remove storage which weren't redetected here
+foreach (DeviceCache::getPrimary()->storage as $s) {
+    Log::debug($s->storage_index . ' -> ' . $s->storage_mib . "\n");
+
+    if (! $valid_storage[$s->storage_mib][$s->storage_index]) {
+        echo '-';
+        $s->delete();
+    }
+}
 echo "\n";
