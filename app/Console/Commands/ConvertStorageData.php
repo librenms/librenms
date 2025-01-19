@@ -65,6 +65,16 @@ class ConvertStorageData extends Command
                         ];
                     }
 
+                    // fix sort orders to match current dump sorting
+                    usort($data['storage'][$type][$table], function ($a, $b) {
+                        // sort by type first
+                        if ($a['type'] != $b['type']) {
+                            return $a['type'] <=> $b['type'];
+                        }
+
+                        return strcmp($a['storage_index'], $b['storage_index']);
+                    });
+
                     // if removed rows, reset indices
                     if ($removed_rows) {
                         if (empty($data['storage'][$type][$table])) {
@@ -72,6 +82,11 @@ class ConvertStorageData extends Command
                         } else {
                             $data['storage'][$type][$table] = array_values($data['storage'][$type][$table]);
                         }
+                    }
+
+                    // set matches discovery if appropriate
+                    if ($type == 'poller' && ! empty($data['storage']['discovery'][$table]) && $data['storage']['discovery'][$table] == $data['storage']['poller'][$table]) {
+                        $data['storage']['poller'] = 'matches discovery';
                     }
                 }
             }
@@ -244,6 +259,17 @@ class ConvertStorageData extends Command
         if (Str::startsWith($snmprec_file, 'dell-os10') && $storage['storage_mib'] == 'ucd-dsktable') {
             return true;
         }
+
+        if (Str::startsWith($snmprec_file, 'esphome')) {
+            return true;
+        }
+
+        if (Str::startsWith($snmprec_file, 'hpe-ilo')) {
+            if ($storage['storage_mib'] == 'hrstorage') {
+                return true;
+            }
+        }
+
 
         return false;
     }

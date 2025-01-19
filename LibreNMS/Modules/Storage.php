@@ -152,7 +152,7 @@ class Storage implements Module
     {
         return [
             'storage' => $device->storage()
-                ->orderBy('storage_index')->orderBy('storage_type')
+                ->orderBy('type')->orderBy('storage_index')
                 ->get()->map->makeHidden(['device_id', 'storage_id']),
         ];
     }
