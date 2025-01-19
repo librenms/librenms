@@ -225,21 +225,6 @@ function print_percentage_bar($width, $height, $percent, $left_text, $left_colou
     ]);
 }
 
-/**
- * Extract type and subtype from a complex graph type, also makes sure variables are file name safe.
- *
- * @param  string  $type
- * @return array [type, subtype]
- */
-function extract_graph_type($type): array
-{
-    preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $type, $graphtype);
-    $type = basename($graphtype['type']);
-    $subtype = basename($graphtype['subtype']);
-
-    return [$type, $subtype];
-}
-
 function generate_port_link($port, $text = null, $type = null, $overlib = 1, $single_graph = 0)
 {
     $graph_array = [];
@@ -403,37 +388,6 @@ function print_optionbar_end()
         ';
 }//end print_optionbar_end()
 
-function devclass($device)
-{
-    if (isset($device['status']) && $device['status'] == '0') {
-        $class = 'list-device-down';
-    } else {
-        $class = 'list-device';
-    }
-
-    if (isset($device['disable_notify']) && $device['disable_notify'] == '1') {
-        $class = 'list-device-ignored';
-        if (isset($device['status']) && $device['status'] == '1') {
-            $class = 'list-device-ignored-up';
-        }
-    }
-
-    if (isset($device['disabled']) && $device['disabled'] == '1') {
-        $class = 'list-device-disabled';
-    }
-
-    return $class;
-}//end devclass()
-
-function getlocations()
-{
-    if (Auth::user()->hasGlobalRead()) {
-        return dbFetchRows('SELECT id, location FROM locations ORDER BY location');
-    }
-
-    return dbFetchRows('SELECT id, L.location FROM devices AS D, locations AS L, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? AND D.location_id = L.id ORDER BY location', [Auth::id()]);
-}
-
 /**
  * Get the recursive file size and count for a directory
  *
@@ -513,33 +467,6 @@ function generate_ap_url($ap, $vars = [])
 {
     return \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $ap['device_id'], 'tab' => 'accesspoints', 'ap' => $ap['accesspoint_id']], $vars);
 }//end generate_ap_url()
-
-// Find all the files in the given directory that match the pattern
-
-function get_matching_files($dir, $match = '/\.php$/')
-{
-    $list = [];
-    if ($handle = opendir($dir)) {
-        while (false !== ($file = readdir($handle))) {
-            if ($file != '.' && $file != '..' && preg_match($match, $file) === 1) {
-                $list[] = $file;
-            }
-        }
-
-        closedir($handle);
-    }
-
-    return $list;
-}//end get_matching_files()
-
-// Include all the files in the given directory that match the pattern
-
-function include_matching_files($dir, $match = '/\.php$/')
-{
-    foreach (get_matching_files($dir, $match) as $file) {
-        include_once $file;
-    }
-}//end include_matching_files()
 
 function generate_pagination($count, $limit, $page, $links = 2)
 {
