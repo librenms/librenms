@@ -1,5 +1,6 @@
 <?php
 
+use App\Facades\PortCache;
 use App\Models\Port;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\RrdGraphException;
@@ -36,6 +37,6 @@ if (! is_file($filename)) {
 Log::debug('exists');
 
 $rrd_filename = $filename;
-$port = cleanPort(Port::with('device')->find($acc['port_id']));
+$port = cleanPort(PortCache::get($acc['port_id'])->load('devices'));
 $title = Url::deviceLink($device) . ' :: Port  ' . Url::portLink($port) . ' :: ' . Mac::parse($acc['mac'])->readable();
 $auth = true;

@@ -1,12 +1,12 @@
 <?php
 
-use App\Models\Port;
+use App\Facades\PortCache;
 use LibreNMS\Util\Clean;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
 
 if (is_numeric($vars['id']) && ($auth || port_permitted($vars['id']))) {
-    $port = cleanPort(Port::with('device')->find($vars['id']));
+    $port = cleanPort(PortCache::get($vars['id'])->load('device'));
     $title = Url::deviceLink($port->device) . ' :: Port  ' . Url::portLink($port);
 
     $graph_title = $port->device->shortDisplayName() . '::' . strtolower(Rewrite::shortenIfName($port->ifDescr));

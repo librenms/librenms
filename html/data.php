@@ -8,7 +8,7 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-use App\Models\Port;
+use App\Facades\PortCache;
 use LibreNMS\Config;
 use LibreNMS\Util\Url;
 
@@ -16,7 +16,7 @@ $init_modules = ['web', 'auth'];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 if (is_numeric($_GET['id']) && (Config::get('allow_unauth_graphs') || port_permitted($_GET['id']))) {
-    $port = cleanPort(Port::with('device')->find($_GET['id']));
+    $port = cleanPort(PortCache::get($_GET['id'])->load('device'));
     $title = Url::deviceLink($port->device) . ' :: Port  ' . Url::portLink($port);
     $auth = true;
 

@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Port;
+use App\Facades\PortCache;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
 
@@ -78,7 +78,7 @@ $sql = "SELECT `E`.*,DATE_FORMAT(datetime, '" . \LibreNMS\Config::get('dateforma
 foreach (dbFetchRows($sql, $param) as $eventlog) {
     $dev = device_by_id_cache($eventlog['device_id']);
     if ($eventlog['type'] == 'interface') {
-        $this_if = cleanPort(Port::find($eventlog['reference']));
+        $this_if = cleanPort(PortCache::get($eventlog['reference']));
         $type = '<b>' . Url::portLink($this_if, Rewrite::shortenIfName(strtolower($this_if->label))) . '</b>';
     } else {
         $type = $eventlog['type'];
