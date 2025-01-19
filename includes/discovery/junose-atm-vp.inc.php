@@ -17,7 +17,7 @@ if ($device['os'] == 'junose' && Config::get('enable_ports_junoseatmvp')) {
             $port_id = dbFetchCell('SELECT `port_id` FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $ifIndex]);
 
             if (is_numeric($port_id) && is_numeric($vp_id)) {
-                discover_juniAtmvp($valid_vp, $port_id, $vp_id, null);
+                discover_juniAtmvp($valid_vp, $device['device_id'], $port_id, $vp_id, null);
             }
         } //end foreach
     } //end if

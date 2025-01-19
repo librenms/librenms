@@ -1,4 +1,4 @@
--- 
+--
 -- Dell Remote Access Controller (RAC) and Chassis Management Controller (CMC)
 -- Management Information Base
 --
@@ -17,7 +17,7 @@
 --
 
 DELL-RAC-MIB DEFINITIONS ::= BEGIN
-     
+
 IMPORTS
 	enterprises, TimeTicks
 		FROM RFC1155-SMI
@@ -28,7 +28,7 @@ IMPORTS
 	DisplayString
 		FROM RFC1213-MIB;
 
--- text convention ------------------------------------------------------------------------     
+-- text convention ------------------------------------------------------------------------
 
 	-------------------------------------------------------------------------------
 	-- This data type is used to model textual information taken
@@ -69,16 +69,16 @@ IMPORTS
 	}
 
 	-------------------------------------------------------------------------------
-	-- DellPowerReading is a string representation of a floating point value, 
+	-- DellPowerReading is a string representation of a floating point value,
 	--   having exactly 3 digits of precision, and a maximum of 31 characters.
 	--
 	-- DellChassisPowerIndexRange defines the possible chassis power instances
 	--   in this MIB.
 	--
-	-- DellCMCPSUIndexRange defines the possible CMC Power Supply Unit (PSU) 
+	-- DellCMCPSUIndexRange defines the possible CMC Power Supply Unit (PSU)
 	--   instances, per chassis power instance, in this MIB.
 	--
-	-- DellCMCPSUCapable is an enumeration of PSU presence and/or monitoring 
+	-- DellCMCPSUCapable is an enumeration of PSU presence and/or monitoring
 	--   capabilities.
 	--
 	-- DellTemperatureReading is an integer value, expressed in degrees Celsius.
@@ -105,8 +105,8 @@ IMPORTS
 	--
 	-- where yyyy is the year, mm is the month number, dd is the day of the month,
 	-- HHMMSS are the hours, minutes and seconds, respectively, uuuuuu is the
-	-- number of microseconds, D is the UTC offset direction, and ooo is the 
-	-- offset from UTC, in minutes. 
+	-- number of microseconds, D is the UTC offset direction, and ooo is the
+	-- offset from UTC, in minutes.
 	--
 	-- Note: D is a plus (+) sign if east of UTC, and a minus (-) if west of UTC.
 	--
@@ -119,7 +119,7 @@ IMPORTS
 	-- DellCMCServerIndexRange defines the possible chassis server instances
 	--   in this MIB.
 	--
-	-- DellCMCServerCapable is an enumeration of server presence and/or monitoring 
+	-- DellCMCServerCapable is an enumeration of server presence and/or monitoring
 	--   capabilities.
 	-------------------------------------------------------------------------------
 	DellCMCServerIndexRange ::= INTEGER (1..32)
@@ -252,7 +252,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 
 	drsAlertGroup                 OBJECT IDENTIFIER ::= { drsOutofBandGroup  5000 }
 	drsAlertVariables             OBJECT IDENTIFIER ::= { drsAlertGroup        10 }
-        
+
 
 -- Variables and Traps ------------------------------------------------------------------------
 
@@ -264,88 +264,88 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		SYNTAX          DellString
 		ACCESS          read-only
 		STATUS          mandatory
-		DESCRIPTION     "0001.0001.0001 This attribute defines the product name of a chassis management controller." 
+		DESCRIPTION     "0001.0001.0001 This attribute defines the product name of a chassis management controller."
 			::= { drsProductInfoGroup 1 }
 
 	drsProductShortName OBJECT-TYPE
 		SYNTAX          DellString
 		ACCESS          read-only
 		STATUS          mandatory
-		DESCRIPTION     "0001.0001.0002 This attribute defines the short product name of a chassis management controller. " 
+		DESCRIPTION     "0001.0001.0002 This attribute defines the short product name of a chassis management controller. "
 			::= { drsProductInfoGroup 2 }
 
 	drsProductDescription OBJECT-TYPE
 		SYNTAX          DellString
 		ACCESS          read-only
 		STATUS          mandatory
-		DESCRIPTION     "0001.0001.0003 This attribute defines the product description of a chassis management controller. " 
+		DESCRIPTION     "0001.0001.0003 This attribute defines the product description of a chassis management controller. "
 			::= { drsProductInfoGroup 3 }
 
 	drsProductManufacturer OBJECT-TYPE
 		SYNTAX          DellString
 		ACCESS          read-only
 		STATUS          mandatory
-		DESCRIPTION     "0001.0001.0004 This attribute defines the product manufacturer of a chassis management controller. " 
+		DESCRIPTION     "0001.0001.0004 This attribute defines the product manufacturer of a chassis management controller. "
 			::= { drsProductInfoGroup 4 }
 
 	drsProductVersion OBJECT-TYPE
 		SYNTAX          DellString
 		ACCESS          read-only
 		STATUS          mandatory
-		DESCRIPTION     "0001.0001.0005 This attribute defines the product version of a chassis management controller. " 
+		DESCRIPTION     "0001.0001.0005 This attribute defines the product version of a chassis management controller. "
 			::= { drsProductInfoGroup 5 }
 
 	drsChassisServiceTag OBJECT-TYPE
 		SYNTAX          DellString
 		ACCESS          read-only
 		STATUS          mandatory
-		DESCRIPTION     "0001.0001.0007 This attribute defines the Service Tag of the chassis. " 
+		DESCRIPTION     "0001.0001.0007 This attribute defines the Service Tag of the chassis. "
 			::= { drsProductInfoGroup 6 }
 
 	drsProductURL       OBJECT-TYPE
-		SYNTAX          DellString 
+		SYNTAX          DellString
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0001.0001.0006 This attribute defines the out-of-band UI URL of a chassis management controller. "
 			::= { drsProductInfoGroup 7 }
-                        
+
 	drsProductChassisAssetTag  OBJECT-TYPE
-		SYNTAX          DellString 
+		SYNTAX          DellString
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0001.0001.0008 This attribute defines the Asset Tag of the chassis. "
 			::= { drsProductInfoGroup 8 }
 
 	drsProductChassisLocation  OBJECT-TYPE
-		SYNTAX          DellString 
+		SYNTAX          DellString
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0001.0001.0009 This attribute defines the location of the chassis. "
 			::= { drsProductInfoGroup 9 }
 
 	drsProductChassisName  OBJECT-TYPE
-		SYNTAX          DellString 
+		SYNTAX          DellString
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0001.0001.0010 This attribute defines the name of the chassis. "
 			::= { drsProductInfoGroup 10 }
 
 	drsSystemServiceTag  OBJECT-TYPE
-		SYNTAX          DellString 
+		SYNTAX          DellString
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0001.0001.0011 This attribute defines the service tag of a system. "
 			::= { drsProductInfoGroup 11 }
 
 	drsProductSystemAssetTag  OBJECT-TYPE
-		SYNTAX          DellString 
+		SYNTAX          DellString
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0001.0001.0012 This attribute defines the asset tag of a system. "
 			::= { drsProductInfoGroup 12 }
 
 	drsProductSystemSlot OBJECT-TYPE
-		SYNTAX          DellString 
+		SYNTAX          DellString
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0001.0001.0013 This attribute defines the slot number of a CMC. "
@@ -357,56 +357,56 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		STATUS          mandatory
 		DESCRIPTION     "0001.0001.0014 This attribute defines type of a remote access card "
 			::= { drsProductInfoGroup 14 }
-               
+
 	drsProductChassisDataCenter  OBJECT-TYPE
-		SYNTAX          DellString 
+		SYNTAX          DellString
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0001.0001.0015 This attribute defines the Data Center locator of the chassis. "
 			::= { drsProductInfoGroup 15 }
 
 	drsProductChassisAisle  OBJECT-TYPE
-		SYNTAX          DellString 
+		SYNTAX          DellString
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0001.0001.0016 This attribute defines the Aisle locator of the chassis. "
 			::= { drsProductInfoGroup 16 }
 
 	drsProductChassisRack  OBJECT-TYPE
-		SYNTAX          DellString 
+		SYNTAX          DellString
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0001.0001.0017 This attribute defines the Rack locator of the chassis. "
 			::= { drsProductInfoGroup 17 }
 
 	drsProductChassisRackSlot  OBJECT-TYPE
-		SYNTAX          DellString 
+		SYNTAX          DellString
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0001.0001.0018 This attribute defines the Rack Slot locator of the chassis. "
 			::= { drsProductInfoGroup 18 }
-               
+
 	drsProductChassisModel  OBJECT-TYPE
 		SYNTAX          DellString
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0001.0001.0019 This attribute defines the Model of the chassis."
 			::= { drsProductInfoGroup 19 }
-               
+
 	drsProductChassisExpressServiceCode  OBJECT-TYPE
 		SYNTAX          DellString
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0001.0001.0020 This attribute defines the Express Service Code of the chassis."
 			::= { drsProductInfoGroup 20 }
-               
+
 	drsProductChassisSystemID  OBJECT-TYPE
 		SYNTAX          INTEGER
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0001.0001.0021 This attribute defines the System ID of the chassis."
 			::= { drsProductInfoGroup 21 }
-               
+
 	drsProductChassisSize  OBJECT-TYPE
 		SYNTAX          INTEGER
 		ACCESS          read-only
@@ -431,7 +431,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		SYNTAX          DellString
 		ACCESS          read-only
 		STATUS          mandatory
-		DESCRIPTION     "0001.0002.0002 This attribute defines the firmware version of the iKVM. " 
+		DESCRIPTION     "0001.0002.0002 This attribute defines the firmware version of the iKVM. "
 			::= { drsFirmwareGroup 2 }
 
 	drsFirmwareVersion2 OBJECT-TYPE
@@ -450,7 +450,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0002.0001.0001 This attribute defines the overall chassis status
-                      being monitored by the chassis management card." 
+                      being monitored by the chassis management card."
 			::= { drsStatusGroup 1 }
 
 	drsGlobalCurrStatus OBJECT-TYPE
@@ -458,7 +458,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0003.0001.0001 This attribute defines the overall chassis status
-                      being monitored by the chassis management card." 
+                      being monitored by the chassis management card."
 			::= { drsStatusNowGroup 1 }
 
 	drsIOMCurrStatus  OBJECT-TYPE
@@ -466,7 +466,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0003.0001.0002 This attribute defines the IOM subsystem status
-                      being monitored by the chassis management card." 
+                      being monitored by the chassis management card."
 			::= { drsStatusNowGroup 2 }
 
 	drsKVMCurrStatus  OBJECT-TYPE
@@ -474,7 +474,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0003.0001.0003 This attribute defines the iKVM subsystem health status
-                      being monitored by the chassis management card." 
+                      being monitored by the chassis management card."
 			::= { drsStatusNowGroup 3 }
 
 	drsRedCurrStatus  OBJECT-TYPE
@@ -482,7 +482,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0003.0001.0004 This attribute defines the Redundancy status
-                      being monitored by the chassis management card." 
+                      being monitored by the chassis management card."
 			::= { drsStatusNowGroup 4 }
 
 	drsPowerCurrStatus OBJECT-TYPE
@@ -490,7 +490,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0003.0001.0005 This attribute defines the power subsystem health status
-                      being monitored by the chassis management card." 
+                      being monitored by the chassis management card."
 			::= { drsStatusNowGroup 5 }
 
 	drsFanCurrStatus OBJECT-TYPE
@@ -498,7 +498,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0003.0001.0006 This attribute defines the Fan subsystem health status
-                      being monitored by the chassis management card." 
+                      being monitored by the chassis management card."
 			::= { drsStatusNowGroup 6 }
 
 	drsBladeCurrStatus OBJECT-TYPE
@@ -506,7 +506,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0003.0001.0007 This attribute defines the Blade subsystem health status
-                      being monitored by the chassis management card." 
+                      being monitored by the chassis management card."
 			::= { drsStatusNowGroup 7 }
 
 	drsTempCurrStatus OBJECT-TYPE
@@ -514,7 +514,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0003.0001.0008 This attribute defines the Temp Sensor subsystem health status
-                      being monitored by the chassis management card." 
+                      being monitored by the chassis management card."
 			::= { drsStatusNowGroup 8 }
 
 	drsCMCCurrStatus OBJECT-TYPE
@@ -522,7 +522,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0003.0001.0009 This attribute defines the CMC health status
-                      being monitored by the chassis management card." 
+                      being monitored by the chassis management card."
 			::= { drsStatusNowGroup 9 }
 
 	drsChassisFrontPanelAmbientTemperature OBJECT-TYPE
@@ -530,7 +530,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0003.0001.0010 This attribute defines the ambient temperature
-                      reading (in degrees Celsius) for the chassis front panel controller." 
+                      reading (in degrees Celsius) for the chassis front panel controller."
 			::= { drsStatusNowGroup 10 }
 
 	drsCMCAmbientTemperature OBJECT-TYPE
@@ -538,7 +538,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0003.0001.0011 This attribute defines the ambient temperature
-                      reading (in degrees Celsius) for the chassis management card." 
+                      reading (in degrees Celsius) for the chassis management card."
 			::= { drsStatusNowGroup 11 }
 
 	drsCMCProcessorTemperature OBJECT-TYPE
@@ -546,7 +546,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0003.0001.0012 This attribute defines the temperature reading
-                      (in degrees Celsius) for the chassis management card processor." 
+                      (in degrees Celsius) for the chassis management card processor."
 			::= { drsStatusNowGroup 12 }
 
 	drsGlobalPrevStatus OBJECT-TYPE
@@ -554,15 +554,15 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0003.0002.0001 This attribute defines the previous chassis status
-                      recorded by the chassis management card." 
+                      recorded by the chassis management card."
 			::= { drsStatusPrevGroup 1 }
-                
+
 	drsIOMPrevStatus    OBJECT-TYPE
 		SYNTAX          DellStatus
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0003.0002.0002 This attribute defines the previous IOM subsystem status
-                      recorded by the chassis management card." 
+                      recorded by the chassis management card."
 			::= { drsStatusPrevGroup 2 }
 
 	drsKVMPrevStatus    OBJECT-TYPE
@@ -570,7 +570,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0003.0002.0003 This attribute defines the previous iKVM subsystem health status
-                      recorded by the chassis management card." 
+                      recorded by the chassis management card."
 			::= { drsStatusPrevGroup 3 }
 
 	drsRedPrevStatus    OBJECT-TYPE
@@ -578,7 +578,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0003.0002.0004 This attribute defines the previous Redundancy status
-                      recorded by the chassis management card." 
+                      recorded by the chassis management card."
 			::= { drsStatusPrevGroup 4 }
 
 	drsPowerPrevStatus  OBJECT-TYPE
@@ -586,7 +586,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0003.0002.0005 This attribute defines the previous power subsystem health status
-                      recorded by the chassis management card." 
+                      recorded by the chassis management card."
 			::= { drsStatusPrevGroup 5 }
 
 	drsFanPrevStatus OBJECT-TYPE
@@ -594,7 +594,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0003.0002.0006 This attribute defines the previous Fan health status
-                      being monitored by the chassis management card." 
+                      being monitored by the chassis management card."
 			::= { drsStatusPrevGroup 6 }
 
 	drsBladePrevStatus  OBJECT-TYPE
@@ -602,7 +602,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0003.0002.0007 This attribute defines the previous Blade subsystem health status
-                      recorded by the chassis management card." 
+                      recorded by the chassis management card."
 			::= { drsStatusPrevGroup 7 }
 
 	drsTempPrevStatus OBJECT-TYPE
@@ -610,7 +610,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0003.0001.0008 This attribute defines the Temp Sensor health status
-                      being monitored by the chassis management card." 
+                      being monitored by the chassis management card."
 			::= { drsStatusPrevGroup 8 }
 
 	drsCMCPrevStatus OBJECT-TYPE
@@ -618,79 +618,79 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS          read-only
 		STATUS          mandatory
 		DESCRIPTION     "0003.0001.0009 This attribute defines the CMC health status
-                      being monitored by the chassis management card." 
+                      being monitored by the chassis management card."
 			::= { drsStatusPrevGroup 9 }
 
 	drsGlobalChangeTime OBJECT-TYPE
 		SYNTAX          TimeTicks
 		ACCESS          read-only
 		STATUS          mandatory
-		DESCRIPTION     "0003.0003.0001 This attribute defines the timestamp of the most recent 
-                      global status change." 
+		DESCRIPTION     "0003.0003.0001 This attribute defines the timestamp of the most recent
+                      global status change."
 			::= { drsStatusChangeGroup 1 }
 
 	drsIOMChangeTime    OBJECT-TYPE
 		SYNTAX          TimeTicks
 		ACCESS          read-only
 		STATUS          mandatory
-		DESCRIPTION     "0003.0003.0002 This attribute defines the timestamp of the most recent 
-                      IOM status change." 
+		DESCRIPTION     "0003.0003.0002 This attribute defines the timestamp of the most recent
+                      IOM status change."
 			::= { drsStatusChangeGroup 2 }
 
 	drsKVMChangeTime    OBJECT-TYPE
 		SYNTAX          TimeTicks
 		ACCESS          read-only
 		STATUS          mandatory
-		DESCRIPTION     "0003.0003.0003 This attribute defines the timestamp of the most recent 
-                      iKVM status change." 
+		DESCRIPTION     "0003.0003.0003 This attribute defines the timestamp of the most recent
+                      iKVM status change."
 			::= { drsStatusChangeGroup 3 }
 
 	drsRedChangeTime    OBJECT-TYPE
 		SYNTAX          TimeTicks
 		ACCESS          read-only
 		STATUS          mandatory
-		DESCRIPTION     "0003.0003.0004 This attribute defines the timestamp of the most recent 
-                      Redundancy status change." 
+		DESCRIPTION     "0003.0003.0004 This attribute defines the timestamp of the most recent
+                      Redundancy status change."
 			::= { drsStatusChangeGroup 4 }
 
 	drsPowerChangeTime  OBJECT-TYPE
 		SYNTAX          TimeTicks
 		ACCESS          read-only
 		STATUS          mandatory
-		DESCRIPTION     "0003.0003.0005 This attribute defines the timestamp of the most recent 
-                      power health status change." 
+		DESCRIPTION     "0003.0003.0005 This attribute defines the timestamp of the most recent
+                      power health status change."
 			::= { drsStatusChangeGroup 5 }
 
 	drsFanChangeTime OBJECT-TYPE
 		SYNTAX          TimeTicks
 		ACCESS          read-only
 		STATUS          mandatory
-		DESCRIPTION     "0003.0003.0006 This attribute defines the timestamp of the most recent 
-                      Fan health status change." 
+		DESCRIPTION     "0003.0003.0006 This attribute defines the timestamp of the most recent
+                      Fan health status change."
 			::= { drsStatusChangeGroup 6 }
 
 	drsBladeChangeTime  OBJECT-TYPE
 		SYNTAX          TimeTicks
 		ACCESS          read-only
 		STATUS          mandatory
-		DESCRIPTION     "0003.0003.0007 This attribute defines the timestamp of the most recent 
-                      Blade health status change." 
+		DESCRIPTION     "0003.0003.0007 This attribute defines the timestamp of the most recent
+                      Blade health status change."
 			::= { drsStatusChangeGroup 7 }
 
 	drsTempChangeTime OBJECT-TYPE
 		SYNTAX          TimeTicks
 		ACCESS          read-only
 		STATUS          mandatory
-		DESCRIPTION     "0003.0003.0008 This attribute defines the timestamp of the most recent 
-                      Temp Sensor health status change." 
+		DESCRIPTION     "0003.0003.0008 This attribute defines the timestamp of the most recent
+                      Temp Sensor health status change."
 			::= { drsStatusChangeGroup 8 }
 
 	drsCMCChangeTime OBJECT-TYPE
 		SYNTAX          TimeTicks
 		ACCESS          read-only
 		STATUS          mandatory
-		DESCRIPTION     "0003.0003.0009 This attribute defines the timestamp of the most recent 
-                      CMC health status change." 
+		DESCRIPTION     "0003.0003.0009 This attribute defines the timestamp of the most recent
+                      CMC health status change."
 			::= { drsStatusChangeGroup 9 }
 
 	-------------------------------------------------------------------------------
@@ -752,7 +752,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		SYNTAX			DellPowerReading
 		ACCESS			read-only
 		STATUS			mandatory
-		DESCRIPTION		"0004.0001.0001.0003 This attribute defines the power (in Watts) required by 
+		DESCRIPTION		"0004.0001.0001.0003 This attribute defines the power (in Watts) required by
 							the chassis	infrastructure, plus the sum of the minimum power requirements
 							for all currently powered-on servers."
 			::= { drsCMCPowerTableEntry 3 }
@@ -761,7 +761,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		SYNTAX			DellPowerReading
 		ACCESS			read-only
 		STATUS			mandatory
-		DESCRIPTION		"0004.0001.0001.0004 This attribute defines the power limit (in Watts) 
+		DESCRIPTION		"0004.0001.0001.0004 This attribute defines the power limit (in Watts)
 							at which server throttling will take place."
 			::= { drsCMCPowerTableEntry 4 }
 
@@ -771,7 +771,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS			read-only
 		STATUS			mandatory
 		DESCRIPTION		"0004.0001.0001.0005 This attribute defines the power surplus (in Watts)
-							remaining above the drsPotentialPower reading." 
+							remaining above the drsPotentialPower reading."
 			::= { drsCMCPowerTableEntry 5 }
 
 	drsKWhCumulative OBJECT-TYPE
@@ -779,7 +779,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS			read-only
 		STATUS			mandatory
 		DESCRIPTION		"0004.0001.0001.0006 This attribute defines the cumulative chassis power
-							usage (in KWh) since last reset." 
+							usage (in KWh) since last reset."
 			::= { drsCMCPowerTableEntry 6 }
 
 	drsKWhCumulativeTime OBJECT-TYPE
@@ -787,7 +787,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS			read-only
 		STATUS			mandatory
 		DESCRIPTION		"0004.0001.0001.0007 This attribute defines the timestamp of the most recent
-							chassis power accumulator reset." 
+							chassis power accumulator reset."
 			::= { drsCMCPowerTableEntry 7 }
 
 	drsWattsPeakUsage OBJECT-TYPE
@@ -795,7 +795,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS			read-only
 		STATUS			mandatory
 		DESCRIPTION		"0004.0001.0001.0008 This attribute defines the chassis peak power
-							usage (in Watts) since last reset." 
+							usage (in Watts) since last reset."
 			::= { drsCMCPowerTableEntry 8 }
 
 	drsWattsPeakTime OBJECT-TYPE
@@ -803,7 +803,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS			read-only
 		STATUS			mandatory
 		DESCRIPTION		"0004.0001.0001.0009 This attribute defines the timestamp of the most recent
-							chassis peak power usage." 
+							chassis peak power usage."
 			::= { drsCMCPowerTableEntry 9 }
 
 	drsWattsMinUsage OBJECT-TYPE
@@ -811,7 +811,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS			read-only
 		STATUS			mandatory
 		DESCRIPTION		"0004.0001.0001.0010 This attribute defines the chassis mimimum power
-							usage (in Watts) since last reset." 
+							usage (in Watts) since last reset."
 			::= { drsCMCPowerTableEntry 10 }
 
 	drsWattsMinTime OBJECT-TYPE
@@ -819,7 +819,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS			read-only
 		STATUS			mandatory
 		DESCRIPTION		"0004.0001.0001.0011 This attribute defines the timestamp of the most recent
-							chassis minimum power usage." 
+							chassis minimum power usage."
 			::= { drsCMCPowerTableEntry 11 }
 
 	drsWattsResetTime OBJECT-TYPE
@@ -827,7 +827,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS			read-only
 		STATUS			mandatory
 		DESCRIPTION		"0004.0001.0001.0012 This attribute defines the timestamp of the most recent
-							reset of the chassis min/peak Watts readings." 
+							reset of the chassis min/peak Watts readings."
 			::= { drsCMCPowerTableEntry 12 }
 
 	drsWattsReading OBJECT-TYPE
@@ -835,7 +835,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS			read-only
 		STATUS			mandatory
 		DESCRIPTION		"0004.0001.0001.0013 This attribute defines the instantaneous chassis power
-							usage (in Watts)." 
+							usage (in Watts)."
 			::= { drsCMCPowerTableEntry 13 }
 
 	drsAmpsReading OBJECT-TYPE
@@ -843,7 +843,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 		ACCESS			read-only
 		STATUS			mandatory
 		DESCRIPTION		"0004.0001.0001.0014 This attribute defines the instantaneous chassis current
-							usage (in Watts)." 
+							usage (in Watts)."
 			::= { drsCMCPowerTableEntry 14 }
 
 	-------------------------------------------------------------------------------
@@ -1046,7 +1046,7 @@ BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 -- OID Format:.1.3.6.1.4.1.674.10892.2.6.1.20.130.15.1.<a>.<i1>
 -------------------------------------------------------------------------------
 
-BatteryTableEntry                               ::=SEQUENCE { 
+BatteryTableEntry                               ::=SEQUENCE {
     batteryNumber                               INTEGER,
     batteryState                                INTEGER,
     batteryComponentStatus                      ObjectStatusEnum,
@@ -1060,11 +1060,11 @@ batteryTable OBJECT-TYPE
     ACCESS         not-accessible
     STATUS         mandatory
     DESCRIPTION
-        "A table of managed batteries. The number of 
+        "A table of managed batteries. The number of
         entries is related to number of Batteries
-        discovered in the system.  The maximum number of entries 
+        discovered in the system.  The maximum number of entries
         is implementation dependent.
-        Note: The properties in this table may not be applicable to all 
+        Note: The properties in this table may not be applicable to all
         entries.
         "
     ::= { physicalDevices 15 }
@@ -1081,7 +1081,7 @@ batteryTableEntry OBJECT-TYPE
     ::= { batteryTable 1 }
 
 batteryNumber OBJECT-TYPE
-    SYNTAX         INTEGER (1..255)
+    SYNTAX         INTEGER (0..255)
     ACCESS         read-only
     STATUS         mandatory
     DESCRIPTION
@@ -1109,7 +1109,7 @@ batteryState OBJECT-TYPE
         2: The battery is operating normally.
         3: The battery has failed and needs to be replaced.
         4: The battery temperature is high or charge level is depleting.
-        5: The battery is missing or not detected. 
+        5: The battery is missing or not detected.
         6: The battery is undergoing the re-charge phase.
         7: The battery voltage or charge level is below the threshold.
         "
@@ -1120,13 +1120,13 @@ batteryComponentStatus OBJECT-TYPE
     ACCESS         read-only
     STATUS         mandatory
     DESCRIPTION
-        "The status of the battery itself without the 
+        "The status of the battery itself without the
         propagation of any contained component status.
         Possible values:
         1: Other
         2: Unknown
-        3: OK 
-        4: Non-critical 
+        3: OK
+        4: Non-critical
         5: Critical
         6: Non-recoverable"
     ::= { batteryTableEntry 6 }
@@ -1141,7 +1141,7 @@ batteryPredictedCapacity OBJECT-TYPE
     ACCESS          read-only
     STATUS          obsolete
     DESCRIPTION
-        "This entry is obsolete. Use the batteryComponentStatus or 
+        "This entry is obsolete. Use the batteryComponentStatus or
         batteryState instead.
         "
     ::= { batteryTableEntry 10 }
@@ -1151,7 +1151,7 @@ batteryFQDD OBJECT-TYPE
     ACCESS         read-only
     STATUS         mandatory
     DESCRIPTION
-        "The battery's Fully Qualified Device Descriptor (FQDD) as 
+        "The battery's Fully Qualified Device Descriptor (FQDD) as
         represented in Storage Management.
         "
     ::= { batteryTableEntry 20 }
@@ -1173,7 +1173,7 @@ batteryDisplayName OBJECT-TYPE
 -- OID Format:.1.3.6.1.4.1.674.10892.2.6.1.20.130.1.1.<a>.<i1>
 -------------------------------------------------------------------------------
 
-ControllerTableEntry                            ::=SEQUENCE { 
+ControllerTableEntry                            ::=SEQUENCE {
     controllerNumber                            INTEGER,
     controllerName                              DisplayString,
     controllerRebuildRate                       INTEGER,
@@ -1199,14 +1199,14 @@ ControllerTableEntry                            ::=SEQUENCE {
     controllerSecurityStatus                    INTEGER,
     controllerEncryptionKeyPresent              BooleanType,
     controllerEncryptionCapability              INTEGER,
-    controllerLoadBalanceSetting                INTEGER,    
+    controllerLoadBalanceSetting                INTEGER,
     controllerMaxCapSpeed                       INTEGER,
     controllerSASAddress                        DisplayString,
     controllerFQDD                              FQDDString,
     controllerDisplayName                       DisplayString,
     controllerT10PICapability                   INTEGER,
     controllerRAID10UnevenSpansSupported        BooleanType,
-    controllerEnhancedAutoImportForeignConfigMode INTEGER,  
+    controllerEnhancedAutoImportForeignConfigMode INTEGER,
     controllerBootModeSupported                 BooleanType,
     controllerBootMode                          INTEGER,
     controllerHighAvailabilityMode              INTEGER,
@@ -1222,7 +1222,7 @@ controllerTable OBJECT-TYPE
         "A table of managed RAID controllers. The number of entries
         is related to number of RAID controllers discovered in the
         system. The maximum number of entries is implementation dependent.
-        Note: The properties in this table may not be applicable to all 
+        Note: The properties in this table may not be applicable to all
         entries.
         "
     ::= { physicalDevices 1 }
@@ -1232,14 +1232,14 @@ controllerTableEntry OBJECT-TYPE
     ACCESS         not-accessible
     STATUS         mandatory
     DESCRIPTION
-        "An entry in the table of RAID controllers. A row in this table 
-        cannot be created or deleted by SNMP operations on columns of 
+        "An entry in the table of RAID controllers. A row in this table
+        cannot be created or deleted by SNMP operations on columns of
         the table."
     INDEX         { controllerNumber }
     ::= { controllerTable 1 }
 
 controllerNumber OBJECT-TYPE
-    SYNTAX         INTEGER (1..255)
+    SYNTAX         INTEGER (0..255)
     ACCESS         read-only
     STATUS         mandatory
     DESCRIPTION
@@ -1261,8 +1261,8 @@ controllerRebuildRate OBJECT-TYPE
     ACCESS         read-only
     STATUS         mandatory
     DESCRIPTION
-        "The rebuild rate is the percentage of the controller's 
-        resources dedicated to rebuilding a failed disk when a rebuild 
+        "The rebuild rate is the percentage of the controller's
+        resources dedicated to rebuilding a failed disk when a rebuild
         is necessary.
         "
     ::= { controllerTableEntry 7 }
@@ -1281,7 +1281,7 @@ controllerCacheSizeInMB OBJECT-TYPE
     ACCESS         read-only
     STATUS         mandatory
     DESCRIPTION
-        "The controller's current amount of cache memory in megabytes.  
+        "The controller's current amount of cache memory in megabytes.
         "
     ::= { controllerTableEntry 9 }
 
@@ -1290,13 +1290,13 @@ controllerRollUpStatus OBJECT-TYPE
     ACCESS         read-only
     STATUS         mandatory
     DESCRIPTION
-        "Severity of the controller state.  
+        "Severity of the controller state.
         This is the combined status of the controller and its components.
         Possible values:
         1: Other.
         2: Unknown.
-        3: OK 
-        4: Non-critical 
+        3: OK
+        4: Non-critical
         5: Critical.
         6: Non-recoverable.
         "
@@ -1307,13 +1307,13 @@ controllerComponentStatus OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The status of the controller itself without the 
+        "The status of the controller itself without the
         propagation of any contained component status.
         Possible values:
         1: Other
         2: Unknown
-        3: OK 
-        4: Non-critical 
+        3: OK
+        4: Non-critical
         5: Critical
         6: Non-recoverable"
     ::= { controllerTableEntry 38 }
@@ -1332,8 +1332,8 @@ controllerPCISlot OBJECT-TYPE
     ACCESS         read-only
     STATUS         mandatory
     DESCRIPTION
-        "The PCI slot on the server where the controller is seated. This 
-        data is not reported for embedded or integrated controllers, 
+        "The PCI slot on the server where the controller is seated. This
+        data is not reported for embedded or integrated controllers,
         "
     ::= { controllerTableEntry 42 }
 
@@ -1342,9 +1342,9 @@ controllerReconstructRate OBJECT-TYPE
     ACCESS         read-only
     STATUS         mandatory
     DESCRIPTION
-        "The reconstruct rate is the percentage of the controller's resources 
-        dedicated to reconstructing a disk group after adding a physical disk 
-        or changing the RAID level of a virtual disk residing on the disk 
+        "The reconstruct rate is the percentage of the controller's resources
+        dedicated to reconstructing a disk group after adding a physical disk
+        or changing the RAID level of a virtual disk residing on the disk
         group.
         "
     ::= { controllerTableEntry 48 }
@@ -1354,7 +1354,7 @@ controllerPatrolReadRate OBJECT-TYPE
     ACCESS         read-only
     STATUS         mandatory
     DESCRIPTION
-        "The patrol read rate is the percentage of the controller's 
+        "The patrol read rate is the percentage of the controller's
         resources dedicated to perform a patrol read on disks participating
         in a virtual disk or hot spares.
         "
@@ -1365,8 +1365,8 @@ controllerBGIRate OBJECT-TYPE
     ACCESS         read-only
     STATUS         mandatory
     DESCRIPTION
-        "The background initialization (BGI) rate is the percentage of the 
-        controller's resources dedicated to performing the background 
+        "The background initialization (BGI) rate is the percentage of the
+        controller's resources dedicated to performing the background
         initialization of a redundant virtual disk after it is created.
         "
     ::= { controllerTableEntry 50 }
@@ -1376,8 +1376,8 @@ controllerCheckConsistencyRate OBJECT-TYPE
     ACCESS         read-only
     STATUS         mandatory
     DESCRIPTION
-        "The check consistency rate is the percentage of the 
-        controller's resources dedicated to performing a check consistency 
+        "The check consistency rate is the percentage of the
+        controller's resources dedicated to performing a check consistency
         on a redundant virtual disk.
         "
     ::= { controllerTableEntry 51 }
@@ -1397,13 +1397,13 @@ controllerPatrolReadMode OBJECT-TYPE
         "Identifies the patrol read mode setting for the controller.
         Possible values:
         1: Not one of the following or could not be determined.
-        2: Not Supported on this controller. 
+        2: Not Supported on this controller.
         3: Disabled.
         4: Automatic.
         5: Manual.
         "
     ::= { controllerTableEntry 52 }
-    
+
 controllerPatrolReadState OBJECT-TYPE
     SYNTAX          INTEGER
                     {
@@ -1427,7 +1427,7 @@ controllerPersistentHotSpare OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "Indicates whether hot spare drives would be restored on insertion 
+        "Indicates whether hot spare drives would be restored on insertion
         into the same slot.
         "
     ::= { controllerTableEntry 59 }
@@ -1457,7 +1457,7 @@ controllerSpinDownTimeInterval OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The duration in minutes after which, the unconfigured or hot 
+        "The duration in minutes after which, the unconfigured or hot
         spare drives will be spun down to power save mode.
         "
     ::= { controllerTableEntry 62 }
@@ -1467,7 +1467,7 @@ controllerPreservedCache OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "Indicates whether preserved cache or pinned cache is 
+        "Indicates whether preserved cache or pinned cache is
         present on the controller.
         "
     ::= { controllerTableEntry 69 }
@@ -1483,13 +1483,13 @@ controllerCheckConsistencyMode OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The current check consistency mode setting 
+        "The current check consistency mode setting
         for the controller.
         Possible values:
         1: Not one of the following.
         2: Not supported on this controller.
         3: Normal check consistency operation.
-        4: Check consistency operation will stop on encountering 
+        4: Check consistency operation will stop on encountering
         an error.
         "
     ::= { controllerTableEntry 70 }
@@ -1506,16 +1506,16 @@ controllerCopyBackMode OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The current copy back mode setting 
+        "The current copy back mode setting
         for the controller.
         Possible values:
         1: Not one of the following.
         2: Not supported on this controller.
         3: Disks assigned as spares could revert back to spare status.
-        4: Data from physical disk participating in a 
-        virtual disk could be automatically copied to the assigned 
-        hot spare in case former has a predictive failure event. 
-        5: Copyback mode is disabled. 
+        4: Data from physical disk participating in a
+        virtual disk could be automatically copied to the assigned
+        hot spare in case former has a predictive failure event.
+        5: Copyback mode is disabled.
         "
     ::= { controllerTableEntry 71 }
 
@@ -1560,7 +1560,7 @@ controllerEncryptionCapability OBJECT-TYPE
     "The type of encryption supported by the controller.
     Possible values:
     1: Not one of the following.
-    2: No encryption supported, 
+    2: No encryption supported,
     3: Local Key Management,
     "
     ::= { controllerTableEntry 74 }
@@ -1576,8 +1576,8 @@ controllerLoadBalanceSetting OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The ability of the controller to automatically use both 
-        controller ports (or connectors) connected to the same enclosure in 
+        "The ability of the controller to automatically use both
+        controller ports (or connectors) connected to the same enclosure in
         order to route I/O requests.
         Possible values:
         1: Not one of the following.
@@ -1599,7 +1599,7 @@ controllerMaxCapSpeed OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The maximum speed of the controller.in 
+        "The maximum speed of the controller.in
         Gigbits per second (Gbps).
         Possible values:
         1: The speed could not be determined.
@@ -1624,7 +1624,7 @@ controllerFQDD OBJECT-TYPE
     ACCESS         read-only
     STATUS         mandatory
     DESCRIPTION
-        "The controller's Fully Qualified Device Descriptor (FQDD) as 
+        "The controller's Fully Qualified Device Descriptor (FQDD) as
         represented in Storage Management.
         "
     ::= { controllerTableEntry 78 }
@@ -1634,7 +1634,7 @@ controllerDisplayName OBJECT-TYPE
     ACCESS         read-only
     STATUS         mandatory
     DESCRIPTION
-        "The controller's friendly FQDD as represented in Storage 
+        "The controller's friendly FQDD as represented in Storage
     Management."
     ::= { controllerTableEntry 79 }
 
@@ -1648,7 +1648,7 @@ controllerT10PICapability OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "Indicates whether the controller supports the T10 PI (Protection 
+        "Indicates whether the controller supports the T10 PI (Protection
         Information). These protection fields are known as DIF
         (Data Integrity Fields).
         Possible values:
@@ -1663,7 +1663,7 @@ controllerRAID10UnevenSpansSupported OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "Indicates whether uneven spans for RAID 10 virtual disk 
+        "Indicates whether uneven spans for RAID 10 virtual disk
         is supported on the controller.
         "
     ::= { controllerTableEntry 81 }
@@ -1679,7 +1679,7 @@ controllerEnhancedAutoImportForeignConfigMode OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "Indicates the status of enhanced auto-import of foreign 
+        "Indicates the status of enhanced auto-import of foreign
         configuration property of the controller.
         1: Not one of the following.
         2: Not Supported.
@@ -1693,7 +1693,7 @@ controllerBootModeSupported OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "Indicates whether headless boot mode settings are supported 
+        "Indicates whether headless boot mode settings are supported
         on the controller.
         "
     ::= { controllerTableEntry 83 }
@@ -1713,9 +1713,9 @@ controllerBootMode OBJECT-TYPE
         "Indicates the boot mode of the controller.
         Possible values:
         1: Not applicable for this controller.
-        2: User mode: User interaction required for all boot messages (not 
+        2: User mode: User interaction required for all boot messages (not
         applicable for uEFI environments).
-        3: Continue Boot On Error. User interaction only required for 
+        3: Continue Boot On Error. User interaction only required for
         critical messages.
         4: Headless Mode Continue On Error. User interaction is not required.
         Controller boot may halt on Error.
@@ -1749,7 +1749,7 @@ controllerPeerController OBJECT-TYPE
     ACCESS         read-only
     STATUS         mandatory
     DESCRIPTION
-        "The peer controller's Fully Qualified Device Descriptor (FQDD) as 
+        "The peer controller's Fully Qualified Device Descriptor (FQDD) as
         represented in Storage Management.
         "
     ::= { controllerTableEntry 86 }
@@ -1773,10 +1773,10 @@ controllerEncryptionKeyIdentifier OBJECT-TYPE
 -- OID Format:.1.3.6.1.4.1.674.10892.2.6.1.20.130.4.1.<a>.<i1>
 -------------------------------------------------------------------------------
 
-PhysicalDiskTableEntry                          ::=SEQUENCE { 
+PhysicalDiskTableEntry                          ::=SEQUENCE {
     physicalDiskNumber                          INTEGER,
     physicalDiskName                            DisplayString,
-    physicalDiskManufacturer                    DisplayString,    
+    physicalDiskManufacturer                    DisplayString,
     physicalDiskState                           INTEGER,
     physicalDiskProductID                       DisplayString,
     physicalDiskSerialNo                        DisplayString,
@@ -1786,7 +1786,7 @@ PhysicalDiskTableEntry                          ::=SEQUENCE {
     physicalDiskFreeSpaceInMB                   INTEGER,
     physicalDiskBusType                         INTEGER,
     physicalDiskSpareState                      INTEGER,
-    physicalDiskComponentStatus                 ObjectStatusEnum,    
+    physicalDiskComponentStatus                 ObjectStatusEnum,
     physicalDiskPartNumber                      DisplayString,
     physicalDiskSASAddress                      DisplayString,
     physicalDiskNegotiatedSpeed                 INTEGER,
@@ -1819,10 +1819,10 @@ physicalDiskTable OBJECT-TYPE
     ACCESS          not-accessible
     STATUS          mandatory
     DESCRIPTION
-        "A table of managed physical disks. The number of entries is 
+        "A table of managed physical disks. The number of entries is
         related to number of physical Disks discovered in the system.
         The maximum number of entries is implementation dependent.
-        Note: The properties in this table may not be applicable to 
+        Note: The properties in this table may not be applicable to
         all entries.
         "
     ::= { physicalDevices 4 }
@@ -1839,7 +1839,7 @@ physicalDiskTableEntry OBJECT-TYPE
     ::= { physicalDiskTable 1 }
 
 physicalDiskNumber OBJECT-TYPE
-    SYNTAX          INTEGER (1..1000000000)
+    SYNTAX          INTEGER (0..1000000000)
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
@@ -1856,7 +1856,7 @@ physicalDiskName OBJECT-TYPE
         "
     ::= { physicalDiskTableEntry 2 }
 
-physicalDiskManufacturer OBJECT-TYPE    
+physicalDiskManufacturer OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
@@ -1885,17 +1885,17 @@ physicalDiskState OBJECT-TYPE
         "The current state of this physical disk.
         Possible states:
         1: The current state could not be determined.
-        2: The physical disk is available for use, but no RAID configuration 
-        has been assigned. 
+        2: The physical disk is available for use, but no RAID configuration
+        has been assigned.
         3: A RAID configuration has been assigned to the physical disk.
         4: The physical disk has been moved from another
         controller and contains all or some portion of a virtual disk.
         5: The physical disk is not available to the RAID
-        controller. 
+        controller.
         6: The physical disk is currently blocked by
         controller.
         7: The physical disk is not operational.
-        8: The physical disk is not a RAID capable disk 
+        8: The physical disk is not a RAID capable disk
         9: The physical disk has been removed.
         10:The physical disk media has been placed in read only mode.
         "
@@ -1915,7 +1915,7 @@ physicalDiskSerialNo OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The physical disk's unique identification number 
+        "The physical disk's unique identification number
         from the manufacturer.
         "
     ::= { physicalDiskTableEntry 7 }
@@ -1935,7 +1935,7 @@ physicalDiskCapacityInMB OBJECT-TYPE
     STATUS          mandatory
     DESCRIPTION
         "The size of the physical disk in megabytes.
-        "        
+        "
     ::= { physicalDiskTableEntry 11 }
 
 physicalDiskUsedSpaceInMB OBJECT-TYPE
@@ -1956,7 +1956,7 @@ physicalDiskFreeSpaceInMB OBJECT-TYPE
         "The amount of free space in megabytes on the physical
         disk. This is not applicable for NVMe devices.
         "
-    ::= { physicalDiskTableEntry 19 }    
+    ::= { physicalDiskTableEntry 19 }
 
 physicalDiskBusType OBJECT-TYPE
     SYNTAX          INTEGER
@@ -1980,7 +1980,7 @@ physicalDiskBusType OBJECT-TYPE
         5: Fibre channel.
         6: PCIe.
         "
-    ::= { physicalDiskTableEntry 21 }    
+    ::= { physicalDiskTableEntry 21 }
 
 physicalDiskSpareState OBJECT-TYPE
     SYNTAX          INTEGER
@@ -2005,13 +2005,13 @@ physicalDiskComponentStatus OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The status of the physical disk itself without the 
+        "The status of the physical disk itself without the
         propagation of any contained component status.
         Possible values:
         1: Other
         2: Unknown
-        3: OK 
-        4: Non-critical 
+        3: OK
+        4: Non-critical
         5: Critical
         6: Non-recoverable
         "
@@ -2049,7 +2049,7 @@ physicalDiskNegotiatedSpeed OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The data transfer speed that the disk negotiated while spinning up 
+        "The data transfer speed that the disk negotiated while spinning up
         in Gigbits per second (Gbps).
         Possible values:
         1: The speed could not be determined.
@@ -2077,7 +2077,7 @@ physicalDiskCapableSpeed OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The maximum data transfer speed supported by the disk 
+        "The maximum data transfer speed supported by the disk
         in Gigbits per second (Gbps).
         Possible values:
         1: The speed could not be determined.
@@ -2095,7 +2095,7 @@ physicalDiskSmartAlertIndication OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "Indicates whether the physical disk has received a predictive 
+        "Indicates whether the physical disk has received a predictive
         failure alert.
         "
     ::= { physicalDiskTableEntry 31 }
@@ -2105,7 +2105,7 @@ physicalDiskManufactureDay OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The day of the week (1=Sunday thru 7=Saturday) 
+        "The day of the week (1=Sunday thru 7=Saturday)
         on which the physical disk was manufactured.
         "
     ::= { physicalDiskTableEntry 32 }
@@ -2115,12 +2115,12 @@ physicalDiskManufactureWeek OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The week (1 thru 53) in which the physical disk 
+        "The week (1 thru 53) in which the physical disk
         was manufactured.
         "
     ::= { physicalDiskTableEntry 33 }
 
-physicalDiskManufactureYear OBJECT-TYPE    
+physicalDiskManufactureYear OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
@@ -2175,12 +2175,12 @@ physicalDiskRemainingRatedWriteEndurance OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "This property is applicable to SSD media type only. This indicates 
-        the wear-out percentage of the SSD. Typically it is a value between 
-        0 to 100. However, if the value is not available or not applicable 
+        "This property is applicable to SSD media type only. This indicates
+        the wear-out percentage of the SSD. Typically it is a value between
+        0 to 100. However, if the value is not available or not applicable
         (in the case of HDD media type) the value will be 255.
         "
-    ::= { physicalDiskTableEntry 49 }    
+    ::= { physicalDiskTableEntry 49 }
 
 physicalDiskOperationalState OBJECT-TYPE
     SYNTAX          INTEGER
@@ -2197,10 +2197,10 @@ physicalDiskOperationalState OBJECT-TYPE
         operations ongoing.
         Possible values:
         1: There is no active operation running.
-        2: Data from a redundant virtual disk is 
+        2: Data from a redundant virtual disk is
         currently being rebuilt onto the physical disk.
         3: Data on the disk is being erased.
-        4: Data is being copied from a hot spare disk to 
+        4: Data is being copied from a hot spare disk to
         the physical disk or vice versa.
          "
     ::= { physicalDiskTableEntry 50 }
@@ -2210,8 +2210,8 @@ physicalDiskProgress OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The progress percentage of the operation that is being 
-        performed on the physical disk. This is applicable 
+        "The progress percentage of the operation that is being
+        performed on the physical disk. This is applicable
         only if there is a progressive operations ongoing
         "
     ::= { physicalDiskTableEntry 51 }
@@ -2263,7 +2263,7 @@ physicalDiskFQDD OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The physical disk's Fully Qualified Device Descriptor (FQDD) 
+        "The physical disk's Fully Qualified Device Descriptor (FQDD)
         as represented in Storage Management.
         "
     ::= { physicalDiskTableEntry 54 }
@@ -2273,7 +2273,7 @@ physicalDiskDisplayName OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The physical disk's friendly FQDD as represented in Storage 
+        "The physical disk's friendly FQDD as represented in Storage
         Management.
         "
     ::= { physicalDiskTableEntry 55 }
@@ -2288,8 +2288,8 @@ physicalDiskT10PICapability OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "Indicates whether the physical disk supports the T10 PI (Protection 
-        Information). These protection fields are known as DIF 
+        "Indicates whether the physical disk supports the T10 PI (Protection
+        Information). These protection fields are known as DIF
         (Data Integrity Fields).
         Possible values:
         1: Not one of the following.
@@ -2303,20 +2303,20 @@ physicalDiskBlockSizeInBytes OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The block size (in bytes) of the physical disk. This is not 
+        "The block size (in bytes) of the physical disk. This is not
         applicable for NVMe devices.
         Possible values:
         1: 512.
         2: 4096
         "
     ::= { physicalDiskTableEntry 58 }
-    
+
 physicalDiskProtocolVersion OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "Applicable for NVMe devices only. The NVMe protocol version supported 
+        "Applicable for NVMe devices only. The NVMe protocol version supported
         by the device.
         "
     ::= { physicalDiskTableEntry 59 }
@@ -2356,7 +2356,7 @@ physicalDiskPCIeCapableLinkWidth OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "Applicable for NVMe devices only. The PCIe link widths the device is capable of 
+        "Applicable for NVMe devices only. The PCIe link widths the device is capable of
         supporting.
         "
     ::= { physicalDiskTableEntry 61 }
@@ -2366,7 +2366,7 @@ physicalDiskCurrentActiveController  OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "Indicates the Fully Qualified Device Descriptor (FQDD) of 
+        "Indicates the Fully Qualified Device Descriptor (FQDD) of
         the current active controller.
         "
     ::= { physicalDiskTableEntry 62 }
@@ -2376,7 +2376,7 @@ physicalDiskFailoverController    OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "Indicates the Fully Qualified Device Descriptor (FQDD) of 
+        "Indicates the Fully Qualified Device Descriptor (FQDD) of
         the failover controller.
         "
     ::= { physicalDiskTableEntry 63 }
@@ -2398,7 +2398,7 @@ physicalDiskForeignKeyIdentifier  OBJECT-TYPE
 --
 -- OID Format:.1.3.6.1.4.1.674.10892.2.6.1.20.140.1.1.<a>.<i1>
 -------------------------------------------------------------------------------
-VirtualDiskTableEntry                          ::=SEQUENCE { 
+VirtualDiskTableEntry                          ::=SEQUENCE {
     virtualDiskNumber                           INTEGER,
     virtualDiskName                             DisplayString,
     virtualDiskState                            INTEGER,
@@ -2407,7 +2407,7 @@ VirtualDiskTableEntry                          ::=SEQUENCE {
     virtualDiskReadPolicy                       INTEGER,
     virtualDiskLayout                           INTEGER,
     virtualDiskStripeSize                       INTEGER,
-    virtualDiskComponentStatus                  ObjectStatusEnum,        
+    virtualDiskComponentStatus                  ObjectStatusEnum,
     virtualDiskBadBlocksDetected                BooleanType,
     virtualDiskSecured                          BooleanType,
     virtualDiskIsCacheCade                      BooleanType,
@@ -2435,7 +2435,7 @@ virtualDiskTable OBJECT-TYPE
     STATUS          mandatory
     DESCRIPTION
         "A table of managed virtual disks. The number of entries is related
-        to number of virtual disks discovered in the system. 
+        to number of virtual disks discovered in the system.
         The maximum number of entries is implementation dependent.
         Note: The properties in this table may not be applicable to all
         entries.
@@ -2452,9 +2452,9 @@ virtualDiskTableEntry OBJECT-TYPE
         "
     INDEX         { virtualDiskNumber }
     ::= { virtualDiskTable 1 }
-    
+
 virtualDiskNumber OBJECT-TYPE
-    SYNTAX          INTEGER (1..100000000)
+    SYNTAX          INTEGER (0..100000000)
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
@@ -2462,7 +2462,7 @@ virtualDiskNumber OBJECT-TYPE
         "
         ::= { virtualDiskTableEntry 1 }
 
-virtualDiskName OBJECT-TYPE    
+virtualDiskName OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
@@ -2487,10 +2487,10 @@ virtualDiskState OBJECT-TYPE
         Possible states:
         1: The current state could not be determined.
         2: The virtual disk is operating normally or optimally.
-        3: The virtual disk has encountered a failure. The data on disk 
+        3: The virtual disk has encountered a failure. The data on disk
         is lost or is about to be lost.
-        4: The virtual disk encounterd a failure with one or all of the 
-        constituent redundant physical disks. The data on the virtual 
+        4: The virtual disk encounterd a failure with one or all of the
+        constituent redundant physical disks. The data on the virtual
         disk might no longer be fault tolerant.
         "
     ::= { virtualDiskTableEntry 4 }
@@ -2504,7 +2504,7 @@ virtualDiskSizeInMB OBJECT-TYPE
         "
     ::= { virtualDiskTableEntry 6 }
 
-virtualDiskWritePolicy OBJECT-TYPE           
+virtualDiskWritePolicy OBJECT-TYPE
     SYNTAX          INTEGER
                     {
                     writeThrough(1),
@@ -2514,7 +2514,7 @@ virtualDiskWritePolicy OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The write policy used by the controller for write operations on 
+        "The write policy used by the controller for write operations on
         this virtual disk.
         Possible values:
         1: Write Through.
@@ -2523,7 +2523,7 @@ virtualDiskWritePolicy OBJECT-TYPE
         "
     ::= { virtualDiskTableEntry 10 }
 
-virtualDiskReadPolicy OBJECT-TYPE        
+virtualDiskReadPolicy OBJECT-TYPE
     SYNTAX          INTEGER
                     {
                     noReadAhead(1),
@@ -2533,7 +2533,7 @@ virtualDiskReadPolicy OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The read policy used by the controller for read operations on 
+        "The read policy used by the controller for read operations on
         this virtual disk.
         Possible values:
         1: No Read Ahead.
@@ -2542,7 +2542,7 @@ virtualDiskReadPolicy OBJECT-TYPE
         "
     ::= { virtualDiskTableEntry 11 }
 
-virtualDiskLayout OBJECT-TYPE            
+virtualDiskLayout OBJECT-TYPE
     SYNTAX          INTEGER
                     {
                     other(1),
@@ -2574,7 +2574,7 @@ virtualDiskLayout OBJECT-TYPE
         "
     ::= { virtualDiskTableEntry 13 }
 
-virtualDiskStripeSize OBJECT-TYPE        
+virtualDiskStripeSize OBJECT-TYPE
     SYNTAX          INTEGER
                     {
                     other(1),
@@ -2627,7 +2627,7 @@ virtualDiskComponentStatus OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The status of the virtual disk itself without the 
+        "The status of the virtual disk itself without the
         propagation of any contained component status.
         Possible values:
         1: Other.
@@ -2639,7 +2639,7 @@ virtualDiskComponentStatus OBJECT-TYPE
         "
     ::= { virtualDiskTableEntry 20 }
 
-virtualDiskBadBlocksDetected OBJECT-TYPE    
+virtualDiskBadBlocksDetected OBJECT-TYPE
     SYNTAX          BooleanType
     ACCESS          read-only
     STATUS          mandatory
@@ -2648,7 +2648,7 @@ virtualDiskBadBlocksDetected OBJECT-TYPE
         "
     ::= { virtualDiskTableEntry 23 }
 
-virtualDiskSecured OBJECT-TYPE            
+virtualDiskSecured OBJECT-TYPE
     SYNTAX          BooleanType
     ACCESS          read-only
     STATUS          mandatory
@@ -2657,17 +2657,17 @@ virtualDiskSecured OBJECT-TYPE
         "
     ::= { virtualDiskTableEntry 24 }
 
-virtualDiskIsCacheCade OBJECT-TYPE        
+virtualDiskIsCacheCade OBJECT-TYPE
     SYNTAX          BooleanType
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "Indicates whether the virtual disk is being used as a secondary 
+        "Indicates whether the virtual disk is being used as a secondary
         cache by the controller.
         "
     ::= { virtualDiskTableEntry 25 }
 
-virtualDiskDiskCachePolicy OBJECT-TYPE        
+virtualDiskDiskCachePolicy OBJECT-TYPE
     SYNTAX          INTEGER
                     {
                     enabled(1),
@@ -2677,8 +2677,8 @@ virtualDiskDiskCachePolicy OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The cache policy of the physical disks that are 
-        part of this virtual disk 
+        "The cache policy of the physical disks that are
+        part of this virtual disk
         Possible values:
         1: Enabled.
         2: Disabled.
@@ -2703,12 +2703,12 @@ virtualDiskOperationalState OBJECT-TYPE
         Possible values:
         1: There is no active operation running.
         2: The virtual disk configuration has changed.
-        The physical disks included in the virtual disk are being 
+        The physical disks included in the virtual disk are being
         modified to support the new configuration.
-        3: A Consistency Check (CC) is being performed 
+        3: A Consistency Check (CC) is being performed
         on the virtual disk.
         4: The virtual disk is being initialized.
-        5: BackGround Initialization (BGI) is being performed 
+        5: BackGround Initialization (BGI) is being performed
         on the virtual disk.
         "
     ::= { virtualDiskTableEntry 30 }
@@ -2718,24 +2718,24 @@ virtualDiskProgress OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The progress percentage of the operation that is being 
-        performed on the virtual disk. This is applicable 
+        "The progress percentage of the operation that is being
+        performed on the virtual disk. This is applicable
         only if there is a progressive operations ongoing
         "
     ::= { virtualDiskTableEntry 31 }
 
-virtualDiskAvailableProtocols OBJECT-TYPE    
+virtualDiskAvailableProtocols OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
         "List of protocols support by physical disks part of this virtual
-        disk. For e.g. SAS for Serial Attached SCSI or SATA for 
+        disk. For e.g. SAS for Serial Attached SCSI or SATA for
         Serial Advanced Technology Attachment.
         "
     ::= { virtualDiskTableEntry 32 }
 
-virtualDiskMediaType OBJECT-TYPE        
+virtualDiskMediaType OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
@@ -2745,7 +2745,7 @@ virtualDiskMediaType OBJECT-TYPE
         "
     ::= { virtualDiskTableEntry 33 }
 
-virtualDiskRemainingRedundancy OBJECT-TYPE    
+virtualDiskRemainingRedundancy OBJECT-TYPE
     SYNTAX          INTEGER (0..2)
     ACCESS          read-only
     STATUS          mandatory
@@ -2755,12 +2755,12 @@ virtualDiskRemainingRedundancy OBJECT-TYPE
         "
     ::= { virtualDiskTableEntry 34 }
 
-virtualDiskFQDD OBJECT-TYPE   
+virtualDiskFQDD OBJECT-TYPE
     SYNTAX          FQDDString
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The virtual disk's Fully Qualified Device Descriptor (FQDD) as 
+        "The virtual disk's Fully Qualified Device Descriptor (FQDD) as
         represented in Storage Management.
         "
     ::= { virtualDiskTableEntry 35 }
@@ -2770,7 +2770,7 @@ virtualDiskDisplayName OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The virtual disk's friendly FQDD as represented in Storage 
+        "The virtual disk's friendly FQDD as represented in Storage
         Management.
         "
     ::= { virtualDiskTableEntry 36 }
@@ -2785,8 +2785,8 @@ virtualDiskT10PIStatus OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "Indicates whether the virtual disk supports the T10 PI (Protection 
-        Information). These protection fields are known as DIF 
+        "Indicates whether the virtual disk supports the T10 PI (Protection
+        Information). These protection fields are known as DIF
         (Data Integrity Fields).
         Possible values:
         1: Not one of the following.
@@ -2875,12 +2875,12 @@ virtualDiskAdapter4AccessPolicy OBJECT-TYPE
         "
     ::= { virtualDiskTableEntry 42 }
 
-virtualDiskCurrentActiveController OBJECT-TYPE   
+virtualDiskCurrentActiveController OBJECT-TYPE
     SYNTAX          FQDDString
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "Indicates the Fully Qualified Device Descriptor (FQDD) of 
+        "Indicates the Fully Qualified Device Descriptor (FQDD) of
         the current active controller.
         "
     ::= { virtualDiskTableEntry 43 }
@@ -2890,7 +2890,7 @@ virtualDiskFailoverController OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "Indicates the Fully Qualified Device Descriptor (FQDD) of 
+        "Indicates the Fully Qualified Device Descriptor (FQDD) of
         the failover controller.
         "
     ::= { virtualDiskTableEntry 44 }
@@ -2902,15 +2902,15 @@ virtualDiskFailoverController OBJECT-TYPE
 -- OID Format:.1.3.6.1.4.1.674.10892.2.6.1.20.130.3.1.<a>.<i1>
 -------------------------------------------------------------------------------
 
-EnclosureTableEntry                             ::=SEQUENCE { 
+EnclosureTableEntry                             ::=SEQUENCE {
     enclosureNumber                             INTEGER,
     enclosureName                               DisplayString,
     enclosureState                              INTEGER,
     enclosureServiceTag                         DisplayString,
     enclosureAssetTag                           DisplayString,
     enclosureConnectedPort                      DisplayString,
-    enclosureRollUpStatus                       ObjectStatusEnum,    
-    enclosureComponentStatus                    ObjectStatusEnum, 
+    enclosureRollUpStatus                       ObjectStatusEnum,
+    enclosureComponentStatus                    ObjectStatusEnum,
     enclosureFirmwareVersion                    DisplayString,
     enclosureSASAddress                         DisplayString,
     enclosureDriveCount                         INTEGER,
@@ -2932,11 +2932,11 @@ enclosureTable OBJECT-TYPE
     ACCESS          not-accessible
     STATUS          mandatory
     DESCRIPTION
-        "A table of managed enclosures/backplanes. The number of entries is 
-        related to number of internal backplane(s) discovered in the system 
+        "A table of managed enclosures/backplanes. The number of entries is
+        related to number of internal backplane(s) discovered in the system
         and external storage enclosure(s) attached to the system..
         The maximum number of entries is implementation dependent.
-        Note: The properties in this table may not be applicable to all 
+        Note: The properties in this table may not be applicable to all
         entries.
         "
     ::= { physicalDevices 3 }
@@ -2952,8 +2952,8 @@ enclosureTableEntry OBJECT-TYPE
     INDEX { enclosureNumber }
     ::= { enclosureTable 1 }
 
-enclosureNumber OBJECT-TYPE    
-    SYNTAX          INTEGER (1..255)
+enclosureNumber OBJECT-TYPE
+    SYNTAX          INTEGER (0..255)
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
@@ -2961,7 +2961,7 @@ enclosureNumber OBJECT-TYPE
         "
     ::= { enclosureTableEntry 1 }
 
-enclosureName OBJECT-TYPE        
+enclosureName OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
@@ -2970,7 +2970,7 @@ enclosureName OBJECT-TYPE
         "
     ::= { enclosureTableEntry 2 }
 
-enclosureState OBJECT-TYPE        
+enclosureState OBJECT-TYPE
     SYNTAX          INTEGER
                     {
                     unknown(1),
@@ -2990,20 +2990,20 @@ enclosureState OBJECT-TYPE
         Possible states:
         1: The current state could not be determined.
         2: The enclosure is operating normally.
-        3: The enclosure has encountered a hardware problem or is not 
+        3: The enclosure has encountered a hardware problem or is not
         responding.
-        4: The enclosure is no longer connected to the controller or 
+        4: The enclosure is no longer connected to the controller or
         there exists a problem communicating to the enclosure.
         5: The enclosure is unstable.
         6: The enclosure is inactive due to being configured by another
         controller.
-        7: The enclosure is offline and inaccessible. 
+        7: The enclosure is offline and inaccessible.
         8: The enclosure is online and accessible.
         9: The enclosure is currently blocked by another controller.
         "
     ::= { enclosureTableEntry 4 }
 
-enclosureServiceTag OBJECT-TYPE    
+enclosureServiceTag OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
@@ -3012,7 +3012,7 @@ enclosureServiceTag OBJECT-TYPE
         "
     ::= { enclosureTableEntry 8 }
 
-enclosureAssetTag OBJECT-TYPE        
+enclosureAssetTag OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
@@ -3020,17 +3020,17 @@ enclosureAssetTag OBJECT-TYPE
         "The asset tag information for the enclosure."
     ::= { enclosureTableEntry 9 }
 
-enclosureConnectedPort OBJECT-TYPE    
+enclosureConnectedPort OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The port on the controller to which the 
+        "The port on the controller to which the
         storage enclosure is connected.
         "
     ::= { enclosureTableEntry 19 }
 
-enclosureRollUpStatus OBJECT-TYPE    
+enclosureRollUpStatus OBJECT-TYPE
     SYNTAX          ObjectStatusEnum
     ACCESS          read-only
     STATUS          mandatory
@@ -3047,12 +3047,12 @@ enclosureRollUpStatus OBJECT-TYPE
         "
     ::= { enclosureTableEntry 23 }
 
-enclosureComponentStatus OBJECT-TYPE    
+enclosureComponentStatus OBJECT-TYPE
     SYNTAX          ObjectStatusEnum
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The status of the enclosure/backplane.itself without the 
+        "The status of the enclosure/backplane.itself without the
         propagation of any contained component status.
         Possible values:
         1: Other.
@@ -3064,7 +3064,7 @@ enclosureComponentStatus OBJECT-TYPE
         "
     ::= { enclosureTableEntry 24 }
 
-enclosureFirmwareVersion OBJECT-TYPE    
+enclosureFirmwareVersion OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
@@ -3082,52 +3082,52 @@ enclosureSASAddress OBJECT-TYPE
         "
     ::= { enclosureTableEntry 30 }
 
-enclosureDriveCount OBJECT-TYPE        
+enclosureDriveCount OBJECT-TYPE
     SYNTAX          INTEGER
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
         "The number of disks present in the enclosure/backplane.
-        "    
+        "
     ::= { enclosureTableEntry 31 }
 
-enclosureTotalSlots OBJECT-TYPE    
+enclosureTotalSlots OBJECT-TYPE
     SYNTAX          INTEGER
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The total physical drive slots in a storage enclosure 
+        "The total physical drive slots in a storage enclosure
         or server backplane.
         "
     ::= { enclosureTableEntry 32 }
 
-enclosureFanCount OBJECT-TYPE        
+enclosureFanCount OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
         "The number of fans present in the storage enclosure.
-        "    
+        "
     ::= { enclosureTableEntry 40 }
 
-enclosurePSUCount OBJECT-TYPE        
+enclosurePSUCount OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The number of Power Supply Units (PSU) present 
+        "The number of Power Supply Units (PSU) present
         in the storage enclosure.
-        "    
+        "
     ::= { enclosureTableEntry 41 }
 
-enclosureEMMCount OBJECT-TYPE        
+enclosureEMMCount OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The number of Enclosure Management Modules (EMM) 
+        "The number of Enclosure Management Modules (EMM)
         present in the storage enclosure.
-        "    
+        "
     ::= { enclosureTableEntry 42 }
 
 enclosureTempProbeCount OBJECT-TYPE
@@ -3135,22 +3135,22 @@ enclosureTempProbeCount OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The number of temperature sensing devices 
+        "The number of temperature sensing devices
         present in the storage enclosure.
         "
     ::= { enclosureTableEntry 43 }
 
-enclosureRedundantPath OBJECT-TYPE    
+enclosureRedundantPath OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "Indicates whether the controller has multiply paths to 
+        "Indicates whether the controller has multiply paths to
         reach the storage enclosure.
         "
     ::= { enclosureTableEntry 44 }
 
-enclosurePosition OBJECT-TYPE        
+enclosurePosition OBJECT-TYPE
      SYNTAX         DisplayString
      ACCESS         read-only
      STATUS         mandatory
@@ -3159,7 +3159,7 @@ enclosurePosition OBJECT-TYPE
          "
     ::= { enclosureTableEntry 45 }
 
-enclosureBackplaneBayID OBJECT-TYPE    
+enclosureBackplaneBayID OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
@@ -3168,27 +3168,27 @@ enclosureBackplaneBayID OBJECT-TYPE
         "
     ::= { enclosureTableEntry 46 }
 
-enclosureFQDD OBJECT-TYPE        
+enclosureFQDD OBJECT-TYPE
     SYNTAX          FQDDString
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The enclosure/backplane's Fully Qualified Device Descriptor (FQDD) 
+        "The enclosure/backplane's Fully Qualified Device Descriptor (FQDD)
         as represented in Storage Management.
         "
     ::= { enclosureTableEntry 47 }
-    
-enclosureDisplayName OBJECT-TYPE    
+
+enclosureDisplayName OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The enclosure/backplane's friendly FQDD as represented in 
+        "The enclosure/backplane's friendly FQDD as represented in
         Storage Management.
         "
     ::= { enclosureTableEntry 48 }
 
-enclosureType OBJECT-TYPE        
+enclosureType OBJECT-TYPE
     SYNTAX          INTEGER
                     {
                     other(1),
@@ -3217,13 +3217,13 @@ enclosureType OBJECT-TYPE
 -- OID Format:.1.3.6.1.4.1.674.10892.2.6.1.20.130.13.1.<a>.<i1>
 -------------------------------------------------------------------------------
 
-EnclosureManagementModuleTableEntry             ::=SEQUENCE { 
+EnclosureManagementModuleTableEntry             ::=SEQUENCE {
     enclosureManagementModuleNumber             INTEGER,
     enclosureManagementModuleName               DisplayString,
     enclosureManagementModuleState              INTEGER,
     enclosureManagementModulePartNumber         DisplayString,
     enclosureManagementModuleFWVersion          DisplayString,
-    enclosureManagementModuleComponentStatus    ObjectStatusEnum, 
+    enclosureManagementModuleComponentStatus    ObjectStatusEnum,
     enclosureManagementModuleFQDD               FQDDString,
     enclosureManagementModuleDisplayName        DisplayString
 }
@@ -3233,12 +3233,12 @@ enclosureManagementModuleTable OBJECT-TYPE
     ACCESS          not-accessible
     STATUS          mandatory
     DESCRIPTION
-        "A table of managed Enclosure Management Modules (EMM) 
-        in the external storage enclosure(s). The number of 
+        "A table of managed Enclosure Management Modules (EMM)
+        in the external storage enclosure(s). The number of
         entries is related to number of enclosure management modules
-        discovered in the enclosure(s). The maximum number of entries 
+        discovered in the enclosure(s). The maximum number of entries
         is implementation dependent.
-        Note: The properties in this table may not be applicable to all 
+        Note: The properties in this table may not be applicable to all
         entries.
         "
     ::= { physicalDevices 13 }
@@ -3248,15 +3248,15 @@ enclosureManagementModuleTableEntry OBJECT-TYPE
     ACCESS          not-accessible
     STATUS          mandatory
     DESCRIPTION
-        "An entry in the enclosure management module table. A row in 
-        this table cannot be created or deleted by SNMP operations 
+        "An entry in the enclosure management module table. A row in
+        this table cannot be created or deleted by SNMP operations
         on columns of the table.
         "
     INDEX { enclosureManagementModuleNumber }
     ::= { enclosureManagementModuleTable 1 }
 
 enclosureManagementModuleNumber OBJECT-TYPE
-    SYNTAX          INTEGER (1..255)
+    SYNTAX          INTEGER (0..255)
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
@@ -3264,17 +3264,17 @@ enclosureManagementModuleNumber OBJECT-TYPE
         "
     ::= { enclosureManagementModuleTableEntry 1 }
 
-enclosureManagementModuleName OBJECT-TYPE        
+enclosureManagementModuleName OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The enclosure management module's name as 
+        "The enclosure management module's name as
         represented in Storage Management.
         "
     ::= { enclosureManagementModuleTableEntry 2 }
- 
-enclosureManagementModuleState OBJECT-TYPE    
+
+enclosureManagementModuleState OBJECT-TYPE
     SYNTAX          INTEGER
                     {
                     unknown(1),
@@ -3290,7 +3290,7 @@ enclosureManagementModuleState OBJECT-TYPE
         Possible states:
         1: The current state could not be determined.
         2: The enclosure management module is operating normally.
-        3: The enclosure management module has encountered a 
+        3: The enclosure management module has encountered a
         hardware problem or is not responding.
         4: The enclosure management module is no longer connected
         to the enclosure or there exists a problem communicating to it.
@@ -3298,7 +3298,7 @@ enclosureManagementModuleState OBJECT-TYPE
         "
     ::= { enclosureManagementModuleTableEntry 4 }
 
-enclosureManagementModulePartNumber OBJECT-TYPE        
+enclosureManagementModulePartNumber OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
@@ -3306,14 +3306,14 @@ enclosureManagementModulePartNumber OBJECT-TYPE
         "The part number of the enclosure management module.
         "
     ::= { enclosureManagementModuleTableEntry 6 }
- 
-enclosureManagementModuleFWVersion OBJECT-TYPE        
+
+enclosureManagementModuleFWVersion OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
         "Firmware version of the enclosure management module.
-        "    
+        "
     ::= { enclosureManagementModuleTableEntry 8 }
 
 enclosureManagementModuleComponentStatus OBJECT-TYPE
@@ -3321,7 +3321,7 @@ enclosureManagementModuleComponentStatus OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The status of the enclosure management module.itself without the 
+        "The status of the enclosure management module.itself without the
         propagation of any contained component status.
         Possible values:
         1: Other.
@@ -3333,22 +3333,22 @@ enclosureManagementModuleComponentStatus OBJECT-TYPE
         "
     ::= { enclosureManagementModuleTableEntry 11 }
 
-enclosureManagementModuleFQDD OBJECT-TYPE        
+enclosureManagementModuleFQDD OBJECT-TYPE
     SYNTAX          FQDDString
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The enclosure management module's Fully Qualified Device 
+        "The enclosure management module's Fully Qualified Device
         Descriptor (FQDD) as represented in Storage Management.
         "
     ::= { enclosureManagementModuleTableEntry 15 }
 
-enclosureManagementModuleDisplayName OBJECT-TYPE    
+enclosureManagementModuleDisplayName OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The enclosure management module's friendly FQDD as represented in 
+        "The enclosure management module's friendly FQDD as represented in
         Storage Management.
         "
     ::= { enclosureManagementModuleTableEntry 16 }
@@ -3361,12 +3361,12 @@ enclosureManagementModuleDisplayName OBJECT-TYPE
 -- OID Format:.1.3.6.1.4.1.674.10892.2.6.1.20.130.7.1.<a>.<i1>
 -------------------------------------------------------------------------------
 
-EnclosureFanTableEntry                          ::=SEQUENCE { 
+EnclosureFanTableEntry                          ::=SEQUENCE {
     enclosureFanNumber                          INTEGER,
     enclosureFanName                            DisplayString,
     enclosureFanState                           INTEGER,
     enclosureFanSpeed                           INTEGER,
-    enclosureFanComponentStatus                 ObjectStatusEnum, 
+    enclosureFanComponentStatus                 ObjectStatusEnum,
     enclosureFanFQDD                            FQDDString,
     enclosureFanDisplayName                     DisplayString
 }
@@ -3376,15 +3376,15 @@ enclosureFanTable OBJECT-TYPE
     ACCESS          not-accessible
     STATUS          mandatory
     DESCRIPTION
-        "A table of managed fans in the external storage enclosure(s). 
-        The number of entries is related to number of fans discovered in 
-        the enclosure(s). The maximum number of entries is implementation 
+        "A table of managed fans in the external storage enclosure(s).
+        The number of entries is related to number of fans discovered in
+        the enclosure(s). The maximum number of entries is implementation
         dependent.
-        Note: The properties in this table may not be applicable to all 
+        Note: The properties in this table may not be applicable to all
         entries.
         "
     ::= { physicalDevices 7 }
-    
+
 enclosureFanTableEntry OBJECT-TYPE
     SYNTAX          EnclosureFanTableEntry
     ACCESS          not-accessible
@@ -3397,7 +3397,7 @@ enclosureFanTableEntry OBJECT-TYPE
     ::= { enclosureFanTable 1 }
 
 enclosureFanNumber OBJECT-TYPE
-    SYNTAX          INTEGER (1..255)
+    SYNTAX          INTEGER (0..255)
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
@@ -3405,7 +3405,7 @@ enclosureFanNumber OBJECT-TYPE
         "
     ::= { enclosureFanTableEntry 1 }
 
-enclosureFanName OBJECT-TYPE        
+enclosureFanName OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
@@ -3430,15 +3430,15 @@ enclosureFanState OBJECT-TYPE
         Possible states:
         1: The current state could not be determined.
         2: The fan is operating normally.
-        3: The fan has encountered a hardware problem or is not 
+        3: The fan has encountered a hardware problem or is not
         responding.
-        4: The fan is no longer connected to the enclosure or 
+        4: The fan is no longer connected to the enclosure or
         there exists a problem communicating to it.
         5: The fan is unstable.
         "
     ::= { enclosureFanTableEntry 4 }
 
-enclosureFanSpeed OBJECT-TYPE            
+enclosureFanSpeed OBJECT-TYPE
     SYNTAX          INTEGER
     ACCESS          read-only
     STATUS          mandatory
@@ -3447,12 +3447,12 @@ enclosureFanSpeed OBJECT-TYPE
         "
     ::= { enclosureFanTableEntry 11 }
 
-enclosureFanComponentStatus OBJECT-TYPE    
+enclosureFanComponentStatus OBJECT-TYPE
     SYNTAX          ObjectStatusEnum
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The status of the fan itself without the 
+        "The status of the fan itself without the
         propagation of any contained component status.
         Possible values:
         1: Other.
@@ -3469,7 +3469,7 @@ enclosureFanFQDD OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The fan's Fully Qualified Device Descriptor (FQDD) 
+        "The fan's Fully Qualified Device Descriptor (FQDD)
         as represented in Storage Management.
         "
     ::= { enclosureFanTableEntry 20 }
@@ -3479,7 +3479,7 @@ enclosureFanDisplayName OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The fan's friendly FQDD as represented in 
+        "The fan's friendly FQDD as represented in
         Storage Management.
         "
     ::= { enclosureFanTableEntry 21 }
@@ -3492,12 +3492,12 @@ enclosureFanDisplayName OBJECT-TYPE
 --
 -- OID Format:.1.3.6.1.4.1.674.10892.2.6.1.20.130.9.1.<a>.<i1>
 -------------------------------------------------------------------------------
-EnclosurePowerSupplyTableEntry                 ::=SEQUENCE { 
+EnclosurePowerSupplyTableEntry                 ::=SEQUENCE {
     enclosurePowerSupplyNumber                  INTEGER,
     enclosurePowerSupplyName                    DisplayString,
     enclosurePowerSupplyState                   INTEGER,
     enclosurePowerSupplyPartNumber              DisplayString,
-    enclosurePowerSupplyComponentStatus         ObjectStatusEnum, 
+    enclosurePowerSupplyComponentStatus         ObjectStatusEnum,
     enclosurePowerSupplyFQDD                    FQDDString,
     enclosurePowerSupplyDisplayName             DisplayString
 }
@@ -3507,29 +3507,29 @@ enclosurePowerSupplyTable OBJECT-TYPE
     ACCESS          not-accessible
     STATUS          mandatory
     DESCRIPTION
-        "A table of managed Power Supply Units(PSU) in the external 
-        storage enclosure(s). The number of entries is related to number 
-        of power supply unit(s) discovered in the enclosure(s). The 
-        maximum number of entries is implementation 
+        "A table of managed Power Supply Units(PSU) in the external
+        storage enclosure(s). The number of entries is related to number
+        of power supply unit(s) discovered in the enclosure(s). The
+        maximum number of entries is implementation
         dependent.
-        Note: The properties in this table may not be applicable to all 
+        Note: The properties in this table may not be applicable to all
         entries.
         "
     ::= { physicalDevices 9 }
-    
+
 enclosurePowerSupplyTableEntry OBJECT-TYPE
     SYNTAX          EnclosurePowerSupplyTableEntry
     ACCESS          not-accessible
     STATUS          mandatory
     DESCRIPTION
-        "An entry in the power supply unit table. A row in this table cannot 
+        "An entry in the power supply unit table. A row in this table cannot
         be created or deleted by SNMP operations on columns of the table.
         "
     INDEX { enclosurePowerSupplyNumber }
     ::= { enclosurePowerSupplyTable 1 }
 
 enclosurePowerSupplyNumber OBJECT-TYPE
-    SYNTAX          INTEGER (1..255)
+    SYNTAX          INTEGER (0..255)
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
@@ -3537,17 +3537,17 @@ enclosurePowerSupplyNumber OBJECT-TYPE
         "
     ::= { enclosurePowerSupplyTableEntry 1 }
 
-enclosurePowerSupplyName OBJECT-TYPE        
+enclosurePowerSupplyName OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The power supply unit's name as represented in 
+        "The power supply unit's name as represented in
         Storage Management.
         "
     ::= { enclosurePowerSupplyTableEntry 2 }
 
-enclosurePowerSupplyState OBJECT-TYPE        
+enclosurePowerSupplyState OBJECT-TYPE
     SYNTAX          INTEGER
                     {
                     unknown(1),
@@ -3563,29 +3563,29 @@ enclosurePowerSupplyState OBJECT-TYPE
         Possible states:
         1: The current state could not be determined.
         2: The power supply unit is operating normally.
-        3: The power supply unit has encountered a hardware problem 
+        3: The power supply unit has encountered a hardware problem
         or is not responding.
-        4: The power supply unit is no longer connected to the enclosure 
+        4: The power supply unit is no longer connected to the enclosure
         or there exists a problem communicating to it.
         5: The power supply unit is unstable.
         "
     ::= { enclosurePowerSupplyTableEntry 4 }
 
-enclosurePowerSupplyPartNumber OBJECT-TYPE        
+enclosurePowerSupplyPartNumber OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The part number of the power supply unit. 
+        "The part number of the power supply unit.
         "
     ::= { enclosurePowerSupplyTableEntry 7 }
 
-enclosurePowerSupplyComponentStatus OBJECT-TYPE     
+enclosurePowerSupplyComponentStatus OBJECT-TYPE
     SYNTAX          ObjectStatusEnum
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The status of the power supply unit itself without the 
+        "The status of the power supply unit itself without the
         propagation of any contained component status.
         Possible values:
         1: Other.
@@ -3597,7 +3597,7 @@ enclosurePowerSupplyComponentStatus OBJECT-TYPE
         "
     ::= { enclosurePowerSupplyTableEntry 9 }
 
-enclosurePowerSupplyFQDD OBJECT-TYPE        
+enclosurePowerSupplyFQDD OBJECT-TYPE
     SYNTAX          FQDDString
     ACCESS          read-only
     STATUS          mandatory
@@ -3607,12 +3607,12 @@ enclosurePowerSupplyFQDD OBJECT-TYPE
         "
     ::= { enclosurePowerSupplyTableEntry 15 }
 
-enclosurePowerSupplyDisplayName OBJECT-TYPE    
+enclosurePowerSupplyDisplayName OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The power supply unit's friendly FQDD as represented in 
+        "The power supply unit's friendly FQDD as represented in
         Storage Management.
         "
     ::= { enclosurePowerSupplyTableEntry 16 }
@@ -3623,7 +3623,7 @@ enclosurePowerSupplyDisplayName OBJECT-TYPE
 --
 -- OID Format:.1.3.6.1.4.1.674.10892.2.6.1.20.130.11.1.<a>.<i1>
 -------------------------------------------------------------------------------
-EnclosureTemperatureProbeTableEntry             ::=SEQUENCE { 
+EnclosureTemperatureProbeTableEntry             ::=SEQUENCE {
     enclosureTemperatureProbeNumber             INTEGER,
     enclosureTemperatureProbeName               DisplayString,
     enclosureTemperatureProbeState              INTEGER,
@@ -3632,7 +3632,7 @@ EnclosureTemperatureProbeTableEntry             ::=SEQUENCE {
     enclosureTemperatureProbeMaxWarningValue    INTEGER,
     enclosureTemperatureProbeMaxCriticalValue   INTEGER,
     enclosureTemperatureProbeCurValue           INTEGER,
-    enclosureTemperatureProbeComponentStatus    ObjectStatusEnum, 
+    enclosureTemperatureProbeComponentStatus    ObjectStatusEnum,
     enclosureTemperatureProbeFQDD               FQDDString,
     enclosureTemperatureProbeDisplayName        DisplayString
 }
@@ -3643,14 +3643,14 @@ enclosureTemperatureProbeTable OBJECT-TYPE
     STATUS          mandatory
     DESCRIPTION
         "A table of managed temperature probes in the external storage
-        enclosure(s). The number of entries is related to number of 
-        temperature probes discovered in the enclosure(s). The maximum 
+        enclosure(s). The number of entries is related to number of
+        temperature probes discovered in the enclosure(s). The maximum
         number of entries is implementation dependent.
-        Note: The properties in this table may not be applicable to all 
+        Note: The properties in this table may not be applicable to all
         entries.
         "
     ::= { physicalDevices 11 }
-    
+
 enclosureTemperatureProbeTableEntry OBJECT-TYPE
     SYNTAX          EnclosureTemperatureProbeTableEntry
     ACCESS          not-accessible
@@ -3663,7 +3663,7 @@ enclosureTemperatureProbeTableEntry OBJECT-TYPE
     ::= { enclosureTemperatureProbeTable 1 }
 
 enclosureTemperatureProbeNumber OBJECT-TYPE
-    SYNTAX          INTEGER (1..255)
+    SYNTAX          INTEGER (0..255)
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
@@ -3671,17 +3671,17 @@ enclosureTemperatureProbeNumber OBJECT-TYPE
         "
     ::= { enclosureTemperatureProbeTableEntry 1 }
 
-enclosureTemperatureProbeName OBJECT-TYPE        
+enclosureTemperatureProbeName OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The temperature probe's name as represented in 
+        "The temperature probe's name as represented in
         Storage Management.
         "
     ::= { enclosureTemperatureProbeTableEntry 2 }
 
-enclosureTemperatureProbeState OBJECT-TYPE    
+enclosureTemperatureProbeState OBJECT-TYPE
     SYNTAX          INTEGER
                     {
                     unknown(1),
@@ -3699,9 +3699,9 @@ enclosureTemperatureProbeState OBJECT-TYPE
         Possible states:
         1: The current state could not be determined.
         2: The temperature probe is operating normally.
-        3: The temperature probe has encountered a hardware problem 
+        3: The temperature probe has encountered a hardware problem
         or is not responding.
-        4: The temperature probe is no longer connected to the enclosure 
+        4: The temperature probe is no longer connected to the enclosure
         or there exists a problem communicating to it.
         5: The temperature probe is unstable.
         6: The temperature probe is Over Warning Temperature.
@@ -3709,7 +3709,7 @@ enclosureTemperatureProbeState OBJECT-TYPE
         "
     ::= { enclosureTemperatureProbeTableEntry 4 }
 
-enclosureTemperatureProbeMinWarningValue OBJECT-TYPE    
+enclosureTemperatureProbeMinWarningValue OBJECT-TYPE
     SYNTAX          INTEGER
     ACCESS          read-only
     STATUS          mandatory
@@ -3719,7 +3719,7 @@ enclosureTemperatureProbeMinWarningValue OBJECT-TYPE
         "
     ::= { enclosureTemperatureProbeTableEntry 7 }
 
-enclosureTemperatureProbeMinCriticalValue OBJECT-TYPE    
+enclosureTemperatureProbeMinCriticalValue OBJECT-TYPE
     SYNTAX          INTEGER
     ACCESS          read-only
     STATUS          mandatory
@@ -3729,7 +3729,7 @@ enclosureTemperatureProbeMinCriticalValue OBJECT-TYPE
         "
     ::= { enclosureTemperatureProbeTableEntry 8 }
 
-enclosureTemperatureProbeMaxWarningValue OBJECT-TYPE    
+enclosureTemperatureProbeMaxWarningValue OBJECT-TYPE
     SYNTAX          INTEGER
     ACCESS          read-only
     STATUS          mandatory
@@ -3739,7 +3739,7 @@ enclosureTemperatureProbeMaxWarningValue OBJECT-TYPE
         "
     ::= { enclosureTemperatureProbeTableEntry 9 }
 
-enclosureTemperatureProbeMaxCriticalValue OBJECT-TYPE    
+enclosureTemperatureProbeMaxCriticalValue OBJECT-TYPE
     SYNTAX          INTEGER
     ACCESS          read-only
     STATUS          mandatory
@@ -3748,8 +3748,8 @@ enclosureTemperatureProbeMaxCriticalValue OBJECT-TYPE
         a warning state.
         "
     ::= { enclosureTemperatureProbeTableEntry 10 }
-    
-enclosureTemperatureProbeCurValue OBJECT-TYPE        
+
+enclosureTemperatureProbeCurValue OBJECT-TYPE
     SYNTAX          INTEGER
     ACCESS          read-only
     STATUS          mandatory
@@ -3764,7 +3764,7 @@ enclosureTemperatureProbeComponentStatus OBJECT-TYPE
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The status of the enclosure management module.itself without the 
+        "The status of the enclosure management module.itself without the
         propagation of any contained component status.
         Possible values:
         1: Other.
@@ -3774,8 +3774,8 @@ enclosureTemperatureProbeComponentStatus OBJECT-TYPE
         5: Critical.
         6: Non-recoverable.
         "
-    ::= { enclosureTemperatureProbeTableEntry 13 }    
-    
+    ::= { enclosureTemperatureProbeTableEntry 13 }
+
 enclosureTemperatureProbeFQDD OBJECT-TYPE
     SYNTAX          FQDDString
     ACCESS          read-only
@@ -3785,13 +3785,13 @@ enclosureTemperatureProbeFQDD OBJECT-TYPE
         as represented in Storage Management.
         "
     ::= { enclosureTemperatureProbeTableEntry 15 }
-    
-enclosureTemperatureProbeDisplayName OBJECT-TYPE    
+
+enclosureTemperatureProbeDisplayName OBJECT-TYPE
     SYNTAX          DisplayString
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
-        "The temperature probe's friendly FQDD as represented 
+        "The temperature probe's friendly FQDD as represented
         in Storage Management.
         "
     ::= { enclosureTemperatureProbeTableEntry 16 }
@@ -3812,7 +3812,7 @@ enclosureTemperatureProbeDisplayName OBJECT-TYPE
                 SYNTAX		  DellStatus
                 ACCESS		  read-only
                 STATUS		  mandatory
-                DESCRIPTION     "0020.0010.0002 This attribute defines the Current Status of the Alerting 
+                DESCRIPTION     "0020.0010.0002 This attribute defines the Current Status of the Alerting
                                  Sub-System"
                ::= { drsChassisAlertVariables 2 }
 
@@ -3820,7 +3820,7 @@ enclosureTemperatureProbeDisplayName OBJECT-TYPE
                 SYNTAX		  DellStatus
                 ACCESS		  read-only
                 STATUS		  mandatory
-                DESCRIPTION     "0020.0010.0003 This attribute defines the Previous Status of the Alerting 
+                DESCRIPTION     "0020.0010.0003 This attribute defines the Previous Status of the Alerting
                                  Sub-System"
                ::= { drsChassisAlertVariables 3 }
 
@@ -3828,7 +3828,7 @@ enclosureTemperatureProbeDisplayName OBJECT-TYPE
                 SYNTAX		  TimeTicks
                 ACCESS		  read-only
                 STATUS		  mandatory
-                DESCRIPTION     "0020.0010.0004 This attribute defines the Timestamp of Most Recent Change of 
+                DESCRIPTION     "0020.0010.0004 This attribute defines the Timestamp of Most Recent Change of
                                  the Alerting Sub-System"
                ::= { drsChassisAlertVariables 4 }
 
@@ -3847,7 +3847,7 @@ enclosureTemperatureProbeDisplayName OBJECT-TYPE
                 --#SEVERITY INFORMATIONAL
                 --#CATEGORY Error Events
                ::= 2000
-              
+
             alertCMCNormalTrap  TRAP-TYPE
                 ENTERPRISE  	  drsOutofBandGroup
                 VARIABLES { 	  drsProductChassisName,
@@ -4046,7 +4046,7 @@ enclosureTemperatureProbeDisplayName OBJECT-TYPE
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
         ::= 2177
-        
+
     ------------------------------------------------------------------------------
     -- Chassis Alerts 2: System: Battery Traps
     --
@@ -6902,7 +6902,7 @@ enclosureTemperatureProbeDisplayName OBJECT-TYPE
         --#SEVERITY INFORMATIONAL
         --#CATEGORY Status Events
         ::= 1001
-    
+
         alertDrscAuthError          TRAP-TYPE
         ENTERPRISE  drsOutofBandGroup
         VARIABLES { drsAlertSystem,

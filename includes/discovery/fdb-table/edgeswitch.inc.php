@@ -22,13 +22,17 @@
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
+
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Util\Mac;
+
 $binding = snmpwalk_group($device, 'agentDynamicDsBindingTable', 'EdgeSwitch-SWITCHING-MIB', 1);
 
 foreach ($binding as $mac => $data) {
     $port = get_port_by_index_cache($device['device_id'], $data['agentDynamicDsBindingIfIndex']);
     $port_id = $port['port_id'];
-    $mac_address = implode(array_map('zeropad', explode(':', $mac)));
+    $mac_address = Mac::parse($mac)->hex();
     $vlan_id = $data['agentDynamicDsBindingVlanId'] ?: 0;
     $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
-    d_echo("vlan $vlan_id mac $mac_address port $port_id\n");
+    Log::debug("vlan $vlan_id mac $mac_address port $port_id\n");
 }

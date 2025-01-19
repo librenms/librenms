@@ -12,6 +12,8 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Util\Number;
+
 if ($device['os'] == 'equallogic') {
     $eql_storage = snmpwalk_cache_oid($device, 'EqliscsiVolumeEntry', null, 'EQLVOLUME-MIB', 'equallogic');
 
@@ -28,7 +30,7 @@ if ($device['os'] == 'equallogic') {
             } else {
                 // Trying to search the last '.' and take something after it as index
                 $arrindex = explode('.', $index);
-                $newindex = (int) cast_number(end($arrindex));
+                $newindex = (int) Number::cast(end($arrindex));
                 if (is_int($newindex)) {
                     discover_storage($valid_storage, $device, $newindex, $fstype, 'eql-storage', $descr, $size, $units, $used);
                 }
