@@ -748,5 +748,5 @@ page](../General/Callback-Stats-and-Privacy.md) on
 what it is and how to enable it.
 
 If you would like to help make LibreNMS better there are [many ways to
-help](../Support/FAQ.md#a-namefaq9-what-can-i-do-to-help). You
+help](../Support/FAQ.md#faq9). You
 can also [back LibreNMS on Open Collective](https://t.libren.ms/donations).

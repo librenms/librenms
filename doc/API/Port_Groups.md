@@ -36,7 +36,7 @@ List all ports matching the group provided.
 Route: `/api/v0/port_groups/:name`
 
 - name Is the name of the port group which can be obtained using
-  [`get_port_groups`](#function-get_port_groups). Please ensure that
+  [`get_port_groups`](#get_port_groups). Please ensure that
   the name is urlencoded if it needs to be (i.e Linux Servers would
   need to be urlencoded.
 
