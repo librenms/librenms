@@ -27,9 +27,9 @@ use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 
-class ZenDuty extends Transport
+class Zenduty extends Transport
 {
-    protected string $name = 'ZenDuty';
+    protected string $name = 'Zenduty';
 
     public function deliverAlert(array $alert_data): bool
     {
