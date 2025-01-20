@@ -238,7 +238,7 @@ class ConvertStorageData extends Command
             return '.1.3.6.1.2.1.25.2.3.1.6.' . $storage['storage_index'];
         }
 
-        if ($storage['storage_mib'] == 'ucd-dsktable') {
+        if ($storage['storage_mib'] == 'ucd-dsktable' && $storage['storage_free'] == 2199023254528) {
             return '.1.3.6.1.4.1.2021.9.1.8.' . $storage['storage_index'];
         }
 
@@ -265,6 +265,10 @@ class ConvertStorageData extends Command
     {
         if ($storage['storage_mib'] == 'aix') {
             return '.1.3.6.1.4.1.2.6.191.6.2.1.6.' . $storage['storage_index'];
+        }
+
+        if ($storage['storage_mib'] == 'ucd-dsktable' && $storage['storage_free'] != 2199023254528) {
+            return '.1.3.6.1.4.1.2021.9.1.7.' . $storage['storage_index'];
         }
 
         if ($storage['storage_mib'] == 'eltex-mes24xx') {

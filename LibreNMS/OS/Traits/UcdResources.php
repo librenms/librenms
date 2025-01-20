@@ -132,20 +132,29 @@ trait UcdResources
         $disks = new Collection;
 
         return \SnmpQuery::walk('UCD-SNMP-MIB::dskTable')->mapTable(function ($data, $index) {
-            $total = $data['UCD-SNMP-MIB::dskTotal'] * 1024;
-            $used = $data['UCD-SNMP-MIB::dskUsed'] * 1024;
+            $units = 1024;
+            $total = $data['UCD-SNMP-MIB::dskTotal'] ?? null;
+            $used = $data['UCD-SNMP-MIB::dskUsed'] ?? null;
+            $free = $data['UCD-SNMP-MIB::dskAvail'] ?? null;
+
+            // available numbers wonky sometimes
+            $avail_broke = $free === null || $free == '2147483647';
+            [$used_calc, $used_oid, $free_oid] = $avail_broke
+                ? [$used, ".1.3.6.1.4.1.2021.9.1.8.$index", null]
+                : [$total - $free, null, ".1.3.6.1.4.1.2021.9.1.7.$index"];
 
             return new Storage([
                 'type' => 'ucd-dsktable',
                 'storage_index' => $index,
                 'storage_type' => 'ucdDisk',
                 'storage_descr' => $data['UCD-SNMP-MIB::dskPath'],
-                'storage_size' => $total,
-                'storage_units' => 1024,
-                'storage_used' => $used,
-                'storage_used_oid' => '.1.3.6.1.4.1.2021.9.1.8.' . $index,
-                'storage_free' => $total - $used,
-                'storage_perc' => Number::calculatePercent($used, $total),
+                'storage_size' => $total * $units,
+                'storage_units' => $units,
+                'storage_used' => $used_calc * $units,
+                'storage_used_oid' => $used_oid,
+                'storage_free' => $free * $units,
+                'storage_free_oid' => $free_oid,
+                'storage_perc' => Number::calculatePercent($used_calc, $total, 0),
             ]);
         });
     }
