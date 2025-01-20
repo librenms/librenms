@@ -1,4 +1,40 @@
+mib: DigiPower-PDU-MIB
 modules:
   os:
-    hardware: .1.3.6.1.4.1.17420.1.2.9.1.19.0
-    version: .1.3.6.1.4.1.17420.1.2.4.0
+    hardware: DigiPower-PDU-MIB::pdu01ModelNo.0
+    version: DigiPower-PDU-MIB::devVersion.0
+    serial: DigiPower-PDU-MIB::devMAC.0
+  sensors:
+    current:
+      options:
+        divisor: 10
+        skip_value_lt: 0
+      data:
+        - oid: 'DigiPower-PDU-MIB::pduTable'
+          value: 'DigiPower-PDU-MIB::pdu01Value' 
+          num_oid: '.1.3.6.1.4.1.17420.1.2.9.1.11.{{ $index }}'
+          index: 0
+          descr: 'Current'
+          warn_limit: 'DigiPower-PDU-MIB::pdu01Threshold1'
+          high_limit: 'DigiPower-PDU-MIB::pdu01Threshold2'
+    voltage:
+      options:
+        skip_value_lt: 0
+      data:
+        - oid: 'DigiPower-PDU-MIB::pduTable'
+          value: 'DigiPower-PDU-MIB::pdu01Voltage'
+          num_oid: '.1.3.6.1.4.1.17420.1.2.9.1.17.{{ $index }}'
+          descr: 'Voltage'
+          index: 0
+    power:
+      options:
+        divisor: 10
+        skip_value_lt: 0
+      data:
+        # multiply current (pdu01Value) by voltage (pdu01Voltage) to get power
+        - oid: 'DigiPower-PDU-MIB::pduTable'
+          value: 'DigiPower-PDU-MIB::pdu01Value' 
+          num_oid: '.1.3.6.1.4.1.17420.1.2.9.1.11.{{ $index }}'
+          index: 0
+          descr: 'Power'
+          multiplier: 'DigiPower-PDU-MIB::pdu01Voltage'

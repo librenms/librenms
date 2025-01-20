@@ -424,10 +424,10 @@
                                 "type": "string"
                             },
                             "divisor": {
-                                "type": "integer"
+                                "type": ["number", "string"]
                             },
                             "multiplier": {
-                                "type": "integer"
+                                "type": ["number", "string"]
                             },
                             "value": {
                                 "type": "string"
