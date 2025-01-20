@@ -111,11 +111,23 @@ class ConvertStorageData extends Command
                 return 'hrStorageFlashMemory';
             }
 
-            if (str::startsWith($snmprec_file, 'ciena')) {
+            if (Str::startsWith($snmprec_file, 'ciena')) {
                 return 'hrDeviceTypes.9'; // derp ciena
             }
 
-            if (str::startsWith($snmprec_file, 'ibos') && $storage['storage_index'] == '3') {
+            if (Str::startsWith($snmprec_file, 'ibos') && $storage['storage_index'] == '3') {
+                return 'hrStorageFlashMemory';
+            }
+
+            if (in_array($snmprec_file, ['junos_mx5t-isis', 'junos_rpm']) && $storage['storage_index'] == '1') {
+                return 'hrStorageFixedDisk';
+            }
+
+            if (Str::startsWith($snmprec_file, 'junos') && $storage['storage_index'] == '1') {
+                return 'hrStorageFlashMemory';
+            }
+
+            if (Str::startsWith($snmprec_file, 'konica') && $storage['storage_index'] == '3') {
                 return 'hrStorageFlashMemory';
             }
 
