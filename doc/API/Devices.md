@@ -1288,7 +1288,7 @@ Fields:
 
 Options:
 
-- force_add: Skip all checks and attempts to detect credentials. Add the device as given directly to the database.
+- force_add: Skip all checks, credentials are required. Add the device as given directly to the database.
 - ping_fallback: if snmp checks fail, add the device as ping only instead of failing
 
 SNMP v1 or v2c credentials:
