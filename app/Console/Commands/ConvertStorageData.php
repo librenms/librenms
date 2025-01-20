@@ -57,7 +57,7 @@ class ConvertStorageData extends Command
                             'storage_units' => $this->getStorageUnits($snmprec_file, $storage),
                             'storage_used' => $this->getStorageUsed($snmprec_file, $storage, $type),
                             'storage_used_oid' => $this->getUsedOid($snmprec_file, $storage),
-                            'storage_free' => $this->getStorageFree($snmprec_file, $storage, $data['storage']['poller'][$table][$index]['storage_free']),
+                            'storage_free' => $this->getStorageFree($snmprec_file, $storage, $data['storage']['poller'][$table][$index]['storage_free'], $type),
                             'storage_free_oid' => $this->getFreeOid($snmprec_file, $storage),
                             'storage_perc' => $data['storage']['poller'][$table][$index]['storage_perc'] ?: $storage['storage_perc'],
                             'storage_perc_oid' => $this->getPercOid($snmprec_file, $storage),
@@ -113,6 +113,10 @@ class ConvertStorageData extends Command
 
             if (str::startsWith($snmprec_file, 'ciena')) {
                 return 'hrDeviceTypes.9'; // derp ciena
+            }
+
+            if (str::startsWith($snmprec_file, 'ibos') && $storage['storage_index'] == '3') {
+                return 'hrStorageFlashMemory';
             }
 
             return 'hrStorageFixedDisk';
@@ -268,6 +272,10 @@ class ConvertStorageData extends Command
             if ($storage['storage_mib'] == 'hrstorage') {
                 return true;
             }
+
+            if (preg_match('#^[^/]+ on /#', $storage['storage_descr'])) {
+                return true;
+            }
         }
 
 
@@ -280,6 +288,10 @@ class ConvertStorageData extends Command
             return $storage['storage_size'] * 1024;
         }
 
+        if ($snmprec_file === 'hpe-ilo_5_with_bat_checks' && $storage['storage_index'] == '33') {
+            return 360066232352770;
+        }
+
         if ($storage['storage_mib'] == 'hpe-ilo' && $data_type == 'discovery') {
             return $storage['storage_size'] * 1048576;
         }
@@ -287,7 +299,7 @@ class ConvertStorageData extends Command
         return $storage['storage_size'];
     }
 
-    private function getStorageFree(string $snmprec_file, array $storage, $poller_free)
+    private function getStorageFree(string $snmprec_file, array $storage, $poller_free, string $data_type)
     {
         $value = $poller_free ?: $storage['storage_free'];
 
@@ -301,6 +313,10 @@ class ConvertStorageData extends Command
             }
 
             return $storage['storage_used'] * 1024;
+        }
+
+        if ($snmprec_file === 'hpe-ilo_5_with_bat_checks' && $storage['storage_index'] == '33' && $data_type == 'poller') {
+            return 78926617509890;
         }
 
         return $value;
