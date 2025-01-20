@@ -906,21 +906,6 @@ function search_oxidized_config($search_in_conf_textbox)
 }
 
 /**
- * @param  $data
- * @return bool|mixed
- */
-function array_to_htmljson($data)
-{
-    if (is_array($data)) {
-        $data = htmlentities(json_encode($data));
-
-        return str_replace(',', ',<br />', $data);
-    } else {
-        return false;
-    }
-}
-
-/**
  * @param  int  $eventlog_severity
  * @return string $eventlog_severity_icon
  */
@@ -997,27 +982,6 @@ function generate_stacked_graphs($force_stack = false, $transparency = '88')
     } else {
         return ['transparency' => '', 'stacked' => '-1'];
     }
-}
-
-/**
- * Returns the sysname of a device with a html line break prepended.
- * if the device has an empty sysname it will return device's hostname instead
- * And finally if the device has no hostname it will return an empty string
- *
- * @param array device
- * @return string
- */
-function get_device_name($device)
-{
-    $ret_str = '';
-
-    if (format_hostname($device) !== $device['sysName']) {
-        $ret_str = $device['sysName'];
-    } elseif ($device['hostname'] !== $device['ip']) {
-        $ret_str = $device['hostname'];
-    }
-
-    return $ret_str;
 }
 
 /**

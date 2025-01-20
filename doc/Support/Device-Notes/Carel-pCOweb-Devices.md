@@ -57,5 +57,5 @@ to configure your pCOweb card with the accorded System OID and Enterprise OID:
 
 ## Unsupported devices
 After constructing the correct System OID for your SNMP card, you can
-start the LibreNMS [new OS implementation](Developing/Support-New-OS/)
+start the LibreNMS [new OS implementation](/Developing/Support-New-OS.md)
 and use this new OID as sysObjectID for the YAML definition file.

@@ -449,7 +449,7 @@ function discover_process_ipv4(&$valid_v4, $device, int $ifIndex, $ipv4_address,
     $ipv4_network = $ipv4->getNetworkAddress() . '/' . $ipv4->cidr;
 
     if ($ipv4_address != '0.0.0.0' && $ifIndex > 0) {
-        $port_id = get_port_by_index_cache($device['device_id'], $ifIndex)['port_id'];
+        $port_id = \App\Facades\PortCache::getIdFromIfIndex($ifIndex, $device['device_id']);
 
         if (is_numeric($port_id)) {
             $dbIpv4Net = Ipv4Network::updateOrCreate([
@@ -715,9 +715,35 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     // process the group
                     $group = trim(YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache)) ?: null;
 
-                    $divisor = (int) (isset($data['divisor']) ? (YamlDiscovery::replaceValues('divisor', $index, $count, $data, $pre_cache) ?: 1) : ($sensor_options['divisor'] ?? 1));
-                    $multiplier = (int) (isset($data['multiplier']) ? (YamlDiscovery::replaceValues('multiplier', $index, $count, $data, $pre_cache) ?: 1) : ($sensor_options['multiplier'] ?? 1));
+                    // process the divisor - cannot be 0
+                    if (isset($data['divisor'])) {
+                        $divisor = (int) YamlDiscovery::replaceValues('divisor', $index, $count, $data, $pre_cache);
+                    } elseif (isset($sensor_options['divisor'])) {
+                        $divisor = (int) $sensor_options['divisor'];
+                    } else {
+                        $divisor = 1;
+                    }
+                    if ($divisor == 0) {
+                        Log::warning('Divisor is not a nonzero number, defaulting to 1');
+                        $divisor = 1;
+                    }
 
+                    // process the multiplier - zero is valid
+                    if (isset($data['multiplier'])) {
+                        $multiplier = YamlDiscovery::replaceValues('multiplier', $index, $count, $data, $pre_cache);
+                    } elseif (isset($sensor_options['multiplier'])) {
+                        $multipler = $sensor_options['multiplier'];
+                    } else {
+                        $multiplier = 1;
+                    }
+                    if (is_numeric($multiplier)) {
+                        $multiplier = (int) $multiplier;
+                    } else {
+                        Log::warning('Multiplier $multiplier is not a valid number, defaulting to 1');
+                        $multiplier = 1;
+                    }
+
+                    // process the limits
                     $limits = ['low_limit', 'low_warn_limit', 'warn_limit', 'high_limit'];
                     foreach ($limits as $limit) {
                         if (isset($data[$limit]) && is_numeric($data[$limit])) {
