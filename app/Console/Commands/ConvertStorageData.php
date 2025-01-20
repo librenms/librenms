@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Str;
 
 class ConvertStorageData extends Command
 {
@@ -103,19 +102,19 @@ class ConvertStorageData extends Command
                 return 'hrStorageRamDisk';
             }
 
-            if (Str::startsWith($snmprec_file, 'arista_eos') && $storage['storage_index'] == '4') {
+            if (str_starts_with($snmprec_file, 'arista_eos') && $storage['storage_index'] == '4') {
                 return 'hrStorageFlashMemory';
             }
 
-            if (Str::startsWith($snmprec_file, 'audiocodes') && $storage['storage_index'] == '2') {
+            if (str_starts_with($snmprec_file, 'audiocodes') && $storage['storage_index'] == '2') {
                 return 'hrStorageFlashMemory';
             }
 
-            if (Str::startsWith($snmprec_file, 'ciena')) {
+            if (str_starts_with($snmprec_file, 'ciena')) {
                 return 'hrStorageFlashMemory'; // derp ciena (fixed)
             }
 
-            if (Str::startsWith($snmprec_file, 'ibos') && $storage['storage_index'] == '3') {
+            if (str_starts_with($snmprec_file, 'ibos') && $storage['storage_index'] == '3') {
                 return 'hrStorageFlashMemory';
             }
 
@@ -123,16 +122,20 @@ class ConvertStorageData extends Command
                 return 'hrStorageFixedDisk';
             }
 
-            if (Str::startsWith($snmprec_file, 'junos') && $storage['storage_index'] == '1') {
+            if (str_starts_with($snmprec_file, 'junos') && $storage['storage_index'] == '1') {
                 return 'hrStorageFlashMemory';
             }
 
-            if (Str::startsWith($snmprec_file, 'konica') && $storage['storage_index'] == '3') {
+            if (str_starts_with($snmprec_file, 'konica') && $storage['storage_index'] == '3') {
                 return 'hrStorageFlashMemory';
             }
 
-            if (Str::startsWith($snmprec_file, 'luminato')) {
+            if (str_starts_with($snmprec_file, 'luminato')) {
                 return 'hrStorageFlashMemory';
+            }
+
+            if (str_starts_with($snmprec_file, 'pfsense')) {
+                return 'hrFSBerkeleyFFS';
             }
 
             return 'hrStorageFixedDisk';
@@ -181,7 +184,7 @@ class ConvertStorageData extends Command
 
     private function getStorageUnits(string $snmprec_file, array $storage): ?int
     {
-        if (Str::startsWith($snmprec_file, 'eltex-mes')) {
+        if (str_starts_with($snmprec_file, 'eltex-mes')) {
             return 1;
         }
 
@@ -268,7 +271,7 @@ class ConvertStorageData extends Command
             return null;
         }
 
-        if (Str::startsWith($snmprec_file, 'eltex-mes')) {
+        if (str_starts_with($snmprec_file, 'eltex-mes')) {
             return '.1.3.6.1.4.1.89.96.5.0';
         }
 
@@ -310,7 +313,7 @@ class ConvertStorageData extends Command
             return true;
         }
 
-        if (Str::startsWith($storage['storage_descr'], '/run/user/')) {
+        if (str_starts_with($storage['storage_descr'], '/run/user/')) {
             return true;
         }
 
@@ -318,15 +321,15 @@ class ConvertStorageData extends Command
             return true;
         }
 
-        if (Str::startsWith($snmprec_file, 'dell-os10') && $storage['storage_mib'] == 'ucd-dsktable') {
+        if (str_starts_with($snmprec_file, 'dell-os10') && $storage['storage_mib'] == 'ucd-dsktable') {
             return true;
         }
 
-        if (Str::startsWith($snmprec_file, 'esphome')) {
+        if (str_starts_with($snmprec_file, 'esphome')) {
             return true;
         }
 
-        if (Str::startsWith($snmprec_file, 'hpe-ilo')) {
+        if (str_starts_with($snmprec_file, 'hpe-ilo')) {
             if ($storage['storage_mib'] == 'hrstorage') {
                 return true;
             }
@@ -336,7 +339,7 @@ class ConvertStorageData extends Command
             }
         }
 
-        if (Str::startsWith($snmprec_file, 'linux')) {
+        if (str_starts_with($snmprec_file, 'linux')) {
             if (preg_match('#^/run($|/)#', $storage['storage_descr'])) {
                 return true;
             }
@@ -346,8 +349,14 @@ class ConvertStorageData extends Command
             }
         }
 
-        if (Str::startsWith($snmprec_file, 'occamos')) {
+        if (str_starts_with($snmprec_file, 'occamos')) {
             if (! in_array($storage['storage_index'], ['1', '2', '3'])) {
+                return true;
+            }
+        }
+
+        if (str_starts_with($snmprec_file, 'pfsense')) {
+            if ($storage['storage_mib'] == 'ucd-dsktable') {
                 return true;
             }
         }

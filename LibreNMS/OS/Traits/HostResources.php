@@ -217,23 +217,22 @@ trait HostResources
         if (empty($hr_storage)) {
             return new Collection;
         }
-        echo 'Host Resources: ';
 
-        return collect($hr_storage)->filter(function ($storage) {
+        return collect($hr_storage)->filter(function ($storage, $index) {
             if (empty($storage['hrStorageType'])) {
-                Log::debug('Host Resources: skipped storage due to missing hrStorageType');
+                Log::debug("Host Resources: skipped storage ($index) due to missing hrStorageType");
 
                 return false;
             }
 
             if (! isset($storage['hrStorageUsed']) || $storage['hrStorageUsed'] < 0) {
-                Log::debug('Host Resources: skipped storage due to missing or negative hrStorageUsed');
+                Log::debug("Host Resources: skipped storage ($index) due to missing or negative hrStorageUsed");
 
                 return false;
             }
 
             if (! isset($storage['hrStorageSize']) || $storage['hrStorageSize'] <= 0) {
-                Log::debug('Host Resources: skipped storage due to missing, negative, or 0 hrStorageSize');
+                Log::debug("Host Resources: skipped storage ($index) due to missing, negative, or 0 hrStorageSize");
 
                 return false;
             }
@@ -254,7 +253,7 @@ trait HostResources
         });
     }
 
-    protected function memValid($storage)
+    protected function memValid($storage): bool
     {
         if (empty($storage['hrStorageType']) || empty($storage['hrStorageDescr'])) {
             return false;
@@ -293,6 +292,12 @@ trait HostResources
                 return $this->hrTypes[$matches[1]];
             }
         }
+
+        if (str_starts_with($hrStorageType, 'hr')) {
+            return $hrStorageType; // pass through other types (such as fs)
+        }
+
+        Log::debug("Could not fix bad hrStorageType: $hrStorageType");
 
         return 'unknown';
     }
