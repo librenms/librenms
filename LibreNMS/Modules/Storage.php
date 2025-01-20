@@ -87,10 +87,13 @@ class Storage implements Module
 
         // poll storage
         if ($os instanceof StoragePolling) {
-            $os->pollStorage($storages);
+            $storages = $os->pollStorage($storages);
         } else {
-            $this->defaultPolling($storages);
+            $storages = $this->defaultPolling($storages);
         }
+
+        // save db updates
+        $storages->each->save();
 
         foreach ($storages as $storage) {
             $this->printStorage($storage);
@@ -109,7 +112,7 @@ class Storage implements Module
         }
     }
 
-    private function defaultPolling(Collection $storages): void
+    private function defaultPolling(Collection $storages): Collection
     {
         // fetch all data
         $oids = $storages->map->only(['storage_used_oid', 'storage_size_oid', 'storage_free_oid', 'storage_perc_oid'])
@@ -118,20 +121,18 @@ class Storage implements Module
         if (empty($oids)) {
             Log::debug('No OIDs to poll');
 
-            return;
+            return $storages;
         }
 
         $data = \SnmpQuery::numeric()->get($oids)->values();
 
-        $storages->each(function (\App\Models\Storage $storage) use ($data) {
+        return $storages->each(function (\App\Models\Storage $storage) use ($data) {
             $storage->fillUsage(
                 $data[$storage->storage_used_oid] ?? null,
                 $storage->storage_units ? $storage->storage_size / $storage->storage_units : null,
                 $data[$storage->storage_free_oid] ?? null,
                 $data[$storage->storage_perc_oid] ?? null,
             );
-
-            $storage->save();
         });
     }
 

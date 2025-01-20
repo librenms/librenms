@@ -138,6 +138,20 @@ class ConvertStorageData extends Command
             return 'flashMemory';
         }
 
+        if ($storage['storage_mib'] == 'intelliflash-pl') {
+            return 'ONLINE';
+        }
+
+        if ($storage['storage_mib'] == 'intelliflash-pr') {
+            if($storage['storage_index'] == '3.1' || $storage['storage_index'] == '3.2') {
+                return 'lz4';
+            }
+
+            if($storage['storage_index'] == '3.3') {
+                return 'gzip-9';
+            }
+        }
+
         return 'Storage';
     }
 
