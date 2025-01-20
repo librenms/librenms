@@ -4,7 +4,6 @@ use LibreNMS\Config;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Util\Number;
 
-
 $sensor_descr_fixed = Rrd::fixedSafeDescr($sensor->sensor_descr, 25);
 $sensor_color = (Config::get('applied_site_style') == 'dark') ? '#f2f2f2' : '#272b30';
 $background_color = (Config::get('applied_site_style') == 'dark') ? '#272b30' : '#ffffff';
