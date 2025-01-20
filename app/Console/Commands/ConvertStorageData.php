@@ -172,6 +172,10 @@ class ConvertStorageData extends Command
             return 'FlashMemory';
         }
 
+        if ($storage['storage_mib'] == 'oceanstor') {
+            return 'dsk';
+        }
+
         return 'Storage';
     }
 
@@ -183,6 +187,10 @@ class ConvertStorageData extends Command
 
         if ($storage['storage_mib'] == 'forcepoint') {
             return 1024;
+        }
+
+        if ($storage['storage_mib'] == 'oceanstor') {
+            return 1048576;
         }
 
         return $storage['storage_units'];
@@ -207,6 +215,10 @@ class ConvertStorageData extends Command
         }
 
         if ($storage['storage_mib'] == 'hpe-ilo' && $data_type == 'discovery') {
+            return $storage['storage_used'] * 1048576;
+        }
+
+        if ($storage['storage_mib'] == 'oceanstor') {
             return $storage['storage_used'] * 1048576;
         }
 
@@ -237,6 +249,10 @@ class ConvertStorageData extends Command
 
         if ($storage['storage_mib'] == 'hpe-ilo') {
             return '.1.3.6.1.4.1.232.11.2.4.1.1.4.' . $storage['storage_index'];
+        }
+
+        if ($storage['storage_mib'] == 'oceanstor') {
+            return '.1.3.6.1.4.1.34774.4.1.1.4.0';
         }
 
         return null;
@@ -353,6 +369,10 @@ class ConvertStorageData extends Command
             return $storage['storage_size'] * 1048576;
         }
 
+        if ($storage['storage_mib'] == 'oceanstor') {
+            return $storage['storage_size'] * 1048576;
+        }
+
         return $storage['storage_size'];
     }
 
@@ -374,6 +394,10 @@ class ConvertStorageData extends Command
 
         if ($snmprec_file === 'hpe-ilo_5_with_bat_checks' && $storage['storage_index'] == '33' && $data_type == 'poller') {
             return 78926617509890;
+        }
+
+        if ($storage['storage_mib'] == 'oceanstor') {
+            return $value * 1048576;
         }
 
         return $value;

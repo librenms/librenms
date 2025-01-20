@@ -46,7 +46,11 @@ trait YamlStorageDiscovery
             ->addField(new OidField('size', 'storage_size', should_poll: false))
             ->addField(new OidField('used', 'storage_used'))
             ->addField(new OidField('free', 'storage_free', should_poll: function (YamlDiscoveryDefinition $def) {
-                return ($def->getFieldCurrentValue('used') === null || $def->getFieldCurrentValue('size') === null) && is_numeric($def->getFieldCurrentValue('free'));
+                if ($def->getFieldCurrentValue('used') === null || $def->getFieldCurrentValue('size') === null) {
+                    return is_numeric($def->getFieldCurrentValue('free'));
+                }
+
+                return false;
             }))
             ->addField(new OidField('percent_used', 'storage_perc'))
             ->addField(new IndexField('index', 'storage_index', '{{ $index }}'))
