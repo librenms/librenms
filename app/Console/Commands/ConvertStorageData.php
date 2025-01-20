@@ -112,7 +112,7 @@ class ConvertStorageData extends Command
             }
 
             if (Str::startsWith($snmprec_file, 'ciena')) {
-                return 'hrDeviceTypes.9'; // derp ciena
+                return 'hrStorageFlashMemory'; // derp ciena (fixed)
             }
 
             if (Str::startsWith($snmprec_file, 'ibos') && $storage['storage_index'] == '3') {
@@ -128,6 +128,10 @@ class ConvertStorageData extends Command
             }
 
             if (Str::startsWith($snmprec_file, 'konica') && $storage['storage_index'] == '3') {
+                return 'hrStorageFlashMemory';
+            }
+
+            if (Str::startsWith($snmprec_file, 'luminato')) {
                 return 'hrStorageFlashMemory';
             }
 
@@ -316,6 +320,21 @@ class ConvertStorageData extends Command
             }
         }
 
+        if (Str::startsWith($snmprec_file, 'linux')) {
+            if (preg_match('#^/run($|/)#', $storage['storage_descr'])) {
+                return true;
+            }
+
+            if (preg_match('#^/dev/shm$#', $storage['storage_descr'])) {
+                return true;
+            }
+        }
+
+        if (Str::startsWith($snmprec_file, 'occamos')) {
+            if (! in_array($storage['storage_index'], ['1', '2', '3'])) {
+                return true;
+            }
+        }
 
         return false;
     }

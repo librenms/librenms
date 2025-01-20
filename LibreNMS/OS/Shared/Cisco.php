@@ -475,7 +475,7 @@ class Cisco extends OS implements
 
                 $descr = $devices[$ciscoFlashDeviceIndex] ?? '';
                 if ($descr != $data['CISCO-FLASH-MIB::ciscoFlashPartitionName']) {
-                    $descr = '(' . $data['CISCO-FLASH-MIB::ciscoFlashPartitionName'] .')';
+                    $descr .= '(' . $data['CISCO-FLASH-MIB::ciscoFlashPartitionName'] .')';
                 }
                 $descr .= ':';
 

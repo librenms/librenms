@@ -58,6 +58,18 @@ trait HostResources
         'nwhrStorageMSEngineMemory',
         'nwhrStorageUnclaimedMemory',
     ];
+    private $hrTypes = [
+        1 => 'hrStorageOther',
+        2 => 'hrStorageRam',
+        3 => 'hrStorageVirtualMemory',
+        4 => 'hrStorageFixedDisk',
+        5 => 'hrStorageRemovableDisk',
+        6 => 'hrStorageFloppyDisk',
+        7 => 'hrStorageCompactDisc',
+        8 => 'hrStorageRamDisk',
+        9 => 'hrStorageFlashMemory',
+        10 => 'hrStorageNetworkDisk',
+    ];
     private $ignoreMemoryDescr = [
         'MALLOC',
         'UMA',
@@ -162,6 +174,7 @@ trait HostResources
     public function discoverMempools()
     {
         $hr_storage = \SnmpQuery::cache()->hideMib()->mibs(['HOST-RESOURCES-TYPES'])->walk('HOST-RESOURCES-MIB::hrStorageTable')->table(1);
+        $this->fixBadData($hr_storage);
 
         if (! is_array($hr_storage)) {
             return new Collection;
@@ -199,6 +212,7 @@ trait HostResources
     public function discoverStorage(): Collection
     {
         $hr_storage = \SnmpQuery::cache()->hideMib()->mibs(['HOST-RESOURCES-TYPES'])->walk('HOST-RESOURCES-MIB::hrStorageTable')->table(1);
+        $this->fixBadData($hr_storage);
 
         if (empty($hr_storage)) {
             return new Collection;
@@ -229,7 +243,7 @@ trait HostResources
             return (new Storage([
                 'type' => 'hrstorage',
                 'storage_index' => $storage['hrStorageIndex'],
-                'storage_type' => str_replace('.0', '', $storage['hrStorageType']),
+                'storage_type' => $storage['hrStorageType'],
                 'storage_descr' => $storage['hrStorageDescr'],
                 'storage_used_oid' => '.1.3.6.1.2.1.25.2.3.1.6.' . $storage['hrStorageIndex'],
                 'storage_units' => $storage['hrStorageAllocationUnits'],
@@ -255,5 +269,31 @@ trait HostResources
         }
 
         return ! Str::contains($storage['hrStorageDescr'], $this->ignoreMemoryDescr);
+    }
+
+    protected function fixBadData(array &$data): void
+    {
+        foreach ($data as $index => $entry) {
+            if (isset($entry['hrStorageType'])) {
+                $data[$index]['hrStorageType'] = $this->fixBadTypes($entry['hrStorageType']);
+            }
+        }
+    }
+
+    protected function fixBadTypes($hrStorageType): string
+    {
+        if (str_starts_with($hrStorageType, 'hrStorage')) {
+            // fix some that set them incorrectly as scalars
+            return preg_replace('/\.0$/', '',$hrStorageType);
+        }
+
+        // if the agent returns with a bad base oid, just take the last index off the oid and manually convert it
+        if (preg_match('/\.(\d+)$/', $hrStorageType, $matches)) {
+            if (isset($this->hrTypes[$matches[1]])) {
+                return $this->hrTypes[$matches[1]];
+            }
+        }
+
+        return 'unknown';
     }
 }
