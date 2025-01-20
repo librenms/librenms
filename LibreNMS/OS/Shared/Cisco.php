@@ -34,6 +34,7 @@ use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\Qos;
 use App\Models\Sla;
+use App\Models\Storage;
 use App\Models\Transceiver;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -44,6 +45,7 @@ use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\QosDiscovery;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
+use LibreNMS\Interfaces\Discovery\StorageDiscovery;
 use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
@@ -54,6 +56,7 @@ use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Mac;
+use SnmpQuery;
 
 class Cisco extends OS implements
     OSDiscovery,
@@ -65,6 +68,7 @@ class Cisco extends OS implements
     NacPolling,
     QosPolling,
     SlaPolling,
+    StorageDiscovery,
     TransceiverDiscovery
 {
     use YamlOSDiscovery {
@@ -242,7 +246,7 @@ class Cisco extends OS implements
 
         // discover cellular device info
         if ($os == 'ios' or $os == 'iosxe') {
-            $cellData = \SnmpQuery::hideMib()->walk('CISCO-WAN-3G-MIB::c3gGsmIdentityTable');
+            $cellData = SnmpQuery::hideMib()->walk('CISCO-WAN-3G-MIB::c3gGsmIdentityTable');
             $baseIndex = $inventory->max('entPhysicalIndex'); // maintain compatability with buggy old code
 
             foreach ($cellData->table(1) as $index => $entry) {
@@ -450,6 +454,42 @@ class Cisco extends OS implements
         }
     }
 
+    public function discoverStorage(): Collection
+    {
+        $devices = SnmpQuery::walk('CISCO-FLASH-MIB::ciscoFlashDeviceName')->pluck();
+
+        return SnmpQuery::walk('CISCO-FLASH-MIB::ciscoFlashPartitionTable')
+            ->mapTable(function ($data, $ciscoFlashDeviceIndex, $ciscoFlashPartitionIndex) use ($devices) {
+                $index = "$ciscoFlashDeviceIndex.$ciscoFlashPartitionIndex";
+                $size = $data['CISCO-FLASH-MIB::ciscoFlashPartitionSize'] == 4294967295
+                    ? $data['CISCO-FLASH-MIB::ciscoFlashPartitionSizeExtended']
+                    : $data['CISCO-FLASH-MIB::ciscoFlashPartitionSize'];
+
+                if ($data['CISCO-FLASH-MIB::ciscoFlashPartitionFreeSpace'] == 4294967295) {
+                    $free = $data['CISCO-FLASH-MIB::ciscoFlashPartitionFreeSpaceExtended'];
+                    $free_oid = ".1.3.6.1.4.1.9.9.10.1.1.4.1.1.14.$index";
+                } else {
+                    $free = $data['CISCO-FLASH-MIB::ciscoFlashPartitionFreeSpace'];
+                    $free_oid = ".1.3.6.1.4.1.9.9.10.1.1.4.1.1.5.$index";
+                }
+
+                $descr = $devices[$ciscoFlashDeviceIndex] ?? '';
+                if ($descr != $data['CISCO-FLASH-MIB::ciscoFlashPartitionName']) {
+                    $descr = '(' . $data['CISCO-FLASH-MIB::ciscoFlashPartitionName'] .')';
+                }
+                $descr .= ':';
+
+                return (new Storage([
+                    'type' => 'cisco-flash',
+                    'storage_descr' => $descr,
+                    'storage_index' => $index,
+                    'storage_type' => 'FlashMemory',
+                    'storage_free_oid' => $free_oid,
+                    'storage_units' => 1,
+                ]))->fillUsage(total: $size, free: $free);
+            });
+    }
+
     public function pollNac()
     {
         $nac = new Collection();
@@ -613,7 +653,7 @@ class Cisco extends OS implements
         $instances = new Collection;
 
         //get Cisco stpxSpanningTreeType
-        $stpxSpanningTreeType = \SnmpQuery::enumStrings()->hideMib()->get('CISCO-STP-EXTENSIONS-MIB::stpxSpanningTreeType.0')->value();
+        $stpxSpanningTreeType = SnmpQuery::enumStrings()->hideMib()->get('CISCO-STP-EXTENSIONS-MIB::stpxSpanningTreeType.0')->value();
 
         // attempt to discover context based vlan instances
         foreach ($vlans->isEmpty() ? [null] : $vlans as $vlan) {
@@ -664,12 +704,12 @@ class Cisco extends OS implements
             })->keyBy('entPhysicalIndex');
         } else {
             // fetch data via snmp
-            $snmpData = \SnmpQuery::cache()->hideMib()->mibs(['CISCO-ENTITY-VENDORTYPE-OID-MIB'])->walk('ENTITY-MIB::entPhysicalTable')->table(1);
+            $snmpData = SnmpQuery::cache()->hideMib()->mibs(['CISCO-ENTITY-VENDORTYPE-OID-MIB'])->walk('ENTITY-MIB::entPhysicalTable')->table(1);
             if (empty($snmpData)) {
                 return new Collection;
             }
 
-            $snmpData = collect(\SnmpQuery::hideMib()->mibs(['IF-MIB'])->walk('ENTITY-MIB::entAliasMappingIdentifier')->table(1, $snmpData));
+            $snmpData = collect(SnmpQuery::hideMib()->mibs(['IF-MIB'])->walk('ENTITY-MIB::entAliasMappingIdentifier')->table(1, $snmpData));
             $sfpCages = $snmpData->filter(fn ($ent) => isset($ent['entPhysicalVendorType']) && in_array($ent['entPhysicalVendorType'], $arrayOfContainers));
             $dataFilter = $snmpData->filter(fn ($ent) => $sfpCages->has($ent['entPhysicalContainedIn'] ?? null));
             $data = $dataFilter->map(function ($e, $e_index) use ($snmpData) {
@@ -714,11 +754,11 @@ class Cisco extends OS implements
         $qos = new Collection();
 
         // SNMP lookup tables
-        $servicePolicies = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosServicePolicyTable')->table(1);
-        $policyMaps = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosPolicyMapCfgTable')->table(1);
-        $classMaps = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMCfgTable')->table(1);
-        $matchStatements = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosMatchStmtCfgTable')->table(1);
-        $qosObjects = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosObjectsTable')->table(2);
+        $servicePolicies = SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosServicePolicyTable')->table(1);
+        $policyMaps = SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosPolicyMapCfgTable')->table(1);
+        $classMaps = SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMCfgTable')->table(1);
+        $matchStatements = SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosMatchStmtCfgTable')->table(1);
+        $qosObjects = SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosObjectsTable')->table(2);
 
         // Iterate over a 2 level table with keys of the policy ID, then the object ID
         foreach ($qosObjects as $policyId => $spObjects) {
@@ -832,12 +872,12 @@ class Cisco extends OS implements
     public function pollQos($qos)
     {
         $poll_time = time();
-        $preBytes = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMPrePolicyByte64')->table(2);
-        $postBytes = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMPostPolicyByte64')->table(2);
-        $dropBytes = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMDropByte64')->table(2);
-        $bufferDrops = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMNoBufDropPkt64')->table(2);
-        $prePackets = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMPrePolicyPkt64')->table(2);
-        $dropPackets = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMDropPkt64')->table(2);
+        $preBytes = SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMPrePolicyByte64')->table(2);
+        $postBytes = SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMPostPolicyByte64')->table(2);
+        $dropBytes = SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMDropByte64')->table(2);
+        $bufferDrops = SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMNoBufDropPkt64')->table(2);
+        $prePackets = SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMPrePolicyPkt64')->table(2);
+        $dropPackets = SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMDropPkt64')->table(2);
 
         foreach ($qos as $thisQos) {
             if ($thisQos->type == 'cisco_cbqos_classmap') {

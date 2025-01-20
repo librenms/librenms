@@ -51,7 +51,7 @@ class ConvertStorageData extends Command
                             'type' => $storage['storage_mib'],
                             'storage_index' => $storage['storage_index'],
                             'storage_type' => $this->getStorageType($snmprec_file, $storage),
-                            'storage_descr' => str_replace('\\\\', '\\', $storage['storage_descr']),
+                            'storage_descr' => $this->getDescr($snmprec_file, $storage),
                             'storage_size' => $this->getStorageSize($snmprec_file, $storage, $type),
                             'storage_size_oid' => null,
                             'storage_units' => $this->getStorageUnits($snmprec_file, $storage),
@@ -152,6 +152,10 @@ class ConvertStorageData extends Command
             }
         }
 
+        if ($storage['storage_mib'] == 'cisco-flash') {
+            return 'FlashMemory';
+        }
+
         return 'Storage';
     }
 
@@ -234,6 +238,14 @@ class ConvertStorageData extends Command
 
         if (Str::startsWith($snmprec_file, 'eltex-mes')) {
             return '.1.3.6.1.4.1.89.96.5.0';
+        }
+
+        if ($storage['storage_mib'] == 'cisco-flash') {
+            if ($storage['storage_size'] > 4294967295) {
+                return '.1.3.6.1.4.1.9.9.10.1.1.4.1.1.14.' . $storage['storage_index'];
+            }
+
+            return '.1.3.6.1.4.1.9.9.10.1.1.4.1.1.5.' . $storage['storage_index'];
         }
 
         return null;
@@ -334,5 +346,22 @@ class ConvertStorageData extends Command
         }
 
         return $value;
+    }
+
+    private function getDescr(string $snmprec_file, mixed $storage): string
+    {
+        if ($storage['storage_mib'] == 'cisco-flash') {
+            if (preg_match('/^(.*)\((.+)\):/', $storage['storage_descr'], $matches)) {
+                if ($matches[1] == $matches[2]) {
+                    return $matches[1] . ':';
+                }
+
+                if ($matches[1] == '') {
+                    return $matches[2] . ':';
+                }
+            }
+        }
+
+        return str_replace('\\\\', '\\', $storage['storage_descr']);
     }
 }
