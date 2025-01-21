@@ -139,6 +139,27 @@ class ConvertStorageData extends Command
                 return 'hrFSBerkeleyFFS';
             }
 
+            if (str_starts_with($snmprec_file, 'ubiquoss-pon')) {
+                if ($storage['storage_index'] == '2') {
+                    return 'hrStorageRamDisk';
+                }
+                if ($storage['storage_index'] == '3') {
+                    return 'hrStorageFlashMemory';
+                }
+                if ($storage['storage_index'] == '4') {
+                    return 'hrStorageFlashMemory';
+                }
+            }
+
+            if (str_starts_with($snmprec_file, 'vmware-esxi')) {
+                if ($storage['storage_index'] == '1') {
+                    return 'hrStorageRamDisk';
+                }
+                if ($storage['storage_index'] == '2') {
+                    return 'hrStorageRamDisk';
+                }
+            }
+
             return 'hrStorageFixedDisk';
         }
 
@@ -190,6 +211,13 @@ class ConvertStorageData extends Command
 
         if ($storage['storage_mib'] == 'truenas-scale-zv') {
             return 'zvol';
+        }
+
+        if ($snmprec_file == 'vrp_ac6605-26') {
+            return 'flash';
+        }
+        if ($snmprec_file == 'vrp_ne8000-m8') {
+            return 'cfCard';
         }
 
         return 'Storage';
@@ -324,6 +352,10 @@ class ConvertStorageData extends Command
 
         if ($storage['storage_mib'] == 'truenas-scale-zv') {
             return '.1.3.6.1.4.1.50536.1.2.1.1.4.' . $storage['storage_index'];
+        }
+
+        if ($storage['storage_mib'] == 'vrp') {
+            return '.1.3.6.1.4.1.2011.6.9.1.4.2.1.4.' . $storage['storage_index'];
         }
 
         return null;
@@ -502,6 +534,14 @@ class ConvertStorageData extends Command
                     return $matches[2] . ':';
                 }
             }
+        }
+
+        if ($snmprec_file == 'vrp_ac6605-26') {
+            return 'flash:';
+        }
+
+        if ($snmprec_file == 'vrp_ne8000-m8') {
+            return 'cfcard:';
         }
 
         return str_replace('\\\\', '\\', $storage['storage_descr']);
