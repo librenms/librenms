@@ -34,6 +34,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use LibreNMS\Util\Number;
 use Rrd;
+use SnmpQuery;
 
 trait HostResources
 {
@@ -71,15 +72,16 @@ trait HostResources
         10 => 'hrStorageNetworkDisk',
     ];
     private $ignoreMemoryDescr = [
-        'MALLOC',
-        'UMA',
+        'malloc',
+        'uma',
         'procfs',
         '/proc',
     ];
     private $validOtherMemory = [
-        'Memory buffers',
-        'Cached memory',
-        'Shared memory',
+        'memory buffers',
+        'cached memory',
+        'memory cache',
+        'shared memory',
     ];
     private $memoryDescrWarn = [
         'Cached memory' => 0,
@@ -171,16 +173,16 @@ trait HostResources
         return $processors;
     }
 
-    public function discoverMempools()
+    public function discoverMempools(): Collection
     {
-        $hr_storage = \SnmpQuery::cache()->hideMib()->mibs(['HOST-RESOURCES-TYPES'])->walk('HOST-RESOURCES-MIB::hrStorageTable')->table(1);
+        $hr_storage = SnmpQuery::cache()->hideMib()->mibs(['HOST-RESOURCES-TYPES'])->walk('HOST-RESOURCES-MIB::hrStorageTable')->table(1);
         $this->fixBadData($hr_storage);
 
-        if (! is_array($hr_storage)) {
+        if (empty($hr_storage)) {
             return new Collection;
         }
 
-        $hrMemorySize = \SnmpQuery::get('HOST-RESOURCES-MIB::hrMemorySize.0')->value();
+        $hrMemorySize = SnmpQuery::get('HOST-RESOURCES-MIB::hrMemorySize.0')->value();
         $ram_bytes = $hrMemorySize
             ? $hrMemorySize * 1024
             : (isset($hr_storage[1]['hrStorageSize']) ? $hr_storage[1]['hrStorageSize'] * $hr_storage[1]['hrStorageAllocationUnits'] : 0);
@@ -211,7 +213,7 @@ trait HostResources
 
     public function discoverStorage(): Collection
     {
-        $hr_storage = \SnmpQuery::cache()->hideMib()->mibs(['HOST-RESOURCES-TYPES'])->walk('HOST-RESOURCES-MIB::hrStorageTable')->table(1);
+        $hr_storage = SnmpQuery::cache()->hideMib()->mibs(['HOST-RESOURCES-TYPES'])->walk('HOST-RESOURCES-MIB::hrStorageTable')->table(1);
         $this->fixBadData($hr_storage);
 
         if (empty($hr_storage)) {
@@ -256,18 +258,32 @@ trait HostResources
     protected function memValid($storage): bool
     {
         if (empty($storage['hrStorageType']) || empty($storage['hrStorageDescr'])) {
+            Log::debug("hrStorageIndex {$storage['hrStorageIndex']} invalid: empty hrStorageType or hrStorageDescr");
+
             return false;
         }
 
         if (! in_array($storage['hrStorageType'], $this->memoryStorageTypes)) {
+            Log::debug("hrStorageIndex {$storage['hrStorageIndex']} invalid: bad hrStorageType ({$storage['hrStorageType']})");
+
             return false;
         }
 
-        if ($storage['hrStorageType'] == 'hrStorageOther' && ! in_array($storage['hrStorageDescr'], $this->validOtherMemory)) {
+        $hrStorageDescr = strtolower($storage['hrStorageDescr']);
+
+        if ($storage['hrStorageType'] == 'hrStorageOther' && ! in_array($hrStorageDescr, $this->validOtherMemory)) {
+            Log::debug("hrStorageIndex {$storage['hrStorageIndex']} invalid: hrStorageOther & not an exception");
+
             return false;
         }
 
-        return ! Str::contains($storage['hrStorageDescr'], $this->ignoreMemoryDescr);
+        if (Str::contains($hrStorageDescr, $this->ignoreMemoryDescr)) {
+            Log::debug("hrStorageIndex {$storage['hrStorageIndex']} invalid: bad hrStorageDescr ({$hrStorageDescr})");
+
+            return false;
+        }
+
+        return true;
     }
 
     protected function fixBadData(array &$data): void
