@@ -1,5 +1,8 @@
 <?php
 
+use App\Facades\Rrd;
+use LibreNMS\Config;
+
 require 'includes/html/graphs/common.inc.php';
 
 $unitlen = $unitlen ?? 0;
@@ -18,7 +21,7 @@ if ($nototal) {
     $unitlen += 2;
 }
 
-$rrd_options .= " COMMENT:'" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr($unit_text, $descr_len) . "        Now       Min       Max     Avg\l'";
+$rrd_options .= " COMMENT:'" . Rrd::fixedSafeDescr($unit_text, $descr_len) . "        Now       Min       Max     Avg\l'";
 
 $unitlen = 10;
 if ($nototal) {
@@ -26,22 +29,22 @@ if ($nototal) {
     $unitlen += 2;
 }
 
-$unit_text = str_pad(truncate($unit_text, $unitlen), $unitlen);
+$unit_text = Rrd::fixedSafeDescr($unit_text, $unitlen);
 
 $colour_iter = 0;
 foreach ($rrd_list as $i => $rrd) {
     if (isset($rrd['colour'])) {
         $colour = $rrd['colour'];
     } else {
-        if (! \LibreNMS\Config::get("graph_colours.$colours.$colour_iter")) {
+        if (! Config::get("graph_colours.$colours.$colour_iter")) {
             $colour_iter = 0;
         }
 
-        $colour = \LibreNMS\Config::get("graph_colours.$colours.$colour_iter");
+        $colour = Config::get("graph_colours.$colours.$colour_iter");
         $colour_iter++;
     }
 
-    $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr'], $descr_len);
+    $descr = Rrd::fixedSafeDescr($rrd['descr'], $descr_len);
 
     $rrd_options .= ' DEF:' . $rrd['ds'] . $i . '=' . $rrd['filename'] . ':' . $rrd['ds'] . ':AVERAGE ';
 

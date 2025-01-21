@@ -22,7 +22,7 @@
             <br />
             <span class=list-device-down>{{ __('Device Down') }}</span>
             <br />
-            <span class=body-date-1>{{ \LibreNMS\Util\StringHelpers::shortenText($device->location, 20) }}</span>
+            <span class=body-date-1>{{ \Str::limit($device->location, 20) }}</span>
         </div>
     @endforeach
 
@@ -35,7 +35,7 @@
             {!! \LibreNMS\Util\Url::PortLink($port) !!}
             @if($port->ifAlias)
                 <br />
-                <span class="body-date-1">{{ \LibreNMS\Util\StringHelpers::shortenText($port->getLabel(), 20) }}</span>
+                <span class="body-date-1">{{ \Str::limit($port->getLabel(), 20) }}</span>
             @endif
         </div>
     @endforeach
@@ -56,7 +56,7 @@
                 {{ $bgp->bgpPeerIdentifier }}
             </span>
             <br />
-            <span class="body-date-1">AS{{ \LibreNMS\Util\StringHelpers::shortenText($bgp->bgpPeerRemoteAs . ' ' . $bgp->astext, 14) }}</span>
+            <span class="body-date-1">AS{{ \Str::limit($bgp->bgpPeerRemoteAs . ' ' . $bgp->astext, 14) }}</span>
         </div>
     @endforeach
 
