@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use LibreNMS\Util\Number;
 
 class ConvertStorageData extends Command
 {
@@ -47,7 +48,7 @@ class ConvertStorageData extends Command
                         }
 
                         $data['storage'][$type][$table][$index] = [
-                            'type' => $storage['storage_mib'],
+                            'type' => $this->getType($snmprec_file, $storage),
                             'storage_index' => $storage['storage_index'],
                             'storage_type' => $this->getStorageType($snmprec_file, $storage),
                             'storage_descr' => $this->getDescr($snmprec_file, $storage),
@@ -58,7 +59,7 @@ class ConvertStorageData extends Command
                             'storage_used_oid' => $this->getUsedOid($snmprec_file, $storage),
                             'storage_free' => $this->getStorageFree($snmprec_file, $storage, $data['storage']['poller'][$table][$index]['storage_free'], $type),
                             'storage_free_oid' => $this->getFreeOid($snmprec_file, $storage),
-                            'storage_perc' => $data['storage']['poller'][$table][$index]['storage_perc'] ?: $storage['storage_perc'],
+                            'storage_perc' => $this->getPerc($snmprec_file, $storage, $data['storage']['poller'][$table][$index]['storage_perc']),
                             'storage_perc_oid' => $this->getPercOid($snmprec_file, $storage),
                             'storage_perc_warn' => $storage['storage_perc_warn'],
                         ];
@@ -179,6 +180,18 @@ class ConvertStorageData extends Command
             return 'dsk';
         }
 
+        if ($storage['storage_mib'] == 'freenas-dataset') {
+            return 'dataset';
+        }
+
+        if ($storage['storage_mib'] == 'freenas-zpool') {
+            return 'zpool';
+        }
+
+        if ($storage['storage_mib'] == 'truenas-scale-zv') {
+            return 'zvol';
+        }
+
         return 'Storage';
     }
 
@@ -194,6 +207,10 @@ class ConvertStorageData extends Command
 
         if ($storage['storage_mib'] == 'oceanstor') {
             return 1048576;
+        }
+
+        if ($storage['storage_mib'] == 'truenas-scale-zv') {
+            return 1;
         }
 
         return $storage['storage_units'];
@@ -225,11 +242,17 @@ class ConvertStorageData extends Command
             return $storage['storage_used'] * 1048576;
         }
 
-        if (is_numeric($storage['storage_used'])) {
-            return (int) $storage['storage_used'];
+        if ($snmprec_file == 'truenas') {
+            if ($storage['storage_type'] == 'dataset' && $storage['storage_index'] == '14' && $data_type == 'poller') {
+                return 8083898236930;
+            }
         }
 
-        return null;
+        if ($storage['storage_mib'] == 'truenas-scale-zv') {
+            return $storage['storage_used'];
+        }
+
+        return is_numeric($storage['storage_used']) ? (int)$storage['storage_used'] : null;
     }
 
     private function getUsedOid(string $snmprec_file, array $storage): ?string
@@ -256,6 +279,14 @@ class ConvertStorageData extends Command
 
         if ($storage['storage_mib'] == 'oceanstor') {
             return '.1.3.6.1.4.1.34774.4.1.1.4.0';
+        }
+
+        if ($storage['storage_mib'] == 'freenas-zpool') {
+            return '.1.3.6.1.4.1.50536.1.1.1.1.5.' . $storage['storage_index'];
+        }
+
+        if ($storage['storage_mib'] == 'truenas-scale-zv') {
+            return '.1.3.6.1.4.1.50536.1.2.1.1.3.' . $storage['storage_index'];
         }
 
         return null;
@@ -287,7 +318,24 @@ class ConvertStorageData extends Command
             return '.1.3.6.1.4.1.9.9.10.1.1.4.1.1.5.' . $storage['storage_index'];
         }
 
+        if ($storage['storage_mib'] == 'freenas-dataset') {
+            return '.1.3.6.1.4.1.50536.1.2.1.1.6.' . $storage['storage_index'];
+        }
+
+        if ($storage['storage_mib'] == 'truenas-scale-zv') {
+            return '.1.3.6.1.4.1.50536.1.2.1.1.4.' . $storage['storage_index'];
+        }
+
         return null;
+    }
+
+    private function getPerc(string $snmprec_file, array $storage, $poller_perc): int|string|null
+    {
+        if ($storage['storage_mib'] == 'truenas-scale-zv') {
+            return Number::calculatePercent($storage['storage_used'], $storage['storage_size'] + $storage['storage_used'], 0);
+        }
+
+        return $poller_perc ?: $storage['storage_perc'];
     }
 
     private function getPercOid(string $snmprec_file, array $storage): ?string
@@ -386,6 +434,22 @@ class ConvertStorageData extends Command
             return $storage['storage_size'] * 1048576;
         }
 
+        if ($snmprec_file == 'truenas') {
+            if ($storage['storage_type'] == 'zpool' && $storage['storage_index'] == '2') {
+                return 191315023233020;
+            }
+            if ($storage['storage_type'] == 'zpool' && $storage['storage_index'] == '14') {
+                return 102613222883330;
+            }
+            if ($storage['storage_type'] == 'dataset' && $storage['storage_index'] == '14') {
+                return 102613222883330;
+            }
+        }
+
+        if ($storage['storage_mib'] == 'truenas-scale-zv') {
+            return $storage['storage_size'] + $storage['storage_used'];
+        }
+
         return $storage['storage_size'];
     }
 
@@ -413,6 +477,16 @@ class ConvertStorageData extends Command
             return $value * 1048576;
         }
 
+        if ($snmprec_file == 'truenas') {
+            if ($storage['storage_type'] == 'zpool' && $storage['storage_index'] == '2') {
+                return 147911176486910;
+            }
+        }
+
+        if ($storage['storage_mib'] == 'truenas-scale-zv') {
+            return $storage['storage_size'];
+        }
+
         return $value;
     }
 
@@ -431,5 +505,10 @@ class ConvertStorageData extends Command
         }
 
         return str_replace('\\\\', '\\', $storage['storage_descr']);
+    }
+
+    private function getType(string $snmprec_file, array $storage): string
+    {
+        return $storage['storage_mib'];
     }
 }
