@@ -299,7 +299,7 @@ trait HostResources
     {
         if (str_starts_with($hrStorageType, 'hrStorage')) {
             // fix some that set them incorrectly as scalars
-            return preg_replace('/\.0$/', '',$hrStorageType);
+            return preg_replace('/\.0$/', '', $hrStorageType);
         }
 
         // if the agent returns with a bad base oid, just take the last index off the oid and manually convert it
