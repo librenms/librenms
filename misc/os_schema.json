@@ -465,7 +465,7 @@
         "ignore_mount_regexp": {
             "type": "array",
             "items": {
-                "type": "regex"
+                "type": "string"
             }
         },
         "ignore_mount_type": {

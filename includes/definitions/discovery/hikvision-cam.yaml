@@ -24,5 +24,5 @@ modules:
             -
                 descr: Storage
                 size: HIK-DEVICE-MIB::diskSize.0
-                percent: HIK-DEVICE-MIB::diskPercent.0
-                percent_num_oid: '.1.3.6.1.4.1.39165.1.9.0'
+                percent_used: HIK-DEVICE-MIB::diskPercent.0
+                percent_used_num_oid: '.1.3.6.1.4.1.39165.1.9.0'

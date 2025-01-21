@@ -1,9 +1,9 @@
 modules:
-  os:
-    serial: NETAPP-MIB::productSerialNum.0
-    hardware: NETAPP-MIB::productModel.0
-    version: NETAPP-MIB::productVersion.0
-    version_regex: '/NetApp Release (?<version>.*?):/'
+    os:
+        serial: NETAPP-MIB::productSerialNum.0
+        hardware: NETAPP-MIB::productModel.0
+        version: NETAPP-MIB::productVersion.0
+        version_regex: '/NetApp Release (?<version>.*?):/'
     storage:
         data:
             -
