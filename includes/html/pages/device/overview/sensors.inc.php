@@ -24,7 +24,7 @@ foreach ($grouped_sensors as $sensor_class => $sensors) {
         <div class="col-md-12">
         <div class="panel panel-default panel-condensed">
         <div class="panel-heading">';
-    echo '<a href="device/device=' . DeviceCache::getPrimary()->device_id . '/tab=health/metric=' . $sensor_class . '/"><i class="fa fa-' . $sensors->first()->icon() . ' fa-lg icon-theme" aria-hidden="true"></i><strong> ' . $sensors->first()->classDescr() . '</strong></a>';
+    echo '<a href="device/device=' . DeviceCache::getPrimary()->device_id . '/tab=health/metric=' . $sensor_class . '/"><i class="fa fa-' . $sensors->first()->icon() . ' fa-lg icon-theme" aria-hidden="true"></i><strong> ' . $sensors->first()->sensor_class->descr() . '</strong></a>';
     echo '      </div>
         <table class="table table-hover table-condensed table-striped">';
     $group = '';

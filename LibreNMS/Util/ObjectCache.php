@@ -87,7 +87,7 @@ class ObjectCache
             $sensor_menu = [];
             foreach ($sensor_classes as $sensor_model) {
                 /** @var Sensor $sensor_model */
-                $class = $sensor_model->sensor_class;
+                $class = $sensor_model->sensor_class->name;
                 if (in_array($class, ['fanspeed', 'humidity', 'temperature', 'signal'])) {
                     // First group
                     $group = 0;
@@ -101,8 +101,8 @@ class ObjectCache
 
                 $sensor_menu[$group][] = [
                     'class' => $class,
-                    'icon' => $sensor_model->icon(),
-                    'descr' => $sensor_model->classDescr(),
+                    'icon' => $sensor_model->sensor_class->icon(),
+                    'descr' => $sensor_model->sensor_class->descr(),
                 ];
             }
 

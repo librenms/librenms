@@ -2,94 +2,92 @@
 
 namespace LibreNMS\Enum;
 
-use Illuminate\Support\Collection;
-use ReflectionClass;
-
-class SensorClass
+enum SensorClass
 {
-    const airflow = 'angle-double-right';
-    const ber = 'sort-amount-desc';
-    const bitrate = 'bar-chart';
-    const charge = 'battery-half';
-    const chromatic_dispersion = 'indent';
-    const cooling = 'thermometer-full';
-    const count = 'hashtag';
-    const current = 'bolt fa-flip-horizontal';
-    const dbm = 'sun-o';
-    const delay = 'clock-o';
-    const eer = 'snowflake-o';
-    const fanspeed = 'refresh';
-    const frequency = 'line-chart';
-    const humidity = 'tint';
-    const load = 'percent';
-    const loss = 'percentage';
-    const percent = 'percent';
-    const power = 'power-off';
-    const power_consumed = 'plug';
-    const power_factor = 'calculator';
-    const pressure = 'thermometer-empty';
-    const quality_factor = 'arrows';
-    const runtime = 'hourglass-half';
-    const signal = 'wifi';
-    const snr = 'signal';
-    const state = 'bullseye';
-    const temperature = 'thermometer-three-quarters';
-    const tv_signal = 'signal';
-    const voltage = 'bolt';
-    const waterflow = 'tint';
+    case airflow;
+    case ber;
+    case charge;
+    case chromatic_dispersion;
+    case cooling;
+    case count;
+    case current;
+    case dbm;
+    case delay;
+    case eer;
+    case fanspeed;
+    case frequency;
+    case humidity;
+    case load;
+    case loss;
+    case power;
+    case power_consumed;
+    case power_factor;
+    case pressur;
+    case quality_factor;
+    case runtime;
+    case signal;
+    case snr;
+    case state;
+    case temperature;
+    case tv_signal;
+    case bitrate;
+    case voltage;
+    case waterflow;
+    case percent;
 
-    public static function all(): Collection
+    public function icon(): string
     {
-        return static::iconMap()->keys();
+        return match($this){
+            self::airflow => 'angle-double-right',
+            self::ber => 'sort-amount-desc',
+            self::charge => 'battery-half',
+            self::chromatic_dispersion => 'indent',
+            self::cooling => 'thermometer-full',
+            self::count => 'hashtag',
+            self::current => 'bolt fa-flip-horizontal',
+            self::dbm => 'sun-o',
+            self::delay => 'clock-o',
+            self::eer => 'snowflake-o',
+            self::fanspeed => 'refresh',
+            self::frequency => 'line-chart',
+            self::humidity => 'tint',
+            self::load => 'percent',
+            self::loss => 'percentage',
+            self::power => 'power-off',
+            self::power_consumed => 'plug',
+            self::power_factor => 'calculator',
+            self::pressur => 'thermometer-empty',
+            self::quality_factor => 'arrows',
+            self::runtime => 'hourglass-half',
+            self::signal => 'wifi',
+            self::snr => 'signal',
+            self::state => 'bullseye',
+            self::temperature => 'thermometer-three-quarters',
+            self::tv_signal => 'signal',
+            self::bitrate => 'bar-chart',
+            self::voltage => 'bolt',
+            self::waterflow => 'tint',
+            self::percent => 'percent',
+        };
     }
 
-    public static function iconMap(): Collection
+    public function descr(): string
     {
-        return collect((new ReflectionClass(__CLASS__))->getConstants());
+        return __('sensors.' . $this->name . '.short');
     }
 
-    public static function descrMap(): Collection
+    public function descrLong(): string
     {
-        return self::all()->mapWithKeys(fn ($type) => [$type => self::descr($type)]);
+        return __('sensors.' . $this->name . '.long');
     }
 
-    public static function descrLongMap(): Collection
+    public function unit(): string
     {
-        return self::all()->mapWithKeys(fn ($type) => [$type => self::descrLong($type)]);
+        return __('sensors.' . $this->name . '.unit');
     }
 
-    public static function unitMap(): Collection
+    public function unitLong(): string
     {
-        return self::all()->mapWithKeys(fn ($type) => [$type => self::unit($type)]);
-    }
-
-    public static function unitLongMap(): Collection
-    {
-        return self::all()->mapWithKeys(fn ($type) => [$type => self::unitLong($type)]);
-    }
-
-    public static function icon(string $class): string
-    {
-        return self::iconMap()->get($class, 'delicius');
-    }
-
-    public static function descr(string $class): string
-    {
-        return __('sensors.' . $class . '.short');
-    }
-
-    public static function descrLong(string $class): string
-    {
-        return __('sensors.' . $class . '.long');
-    }
-
-    public static function unit(string $class): string
-    {
-        return __('sensors.' . $class . '.unit');
-    }
-
-    public static function unitLong(string $class): string
-    {
-        return __('sensors.' . $class . '.unit_long');
+        return __('sensors.' . $this->name. '.unit_long');
     }
 }
