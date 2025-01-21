@@ -1,5 +1,6 @@
 <?php
 
+use LibreNMS\Config;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Util\Number;
 
