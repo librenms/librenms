@@ -39,9 +39,9 @@ class UserFuncHelper
         throw new UserFunctionExistException("Invalid user function: $name");
     }
 
-    public function dateToDays(): int
+    public function dateToRuntime(): int
     {
-        return \LibreNMS\Util\Time::dateToDays($this->value_raw);
+        return \LibreNMS\Util\Time::dateToMinutes($this->value_raw);
     }
 
     public function fsParseChannelValue(): float
