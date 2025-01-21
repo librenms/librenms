@@ -353,17 +353,17 @@ class ArubaInstant extends OS implements
         }
 
         $index = 2;
-        $ap_data = SnmpQuery::cache()->walk('AI-AP-MIB:aiAccessPointTable')->table(1);
+        $ap_data = SnmpQuery::cache()->walk('AI-AP-MIB::aiAccessPointTable')->table(1);
         foreach ($ap_data as $mac => $entry) {
-            $type = $master_ip == $entry['AI-AP-MIB:aiAPIPAddress'] ? 'Master' : 'Member';
+            $type = $master_ip == $entry['AI-AP-MIB::aiAPIPAddress'] ? 'Master' : 'Member';
             $inventory->push(new EntPhysical([
                 'entPhysicalIndex' => $index++,
-                'entPhysicalDescr' => $entry['AI-AP-MIB:aiAPMACAddress'],
-                'entPhysicalName' => sprintf('%s %s Cluster %s', $entry['AI-AP-MIB:aiAPName'], $entry['AI-AP-MIB:aiAPIPAddress'], $type),
+                'entPhysicalDescr' => $entry['AI-AP-MIB::aiAPMACAddress'],
+                'entPhysicalName' => sprintf('%s %s Cluster %s', $entry['AI-AP-MIB::aiAPName'], $entry['AI-AP-MIB::aiAPIPAddress'], $type),
                 'entPhysicalClass' => 'other',
                 'entPhysicalContainedIn' => 1,
-                'entPhysicalSerialNum' => $entry['AI-AP-MIB:aiAPSerialNum'],
-                'entPhysicalModelName' => $entry['AI-AP-MIB:aiAPModel'],
+                'entPhysicalSerialNum' => $entry['AI-AP-MIB::aiAPSerialNum'],
+                'entPhysicalModelName' => $entry['AI-AP-MIB::aiAPModel'],
                 'entPhysicalMfgName' => 'Aruba',
                 'entPhysicalVendorType' => 'accessPoint',
                 'entPhysicalSoftwareRev' => $this->getDevice()->version,
