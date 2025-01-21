@@ -1,0 +1,169 @@
+EDGECORE-ENTITY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+edgecoreEntityMIB MODULE-IDENTITY
+    LAST-UPDATED "202501200000Z"
+    ORGANIZATION "Edgecore Networks"
+    CONTACT-INFO
+        "support@edgecore.com"
+    DESCRIPTION
+        "Custom ENTITY-MIB for Edgecore devices."
+    ::= { edgecoreMibs 1 }
+
+-- Root OID for Edgecore MIBs
+edgecoreMibs OBJECT IDENTIFIER ::= { enterprises 25923 }
+
+-- Physical Entity Table
+edgecoreEntityTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF EdgecoreEntityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table of physical entities for Edgecore devices."
+    ::= { edgecoreEntityMIB 1 }
+
+edgecoreEntityEntry OBJECT-TYPE
+    SYNTAX EdgecoreEntityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the physical entity table."
+    INDEX { edgecoreEntityIndex }
+    ::= { edgecoreEntityTable 1 }
+
+EdgecoreEntityEntry ::= SEQUENCE {
+    edgecoreEntityIndex               Integer32,
+    edgecoreEntityDescr               OCTET STRING,
+    edgecoreEntityClass               INTEGER,
+    edgecoreEntityType                OCTET STRING,
+    edgecoreEntityStatus              INTEGER,
+    edgecoreEntityConnectorType       OCTET STRING,
+    edgecoreEntityDistance            Integer32,
+    edgecoreEntityWavelength          Integer32,
+    edgecoreEntityPowerConsumption    Integer32,
+    edgecoreEntityTemperature         Integer32,
+    edgecoreEntitySerialNumber        OCTET STRING,
+    edgecoreEntityVendorName          OCTET STRING
+}
+
+-- Table Columns
+edgecoreEntityIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Unique index for each physical entity."
+    ::= { edgecoreEntityEntry 1 }
+
+edgecoreEntityDescr OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Description of the physical entity."
+    ::= { edgecoreEntityEntry 2 }
+
+edgecoreEntityClass OBJECT-TYPE
+    SYNTAX INTEGER {
+        other(1),
+        chassis(2),
+        backplane(3),
+        container(4),
+        powerSupply(5),
+        fan(6),
+        sensor(7),
+        module(8),
+        port(9),
+        stack(10),
+        transceiver(11)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Class of the physical entity."
+    ::= { edgecoreEntityEntry 3 }
+
+edgecoreEntityType OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Type of the physical entity."
+    ::= { edgecoreEntityEntry 4 }
+
+edgecoreEntityStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        active(1),
+        inactive(2),
+        fault(3)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operational status of the entity."
+    ::= { edgecoreEntityEntry 5 }
+
+edgecoreEntityConnectorType OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Connector type for the entity."
+    ::= { edgecoreEntityEntry 6 }
+
+edgecoreEntityDistance OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Optical transfer distance in meters."
+    ::= { edgecoreEntityEntry 7 }
+
+edgecoreEntityWavelength OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Optical wavelength in nanometers."
+    ::= { edgecoreEntityEntry 8 }
+
+edgecoreEntityPowerConsumption OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Power consumption of the entity in watts."
+    ::= { edgecoreEntityEntry 9 }
+
+edgecoreEntityTemperature OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operating temperature of the entity in Celsius."
+    ::= { edgecoreEntityEntry 10 }
+
+edgecoreEntitySerialNumber OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial number of the physical entity."
+    ::= { edgecoreEntityEntry 11 }
+
+edgecoreEntityVendorName OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Vendor name of the physical entity."
+    ::= { edgecoreEntityEntry 12 }
+
+END
