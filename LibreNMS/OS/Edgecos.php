@@ -26,12 +26,15 @@
 
 namespace LibreNMS\OS;
 
-use LibreNMS\Device\OS;
 use Illuminate\Support\Collection;
-use LibreNMS\Transceiver;
+use LibreNMS\Device\OS;
+use App\Model\Transceiver;
 use LibreNMS\Util\PortCache;
+use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
+use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 
-class Edgecos extends OS
+class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, TransceiverDiscovery
 {
     public function discoverMempools($device): Collection
     {
@@ -93,8 +96,21 @@ class Edgecos extends OS
         );
     }
 
-    public function pollOS($device): void
+    public function discoverOS($device): void
     {
-        // Poll OS-specific data
+        parent::discoverOS($device); // yaml
+
+        preg_match('/Version (\S+)/', $device->sysDescr, $matches);
+        $device->version = isset($matches[1]) ? ($matches[1] . ($device->version ? " ($device->version)" : '')) : null;
+
+        $patch = snmp_getnext($this->getDeviceArray(), 'EDGECORE-SYSTEM-MIB::ecPatchVersion', '-OQv');
+        if ($patch) {
+            $device->version .= " [$patch]";
+        }
+
+        $hardware = snmp_get($this->getDeviceArray(), 'EDGECORE-ENTITY-MIB::ecEntityHardwareName.0', '-OQv');
+        if ($hardware) {
+            $device->hardware = $hardware;
+        }
     }
 }
