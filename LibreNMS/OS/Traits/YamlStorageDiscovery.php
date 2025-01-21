@@ -28,6 +28,7 @@ namespace LibreNMS\OS\Traits;
 use App\Models\Storage;
 use Illuminate\Support\Collection;
 use LibreNMS\Discovery\Yaml\IndexField;
+use LibreNMS\Discovery\Yaml\LiteralField;
 use LibreNMS\Discovery\Yaml\OidField;
 use LibreNMS\Discovery\Yaml\YamlDiscoveryField;
 use LibreNMS\Discovery\YamlDiscoveryDefinition;
@@ -39,7 +40,7 @@ trait YamlStorageDiscovery
     public function discoverYamlStorage(): Collection
     {
         $discovery = YamlDiscoveryDefinition::make(Storage::class)
-            ->addField(new YamlDiscoveryField('poller_type', 'type', $this->getName()))
+            ->addField(new LiteralField('poller_type', 'type', $this->getName()))
             ->addField(new YamlDiscoveryField('type', 'storage_type', 'Storage'))
             ->addField(new YamlDiscoveryField('descr', 'storage_descr', 'Disk {{ $index }}'))
             ->addField(new YamlDiscoveryField('units', 'storage_units', 1)) // 1 for percentage only storages

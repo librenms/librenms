@@ -27,6 +27,7 @@ namespace LibreNMS\OS\Traits;
 
 use App\Models\Mempool;
 use LibreNMS\Discovery\Yaml\IndexField;
+use LibreNMS\Discovery\Yaml\LiteralField;
 use LibreNMS\Discovery\Yaml\OidField;
 use LibreNMS\Discovery\Yaml\YamlDiscoveryField;
 use LibreNMS\Discovery\YamlDiscoveryDefinition;
@@ -39,8 +40,8 @@ trait YamlMempoolsDiscovery
 
         $def = YamlDiscoveryDefinition::make(Mempool::class)
             ->addField(new IndexField('index', 'mempool_index'))
-            ->addField(new YamlDiscoveryField('type', 'mempool_type', $this->getName()))
-            ->addField(new YamlDiscoveryField('class', 'mempool_class', 'system'))
+            ->addField(new LiteralField('type', 'mempool_type', $this->getName()))
+            ->addField(new LiteralField('class', 'mempool_class', 'system'))
             ->addField(new YamlDiscoveryField('precision', 'mempool_precision', 1))
             ->addField(new YamlDiscoveryField('descr', 'mempool_descr', 'Memory', callback: fn ($value) => ucwords($value)))
             ->addField(new OidField('used', 'mempool_used'))

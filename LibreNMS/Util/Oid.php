@@ -61,7 +61,7 @@ class Oid
 
     public function isFullTextualOid(): bool
     {
-        return (bool) preg_match('/[-_A-Za-z0-9]+::[-_A-Za-z0-9]+', $this->oid);
+        return (bool) preg_match('/[-_A-Za-z0-9]+::[-_A-Za-z0-9]+/', $this->oid);
     }
 
     public function hasMib(): bool

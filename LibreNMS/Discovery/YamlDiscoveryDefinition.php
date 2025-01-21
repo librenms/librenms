@@ -75,7 +75,7 @@ class YamlDiscoveryDefinition
 
     public function getFieldCurrentValue(string $name): mixed
     {
-        return $this->fields[$name]?->value;
+        return $this->fields[$name]->value;
     }
 
     public function afterEach(callable $callable): static

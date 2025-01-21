@@ -39,7 +39,7 @@ class YamlDiscoveryField
     public function __construct(
         public readonly string $key,
         public readonly ?string $model_column = null,
-        public readonly ?string $default = null,
+        public readonly int|string|null $default = null,
         public readonly ?\Closure $callback = null,
     ) {
         $this->should_poll = fn (YamlDiscoveryDefinition $def) => false;

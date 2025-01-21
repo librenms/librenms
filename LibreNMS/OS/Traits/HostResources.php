@@ -182,7 +182,7 @@ trait HostResources
             return new Collection;
         }
 
-        $hrMemorySize = SnmpQuery::get('HOST-RESOURCES-MIB::hrMemorySize.0')->value();
+        $hrMemorySize = (int) SnmpQuery::get('HOST-RESOURCES-MIB::hrMemorySize.0')->value();
         $ram_bytes = $hrMemorySize
             ? $hrMemorySize * 1024
             : (isset($hr_storage[1]['hrStorageSize']) ? $hr_storage[1]['hrStorageSize'] * $hr_storage[1]['hrStorageAllocationUnits'] : 0);

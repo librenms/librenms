@@ -287,7 +287,8 @@ class Number
         }
 
         // fill used if it is missing
-        if ($used === null) {
+        $used_is_null = $used === null;
+        if ($used_is_null) {
             $used = $available !== null
                 ? $total - $available
                 : $total * ($used_percent ? ($used_percent / 100) : 0);
@@ -300,9 +301,9 @@ class Number
 
         // fill available if it is missing
         if ($available === null) {
-            $available = $used !== null
-                ? $total - $used
-                : $total * (1 - ($used_percent / 100));
+            $available = $used_is_null
+                ? $total * (1 - ($used_percent / 100))
+                : $total - $used;
         }
 
         // return nicely formatted values

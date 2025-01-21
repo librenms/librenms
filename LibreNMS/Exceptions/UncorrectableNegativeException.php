@@ -25,6 +25,8 @@
 
 namespace LibreNMS\Exceptions;
 
+use Throwable;
+
 class UncorrectableNegativeException extends \Exception
 {
     public function __construct(string $message = 'Uncorrectable negative value', int $code = 0, ?Throwable $previous = null)

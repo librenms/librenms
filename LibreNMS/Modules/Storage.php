@@ -31,7 +31,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
-use LibreNMS\Interfaces\Discovery\StorageDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\StoragePolling;
 use LibreNMS\OS;
@@ -58,15 +57,13 @@ class Storage implements Module
      */
     public function discover(OS $os): void
     {
-        if ($os instanceof StorageDiscovery) {
-            $storages = $os->discoverStorage()->filter->isValid($os->getName());
+        $storages = $os->discoverStorage()->filter->isValid($os->getName());
 
-            ModuleModelObserver::observe(\App\Models\Storage::class);
-            $this->syncModels($os->getDevice(), 'storage', $storages);
+        ModuleModelObserver::observe(\App\Models\Storage::class);
+        $this->syncModels($os->getDevice(), 'storage', $storages);
 
-            Log::info('');
-            $storages->each($this->printStorage(...));
-        }
+        Log::info('');
+        $storages->each($this->printStorage(...));
     }
 
     public function shouldPoll(OS $os, ModuleStatus $status): bool
