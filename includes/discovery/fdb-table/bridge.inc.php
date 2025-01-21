@@ -83,7 +83,7 @@ if (! empty($fdbPort_table)) {
                 Log::debug("MAC address padding failed for $mac\n");
                 continue;
             }
-            $port_id = $portid_dict[$dot1dBasePort];
+            $port_id = $portid_dict[$dot1dBasePort] ?? PortCache::getIdFromIfIndex($dot1dBasePort); // if vendor messed up, assume base port = ifIndex
             $vlan_id = isset($vlans_dict[$vlan]) ? $vlans_dict[$vlan] : 0;
             $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
             Log::debug("vlan $vlan mac $mac_address port ($dot1dBasePort) $port_id\n");
