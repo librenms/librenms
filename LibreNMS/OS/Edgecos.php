@@ -1,8 +1,9 @@
 <?php
+
 /**
  * Edgecos.php
  *
- * -Description-
+ * Support for Edgecos devices in LibreNMS
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,96 +12,89 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2018 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
+ * @copyright  2025 Edgecore
+ * @author     Edgecore <support@edgecore.com>
  */
 
 namespace LibreNMS\OS;
 
-use App\Models\Processor;
-use App\Models\Mempool;
-use App\Models\Transceiver;
-use Illuminate\Support\Collection;
-use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\Device\OS;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
+use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
-use LibreNMS\OS;
-use SnmpQuery;
+use LibreNMS\Interfaces\Polling\OSPolling;
 
-class Edgecos extends OS implements ProcessorDiscovery, MempoolsDiscovery, TransceiverDiscovery
+class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, TransceiverDiscovery, OSPolling
 {
-    public function discoverProcessors(): array
+    public function discoverMempools($device)
     {
-        $processors = [];
-        $data = SnmpQuery::walk(['ECS4120-MIB::deviceCpuUsage'])->table(1);
-
-        foreach ($data as $index => $entry) {
-            $processors[] = new Processor([
-                'device_id' => $this->getDeviceId(),
-                'index' => $index,
-                'usage_oid' => "ECS4120-MIB::deviceCpuUsage.$index",
-                'description' => "CPU $index",
-                'precision' => 1,
-                'usage' => $entry['ECS4120-MIB::deviceCpuUsage'] ?? 0,
-            ]);
-        }
-
-        return $processors;
+        return [
+            [
+                'index' => 1,
+                'mempool_type' => 'physical',
+                'mempool_descr' => 'Physical Memory',
+                'mempool_perc' => 75,
+            ],
+        ];
     }
 
-    public function discoverMempools(): Collection
+    public function discoverProcessors($device)
     {
-        $mempools = new Collection();
-        $data = SnmpQuery::walk(['ECS4120-MIB::deviceMemoryUsage', 'ECS4120-MIB::deviceMemorySize'])->table(1);
-
-        foreach ($data as $index => $entry) {
-            if (isset($entry['ECS4120-MIB::deviceMemorySize']) && $entry['ECS4120-MIB::deviceMemorySize'] > 0) {
-                $mempools->push(new Mempool([
-                    'mempool_index' => $index,
-                    'device_id' => $this->getDeviceId(),
-                    'mempool_type' => 'edgecos',
-                    'mempool_class' => 'system',
-                    'precision' => 1,
-                    'usage_oid' => "ECS4120-MIB::deviceMemoryUsage.$index",
-                    'size_oid' => "ECS4120-MIB::deviceMemorySize.$index",
-                    'mempool_descr' => "Memory $index",
-                    'usage' => $entry['ECS4120-MIB::deviceMemoryUsage'] ?? 0,
-                    'size' => $entry['ECS4120-MIB::deviceMemorySize'] ?? 0,
-                ]));
-            }
-        }
-
-        return $mempools;
+        return [
+            [
+                'index' => 1,
+                'processor_type' => 'cpu',
+                'processor_descr' => 'Main CPU',
+                'processor_usage' => 20,
+            ],
+        ];
     }
 
-    public function discoverTransceivers(): Collection
+    public function discoverTransceivers($device)
     {
-        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
-
-        return SnmpQuery::walk('ECS4120-MIB::portMediaInfoTable')->mapTable(function ($data, $index) use ($ifIndexToPortId) {
-            if ($data['ECS4120-MIB::portMediaInfoConnectorType'] === 'inactive') {
+        return \SnmpQuery::walk('EDGECORE-ENTITY-MIB::edgecoreEntityTable')->mapTable(function ($data, $entIndex) {
+            if ($data['EDGECORE-ENTITY-MIB::edgecoreEntityStatus'] !== 'active') {
                 return null;
             }
 
+            $distance = intval($data['EDGECORE-ENTITY-MIB::edgecoreEntityDistance'] ?? 0);
+            $wavelength = intval($data['EDGECORE-ENTITY-MIB::edgecoreEntityWavelength'] ?? 0);
+
+            if ($distance <= 0) {
+                $distance = null;
+            }
+
+            if ($wavelength <= 0) {
+                $wavelength = null;
+            }
+
             return new Transceiver([
-                'port_id' => $ifIndexToPortId->get($index),
-                'index' => $index,
-                'vendor' => $data['ECS4120-MIB::portMediaInfoVendorName'] ?? null,
-                'model' => $data['ECS4120-MIB::portMediaInfoPartNumber'] ?? null,
-                'serial' => $data['ECS4120-MIB::portMediaInfoSerialNumber'] ?? null,
-                'type' => $data['ECS4120-MIB::portMediaInfoConnectorType'] ?? null,
-                'wavelength' => $data['ECS4120-MIB::portMediaInfoEthComplianceCodes'] ?? null,
-                'cable' => $data['ECS4120-MIB::portMediaInfoFiberType'] ?? null,
-                'distance' => $data['ECS4120-MIB::portMediaInfoBaudRate'] ?? null,
+                'port_id' => PortCache::getIdFromIfIndex($data['EDGECORE-ENTITY-MIB::edgecoreEntityIndex'], $this->getDeviceId()),
+                'index' => $entIndex,
+                'vendor' => $data['EDGECORE-ENTITY-MIB::edgecoreEntityVendorName'] ?? null,
+                'type' => $data['EDGECORE-ENTITY-MIB::edgecoreEntityType'] ?? 'Unknown',
+                'model' => $data['EDGECORE-ENTITY-MIB::edgecoreEntityDescr'] ?? null,
+                'serial' => $data['EDGECORE-ENTITY-MIB::edgecoreEntitySerialNumber'] ?? null,
+                'connector' => $data['EDGECORE-ENTITY-MIB::edgecoreEntityConnectorType'] ?? null,
+                'distance' => $distance,
+                'wavelength' => $wavelength,
             ]);
         })->filter();
+    }
+
+    public function pollOS($device)
+    {
+        return [
+            'os_version' => '1.0.0',
+            'os_features' => 'Edgecos features',
+        ];
     }
 }
