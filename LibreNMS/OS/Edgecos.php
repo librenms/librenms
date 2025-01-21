@@ -27,74 +27,74 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\OS;
-use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
-use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
-use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
-use LibreNMS\Interfaces\Polling\OSPolling;
+use Illuminate\Support\Collection;
+use LibreNMS\Transceiver;
+use LibreNMS\Util\PortCache;
 
-class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, TransceiverDiscovery, OSPolling
+class Edgecos extends OS
 {
-    public function discoverMempools($device)
+    public function discoverMempools($device): Collection
     {
-        return [
+        return collect([
             [
                 'index' => 1,
                 'mempool_type' => 'physical',
                 'mempool_descr' => 'Physical Memory',
                 'mempool_perc' => 75,
             ],
-        ];
+        ]);
     }
 
-    public function discoverProcessors($device)
+    public function discoverProcessors($device): Collection
     {
-        return [
+        return collect([
             [
                 'index' => 1,
                 'processor_type' => 'cpu',
                 'processor_descr' => 'Main CPU',
                 'processor_usage' => 20,
             ],
-        ];
+        ]);
     }
 
-    public function discoverTransceivers($device)
+    public function discoverTransceivers($device): Collection
     {
-        return \SnmpQuery::walk('EDGECORE-ENTITY-MIB::edgecoreEntityTable')->mapTable(function ($data, $entIndex) {
-            if ($data['EDGECORE-ENTITY-MIB::edgecoreEntityStatus'] !== 'active') {
-                return null;
-            }
+        return collect(
+            \SnmpQuery::walk('EDGECORE-ENTITY-MIB::edgecoreEntityTable')->mapTable(function ($data, $entIndex) use ($device) {
+                if ($data['EDGECORE-ENTITY-MIB::edgecoreEntityStatus'] !== 'active') {
+                    return null;
+                }
 
-            $distance = intval($data['EDGECORE-ENTITY-MIB::edgecoreEntityDistance'] ?? 0);
-            $wavelength = intval($data['EDGECORE-ENTITY-MIB::edgecoreEntityWavelength'] ?? 0);
+                $distance = intval($data['EDGECORE-ENTITY-MIB::edgecoreEntityDistance'] ?? 0);
+                $wavelength = intval($data['EDGECORE-ENTITY-MIB::edgecoreEntityWavelength'] ?? 0);
 
-            if ($distance <= 0) {
-                $distance = null;
-            }
+                if ($distance <= 0) {
+                    $distance = null;
+                }
 
-            if ($wavelength <= 0) {
-                $wavelength = null;
-            }
+                if ($wavelength <= 0) {
+                    $wavelength = null;
+                }
 
-            return new Transceiver([
-                'port_id' => PortCache::getIdFromIfIndex($data['EDGECORE-ENTITY-MIB::edgecoreEntityIndex'], $this->getDeviceId()),
-                'index' => $entIndex,
-                'vendor' => $data['EDGECORE-ENTITY-MIB::edgecoreEntityVendorName'] ?? null,
-                'type' => $data['EDGECORE-ENTITY-MIB::edgecoreEntityType'] ?? 'Unknown',
-                'model' => $data['EDGECORE-ENTITY-MIB::edgecoreEntityDescr'] ?? null,
-                'serial' => $data['EDGECORE-ENTITY-MIB::edgecoreEntitySerialNumber'] ?? null,
-                'connector' => $data['EDGECORE-ENTITY-MIB::edgecoreEntityConnectorType'] ?? null,
-                'distance' => $distance,
-                'wavelength' => $wavelength,
-            ]);
-        })->filter();
+                $port_id = PortCache::getIdFromIfIndex($data['EDGECORE-ENTITY-MIB::edgecoreEntityIndex'], $device->id);
+
+                return new Transceiver([
+                    'port_id' => $port_id,
+                    'index' => $entIndex,
+                    'vendor' => $data['EDGECORE-ENTITY-MIB::edgecoreEntityVendorName'] ?? null,
+                    'type' => $data['EDGECORE-ENTITY-MIB::edgecoreEntityType'] ?? 'Unknown',
+                    'model' => $data['EDGECORE-ENTITY-MIB::edgecoreEntityDescr'] ?? null,
+                    'serial' => $data['EDGECORE-ENTITY-MIB::edgecoreEntitySerialNumber'] ?? null,
+                    'connector' => $data['EDGECORE-ENTITY-MIB::edgecoreEntityConnectorType'] ?? null,
+                    'distance' => $distance,
+                    'wavelength' => $wavelength,
+                ]);
+            })->filter()
+        );
     }
 
-    public function pollOS($device)
+    public function pollOS($device): void
     {
-        return [
-            'os_version' => '1.0.0',
-            'os_features' => 'Edgecos features',
-        ];
+        // Poll OS-specific data
     }
 }
