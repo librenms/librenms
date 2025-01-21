@@ -53,6 +53,7 @@ trait YamlStorageDiscovery
                 return false;
             }))
             ->addField(new OidField('percent_used', 'storage_perc'))
+            ->addField(new YamlDiscoveryField('percent_warn', 'storage_perc_warn', \LibrenmsConfig::get('storage_perc_warn', 80)))
             ->addField(new IndexField('index', 'storage_index', '{{ $index }}'))
             ->afterEach(function (Storage $storage, YamlDiscoveryDefinition $def, $yaml, $index) {
                 // fill missing values
