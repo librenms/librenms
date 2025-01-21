@@ -80,6 +80,7 @@ class ArubaInstant extends OS implements
                 $mac = Mac::parse($aiAPMACAddress);
                 $oid = '.1.3.6.1.4.1.14823.2.3.3.1.2.1.1.7.' . $mac->oid();
                 $description = $data['AI-AP-MIB::aiAPSerialNum'];
+
                 return Processor::discover('aruba-instant', $this->getDeviceId(), $oid, $mac->hex(), $description, 1, $data['AI-AP-MIB::aiAPCPUUtilization']);
             })->all();
     }
