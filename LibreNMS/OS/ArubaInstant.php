@@ -93,7 +93,6 @@ class ArubaInstant extends OS implements
     public function discoverWirelessClients(): array
     {
         $sensors = [];
-
         if (version_compare($this->getDevice()->version, '8.4.0.0', '>=')) {
             // version is at least 8.4.0.0
             $ap_data = SnmpQuery::cache()->walk('AI-AP-MIB::aiAccessPointTable')->table(1); // aiAPMACAddress
@@ -356,6 +355,7 @@ class ArubaInstant extends OS implements
         $ap_data = SnmpQuery::cache()->walk('AI-AP-MIB::aiAccessPointTable')->table(1);
         foreach ($ap_data as $mac => $entry) {
             $type = $master_ip == $entry['AI-AP-MIB::aiAPIPAddress'] ? 'Master' : 'Member';
+            $model = $entry['AI-AP-MIB::aiAPModel'] ?? null;
             $inventory->push(new EntPhysical([
                 'entPhysicalIndex' => $index++,
                 'entPhysicalDescr' => $entry['AI-AP-MIB::aiAPMACAddress'],
@@ -363,7 +363,7 @@ class ArubaInstant extends OS implements
                 'entPhysicalClass' => 'other',
                 'entPhysicalContainedIn' => 1,
                 'entPhysicalSerialNum' => $entry['AI-AP-MIB::aiAPSerialNum'],
-                'entPhysicalModelName' => $entry['AI-AP-MIB::aiAPModel'],
+                'entPhysicalModelName' => explode('::', $model, 2)[1] ?? $model,
                 'entPhysicalMfgName' => 'Aruba',
                 'entPhysicalVendorType' => 'accessPoint',
                 'entPhysicalSoftwareRev' => $this->getDevice()->version,
