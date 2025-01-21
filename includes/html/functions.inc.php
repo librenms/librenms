@@ -11,6 +11,8 @@
  */
 
 use App\Facades\DeviceCache;
+use App\Facades\PortCache;
+use App\Models\Port;
 use LibreNMS\Config;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Number;
@@ -50,7 +52,7 @@ function toner2colour($descr, $percent)
 
 function generate_link($text, $vars, $new_vars = [])
 {
-    return '<a href="' . \LibreNMS\Util\Url::generate($vars, $new_vars) . '">' . $text . '</a>';
+    return '<a href="' . Url::generate($vars, $new_vars) . '">' . $text . '</a>';
 }//end generate_link()
 
 function escape_quotes($text)
@@ -63,7 +65,7 @@ function generate_overlib_content($graph_array, $text)
     $overlib_content = '<div class=overlib><span class=overlib-text>' . htmlspecialchars($text) . '</span><br />';
     foreach (['day', 'week', 'month', 'year'] as $period) {
         $graph_array['from'] = Config::get("time.$period");
-        $overlib_content .= escape_quotes(\LibreNMS\Util\Url::graphTag($graph_array));
+        $overlib_content .= escape_quotes(Url::graphTag($graph_array));
     }
 
     $overlib_content .= '</div>';
@@ -75,7 +77,7 @@ function generate_device_link($device, $text = null, $vars = [], $start = 0, $en
 {
     $deviceModel = DeviceCache::get((int) $device['device_id']);
 
-    return \LibreNMS\Util\Url::deviceLink($deviceModel, $text, $vars, $start, $end, $escape_text, $overlib);
+    return Url::deviceLink($deviceModel, $text, $vars, $start, $end, $escape_text, $overlib);
 }
 
 function bill_permitted($bill_id)
@@ -90,7 +92,7 @@ function bill_permitted($bill_id)
 function port_permitted($port_id, $device_id = null)
 {
     if (! is_numeric($device_id)) {
-        $device_id = get_device_id_by_port_id($port_id);
+        $device_id = PortCache::get($port_id)?->device_id;
     }
 
     if (device_permitted($device_id)) {
@@ -262,14 +264,14 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
     $graph_array['to'] = Config::get('time.now');
     $graph_array['from'] = Config::get('time.day');
     $graph_array['id'] = $port['port_id'];
-    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
+    $content .= Url::graphTag($graph_array);
     if ($single_graph == 0) {
         $graph_array['from'] = Config::get('time.week');
-        $content .= \LibreNMS\Util\Url::graphTag($graph_array);
+        $content .= Url::graphTag($graph_array);
         $graph_array['from'] = Config::get('time.month');
-        $content .= \LibreNMS\Util\Url::graphTag($graph_array);
+        $content .= Url::graphTag($graph_array);
         $graph_array['from'] = Config::get('time.year');
-        $content .= \LibreNMS\Util\Url::graphTag($graph_array);
+        $content .= Url::graphTag($graph_array);
     }
 
     $content .= '</div>';
@@ -279,7 +281,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
     if ($overlib == 0) {
         return $content;
     } elseif (port_permitted($port['port_id'], $port['device_id'])) {
-        return \LibreNMS\Util\Url::overlibLink($url, $text, $content, $class);
+        return Url::overlibLink($url, $text, $content, $class);
     } else {
         return Rewrite::normalizeIfName($text);
     }
@@ -313,27 +315,27 @@ function generate_sensor_link($args, $text = null, $type = null)
         'from' => Config::get('time.day'),
         'id' => $args['sensor_id'],
     ];
-    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
+    $content .= Url::graphTag($graph_array);
 
     $graph_array['from'] = Config::get('time.week');
-    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
+    $content .= Url::graphTag($graph_array);
 
     $graph_array['from'] = Config::get('time.month');
-    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
+    $content .= Url::graphTag($graph_array);
 
     $graph_array['from'] = Config::get('time.year');
-    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
+    $content .= Url::graphTag($graph_array);
 
     $content .= '</div>';
 
-    $url = \LibreNMS\Util\Url::generate(['page' => 'graphs', 'id' => $args['sensor_id'], 'type' => $args['graph_type'], 'from' => \LibreNMS\Config::get('time.day')], []);
+    $url = Url::generate(['page' => 'graphs', 'id' => $args['sensor_id'], 'type' => $args['graph_type'], 'from' => \LibreNMS\Config::get('time.day')], []);
 
-    return \LibreNMS\Util\Url::overlibLink($url, $text, $content);
+    return Url::overlibLink($url, $text, $content);
 }//end generate_sensor_link()
 
 function generate_port_url($port, $vars = [])
 {
-    return \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']], $vars);
+    return Url::generate(['page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']], $vars);
 }//end generate_port_url()
 
 function generate_sap_url($sap, $vars = [])
@@ -343,7 +345,7 @@ function generate_sap_url($sap, $vars = [])
         $sap['sapEncapValue'] = '4095';
     }
 
-    return \LibreNMS\Util\Url::graphPopup(['device' => $sap['device_id'], 'page' => 'graphs', 'type' => 'device_sap', 'tab' => 'routing', 'proto' => 'mpls', 'view' => 'saps', 'traffic_id' => $sap['svc_oid'] . '.' . $sap['sapPortId'] . '.' . $sap['sapEncapValue']], $vars);
+    return Url::graphPopup(['device' => $sap['device_id'], 'page' => 'graphs', 'type' => 'device_sap', 'tab' => 'routing', 'proto' => 'mpls', 'view' => 'saps', 'traffic_id' => $sap['svc_oid'] . '.' . $sap['sapPortId'] . '.' . $sap['sapEncapValue']], $vars);
 }//end generate_sap_url()
 
 function generate_port_image($args)
@@ -446,18 +448,18 @@ function generate_ap_link($args, $text = null, $type = null)
     $graph_array['to'] = Config::get('time.now');
     $graph_array['from'] = Config::get('time.day');
     $graph_array['id'] = $args['accesspoint_id'];
-    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
+    $content .= Url::graphTag($graph_array);
     $graph_array['from'] = Config::get('time.week');
-    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
+    $content .= Url::graphTag($graph_array);
     $graph_array['from'] = Config::get('time.month');
-    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
+    $content .= Url::graphTag($graph_array);
     $graph_array['from'] = Config::get('time.year');
-    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
+    $content .= Url::graphTag($graph_array);
     $content .= '</div>';
 
     $url = generate_ap_url($args);
     if (port_permitted($args['interface_id'], $args['device_id'])) {
-        return \LibreNMS\Util\Url::overlibLink($url, $text, $content);
+        return Url::overlibLink($url, $text, $content);
     } else {
         return Rewrite::normalizeIfName($text);
     }
@@ -465,7 +467,7 @@ function generate_ap_link($args, $text = null, $type = null)
 
 function generate_ap_url($ap, $vars = [])
 {
-    return \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $ap['device_id'], 'tab' => 'accesspoints', 'ap' => $ap['accesspoint_id']], $vars);
+    return Url::generate(['page' => 'device', 'device' => $ap['device_id'], 'tab' => 'accesspoints', 'ap' => $ap['accesspoint_id']], $vars);
 }//end generate_ap_url()
 
 function generate_pagination($count, $limit, $page, $links = 2)
@@ -552,15 +554,15 @@ function alert_details($details)
         $fallback = true;
         $fault_detail .= '#' . ($o + 1) . ':&nbsp;';
         if (isset($tmp_alerts['bill_id'])) {
-            $fault_detail .= '<a href="' . \LibreNMS\Util\Url::generate(['page' => 'bill', 'bill_id' => $tmp_alerts['bill_id']], []) . '">' . $tmp_alerts['bill_name'] . '</a>;&nbsp;';
+            $fault_detail .= '<a href="' . Url::generate(['page' => 'bill', 'bill_id' => $tmp_alerts['bill_id']], []) . '">' . $tmp_alerts['bill_name'] . '</a>;&nbsp;';
             $fallback = false;
         }
 
         if (isset($tmp_alerts['port_id'])) {
             if ($tmp_alerts['isisISAdjState']) {
                 $fault_detail .= 'Adjacent ' . $tmp_alerts['isisISAdjIPAddrAddress'];
-                $port = \App\Models\Port::find($tmp_alerts['port_id']);
-                $fault_detail .= ', Interface ' . \LibreNMS\Util\Url::portLink($port);
+                $port = Port::find($tmp_alerts['port_id']);
+                $fault_detail .= ', Interface ' . Url::portLink($port);
             } else {
                 $tmp_alerts = cleanPort($tmp_alerts);
                 $fault_detail .= generate_port_link($tmp_alerts) . ';&nbsp;';
@@ -603,7 +605,7 @@ function alert_details($details)
 
         if (isset($tmp_alerts['service_id'])) {
             $fault_detail .= "Service: <a href='" .
-                \LibreNMS\Util\Url::generate([
+                Url::generate([
                     'page' => 'device',
                     'device' => $tmp_alerts['device_id'],
                     'tab' => 'services',
@@ -620,7 +622,7 @@ function alert_details($details)
         if (isset($tmp_alerts['bgpPeer_id'])) {
             // If we have a bgpPeer_id, we format the data accordingly
             $fault_detail .= "BGP peer <a href='" .
-                \LibreNMS\Util\Url::generate([
+                Url::generate([
                     'page' => 'device',
                     'device' => $tmp_alerts['device_id'],
                     'tab' => 'routing',
@@ -636,13 +638,13 @@ function alert_details($details)
         if (isset($tmp_alerts['mempool_id'])) {
             // If we have a mempool_id, we format the data accordingly
             $fault_detail .= "MemoryPool <a href='" .
-                \LibreNMS\Util\Url::generate([
+                Url::generate([
                     'page' => 'graphs',
                     'id' => $tmp_alerts['mempool_id'],
                     'type' => 'mempool_usage',
                 ]) .
                 "'>" . ($tmp_alerts['mempool_descr'] ?? 'link') . '</a>';
-            $fault_detail .= '<br> &nbsp; &nbsp; &nbsp; Usage ' . $tmp_alerts['mempool_perc'] . '%, &nbsp; Free ' . \LibreNMS\Util\Number::formatSi($tmp_alerts['mempool_free']) . ',&nbsp; Size ' . \LibreNMS\Util\Number::formatSi($tmp_alerts['mempool_total']);
+            $fault_detail .= '<br> &nbsp; &nbsp; &nbsp; Usage ' . $tmp_alerts['mempool_perc'] . '%, &nbsp; Free ' . Number::formatSi($tmp_alerts['mempool_free']) . ',&nbsp; Size ' . Number::formatSi($tmp_alerts['mempool_total']);
             $fallback = false;
         }
 
@@ -657,7 +659,7 @@ function alert_details($details)
 
         if (in_array('app_id', array_keys($tmp_alerts))) {
             $fault_detail .= "<a href='" .
-                \LibreNMS\Util\Url::generate([
+                Url::generate([
                     'page' => 'device',
                     'device' => $tmp_alerts['device_id'],
                     'tab' => 'apps',

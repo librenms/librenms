@@ -180,18 +180,6 @@ function get_port_by_id($port_id)
     }
 }
 
-function get_device_id_by_port_id($port_id)
-{
-    if (is_numeric($port_id)) {
-        $device_id = dbFetchCell('SELECT `device_id` FROM `ports` WHERE `port_id` = ?', [$port_id]);
-        if (is_numeric($device_id)) {
-            return $device_id;
-        } else {
-            return false;
-        }
-    }
-}
-
 function ifclass($ifOperStatus, $ifAdminStatus)
 {
     // fake a port model
