@@ -44,7 +44,6 @@ class Intelliflash extends OS implements StorageDiscovery, StoragePolling
         });
 
         return $pools->merge($projects);
-
     }
 
     public function pollStorage(Collection $storages): Collection
