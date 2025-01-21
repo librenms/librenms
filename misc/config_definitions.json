@@ -1992,6 +1992,10 @@
             "default": false,
             "type": "boolean"
         },
+        "enable_proxmox": {
+            "default": false,
+            "type": "boolean"
+        },
         "enable_pseudowires": {
             "default": true,
             "type": "boolean"
