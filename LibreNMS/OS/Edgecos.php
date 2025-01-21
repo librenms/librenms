@@ -26,22 +26,21 @@
 
 namespace LibreNMS\OS;
 
-use App\Model\Transceiver;
 use Illuminate\Support\Collection;
 use LibreNMS\Device\OS;
+use App\Model\Transceiver;
+use LibreNMS\Util\PortCache;
 use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\Mempool;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
-use LibreNMS\Util\PortCache;
 
 class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, TransceiverDiscovery
 {
     public function getDeviceArray()
     {
-        // Implementation of the method
         return [
             'hostname' => $this->getDevice()->hostname,
             'community' => $this->getDevice()->community,
@@ -51,26 +50,30 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
 
     public function discoverMempools($device): Collection
     {
-        return collect([
-            [
-                'index' => 1,
-                'mempool_type' => 'physical',
-                'mempool_descr' => 'Physical Memory',
-                'mempool_perc' => 75,
-            ],
-        ]);
+        $mempools = Mempool::where('device_id', $device->id)->get();
+
+        return $mempools->map(function ($mempool) {
+            return [
+                'index' => $mempool->index,
+                'mempool_type' => $mempool->type,
+                'mempool_descr' => $mempool->description,
+                'mempool_perc' => $mempool->percentage,
+            ];
+        });
     }
 
     public function discoverProcessors($device): Collection
     {
-        return collect([
-            [
-                'index' => 1,
+        $entPhysicals = EntPhysical::where('device_id', $device->id)->where('class', 'processor')->get();
+
+        return $entPhysicals->map(function ($physical) {
+            return [
+                'index' => $physical->index,
                 'processor_type' => 'cpu',
-                'processor_descr' => 'Main CPU',
-                'processor_usage' => 20,
-            ],
-        ]);
+                'processor_descr' => $physical->description,
+                'processor_usage' => $physical->usage,
+            ];
+        });
     }
 
     public function discoverTransceivers($device): Collection
