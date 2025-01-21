@@ -26,16 +26,26 @@
 
 namespace LibreNMS\OS;
 
+use App\Model\Transceiver;
 use Illuminate\Support\Collection;
 use LibreNMS\Device\OS;
-use App\Model\Transceiver;
-use LibreNMS\Util\PortCache;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
+use LibreNMS\Util\PortCache;
 
 class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, TransceiverDiscovery
 {
+    public function getDeviceArray()
+    {
+        // Implementation of the method
+        return [
+            'hostname' => $this->getDevice()->hostname,
+            'community' => $this->getDevice()->community,
+            'snmpver' => $this->getDevice()->snmpver,
+        ];
+    }
+
     public function discoverMempools($device): Collection
     {
         return collect([
