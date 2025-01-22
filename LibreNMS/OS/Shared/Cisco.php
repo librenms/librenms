@@ -26,6 +26,7 @@
 
 namespace LibreNMS\OS\Shared;
 
+use App\Facades\PortCache;
 use App\Models\Component;
 use App\Models\Device;
 use App\Models\EntPhysical;
@@ -52,6 +53,7 @@ use LibreNMS\OS;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\Mac;
 
 class Cisco extends OS implements
     OSDiscovery,
@@ -461,17 +463,14 @@ class Cisco extends OS implements
                 return [$key => ['method' => $key_parts[2], 'authc_status' => $item['cafSessionMethodState']]];
             });
 
-            // cache port ifIndex -> port_id map
-            $ifIndex_map = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
-
             // update the DB
             foreach ($portAuthSessionEntry as $index => $portAuthSessionEntryParameters) {
                 [$ifIndex, $auth_id] = explode('.', str_replace("'", '', $index));
                 $session_info = $cafSessionMethodsInfoEntry->get($ifIndex . '.' . $auth_id);
-                $mac_address = strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['cafSessionClientMacAddress'] ?? null))));
+                $mac_address = Mac::parse($portAuthSessionEntryParameters['cafSessionClientMacAddress'])->hex();
 
                 $nac->put($mac_address, new PortsNac([
-                    'port_id' => $ifIndex_map->get($ifIndex, 0),
+                    'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
                     'mac_address' => $mac_address,
                     'auth_id' => $auth_id,
                     'domain' => $portAuthSessionEntryParameters['cafSessionDomain'] ?? '',
@@ -509,6 +508,9 @@ class Cisco extends OS implements
             $rtt_type = $sla->rtt_type;
 
             // Lets process each SLA
+            if (! isset($data[$sla_nr]['rttMonLatestRttOperTime'])) {
+                continue;
+            }
             $unixtime = intval($data[$sla_nr]['rttMonLatestRttOperTime'] / 100 + $time_offset);
             $time = date('Y-m-d H:i:s', $unixtime);
 
@@ -610,10 +612,17 @@ class Cisco extends OS implements
         $vlans = $this->getDevice()->vlans;
         $instances = new Collection;
 
+        //get Cisco stpxSpanningTreeType
+        $stpxSpanningTreeType = \SnmpQuery::enumStrings()->hideMib()->get('CISCO-STP-EXTENSIONS-MIB::stpxSpanningTreeType.0')->value();
+
         // attempt to discover context based vlan instances
         foreach ($vlans->isEmpty() ? [null] : $vlans as $vlan) {
             $vlan = (empty($vlan->vlan_vlan) || $vlan->vlan_vlan == '1') ? null : (string) $vlan->vlan_vlan;
-            $instances = $instances->merge(parent::discoverStpInstances($vlan));
+            $instance = parent::discoverStpInstances($vlan);
+            if ($instance[0]->protocolSpecification == 'unknown') {
+                $instance[0]->protocolSpecification = $stpxSpanningTreeType;
+            }
+            $instances = $instances->merge($instance);
         }
 
         return $instances;
@@ -638,11 +647,17 @@ class Cisco extends OS implements
     public function discoverTransceivers(): Collection
     {
         // use data collected by entPhysical module if available
-        $dbSfpCages = $this->getDevice()->entityPhysical()->whereIn('entPhysicalVendorType', ['cevContainerSFP', 'cevContainerGbic', 'cevContainer10GigBasePort', 'cevContainerTransceiver', 'cevContainerXFP', 'cevContainer40GigBasePort', 'cevContainerCFP', 'cevContainerCXP', 'cevContainerCPAK', 'cevContainerNCS4KSFP', 'cevContainerQSFP28SR', 'cevContainerQSFP28LR', 'cevContainerQSFP28CR', 'cevContainerQSFP28AOC', 'cevContainerQSFP28CWDM', 'cevContainerNonCiscoQSFP28SR', 'cevContainerNonCiscoQSFP28LR', 'cevContainerNonCiscoQSFP28CR', 'cevContainerNonCiscoQSFP28AOC', 'cevContainerNonCiscoQSFP28CWDM'])->pluck('ifIndex', 'entPhysicalIndex');
+        $arrayOfContainers = ['cevContainerSFP', 'cevContainerGbic', 'cevContainer10GigBasePort', 'cevContainerTransceiver', 'cevContainerXFP', 'cevContainer40GigBasePort', 'cevContainerCFP', 'cevContainerCXP', 'cevContainerCPAK', 'cevContainerNCS4KSFP', 'cevContainerQSFP28SR', 'cevContainerQSFP28LR', 'cevContainerQSFP28CR', 'cevContainerQSFP28AOC', 'cevContainerQSFP28CWDM', 'cevContainerNonCiscoQSFP28SR', 'cevContainerNonCiscoQSFP28LR', 'cevContainerNonCiscoQSFP28CR', 'cevContainerNonCiscoQSFP28AOC', 'cevContainerNonCiscoQSFP28CWDM'];
+
+        $dbSfpCages = $this->getDevice()->entityPhysical()->whereIn('entPhysicalVendorType', $arrayOfContainers)->pluck('ifIndex', 'entPhysicalIndex');
         if ($dbSfpCages->isNotEmpty()) {
             $data = $this->getDevice()->entityPhysical()->whereIn('entPhysicalContainedIn', $dbSfpCages->keys())->get()->map(function ($ent) use ($dbSfpCages) {
                 if (empty($ent->ifIndex) && $dbSfpCages->has($ent->entPhysicalContainedIn)) {
                     $ent->ifIndex = $dbSfpCages->get($ent->entPhysicalContainedIn);
+                    if (empty($ent->ifIndex)) {
+                        // Lets try to find the 1st subentity with an ifIndex below this one and use it. Some (most?) ISR and ASR on IOSXE at least are behaving like this.
+                        $ent->ifIndex = $this->getDevice()->entityPhysical()->where('entPhysicalContainedIn', '=', $ent->entPhysicalIndex)->whereNotNull('ifIndex')->first()->ifIndex;
+                    }
                 }
 
                 return $ent;
@@ -655,30 +670,40 @@ class Cisco extends OS implements
             }
 
             $snmpData = collect(\SnmpQuery::hideMib()->mibs(['IF-MIB'])->walk('ENTITY-MIB::entAliasMappingIdentifier')->table(1, $snmpData));
-
-            $sfpCages = $snmpData->filter(fn ($ent) => isset($ent['entPhysicalVendorType']) && $ent['entPhysicalVendorType'] == 'cevContainerSFP');
-            $data = $snmpData->filter(fn ($ent) => $sfpCages->has($ent['entPhysicalContainedIn'] ?? null))->map(function ($e) {
+            $sfpCages = $snmpData->filter(fn ($ent) => isset($ent['entPhysicalVendorType']) && in_array($ent['entPhysicalVendorType'], $arrayOfContainers));
+            $dataFilter = $snmpData->filter(fn ($ent) => $sfpCages->has($ent['entPhysicalContainedIn'] ?? null));
+            $data = $dataFilter->map(function ($e, $e_index) use ($snmpData) {
+                $e['entPhysicalIndex'] = $e_index;
                 if (isset($e['entAliasMappingIdentifier'][0])) {
                     $e['ifIndex'] = preg_replace('/^.*ifIndex[.[](\d+).*$/', '$1', $e['entAliasMappingIdentifier'][0]);
+                } else {
+                    // Lets try to find the 1st subentity with an ifIndex below this one and use it. Some (most?) ISR and ASR on IOSXE at least are behaving like this.
+                    $sibling = $snmpData->filter(fn ($ent, $ent_index) => ($ent['entPhysicalContainedIn'] == $e_index) && isset($ent['entAliasMappingIdentifier'][0]))->first();
+                    // If we found one, let's use this ifindex
+                    if ($sibling) {
+                        $ifIndexTmp = $sibling['entAliasMappingIdentifier'][0];
+                        if (isset($ifIndexTmp)) {
+                            $e['ifIndex'] = preg_replace('/^.*ifIndex[.[](\d+).*$/', '$1', $ifIndexTmp);
+                        }
+                    }
                 }
 
                 return $e;
             });
         }
-        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
 
-        return $data->map(function ($ent, $index) use ($ifIndexToPortId) {
+        return $data->map(function ($ent, $index) {
             $ifIndex = $ent['ifIndex'] ?? null;
 
             return new Transceiver([
-                'port_id' => $ifIndexToPortId->get($ifIndex, 0),
+                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
                 'index' => $index,
                 'type' => $ent['entPhysicalDescr'] ?? null,
                 'vendor' => $ent['entPhysicalMfgName'] ?? null,
                 'revision' => $ent['entPhysicalHardwareRev'] ?? null,
                 'model' => $ent['entPhysicalModelName'] ?? null,
                 'serial' => $ent['entPhysicalSerialNum'] ?? null,
-                'entity_physical_index' => $ifIndex,
+                'entity_physical_index' => $ent['entPhysicalIndex'],
             ]);
         });
     }
@@ -687,9 +712,6 @@ class Cisco extends OS implements
     {
         $this->qosIdxToParent = new Collection();
         $qos = new Collection();
-
-        // Map QoS index to port
-        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
 
         // SNMP lookup tables
         $servicePolicies = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosServicePolicyTable')->table(1);
@@ -762,7 +784,7 @@ class Cisco extends OS implements
 
                 $qos->push(new Qos([
                     'device_id' => $this->getDeviceId(),
-                    'port_id' => $parent ? null : $ifIndexToPortId->get($servicePolicies[$policyId]['cbQosIfIndex'], null),
+                    'port_id' => $parent ? null : PortCache::getIdFromIfIndex($servicePolicies[$policyId]['cbQosIfIndex'], $this->getDevice()),
                     'type' => $dbtype,
                     'title' => $title,
                     'tooltip' => $tooltip,

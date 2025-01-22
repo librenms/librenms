@@ -754,6 +754,12 @@
             "order": 5,
             "type": "boolean"
         },
+        "auth_ldap_userlist_filter": {
+            "group": "auth",
+            "section": "ldap",
+            "order": 30,
+            "type": "text"
+        },
         "auth_ldap_wildcard_ou": {
             "default": false,
             "group": "auth",
@@ -1439,13 +1445,6 @@
             "default": false,
             "type": "boolean"
         },
-        "discovery_modules.transceivers": {
-            "order": 322,
-            "group": "discovery",
-            "section": "discovery_modules",
-            "default": true,
-            "type": "boolean"
-        },
         "discovery_modules.entity-physical": {
             "order": 110,
             "group": "discovery",
@@ -1563,6 +1562,13 @@
             "group": "discovery",
             "section": "discovery_modules",
             "default": false,
+            "type": "boolean"
+        },
+        "discovery_modules.transceivers": {
+            "order": 322,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": true,
             "type": "boolean"
         },
         "discovery_modules.sensors": {
@@ -1987,6 +1993,10 @@
             "type": "boolean"
         },
         "enable_ports_junoseatmvp": {
+            "default": false,
+            "type": "boolean"
+        },
+        "enable_proxmox": {
             "default": false,
             "type": "boolean"
         },
@@ -4128,15 +4138,21 @@
                 "custom8": "Custom 8"
             }
         },
+        "html_dir": {
+            "type": "directory"
+        },
         "http_auth_header": {
             "default": "REMOTE_USER",
             "group": "auth",
-            "section": "general",
-            "order": 4,
+            "section": "http",
+            "order": 0,
             "type": "text"
         },
-        "html_dir": {
-            "type": "directory"
+        "http_auth_guest": {
+            "group": "auth",
+            "section": "http",
+            "order": 1,
+            "type": "text"
         },
         "http_proxy": {
             "group": "system",
@@ -5301,13 +5317,6 @@
             "default": false,
             "type": "boolean"
         },
-        "poller_modules.transceivers": {
-            "order": 322,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": true,
-            "type": "boolean"
-        },
         "poller_modules.customoid": {
             "default": true,
             "type": "boolean"
@@ -5343,13 +5352,6 @@
         },
         "poller_modules.vminfo": {
             "order": 410,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": false,
-            "type": "boolean"
-        },
-        "poller_modules.wifi": {
-            "order": 430,
             "group": "poller",
             "section": "poller_modules",
             "default": false,
@@ -5483,6 +5485,13 @@
         },
         "poller_modules.entity-physical": {
             "order": 170,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": true,
+            "type": "boolean"
+        },
+        "poller_modules.transceivers": {
+            "order": 322,
             "group": "poller",
             "section": "poller_modules",
             "default": true,

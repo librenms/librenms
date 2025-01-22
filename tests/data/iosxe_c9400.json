@@ -29427,7 +29427,7 @@
                     "vlan": null,
                     "rootBridge": 0,
                     "bridgeAddress": "00eeab8f4200",
-                    "protocolSpecification": "unknown",
+                    "protocolSpecification": "rapidPvstPlus",
                     "priority": 32769,
                     "timeSinceTopologyChange": "2879862",
                     "topChanges": 167,
@@ -34304,7 +34304,7 @@
             "transceivers": [
                 {
                     "index": "2072",
-                    "entity_physical_index": 50,
+                    "entity_physical_index": 2072,
                     "type": "10G AOC2M",
                     "vendor": "CISCO-AVAGO",
                     "oui": null,
@@ -34323,7 +34323,7 @@
                 },
                 {
                     "index": "2078",
-                    "entity_physical_index": 51,
+                    "entity_physical_index": 2078,
                     "type": "GE T",
                     "vendor": "CISCO-AVAGO",
                     "oui": null,
@@ -34342,7 +34342,7 @@
                 },
                 {
                     "index": "3072",
-                    "entity_physical_index": 60,
+                    "entity_physical_index": 3072,
                     "type": "10G AOC2M",
                     "vendor": "CISCO-AVAGO",
                     "oui": null,
@@ -34361,7 +34361,7 @@
                 },
                 {
                     "index": "3078",
-                    "entity_physical_index": 61,
+                    "entity_physical_index": 3078,
                     "type": "GE T",
                     "vendor": "CISCO-AVAGO",
                     "oui": null,

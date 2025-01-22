@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\PortsNac;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -172,13 +173,11 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling, N
             $row['agentAuthMgrPortHostMode'] = $hostmode[$row['agentAuthMgrInterface']]['agentAuthMgrPortHostMode'] ?? '';
         }
 
-        $ifIndex_map = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
-
         foreach ($table as $authIndex => $data) {
             $mac_address = $data['agentAuthMgrClientMacAddress'];
 
             $nac->put($mac_address, new PortsNac([
-                'port_id' => $ifIndex_map->get($data['agentAuthMgrInterface'], 0),
+                'port_id' => (int) PortCache::getIdFromIfIndex($data['agentAuthMgrInterface'], $this->getDevice()),
                 'mac_address' => $mac_address,
                 'auth_id' => $authIndex,
                 'domain' => '',
