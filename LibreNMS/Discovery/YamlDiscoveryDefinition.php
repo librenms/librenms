@@ -19,7 +19,7 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2023 Tony Murray
+ * @copyright  2025 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
@@ -136,7 +136,8 @@ class YamlDiscoveryDefinition
 
             foreach ($snmp_data as $index => $snmpItem) {
                 if (YamlDiscovery::canSkipItem(null, $index, $yamlItem, $yaml, $fetchedData)) {
-                    echo 's';
+                    Log::debug('Data at index ' . $index . ' skipped due to skip_values');
+                    Log::info('x');
                     continue;
                 }
 

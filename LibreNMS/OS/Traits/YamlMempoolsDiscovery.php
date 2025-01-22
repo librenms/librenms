@@ -19,7 +19,7 @@
  *
  * @package    LibreNMS
  * @link       https://www.librenms.org
- * @copyright  2020 Tony Murray
+ * @copyright  2025 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
