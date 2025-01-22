@@ -68,6 +68,7 @@ class Enterasys extends \LibreNMS\OS implements MempoolsDiscovery
         $total = SnmpQuery::get('ENTERASYS-RESOURCE-UTILIZATION-MIB::etsysResourceStorageSize.3.flash.0')->value();
         if (is_numeric($free) && is_numeric($total)) {
             $storage->push((new Storage([
+                'type' => 'enterasys',
                 'storage_type' => 'Flash',
                 'storage_descr' => 'Internal Flash Storage',
                 'storage_units' => 1024,

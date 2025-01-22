@@ -14,6 +14,7 @@ class Equallogic extends OS
         return \SnmpQuery::mibDir('equallogic')->walk('EQLVOLUME-MIB::eqliscsiVolumeTable')
             ->mapTable(function ($data, $eqliscsiLocalMemberId, $eqliscsiVolumeIndex) {
                 return (new Storage([
+                    'type' => 'equallogic',
                     'storage_type' => $data['EQLVOLUME-MIB:eqliscsiVolumeAdminStatus'],
                     'storage_descr' => $data['EQLVOLUME-MIB:eqliscsiVolumeName'],
                     'storage_index' => "$eqliscsiLocalMemberId.$eqliscsiVolumeIndex",
