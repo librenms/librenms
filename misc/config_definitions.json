@@ -1184,6 +1184,13 @@
                 "icon": "Icon"
             }
         },
+        "custom_map.node_warnings": {
+            "default": false,
+            "type": "boolean",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 46
+        },
         "custom_map.reverse_arrows": {
             "default": false,
             "type": "boolean",
@@ -4730,6 +4737,11 @@
                     "border": "#ff5555",
                     "edge": "#ff777788",
                     "node": "#ffdddd"
+                },
+                "wn": {
+                    "border": "#ff6644",
+                    "edge": "#ff7755",
+                    "node": "#ffeecc"
                 },
                 "highlight": {
                     "border": "#ee4000",

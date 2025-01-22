@@ -584,6 +584,10 @@ return [
                 'description' => 'Node Display Type',
                 'help' => 'Default display type for nodes',
             ],
+            'node_warnings' => [
+                'description' => 'Node Warnings',
+                'help' => 'Show nodes in warning state with different colour',
+            ],
             'reverse_arrows' => [
                 'description' => 'Reverse Edge Arrows',
                 'help' => 'Default arrow direction. Towards center (default) or towards ends',
