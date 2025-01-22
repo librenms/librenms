@@ -69,7 +69,7 @@ class PortSearchController extends SearchController
             'name' => $label,
             'description' => $description,
             'colours' => Color::forPortStatus($port),
-            'hostname' => $port->device->displayName(),
+            'hostname' => $port->device?->displayName(),
             'port_id' => $port->port_id,
         ];
     }
