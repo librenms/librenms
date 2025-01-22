@@ -28,6 +28,7 @@ namespace LibreNMS\Device;
 use App\Models\Eventlog;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
+use LibreNMS\Enum\SensorClass;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Discovery\DiscoveryModule;
 use LibreNMS\Interfaces\Polling\PollerModule;
@@ -41,7 +42,6 @@ class Sensor implements DiscoveryModule, PollerModule
     protected static $name = 'Sensor';
     protected static $table = 'sensors';
     protected static $data_name = 'sensor';
-    protected static $translation_prefix = 'sensors';
 
     private $valid = true;
 
@@ -586,24 +586,6 @@ class Sensor implements DiscoveryModule, PollerModule
     }
 
     /**
-     * Return a list of valid types with metadata about each type
-     * $class => array(
-     *  'short' - short text for this class
-     *  'long'  - long text for this class
-     *  'unit'  - units used by this class 'dBm' for example
-     *  'icon'  - font awesome icon used by this class
-     * )
-     *
-     * @param  bool  $valid  filter this list by valid types in the database
-     * @param  int  $device_id  when filtering, only return types valid for this device_id
-     * @return array
-     */
-    public static function getTypes($valid = false, $device_id = null)
-    {
-        return [];
-    }
-
-    /**
      * Record sensor data in the database and data stores
      *
      * @param  OS  $os
@@ -612,12 +594,10 @@ class Sensor implements DiscoveryModule, PollerModule
      */
     protected static function recordSensorData(OS $os, $sensors, $data)
     {
-        $types = static::getTypes();
-
         foreach ($sensors as $sensor) {
             $sensor_value = $data[$sensor['sensor_id']];
 
-            echo "  {$sensor['sensor_descr']}: $sensor_value " . __(static::$translation_prefix . '.' . $sensor['sensor_class'] . '.unit') . PHP_EOL;
+            echo "  {$sensor['sensor_descr']}: $sensor_value " . SensorClass::unit($sensor['sensor_class']) . PHP_EOL;
 
             // update rrd and database
             $rrd_name = [
@@ -626,7 +606,7 @@ class Sensor implements DiscoveryModule, PollerModule
                 $sensor['sensor_type'],
                 $sensor['sensor_index'],
             ];
-            $rrd_type = isset($types[$sensor['sensor_class']]['type']) ? strtoupper($types[$sensor['sensor_class']]['type']) : $sensor['rrd_type'];
+            $rrd_type = $sensor['rrd_type'];
             $rrd_def = RrdDefinition::make()->addDataset('sensor', $rrd_type);
 
             $fields = [

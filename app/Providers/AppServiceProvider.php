@@ -3,13 +3,13 @@
 namespace App\Providers;
 
 use App\Facades\LibrenmsConfig;
-use App\Models\Sensor;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use LibreNMS\Cache\PermissionsCache;
+use LibreNMS\Enum\SensorClass;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
 use Validator;
@@ -96,10 +96,9 @@ class AppServiceProvider extends ServiceProvider
 
     private function configureMorphAliases()
     {
-        $sensor_types = [];
-        foreach (Sensor::getTypes() as $sensor_type) {
-            $sensor_types[$sensor_type] = \App\Models\Sensor::class;
-        }
+        $sensor_types = collect([])
+            ->mapWithKeys(fn ($type) => [$type => \App\Models\Sensor::class])
+            ->toArray();
         Relation::morphMap(array_merge([
             'interface' => \App\Models\Port::class,
             'sensor' => \App\Models\Sensor::class,

@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Collection;
+use LibreNMS\Enum\SensorClass;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
@@ -38,78 +40,48 @@ class Sensor extends DeviceRelatedModel implements Keyable
         'group',
         'rrd_type',
     ];
-    protected static $icons = [
-        'airflow' => 'angle-double-right',
-        'ber' => 'sort-amount-desc',
-        'charge' => 'battery-half',
-        'chromatic_dispersion' => 'indent',
-        'cooling' => 'thermometer-full',
-        'count' => 'hashtag',
-        'current' => 'bolt fa-flip-horizontal',
-        'dbm' => 'sun-o',
-        'delay' => 'clock-o',
-        'eer' => 'snowflake-o',
-        'fanspeed' => 'refresh',
-        'frequency' => 'line-chart',
-        'humidity' => 'tint',
-        'load' => 'percent',
-        'loss' => 'percentage',
-        'power' => 'power-off',
-        'power_consumed' => 'plug',
-        'power_factor' => 'calculator',
-        'pressure' => 'thermometer-empty',
-        'quality_factor' => 'arrows',
-        'runtime' => 'hourglass-half',
-        'signal' => 'wifi',
-        'snr' => 'signal',
-        'state' => 'bullseye',
-        'temperature' => 'thermometer-three-quarters',
-        'tv_signal' => 'signal',
-        'bitrate' => 'bar-chart',
-        'voltage' => 'bolt',
-        'waterflow' => 'tint',
-        'percent' => 'percent',
-    ];
+
+    protected $casts = ['sensor_class' => '\LibreNMS\Enum\SensorClass'];
 
     // ---- Helper Methods ----
+    public static function getClasses(): Collection
+    {
+        return collect(SensorClass::cases())
+            ->map(fn($class) => $class->name);
+    }
+
+    public static function getIconMap(): Collection
+    {
+        return collect(SensorClass::cases())
+            ->mapWithKeys(fn ($class) => [$class->name => $class->icon()]);
+    }
 
     public function classDescr(): string
     {
-        return __('sensors.' . $this->sensor_class . '.short');
+        return $this->sensor_class->descr();
     }
 
     public function classDescrLong(): string
     {
-        return __('sensors.' . $this->sensor_class . '.long');
+        return $this->sensor_class->descrLong();
     }
 
     public function unit(): string
     {
-        return __('sensors.' . $this->sensor_class . '.unit');
+        return $this->sensor_class->unit();
     }
 
     public function unitLong(): string
     {
-        return __('sensors.' . $this->sensor_class . '.unit_long');
+        return $this->sensor_class->unitLong();
     }
 
     public function icon()
     {
-        return collect(self::$icons)->get($this->sensor_class, 'delicius');
+        return $this->sensor_class->icon();
     }
 
-    public static function getTypes()
-    {
-        return array_keys(self::$icons);
-    }
-
-    // for the legacy menu
-    public static function getIconMap()
-    {
-        return self::$icons;
-    }
-
-    public function guessLimits(bool $high, bool $low): void
+    public function guessLimits(bool $high, bool $high_warn, bool $low_warn, bool $low): void
     {
         if ($high) {
             $this->sensor_limit = match ($this->sensor_class) {
@@ -125,10 +97,23 @@ class Sensor extends DeviceRelatedModel implements Keyable
             };
         }
 
+        if ($high_warn) {
+            $this->sensor_limit_warn = match ($this->sensor_class->name) {
+                default => null,
+            };
+        }
+
+        if ($low_warn) {
+            $this->sensor_limit_low_warn = match ($this->sensor_class->name) {
+                default => null,
+            };
+        }
+
         if ($low) {
-            $this->sensor_limit_low = match ($this->sensor_class) {
+            $this->sensor_limit_low = match ($this->sensor_class->name) {
                 'temperature' => $this->sensor_current - 10,
                 'voltage' => $this->sensor_current * 0.85,
+                'current' => $this->sensor_current * 0.85,
                 'humidity' => 30,
                 'fanspeed' => $this->sensor_current * 0.80,
                 'power_factor' => -1,
@@ -144,10 +129,10 @@ class Sensor extends DeviceRelatedModel implements Keyable
      */
     public function formatValue(): string
     {
-        return match ($this->sensor_class) {
-            'current', 'power' => Number::formatSi($this->sensor_current, 3, 0, $this->unit()),
-            'dbm' => round($this->sensor_current, 3) . ' ' . $this->unit(),
-            default => $this->sensor_current . ' ' . $this->unit(),
+        return match ($this->sensor_class->name) {
+            'current', 'power' => Number::formatSi($this->sensor_current, 3, 0, $this->sensor_class->unit()),
+            'dbm' => round($this->sensor_current, 3) . ' ' . $this->sensor_class->unit(),
+            default => $this->sensor_current . ' ' . $this->sensor_class->unit(),
         };
     }
 

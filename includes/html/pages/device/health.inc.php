@@ -23,11 +23,13 @@
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
+use App\Facades\DeviceCache;
 use App\Models\DiskIo;
 use App\Models\Mempool;
 use App\Models\Processor;
-use App\Models\Sensor;
 use App\Models\Storage;
+use LibreNMS\Component;
+use LibreNMS\Enum\SensorClass;
 
 /*
 # QFP count for cisco devices
@@ -35,7 +37,7 @@ use App\Models\Storage;
 
 $qfp = 0;
 if ($device['os_group'] == 'cisco') {
-    $component = new LibreNMS\Component();
+    $component = new Component();
     $components = $component->getComponents($device['device_id'], ['type' => 'cisco-qfp']);
     $components = $components[$device['device_id']];
     $qfp = isset($components) ? count($components) : 0;
@@ -63,28 +65,18 @@ if (Storage::where('device_id', $device['device_id'])->count()) {
 if (DiskIo::where('device_id', $device['device_id'])->count()) {
     $datas[] = 'diskio';
 }
-
-$sensors = [
-    'airflow', 'ber', 'bitrate', 'charge', 'chromatic_dispersion', 'cooling', 'count', 'current', 'dBm', 'delay', 'eer',
-    'fanspeed', 'frequency', 'humidity', 'load', 'loss', 'percent', 'power', 'power_consumed', 'power_factor', 'pressure',
-    'runtime', 'signal', 'snr', 'state', 'temperature', 'tv_signal', 'voltage', 'waterflow', 'quality_factor',
-];
-
-foreach ($sensors as $sensor_name) {
-    if (Sensor::where('sensor_class', $sensor_name)->where('device_id', $device['device_id'])->count()) {
-        //strtolower because 'dBm - dbm' difference
-        $lowname = strtolower($sensor_name);
-        $datas[] = $lowname;
-        $type_text[$lowname] = trans('sensors.' . $lowname . '.short');
-    }
+// TODO:  The filling of two arrays are ugly but works for the moment
+foreach (DeviceCache::getPrimary()->sensors()->distinct()->select('sensor_class')->get() as $sensor) {
+    $datas[] = $sensor->sensor_class;
+    $type_text[$sensor->sensor_class] = $sensor->sensor_class->descr();
 }
 
-$type_text['overview'] = 'Overview';
-$type_text['qfp'] = 'QFP';
-$type_text['processor'] = 'Processor';
-$type_text['mempool'] = 'Memory';
-$type_text['storage'] = 'Disk Usage';
-$type_text['diskio'] = 'Disk I/O';
+$type_text['overview'] = __('Overview');
+$type_text['qfp'] = __('QFP');
+$type_text['processor'] = __('Processor');
+$type_text['mempool'] = __('Memory');
+$type_text['storage'] = __('Disk Usage');
+$type_text['diskio'] = __('Disk I/O');
 
 $link_array = [
     'page' => 'device',
@@ -94,7 +86,7 @@ $link_array = [
 
 print_optionbar_start();
 
-echo "<span style='font-weight: bold;'>Health</span> &#187; ";
+echo '<span style="font-weight: bold;">' . __('Health') . '</span> &#187; ';
 
 if (empty($vars['metric'])) {
     $vars['metric'] = 'overview';
@@ -118,8 +110,13 @@ foreach ($datas as $type) {
 print_optionbar_end();
 
 $metric = basename($vars['metric']);
-if (is_file("includes/html/pages/device/health/$metric.inc.php")) {
-    include "includes/html/pages/device/health/$metric.inc.php";
+if (SensorClass::all()->contains($metric)) {
+    $class = $metric;
+    $unit = SensorClass::unit($metric);
+    $graph_type = 'sensor_' . $metric;
+    include 'includes/html/pages/device/health/sensors.inc.php';
+} elseif (is_file('includes/html/pages/device/health/' . $metric . '.inc.php')) {
+    include 'includes/html/pages/device/health/' . $metric . '.inc.php';
 } else {
     foreach ($datas as $type) {
         if ($type != 'overview') {

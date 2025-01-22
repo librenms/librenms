@@ -29,6 +29,7 @@ use App\Models\Eventlog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Blade;
 use LibreNMS\Config;
+use LibreNMS\Enum\SensorClass;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Url;
 
@@ -101,12 +102,10 @@ class EventlogController extends TableController
             }
         } elseif ($eventlog->type == 'stp') {
             return Blade::render('<x-device-link :device="$device" tab="stp">stp</x-device-link>', ['device' => $eventlog->device]);
-        } elseif (in_array($eventlog->type, \App\Models\Sensor::getTypes())) {
-            if (is_numeric($eventlog->reference)) {
-                $sensor = $eventlog->related;
-                if (isset($sensor)) {
-                    return '<b>' . Url::sensorLink($sensor, $sensor->sensor_descr) . '</b>';
-                }
+        } elseif (SensorClass::all()->contains($eventlog->type) && is_numeric($eventlog->reference)) {
+            $sensor = $eventlog->related;
+            if (isset($sensor)) {
+                return '<b>' . Url::sensorLink($sensor, $sensor->sensor_descr) . '</b>';
             }
         }
 
