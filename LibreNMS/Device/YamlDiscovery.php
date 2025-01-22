@@ -254,7 +254,7 @@ class YamlDiscovery
         }
 
         // if index is 0 and this is a scalar value, remove the scalar .0
-        if ($index == 0 && str_ends_with($name, '.0')) {
+        if ($index == 0 && str_ends_with($name, '.0') && ! Oid::of($name)->isNumeric()) {
             $name = substr($name, 0, -2);
         }
 
