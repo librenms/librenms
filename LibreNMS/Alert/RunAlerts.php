@@ -329,23 +329,23 @@ class RunAlerts
                     $state = AlertState::CHANGED;
                     $alert['details']['diff'] = ['added' => $added_diff, 'resolved' => $resolved_diff];
                 } elseif (! empty($added_diff)) {
-                    $ret .= ' Worsens';
+                    $ret .= ' Worse';
                     $state = AlertState::WORSE;
                     $alert['details']['diff'] = ['added' => $added_diff];
                 } elseif (! empty($resolved_diff)) {
-                    $ret .= ' Betters';
+                    $ret .= ' Better';
                     $state = AlertState::BETTER;
                     $alert['details']['diff'] = ['resolved' => $resolved_diff];
                 // Failsafe if the diff didn't return any results
                 } elseif ($current_alert_count > $previous_alert_count) {
-                    $ret .= ' Worsens';
+                    $ret .= ' Worse';
                     $state = AlertState::WORSE;
-                    Eventlog::log('A worse was detected but the diff was not, ensure that a "id" or "_id" field is available for rule ' . $alert['name'], $alert['device_id'], 'alert', Severity::Warning);
+                    Eventlog::log('Alert got worse but the diff was not, ensure that a "id" or "_id" field is available for rule ' . $alert['name'], $alert['device_id'], 'alert', Severity::Warning);
                 // Failsafe if the diff didn't return any results
                 } elseif ($current_alert_count < $previous_alert_count) {
-                    $ret .= ' Betters';
+                    $ret .= ' Better';
                     $state = AlertState::BETTER;
-                    Eventlog::log('A better was detected but the diff was not, ensure that a "id" or "_id" field is available for rule ' . $alert['name'], $alert['device_id'], 'alert', Severity::Warning);
+                    Eventlog::log('Alert got better but the diff was not, ensure that a "id" or "_id" field is available for rule ' . $alert['name'], $alert['device_id'], 'alert', Severity::Warning);
                 }
 
                 if ($state > AlertState::CLEAR && $current_alert_count > 0) {

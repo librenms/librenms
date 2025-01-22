@@ -37,7 +37,7 @@ until the alert clears. Click this icon to un-acknowledge the alert.
 
 ![unack alert until fault worsens](img/nunack.png) This alert is
 currently acknowledged until the alert worsens, gets
-better or get changed, at which stage it will be automatically unacknowledged and
+better or changes, at which stage it will be automatically unacknowledged and
 alerts will resume. Click this icon to un-acknowledge the alert.
 
 ### Notes
