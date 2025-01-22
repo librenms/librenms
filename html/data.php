@@ -20,30 +20,14 @@ if (is_numeric($_GET['id']) && (Config::get('allow_unauth_graphs') || port_permi
     $title = Url::deviceLink($port->device) . ' :: Port  ' . Url::portLink($port);
     $auth = true;
 
-    $in = $port->device->snmpQuery()
-            ->mibs(['IF-MIB'])
-            ->options('-OUqnv')
-            ->get('ifHCInOctets.' . $port->ifIndex)
-            ->value();
+    $in = SnmpQuery::get('IF-MIB::ifHCInOctets.' . $port->ifIndex)->value();
     if (empty($in)) {
-        $in = $port->device->snmpQuery()
-            ->mibs(['IF-MIB'])
-            ->options('-OUqnv')
-            ->get('ifInOctets.' . $port->ifIndex)
-            ->value();
+        $in = SnmpQuery::get('IF-MIB::ifInOctets.' . $port->ifIndex)->value();
     }
 
-    $out = $port->device->snmpQuery()
-            ->mibs(['IF-MIB'])
-            ->options('-OUqnv')
-            ->get('ifHCOutOctets.' . $port->ifIndex)
-            ->value();
+    $out = SnmpQuery::get('IF-MIB::ifHCOutOctets.' . $port->ifIndex)->value();
     if (empty($out)) {
-        $out = $port->device->snmpQuery()
-            ->mibs(['IF-MIB'])
-            ->options('-OUqnv')
-            ->get('ifOutOctets.' . $port->ifIndex)
-            ->value();
+        $out = SnmpQuery::get('IF-MIB::ifOutOctets.' . $port->ifIndex)->value();
     }
 
     $time = microtime(true);
