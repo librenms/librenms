@@ -198,8 +198,8 @@ class CustomMapDataController extends Controller
                 $nodes[$nodeid]['device_image'] = $node->device->icon;
                 $nodes[$nodeid]['device_info'] = Blade::render('<x-device-link-map :device="$device" />', ['device' => $node->device]);
 
-                $warning_time = \LibreNMS\Config::get('uptime_warning', 86400);
-                if ($node->device->uptime < $warning_time && $node->device->uptime != 0 && \LibreNMS\Config::get('custom_map.node_warnings')) {
+                $warning_time = Config::get('uptime_warning', 86400);
+                if ($node->device->uptime < $warning_time && $node->device->uptime != 0 && Config::get('custom_map.node_warnings')) {
                     $this->setNodeWarningStyle($nodes[$nodeid], $request);
                 }
 
