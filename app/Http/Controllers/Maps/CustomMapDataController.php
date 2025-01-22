@@ -204,7 +204,7 @@ class CustomMapDataController extends Controller
                     $this->setNodeDownStyle($nodes[$nodeid], $request);
                 }
 
-		$warning_time = Config::get('uptime_warning', 86400);
+                $warning_time = Config::get('uptime_warning', 86400);
                 if ($node->device->uptime < $warning_time && $node->device->uptime != 0 && Config::get('custom_map.node_warnings')) {
                     $this->setNodeWarningStyle($nodes[$nodeid], $request);
                 }
