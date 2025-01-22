@@ -81,11 +81,6 @@ parameters:
 			path: LibreNMS/Modules/Ospf.php
 
 		-
-			message: "#^Variable \\$sensors in empty\\(\\) always exists and is not falsy\\.$#"
-			count: 1
-			path: LibreNMS/OS/ArubaInstant.php
-
-		-
 			message: "#^Variable \\$multi_get_array on left side of \\?\\? is never defined\\.$#"
 			count: 2
 			path: LibreNMS/OS/Ceraos.php
