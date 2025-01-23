@@ -119,8 +119,8 @@ class SnmpResponse
 
             // if this is a textual oid without an index, match the first one at any index
             if (! preg_match('/[.[]\d+]?$/', $oid)) {
-                foreach($values as $key => $value) {
-                    if (preg_match('/^' . preg_quote($oid) . '[.[]/',$key) && $value !== '') {
+                foreach ($values as $key => $value) {
+                    if (preg_match('/^' . preg_quote($oid) . '[.[]/', $key) && $value !== '') {
                         return $value;
                     }
                 }

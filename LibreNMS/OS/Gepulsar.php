@@ -36,7 +36,7 @@ class Gepulsar extends OS implements OSDiscovery
         $info = SnmpQuery::get([
             'NE843-MIB::ne843Ps1Sn.0',
             'NE843-MIB::ne843Ps1Verw.0',
-            'NE843-MIB::ne843Ps1Brc.0'
+            'NE843-MIB::ne843Ps1Brc.0',
         ])->values();
 
         $device->version = $info['NE843-MIB::ne843Ps1Verw.0'] ?? null;
