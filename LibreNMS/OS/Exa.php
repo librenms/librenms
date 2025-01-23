@@ -47,7 +47,7 @@ class Exa extends OS implements OSDiscovery, TransceiverDiscovery
         $device->serial = $response->value('E7-Calix-MIB::e7CardSerialNumber') ?: null;
         $device->hardware = 'Calix ' . $device->sysDescr;
 
-        $cards = SnmpQuery::walk('E7-Calix-MIB::e7CardProvType')->values();
+        $cards = SnmpQuery::enumStrings()->walk('E7-Calix-MIB::e7CardProvType')->values();
         $card_count = [];
         foreach ($cards as $card) {
             $card_count[$card] = ($card_count[$card] ?? 0) + 1;

@@ -36,6 +36,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessCcqPolling;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Unifi extends OS implements
     ProcessorDiscovery,
@@ -56,7 +57,7 @@ class Unifi extends OS implements
     public function discoverOS(Device $device): void
     {
         // try the Unifi MIB first, then fall back to dot11manufacturer
-        $response = \SnmpQuery::next(['UBNT-UniFi-MIB::unifiApSystemModel', 'UBNT-UniFi-MIB::unifiApSystemVersion']);
+        $response = SnmpQuery::next(['UBNT-UniFi-MIB::unifiApSystemModel', 'UBNT-UniFi-MIB::unifiApSystemVersion']);
         if ($response->isValid()) {
             $device->hardware = $response->value('UBNT-UniFi-MIB::unifiApSystemModel') ?: null;
             $device->version = $response->value('UBNT-UniFi-MIB::unifiApSystemVersion') ?: null;
