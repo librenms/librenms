@@ -17561,6 +17561,70 @@
                     "mempool_perc_oid": ".1.3.6.1.4.1.890.1.5.13.13.5.10.1.3.1",
                     "mempool_used": 16,
                     "mempool_used_oid": null,
+                    "mempool_free": 84,
+                    "mempool_free_oid": null,
+                    "mempool_total": 100,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 97
+                },
+                {
+                    "mempool_index": "2",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "ies52xxM-mem",
+                    "mempool_class": "system",
+                    "mempool_precision": 1,
+                    "mempool_descr": "Memory 2",
+                    "mempool_perc": 14,
+                    "mempool_perc_oid": ".1.3.6.1.4.1.890.1.5.13.13.5.10.1.3.2",
+                    "mempool_used": 14,
+                    "mempool_used_oid": null,
+                    "mempool_free": 86,
+                    "mempool_free_oid": null,
+                    "mempool_total": 100,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 97
+                },
+                {
+                    "mempool_index": "3",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "ies52xxM-mem",
+                    "mempool_class": "system",
+                    "mempool_precision": 1,
+                    "mempool_descr": "Memory 3",
+                    "mempool_perc": 34,
+                    "mempool_perc_oid": ".1.3.6.1.4.1.890.1.5.13.13.5.10.1.3.3",
+                    "mempool_used": 34,
+                    "mempool_used_oid": null,
+                    "mempool_free": 66,
+                    "mempool_free_oid": null,
+                    "mempool_total": 100,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 97
+                }
+            ]
+        },
+        "poller": {
+            "mempools": [
+                {
+                    "mempool_index": "1",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "ies52xxM-mem",
+                    "mempool_class": "system",
+                    "mempool_precision": 1,
+                    "mempool_descr": "Memory 1",
+                    "mempool_perc": 16,
+                    "mempool_perc_oid": ".1.3.6.1.4.1.890.1.5.13.13.5.10.1.3.1",
+                    "mempool_used": 16,
+                    "mempool_used_oid": null,
                     "mempool_free": 85,
                     "mempool_free_oid": null,
                     "mempool_total": 100,
@@ -17611,8 +17675,7 @@
                     "mempool_perc_warn": 97
                 }
             ]
-        },
-        "poller": "matches discovery"
+        }
     },
     "sensors": {
         "discovery": {

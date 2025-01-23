@@ -2928,88 +2928,55 @@
         "discovery": {
             "storage": [
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "36",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/dev/shm",
                     "storage_size": 79843328,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 286720,
-                    "storage_free": 0,
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.36",
+                    "storage_free": 79556608,
+                    "storage_free_oid": null,
                     "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "37",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/tmp",
                     "storage_size": 47185920,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 688128,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.37",
+                    "storage_free": 46497792,
+                    "storage_free_oid": null,
+                    "storage_perc": 1,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "40",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/opt/pme/pram",
                     "storage_size": 8117248,
+                    "storage_size_oid": null,
                     "storage_units": 1024,
                     "storage_used": 4658176,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.40",
+                    "storage_free": 3459072,
+                    "storage_free_oid": null,
+                    "storage_perc": 57,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 }
             ]
         },
-        "poller": {
-            "storage": [
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "36",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/dev/shm",
-                    "storage_size": 79843328,
-                    "storage_units": 4096,
-                    "storage_used": 286720,
-                    "storage_free": 79556608,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "37",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/tmp",
-                    "storage_size": 47185920,
-                    "storage_units": 4096,
-                    "storage_used": 688128,
-                    "storage_free": 46497792,
-                    "storage_perc": 1,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "40",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/opt/pme/pram",
-                    "storage_size": 8117248,
-                    "storage_units": 1024,
-                    "storage_used": 4658176,
-                    "storage_free": 3459072,
-                    "storage_perc": 57,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                }
-            ]
-        }
+        "poller": "matches discovery"
     }
 }

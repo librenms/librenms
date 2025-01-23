@@ -26,6 +26,8 @@
 namespace LibreNMS\Util;
 
 use LibreNMS\Enum\IntegerType;
+use LibreNMS\Exceptions\InsufficientDataException;
+use LibreNMS\Exceptions\UncorrectableNegativeException;
 
 class Number
 {
@@ -225,5 +227,105 @@ class Number
         }
 
         return $value;
+    }
+
+    /**
+     * If a number is less than 0, assume it has overflowed 32bit INT_MAX
+     * And try to correct the value by adding INT_MAX
+     *
+     * @param  int|null  $value  The value to correct
+     * @param  int|null  $max  an upper bounds on the corrected value
+     * @return int|null
+     *
+     * @throws UncorrectableNegativeException
+     */
+    public static function correctIntegerOverflow(mixed $value, ?int $max = null): int|null
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $int_max = 4294967296;
+        if ($value < 0) {
+            // assume unsigned/signed issue
+            $value = $int_max + self::cast($value);
+            if (($max !== null && $value > $max) || $value > $int_max) {
+                throw new UncorrectableNegativeException;
+            }
+        }
+
+        return (int) $value;
+    }
+
+    /**
+     * Supply a minimum of two of the four values and the others will be filled.
+     *
+     * @throws InsufficientDataException
+     */
+    public static function fillMissingRatio(mixed $total = null, mixed $used = null, mixed $available = null, mixed $used_percent = null, int $precision = 2, int|float $multiplier = 1): array
+    {
+        // fix out of bounds percent
+        if ($used_percent) {
+            $used_percent = self::normalizePercent($used_percent);
+        }
+
+        // total is missing try to calculate it
+        if (! is_numeric($total)) {
+            if (isset($used, $available)) {
+                $total = $used + $available;
+            } elseif ($used && $used_percent) {
+                $total = $used / ($used_percent / 100);
+            } elseif ($available && $used_percent) {
+                $total = $available / (1 - ($used_percent / 100));
+            } elseif (is_numeric($used_percent)) {
+                $total = 100; // only have percent, mark total as 100
+            }
+        }
+
+        if (! is_numeric($total) || ($used === null && $available === null && ! is_numeric($used_percent))) {
+            throw new InsufficientDataException('Unable to calculate missing ratio values, not enough information. ' . json_encode(get_defined_vars()));
+        }
+
+        // fill used if it is missing
+        $used_is_null = $used === null;
+        if ($used_is_null) {
+            $used = $available !== null
+                ? $total - $available
+                : $total * ($used_percent ? ($used_percent / 100) : 0);
+        }
+
+        // fill percent if it is missing
+        if ($used_percent == null) {
+            $used_percent = static::calculatePercent($used, $total, $precision);
+        }
+
+        // fill available if it is missing
+        if ($available === null) {
+            $available = $used_is_null
+                ? $total * (1 - ($used_percent / 100))
+                : $total - $used;
+        }
+
+        // return nicely formatted values
+        return [
+            round($total * $multiplier, $precision),
+            round($used * $multiplier, $precision),
+            round($available * $multiplier, $precision),
+            round($used_percent, $precision),
+        ];
+    }
+
+    /**
+     * Handle a value that should be a percent, but is > 100 and assume it is off by some factor of 10
+     */
+    public static function normalizePercent(mixed $percent): float
+    {
+        $percent = floatval($percent);
+
+        while ($percent > 100) {
+            $percent = $percent / 10;
+        }
+
+        return $percent;
     }
 }

@@ -4188,23 +4188,21 @@
                 "/proc",
                 "/dev",
                 "/compat/linux/proc",
-                "/compat/linux/sys"
+                "/compat/linux/sys",
+                "/sys/fs/cgroup"
             ],
             "type": "array"
         },
-        "ignore_mount_network": {
-            "group": "discovery",
-            "section": "storage",
-            "order": 0,
-            "default": true,
-            "type": "boolean"
-        },
-        "ignore_mount_optical": {
+        "ignore_mount_type": {
             "group": "discovery",
             "section": "storage",
             "order": 1,
-            "default": true,
-            "type": "boolean"
+            "default": [
+                "hrStorageRemovableDisk",
+                "hrStorageNetworkDisk",
+                "hrStorageCompactDisc"
+            ],
+            "type": "array"
         },
         "ignore_mount_regexp": {
             "group": "discovery",
@@ -4221,19 +4219,13 @@
                 "/^\\/dev\\/md0/",
                 "/^\\/var\\/dhcpd\\/dev/",
                 "/UMA/",
-                "/^\\/Volumes\\/OS X Base System/"
+                "/^\\/Volumes\\/OS X Base System/",
+                "/^\\/run\\/user\\//"
             ],
             "type": "array",
             "validate": {
                 "value.*": "is_regex"
             }
-        },
-        "ignore_mount_removable": {
-            "group": "discovery",
-            "section": "storage",
-            "order": 2,
-            "default": true,
-            "type": "boolean"
         },
         "ignore_mount_string": {
             "group": "discovery",

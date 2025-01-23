@@ -180,7 +180,7 @@ class YamlDiscovery
      * @param  array  $pre_cache  snmp data fetched from device
      * @return mixed|string|string[]|null
      */
-    public static function replaceValues($name, $index, $count, $def, $pre_cache)
+    public static function replaceValues($name, $index, $count, $def, $pre_cache = [])
     {
         $value = static::getValueFromData($name, $index, $def, $pre_cache);
 
@@ -251,6 +251,11 @@ class YamlDiscovery
             Log::debug("Using $value from \$pre_cache[\$discovery_data['oid']][$index][$name] for $name");
 
             return $value;
+        }
+
+        // if index is 0 and this is a scalar value, remove the scalar .0
+        if ($index == 0 && str_ends_with($name, '.0') && ! Oid::of($name)->isNumeric()) {
+            $name = substr($name, 0, -2);
         }
 
         if (isset($pre_cache[$index][$name])) {

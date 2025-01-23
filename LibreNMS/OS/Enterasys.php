@@ -26,8 +26,10 @@
 namespace LibreNMS\OS;
 
 use App\Models\Mempool;
+use App\Models\Storage;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
+use SnmpQuery;
 
 class Enterasys extends \LibreNMS\OS implements MempoolsDiscovery
 {
@@ -56,5 +58,25 @@ class Enterasys extends \LibreNMS\OS implements MempoolsDiscovery
         }
 
         return $mempools;
+    }
+
+    public function discoverStorage(): Collection
+    {
+        $storage = new Collection;
+
+        $free = SnmpQuery::get('ENTERASYS-RESOURCE-UTILIZATION-MIB::etsysResourceStorageAvailable.3.flash.0')->value();
+        $total = SnmpQuery::get('ENTERASYS-RESOURCE-UTILIZATION-MIB::etsysResourceStorageSize.3.flash.0')->value();
+        if (is_numeric($free) && is_numeric($total)) {
+            $storage->push((new Storage([
+                'type' => 'enterasys',
+                'storage_type' => 'Flash',
+                'storage_descr' => 'Internal Flash Storage',
+                'storage_units' => 1024,
+                'storage_index' => 0,
+                'storage_free_oid' => '.1.3.6.1.4.1.5624.1.2.49.1.3.1.1.5.3.3.0',
+            ]))->fillUsage(total: $total, free: $free));
+        }
+
+        return $storage;
     }
 }

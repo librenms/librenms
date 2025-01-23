@@ -149,88 +149,55 @@
         "discovery": {
             "storage": [
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "36",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/tmp",
                     "storage_size": 12582912,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 311296,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.36",
+                    "storage_free": 12271616,
+                    "storage_free_oid": null,
+                    "storage_perc": 2,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "38",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/etc/symphony/sw_update",
                     "storage_size": 33554432,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 0,
-                    "storage_free": 0,
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.38",
+                    "storage_free": 33554432,
+                    "storage_free_oid": null,
                     "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "39",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/log",
                     "storage_size": 1048576,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 57344,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.39",
+                    "storage_free": 991232,
+                    "storage_free_oid": null,
+                    "storage_perc": 5,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 }
             ]
         },
-        "poller": {
-            "storage": [
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "36",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/tmp",
-                    "storage_size": 12582912,
-                    "storage_units": 4096,
-                    "storage_used": 311296,
-                    "storage_free": 12271616,
-                    "storage_perc": 2,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "38",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/etc/symphony/sw_update",
-                    "storage_size": 33554432,
-                    "storage_units": 4096,
-                    "storage_used": 0,
-                    "storage_free": 33554432,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "39",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/log",
-                    "storage_size": 1048576,
-                    "storage_units": 4096,
-                    "storage_used": 57344,
-                    "storage_free": 991232,
-                    "storage_perc": 5,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                }
-            ]
-        }
+        "poller": "matches discovery"
     }
 }

@@ -313,39 +313,7 @@
         }
     },
     "storage": {
-        "discovery": {
-            "storage": [
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "1",
-                    "storage_type": null,
-                    "storage_descr": "FLASH",
-                    "storage_size": 4194304,
-                    "storage_units": 1,
-                    "storage_used": 924224,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                }
-            ]
-        },
-        "poller": {
-            "storage": [
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "1",
-                    "storage_type": null,
-                    "storage_descr": "FLASH",
-                    "storage_size": 4194304,
-                    "storage_units": 1,
-                    "storage_used": 924224,
-                    "storage_free": 3270080,
-                    "storage_perc": 22,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                }
-            ]
-        }
+        "discovery": [],
+        "poller": []
     }
 }

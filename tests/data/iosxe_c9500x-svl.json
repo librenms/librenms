@@ -58680,89 +58680,56 @@
         "discovery": {
             "storage": [
                 {
-                    "storage_mib": "cisco-flash",
+                    "type": "cisco-flash",
                     "storage_index": "1.1",
-                    "storage_type": "flash",
-                    "storage_descr": "bootflash(bootflash):",
+                    "storage_type": "FlashMemory",
+                    "storage_descr": "bootflash:",
                     "storage_size": 11250098176,
+                    "storage_size_oid": null,
                     "storage_units": 1,
                     "storage_used": 2096803840,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": null,
+                    "storage_free": 9153294336,
+                    "storage_free_oid": ".1.3.6.1.4.1.9.9.10.1.1.4.1.1.14.1.1",
+                    "storage_perc": 19,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "cisco-flash",
+                    "type": "cisco-flash",
                     "storage_index": "3.1",
-                    "storage_type": "flash",
-                    "storage_descr": "crashinfo(crashinfo):",
+                    "storage_type": "FlashMemory",
+                    "storage_descr": "crashinfo:",
                     "storage_size": 1651314688,
+                    "storage_size_oid": null,
                     "storage_units": 1,
                     "storage_used": 113467392,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": null,
+                    "storage_free": 1537847296,
+                    "storage_free_oid": ".1.3.6.1.4.1.9.9.10.1.1.4.1.1.5.3.1",
+                    "storage_perc": 7,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "cisco-flash",
+                    "type": "cisco-flash",
                     "storage_index": "4.1",
-                    "storage_type": "flash",
-                    "storage_descr": "disk0(disk0):",
+                    "storage_type": "FlashMemory",
+                    "storage_descr": "disk0:",
                     "storage_size": 236092686336,
+                    "storage_size_oid": null,
                     "storage_units": 1,
                     "storage_used": 12020199424,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": null,
+                    "storage_free": 224072486912,
+                    "storage_free_oid": ".1.3.6.1.4.1.9.9.10.1.1.4.1.1.14.4.1",
+                    "storage_perc": 5,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 }
             ]
         },
-        "poller": {
-            "storage": [
-                {
-                    "storage_mib": "cisco-flash",
-                    "storage_index": "1.1",
-                    "storage_type": "flash",
-                    "storage_descr": "bootflash(bootflash):",
-                    "storage_size": 11250098176,
-                    "storage_units": 1,
-                    "storage_used": 2096803840,
-                    "storage_free": 9153294336,
-                    "storage_perc": 19,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "cisco-flash",
-                    "storage_index": "3.1",
-                    "storage_type": "flash",
-                    "storage_descr": "crashinfo(crashinfo):",
-                    "storage_size": 1651314688,
-                    "storage_units": 1,
-                    "storage_used": 113467392,
-                    "storage_free": 1537847296,
-                    "storage_perc": 7,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "cisco-flash",
-                    "storage_index": "4.1",
-                    "storage_type": "flash",
-                    "storage_descr": "disk0(disk0):",
-                    "storage_size": 236092686336,
-                    "storage_units": 1,
-                    "storage_used": 12020199424,
-                    "storage_free": 224072486912,
-                    "storage_perc": 5,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "discovery-protocols": {
         "discovery": {
