@@ -6,7 +6,7 @@ you think something is missing, feel free to ask us.
 * Auto discovery
 * Alerting
 * Multiple environment sensors support
-* Multiple protocols data collection (STP, OSPF, BGP etc)
+* Multiple protocols data collection (STP, OSPF, OSPFv3, BGP etc)
 * VLAN, ARP and FDB table collection
 * Customizable Dashboards
 * Device Backup integration (Oxidized, RANCID)

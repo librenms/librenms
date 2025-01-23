@@ -487,6 +487,32 @@ if (Config::get('autodiscovery.ospf') === true) {
     echo PHP_EOL;
 }
 
+if (Config::get('autodiscovery.ospfv3') === true) {
+    echo ' OSPFv3 Discovery: ';
+    $sql = 'SELECT DISTINCT(`ospfv3NbrAddress`),`device_id` FROM `ospfv3_nbrs` WHERE `device_id`=?';
+    foreach (dbFetchRows($sql, [$device['device_id']]) as $nbr) {
+        try {
+            $ip = IP::parse($nbr['ospfv3NbrAddress']);
+
+            if ($ip->inNetworks(Config::get('autodiscovery.nets-exclude'))) {
+                echo 'x';
+                continue;
+            }
+
+            if (! $ip->inNetworks(Config::get('nets'))) {
+                echo 'i';
+                continue;
+            }
+
+            $name = gethostbyaddr($ip);
+            $remote_device_id = discover_new_device($name, $device, 'OSPFv3');
+        } catch (\LibreNMS\Exceptions\InvalidIpException $e) {
+            //
+        }
+    }
+    echo PHP_EOL;
+}
+
 d_echo($link_exists);
 
 $sql = 'SELECT * FROM `links` AS L LEFT JOIN `ports` AS I ON L.local_port_id = I.port_id WHERE L.local_device_id = ?';

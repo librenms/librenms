@@ -23,6 +23,7 @@ use App\Models\Location;
 use App\Models\MplsSap;
 use App\Models\MplsService;
 use App\Models\OspfPort;
+use App\Models\Ospfv3Port;
 use App\Models\PollerGroup;
 use App\Models\Port;
 use App\Models\PortGroup;
@@ -832,6 +833,37 @@ function list_ospf_ports(Illuminate\Http\Request $request)
     }
 
     return api_success($ospf_ports, 'ospf_ports', null, 200, $ospf_ports->count());
+}
+
+function list_ospfv3(Illuminate\Http\Request $request)
+{
+    $sql = '';
+    $sql_params = [];
+    $hostname = $request->get('hostname');
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if (is_numeric($device_id)) {
+        $sql = ' AND `device_id`=?';
+        $sql_params = [$device_id];
+    }
+
+    $ospf_neighbours = dbFetchRows("SELECT * FROM ospfv3_nbrs WHERE `ospfv3NbrState` IS NOT NULL AND `ospfv3NbrState` != '' $sql", $sql_params);
+    $total_ospf_neighbours = count($ospf_neighbours);
+    if (! is_numeric($total_ospf_neighbours)) {
+        return api_error(500, 'Error retrieving ospfv3_nbrs');
+    }
+
+    return api_success($ospf_neighbours, 'ospfv3_neighbours');
+}
+
+function list_ospfv3_ports(Illuminate\Http\Request $request)
+{
+    $ospf_ports = Ospfv3Port::hasAccess(Auth::user())
+              ->get();
+    if ($ospf_ports->isEmpty()) {
+        return api_error(404, 'Ospfv3 ports do not exist');
+    }
+
+    return api_success($ospf_ports, 'ospfv3_ports', null, 200, $ospf_ports->count());
 }
 
 function get_graph_by_portgroup(Request $request)
