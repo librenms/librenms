@@ -1550,7 +1550,7 @@
             "order": 260,
             "group": "discovery",
             "section": "discovery_modules",
-            "default": true,
+            "default": false,
             "type": "boolean"
         },
         "discovery_modules.route": {
