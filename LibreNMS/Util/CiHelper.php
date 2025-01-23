@@ -203,7 +203,7 @@ class CiHelper
             array_push($phpunit_cmd, '--group', 'docs');
         } elseif ($this->flags['unit_svg']) {
             $phpunit_cmd[] = 'tests/SVGTest.php';
-        } elseif ($this->flags['unit_modules']) {
+        } elseif ($this->flags['unit_modules'] || $this->flags['os-modules-only']) {
             $phpunit_cmd[] = 'tests/OSModulesTest.php';
         }
 
