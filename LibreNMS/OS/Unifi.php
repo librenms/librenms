@@ -55,11 +55,16 @@ class Unifi extends OS implements
 
     public function discoverOS(Device $device): void
     {
-        // try the Unifi MIB first, then fall back to dot11manufacturer
-        if ($data = snmp_getnext_multi($this->getDeviceArray(), ['unifiApSystemModel', 'unifiApSystemVersion'], '-OQUs', 'UBNT-UniFi-MIB')) {
+        if (preg_match('/^Ubiquiti UniFi (\S+) (\S+)/', $device->sysDescr, $regexp_result)) {
+            // UnifiOS devices use sysDescr matching
+            $device->hardware = $regexp_result[1];
+            $device->version = $regexp_result[2];
+        } elseif ($data = snmp_getnext_multi($this->getDeviceArray(), ['unifiApSystemModel', 'unifiApSystemVersion'], '-OQUs', 'UBNT-UniFi-MIB')) {
+            // Next try the Unifi MIB
             $device->hardware = $data['unifiApSystemModel'] ?? $device->hardware;
             $device->version = $data['unifiApSystemVersion'] ?? $device->version;
         } elseif ($data = snmp_getnext_multi($this->getDeviceArray(), ['dot11manufacturerProductName', 'dot11manufacturerProductVersion'], '-OQUs', 'IEEE802dot11-MIB')) {
+            // Fall back to dot11manufacturer
             $device->hardware = $data['dot11manufacturerProductName'] ?? $device->hardware;
             if (preg_match('/(v[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/', $data['dot11manufacturerProductVersion'], $matches)) {
                 $device->version = $matches[1];

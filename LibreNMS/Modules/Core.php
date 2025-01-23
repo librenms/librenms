@@ -75,7 +75,7 @@ class Core implements Module
         }
 
         // detect OS
-        $device->os = self::detectOS($device, false);
+        self::detectOS($device, false);
 
         if ($device->isDirty('os')) {
             Eventlog::log('Device OS changed: ' . $device->getOriginal('os') . ' -> ' . $device->os, $device, 'system', Severity::Notice);
@@ -84,11 +84,8 @@ class Core implements Module
             Log::info('OS Changed ');
         }
 
-        // Set type to a predefined type for the OS if it's not already set
-        $loaded_os_type = Config::get("os.$device->os.type");
-        if (! $device->getAttrib('override_device_type') && $loaded_os_type != $device->type) {
-            $device->type = $loaded_os_type;
-            Log::debug("Device type changed to $loaded_os_type!");
+        if ($device->isDirty('type')) {
+            Log::debug("Device type changed to $device->type!");
         }
 
         $device->save();
@@ -144,16 +141,25 @@ class Core implements Module
         return null; // all data here is stored in the devices table and covered by the os module
     }
 
+    private static function setOS(Device $device, string $os_name, array $os_def): void
+    {
+        $device->os = $os_name;
+
+        if (! $device->getAttrib('override_device_type')) {
+            $device->type = $os_def['type'] ?? Config::get("os.$device->os.type");
+        }
+    }
+
     /**
      * Detect the os of the given device.
      *
-     * @param  Device  $device  device to check
+     * @param  Device  $device  device to check and update
      * @param  bool  $fetch  fetch sysDescr and sysObjectID fresh from the device
-     * @return string the name of the os
+     * @return void
      *
      * @throws \Exception
      */
-    public static function detectOS(Device $device, bool $fetch = true): string
+    public static function detectOS(Device $device, bool $fetch = true): void
     {
         if ($fetch) {
             // some devices act oddly when getting both OIDs at once
@@ -183,7 +189,9 @@ class Core implements Module
 
                 foreach ($def['discovery'] as $item) {
                     if (self::checkDiscovery($device, $item, $def['mib_dir'] ?? null)) {
-                        return $os;
+                        self::setOS($device, $os, $item);
+
+                        return;
                     }
                 }
             }
@@ -194,12 +202,14 @@ class Core implements Module
         foreach ($deferred_os as $os) {
             foreach ($os_defs[$os]['discovery'] as $item) {
                 if (self::checkDiscovery($device, $item, $os_defs[$os]['mib_dir'] ?? null)) {
-                    return $os;
+                    self::setOS($device, $os, $item);
+
+                    return;
                 }
             }
         }
 
-        return 'generic';
+        self::setOS($device, 'generic', []);
     }
 
     /**
