@@ -257,13 +257,13 @@ class Ospfv3 implements Module
                 ->select(['ospfv3_ports.*', 'ifIndex'])
                 ->orderBy('ospfv3_port_id')->orderBy('context_name')
                 ->get()->map->makeHidden(['id', 'device_id', 'port_id']),
-            'ospfv3_instances' => $device->ospfInstances()
+            'ospfv3_instances' => $device->ospfv3Instances()
                 ->orderBy('ospfv3_instance_id')->orderBy('context_name')
                 ->get()->map->makeHidden(['id', 'device_id']),
-            'ospfv3_areas' => $device->ospfAreas()
+            'ospfv3_areas' => $device->ospfv3Areas()
                 ->orderBy('ospfv3AreaId')->orderBy('context_name')
                 ->get()->map->makeHidden(['id', 'device_id']),
-            'ospfv3_nbrs' => $device->ospfNbrs()
+            'ospfv3_nbrs' => $device->ospfv3Nbrs()
                 ->orderBy('ospfv3_nbr_id')->orderBy('context_name')
                 ->get()->map->makeHidden(['id', 'device_id']),
         ];
