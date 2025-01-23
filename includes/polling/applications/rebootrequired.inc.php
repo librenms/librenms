@@ -6,7 +6,8 @@ $name = 'rebootrequired';
 
 $options = '-Oqv';
 $mib = 'NET-SNMP-EXTEND-MIB';
-$oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.16.111.115.114.101.98.111.111.116.114.101.113.117.105.114.101.100.1';
+$oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.14.114.101.98.111.111.116.114.101.113.117.105.114.101.100.1';
+
 $rebootrequired = snmp_get($device, $oid, $options, $mib);
 $rebootrequired = preg_replace('/^.+\n/', '', $rebootrequired);
 
