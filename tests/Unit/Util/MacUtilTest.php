@@ -17,6 +17,18 @@ class MacUtilTest extends TestCase
         $this->assertEquals(['de', 'ad', 'be', 'ef', 'a0', 'c3'], $mac->array());
     }
 
+    public function testPartial(): void
+    {
+        $this->assertEquals('00000c000000', Mac::parsePartial('0000.0c')->hex());
+        $this->assertEquals('080020000000', Mac::parsePartial('08:00:20')->hex());
+        $this->assertEquals('080020000000', Mac::parsePartial('8::20')->hex());
+        $this->assertEquals('aaaaaa000000', Mac::parsePartial('aaaaaa')->hex());
+        $this->assertEquals('aaaaa0000000', Mac::parsePartial('aaaaa')->hex());
+        $this->assertEquals('aaaaaa120000', Mac::parsePartial('aaaaaa12')->hex());
+        $this->assertEquals('aaaaaa123000', Mac::parsePartial('aaaaaa123')->hex());
+
+    }
+
     public function testBridgeParsing(): void
     {
         $this->assertEquals('0c85255ce500', Mac::parseBridge('80 62 0c 85 25 5c e5 00')->hex());
@@ -52,6 +64,8 @@ class MacUtilTest extends TestCase
             ['00:02:04:0B:0D:0F', '0002040b0d0f'],
             ['0:2:4:B:D:F',       '0002040b0d0f'],
             ['0:2:4:B:D:F',       '0002040b0d0f'],
+            ['00d9.d110.21f9',    '00d9d11021f9'],
+            ['garbage',           ''],
         ];
     }
 }
