@@ -45,6 +45,8 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
     $agent_end = microtime(true);
     $agent_time = round(($agent_end - $agent_start) * 1000);
 
+    $agent_raw = "<<<app-proxmox>>>\nblah";
+
     if (! empty($agent_raw)) {
         echo 'execution time: ' . $agent_time . 'ms';
 
@@ -202,10 +204,10 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
             DeviceCache::getPrimary()->serial = $agent_data['dmi']['system-serial-number'];
         }
         DeviceCache::getPrimary()->save();
-
-        // store results in array cache
-        Cache::driver('array')->put('agent_data', $agent_data);
     }
+
+    // store results in array cache
+    Cache::driver('array')->put('agent_data', $agent_data);
 
     if (! empty($agent_sensors)) {
         echo 'Sensors: ';
