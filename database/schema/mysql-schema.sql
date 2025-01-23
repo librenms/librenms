@@ -1660,7 +1660,7 @@ CREATE TABLE `ospfv3_instances` (
   `ospfv3ExtAreaLsdbLimit` int(11) DEFAULT NULL,
   `ospfv3AsScopeLsaCount` int(11) DEFAULT NULL,
   `ospfv3ExitOverflowInterval` int(11) DEFAULT NULL,
-  `ospfv3AsScopeLsaCksumSum` int(11) DEFAULT NULL,,
+  `ospfv3AsScopeLsaCksumSum` int(11) DEFAULT NULL,
   `context_name` varchar(128) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `ospfv3_instances_device_id_ospfv3_instance_id_context_name_uniq` (`device_id`,`ospfv3_instance_id`,`context_name`)
@@ -1713,9 +1713,9 @@ CREATE TABLE `ospfv3_ports` (
   `ospfv3IfState` varchar(32) DEFAULT NULL,
   `ospfv3IfDesignatedRouter` varchar(32) DEFAULT NULL,
   `ospfv3IfBackupDesignatedRouter` varchar(32) DEFAULT NULL,
-  `ospfv3IfEvents` int(11)  int(11) NOT NULL,
+  `ospfv3IfEvents` int(11) NOT NULL,
   `ospfv3IfDemand` varchar(32) DEFAULT NULL,
-  `ospfv3IfMetricValue` int(11)  int(11) NOT NULL,
+  `ospfv3IfMetricValue` int(11) NOT NULL,
   `context_name` varchar(128) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `ospfv3_ports_device_id_ospfv3_port_id_context_name_unique` (`device_id`,`ospfv3_port_id`,`context_name`)
