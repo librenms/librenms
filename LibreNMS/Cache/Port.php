@@ -28,8 +28,12 @@ class Port
      * Tries to check the primary device's port relationship to save a db query
      * returns null when port is not found (including port_id = 0)
      */
-    public function get(int $port_id): ?\App\Models\Port
+    public function get(?int $port_id): ?\App\Models\Port
     {
+        if (! $port_id) {
+            return null;
+        }
+
         if (! array_key_exists($port_id, $this->ports)) {
             $this->cachePort($port_id);
         }
@@ -43,7 +47,7 @@ class Port
      */
     public function getByIfIndex(int|string|null $ifIndex, \App\Models\Device|int|null $device = null): ?\App\Models\Port
     {
-        return $this->get((int) $this->getIdFromIfIndex($ifIndex, $device));
+        return $this->get($this->getIdFromIfIndex($ifIndex, $device));
     }
 
     /**
@@ -52,7 +56,7 @@ class Port
      */
     public function getByIfName(string $ifName, \App\Models\Device|int|null $device = null): ?\App\Models\Port
     {
-        return $this->get((int) $this->getIdFromIfName($ifName, $device));
+        return $this->get($this->getIdFromIfName($ifName, $device));
     }
 
     /**
