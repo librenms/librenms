@@ -143,6 +143,7 @@ class FpingResponse implements \Stringable
     {
         $device->last_ping = Carbon::now();
         $device->last_ping_timetaken = $this->avg_latency ?: $device->last_ping_timetaken;
+        $device->last_ping_loss = $this->transmitted ? 100 * ($this->transmitted - $this->received) / $this->transmitted : null;
         $device->save();
 
         // detailed multi-ping capable graph
