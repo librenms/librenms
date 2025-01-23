@@ -195,7 +195,7 @@ class CustomMapDataController extends Controller
             // set up linked device and status
             if ($node->device) {
                 $warning_time = Config::get('uptime_warning', 86400);
-                
+
                 $nodes[$nodeid]['device_name'] = $node->device->hostname . '(' . $node->device->sysName . ')';
                 $nodes[$nodeid]['device_image'] = $node->device->icon;
                 $nodes[$nodeid]['device_info'] = Blade::render('<x-device-link-map :device="$device" />', ['device' => $node->device]);
