@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Port;
 use App\Models\PortAdsl;
 use App\Models\PortsNac;
 use App\Models\PortVdsl;
@@ -10,7 +9,7 @@ use LibreNMS\Util\Url;
 
 $vars['view'] = basename($vars['view'] ?? 'graphs');
 
-$port = \App\Models\Port::find($vars['port']);
+$port = \App\Facades\PortCache::get($vars['port']);
 
 $port_details = 1;
 
@@ -127,9 +126,7 @@ if ($port->qos()->count() > 0) {
     $menu_options['qos'] = 'QoS';
 }
 
-$portModel = Port::find($port->port_id);
-
-if (LibreNMS\Plugins::countHooks('port_container') || \PluginManager::hasHooks(PortTabHook::class, ['port' => $portModel])) {
+if (LibreNMS\Plugins::countHooks('port_container') || \PluginManager::hasHooks(PortTabHook::class, ['port' => $port])) {
     // Checking if any plugin implements the port_container. If yes, allow to display the menu_option
     $menu_options['plugins'] = 'Plugins';
 }

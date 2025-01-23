@@ -462,6 +462,18 @@
                 "type": "string"
             }
         },
+        "ignore_mount_regexp": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "ignore_mount_type": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
         "bad_hrSystemUptime": {
             "type": "boolean"
         },

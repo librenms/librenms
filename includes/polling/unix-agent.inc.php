@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Device;
+use Illuminate\Support\Facades\Cache;
 use LibreNMS\RRD\RrdDefinition;
 
 if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
@@ -44,6 +45,8 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
     $agent_end = microtime(true);
     $agent_time = round(($agent_end - $agent_start) * 1000);
 
+    $agent_raw = "<<<app-proxmox>>>\nblah";
+
     if (! empty($agent_raw)) {
         echo 'execution time: ' . $agent_time . 'ms';
 
@@ -74,7 +77,6 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
             'gpsd',
         ];
 
-        global $agent_data;
         $agent_data = [];
         foreach (explode('<<<', $agent_raw) as $section) {
             if (empty($section)) {
@@ -203,6 +205,9 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
         }
         DeviceCache::getPrimary()->save();
     }
+
+    // store results in array cache
+    Cache::driver('array')->put('agent_data', $agent_data);
 
     if (! empty($agent_sensors)) {
         echo 'Sensors: ';

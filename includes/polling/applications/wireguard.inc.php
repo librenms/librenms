@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Eventlog;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
@@ -181,7 +182,7 @@ if (count($added_interfaces) > 0 || count($removed_interfaces) > 0) {
         count($removed_interfaces) > 0
             ? ' Removed ' . implode(',', $removed_interfaces)
             : '';
-    log_event($log_message, $device, 'application');
+    Eventlog::log($log_message, $device['device_id'], 'application');
 }
 
 // check for client changes
@@ -204,7 +205,7 @@ foreach ($mappings as $interface => $client_list) {
             count($removed_clients) > 0
                 ? ' Removed ' . implode(',', $removed_clients)
                 : '';
-        log_event($log_message, $device, 'application');
+        Eventlog::log($log_message, $device['device_id'], 'application');
     }
 }
 

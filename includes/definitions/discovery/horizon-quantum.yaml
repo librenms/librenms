@@ -1,0 +1,50 @@
+mib: DRAGONWAVE-HORIZON-QUANTUM-MIB
+modules:
+    os:
+        version: DRAGONWAVE-HORIZON-QUANTUM-MIB::hzQtmSwInvAppOmniVersionNo.0
+        serial: DRAGONWAVE-HORIZON-QUANTUM-MIB::hzQtmUnitSerialNo.0
+        hardware: DRAGONWAVE-HORIZON-QUANTUM-MIB::hzQtmUnitAssemblylNo.0
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: hzQtmIduTemperature.0
+                    num_oid: '.1.3.6.1.4.1.7262.2.4.1.1.8.0'
+                    divisor: 100
+                    descr: 'IDU Temperature'
+                -
+                    oid: hzQtmRadioTemperature.1
+                    num_oid: '.1.3.6.1.4.1.7262.2.4.5.4.1.1.14.1'
+                    divisor: 10
+                    descr: 'Radio Temperature'
+        state:
+            data:
+                -
+                    oid: hzQtmModemRxLossOfSignalAlarm
+                    num_oid: '.1.3.6.1.4.1.7262.2.4.7.4.1.1.1.2.{{ $index }}'
+                    index: 'hzQtmModemAlarmsIndex.{{ $index }}'
+                    descr: 'Radio {{ $index }} Loss of Signal'
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'No' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'Yes' }
+                -
+                    oid: hzQtmModemModulationType
+                    num_oid: '.1.3.6.1.4.1.7262.2.4.5.2.1.1.5.{{ $index }}'
+                    index: 'hzQtmModemIndex.{{ $index }}'
+                    descr: 'Radio {{ $index }} Modulation'
+                    states:
+                        - { value: 1, generic: 2, graph: 0, descr: 'qpsk' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'qam' }
+                        - { value: 3, generic: 2, graph: 0, descr: 'qam16' }
+                        - { value: 4, generic: 1, graph: 0, descr: 'qam32' }
+                        - { value: 5, generic: 1, graph: 0, descr: 'qam64' }
+                        - { value: 6, generic: 1, graph: 0, descr: 'qam128' }
+                        - { value: 7, generic: 0, graph: 0, descr: 'qam256' }
+                        - { value: 8, generic: 0, graph: 0, descr: 'x8psk' }
+        count:
+            data:
+                -
+                    oid: hzQtmModemRxLossOfSignalCounts
+                    num_oid: '.1.3.6.1.4.1.7262.2.4.7.4.1.1.1.3.{{ $index }}'
+                    index: 'hzQtmModemAlarmsIndex.{{ $index }}'
+                    descr: 'Radio {{ $index }} Loss of Signals'
