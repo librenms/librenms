@@ -32,17 +32,22 @@ use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Exa extends OS implements OSDiscovery, TransceiverDiscovery
 {
     public function discoverOS(Device $device): void
     {
-        $info = snmp_getnext_multi($this->getDeviceArray(), ['e7CardSoftwareVersion', 'e7CardSerialNumber'], '-OQUs', 'E7-Calix-MIB');
-        $device->version = $info['e7CardSoftwareVersion'] ?? null;
-        $device->serial = $info['e7CardSerialNumber'] ?? null;
+        $response = SnmpQuery::next([
+            'E7-Calix-MIB::e7CardSoftwareVersion',
+            'E7-Calix-MIB::e7CardSerialNumber',
+        ]);
+
+        $device->version = $response->value('E7-Calix-MIB::e7CardSoftwareVersion') ?: null;
+        $device->serial = $response->value('E7-Calix-MIB::e7CardSerialNumber') ?: null;
         $device->hardware = 'Calix ' . $device->sysDescr;
 
-        $cards = explode("\n", snmp_walk($this->getDeviceArray(), 'e7CardProvType', '-OQv', 'E7-Calix-MIB'));
+        $cards = SnmpQuery::walk('E7-Calix-MIB::e7CardProvType')->values();
         $card_count = [];
         foreach ($cards as $card) {
             $card_count[$card] = ($card_count[$card] ?? 0) + 1;
