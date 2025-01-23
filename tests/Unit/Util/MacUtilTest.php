@@ -26,7 +26,6 @@ class MacUtilTest extends TestCase
         $this->assertEquals('aaaaa0000000', Mac::parsePartial('aaaaa')->hex());
         $this->assertEquals('aaaaaa120000', Mac::parsePartial('aaaaaa12')->hex());
         $this->assertEquals('aaaaaa123000', Mac::parsePartial('aaaaaa123')->hex());
-
     }
 
     public function testBridgeParsing(): void
