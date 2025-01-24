@@ -20,7 +20,10 @@ echo '
           </tr>
         </thead>';
 
-$instances = DeviceCache::getPrimary()->ospfInstances()->withCount(['device.ospfv3Areas', 'device.ospfv3Ports', 'device.ospfv3Nbr'])->get();
+$instances = DeviceCache::getPrimary()->ospfv3Instances()->with(['device' => function ($query) {
+    return $query->withCount(['ospfv3Areas', 'ospfv3Ports', 'ospfv3Nbrs']);
+}])->get();
+
 foreach ($instances as $instance) {
     $i++;
 
@@ -38,9 +41,9 @@ foreach ($instances as $instance) {
             <td><span class="label label-' . $status_color . '">' . $instance->ospfv3AdminStatus . '</span></td>
             <td><span class="label label-' . $abr_status_color . '">' . $instance->ospfv3AreaBdrRtrStatus . '</span></td>
             <td><span class="label label-' . $asbr_status_color . '">' . $instance->ospfv3ASBdrRtrStatus . '</span></td>
-            <td>' . $instance->device->ospfv3AreasCount . '</td>
-            <td>' . $instance->device->ospfv3PortsCount . '(' . $port_count_enabled . ')</td>
-            <td>' . $instance->device->ospfv3NbrsCount . '</td>
+            <td>' . $instance->device->ospfv3_areas_count . '</td>
+            <td>' . $instance->device->ospfv3_ports_count . '(' . $port_count_enabled . ')</td>
+            <td>' . $instance->device->ospfv3_nbrs_count . '</td>
           </tr>
           <script type="text/javascript">
           $("#ospf-panel_button' . $i . '").on("click", function(){
