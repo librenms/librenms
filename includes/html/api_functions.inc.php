@@ -837,18 +837,15 @@ function list_ospf_ports(Illuminate\Http\Request $request)
 
 function list_ospfv3(Illuminate\Http\Request $request)
 {
-    $sql = '';
-    $sql_params = [];
     $hostname = $request->get('hostname');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    if (is_numeric($device_id)) {
-        $sql = ' AND `device_id`=?';
-        $sql_params = [$device_id];
-    }
+    $device_id = \App\Facades\DeviceCache::get($hostname)->device_id;
 
-    $ospf_neighbours = dbFetchRows("SELECT * FROM ospfv3_nbrs WHERE `ospfv3NbrState` IS NOT NULL AND `ospfv3NbrState` != '' $sql", $sql_params);
-    $total_ospf_neighbours = count($ospf_neighbours);
-    if (! is_numeric($total_ospf_neighbours)) {
+    $ospf_neighbours = \App\Models\OspfNbr::whereHasAccess(Auth::user())
+        ->when($device_id, fn($q) => $q->where('device_id', $device_id))
+        ->whereNotNull('ospfv3NbrState')->where('ospfv3NbrState', '!=', '')
+        ->get();
+
+    if ($ospf_neighbours->isEmpty()) {
         return api_error(500, 'Error retrieving ospfv3_nbrs');
     }
 

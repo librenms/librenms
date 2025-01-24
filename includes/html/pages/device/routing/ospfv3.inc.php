@@ -1,8 +1,4 @@
 <?php
-use App\Models\Ospfv3Nbr;
-use App\Models\Ospfv3Instance;
-use App\Models\Ospfv3Area;
-use App\Models\Ospfv3Port;
 
 $i = 0;
 
@@ -23,39 +19,28 @@ echo '
             <th>Neighbours</th>
           </tr>
         </thead>';
-foreach (Ospfv3Instance::where("device_id", $device['device_id'])->get() as $instance) {
+
+$instances = DeviceCache::getPrimary()->ospfInstances()->withCount(['device.ospfv3Areas', 'device.ospfv3Ports', 'device.ospfv3Nbr'])->get();
+foreach ($instances as $instance) {
     $i++;
 
-    $area_count = Ospfv3Area::where("device_id", $device['device_id'])->count();
-    $port_count = Ospfv3Port::where("device_id", $device['device_id'])->count();
-    $port_count_enabled = Ospfv3Port::where("device_id", $device['device_id'])->where("ospfv3IfAdminStatus", "enabled")->count();
-    $nbr_count = Ospfv3Nbr::where("device_id", $device['device_id'])->count();
+    $port_count_enabled = DeviceCache::getPrimary()->ospfv3Ports()->where('ospfv3IfAdminStatus', 'enabled')->count();
 
-    $status_color = $abr_status_color = $asbr_status_color = 'default';
-
-    if ($instance->ospfv3AdminStatus == 'enabled') {
-        $status_color = 'success';
-    }
-
-    if ($instance->ospfv3AreaBdrRtrStatus == 'true') {
-        $abr_status_color = 'success';
-    }
-
-    if ($instance->ospfv3ASBdrRtrStatus == 'true') {
-        $asbr_status_color = 'success';
-    }
+    $status_color = $instance->ospfv3AdminStatus == 'enabled' ? 'success' : 'default';
+    $abr_status_color = $instance->ospfv3AreaBdrRtrStatus == 'true' ? 'success' : 'default';
+    $asbr_status_color = $instance->ospfv3ASBdrRtrStatus == 'true' ? 'success' : 'default';
 
     echo '
         <tbody>
           <tr data-toggle="collapse" data-target="#ospf-panel' . $i . '" class="accordion-toggle">
             <td><button id="ospf-panel_button' . $i . '" class="btn btn-default btn-xs"><span id="ospf-panel_span' . $i . '" class="fa fa-plus"></span></button></td>
-            <td>' . long2ip($instance['ospfv3RouterId']) . '</td>
+            <td>' . long2ip($instance->ospfv3RouterId) . '</td>
             <td><span class="label label-' . $status_color . '">' . $instance->ospfv3AdminStatus . '</span></td>
             <td><span class="label label-' . $abr_status_color . '">' . $instance->ospfv3AreaBdrRtrStatus . '</span></td>
             <td><span class="label label-' . $asbr_status_color . '">' . $instance->ospfv3ASBdrRtrStatus . '</span></td>
-            <td>' . $area_count . '</td>
-            <td>' . $port_count . '(' . $port_count_enabled . ')</td>
-            <td>' . $nbr_count . '</td>
+            <td>' . $instance->device->ospfv3AreasCount . '</td>
+            <td>' . $instance->device->ospfv3PortsCount . '(' . $port_count_enabled . ')</td>
+            <td>' . $instance->device->ospfv3NbrsCount . '</td>
           </tr>
           <script type="text/javascript">
           $("#ospf-panel_button' . $i . '").on("click", function(){
@@ -77,9 +62,9 @@ foreach (Ospfv3Instance::where("device_id", $device['device_id'])->get() as $ins
                           <th>Status</th>
                         </tr>
                       </thead>';
-    foreach (Ospfv3Area::where("device_id", $device['device_id'])->get() as $area) {
-        $area_port_count = Ospfv3Port::where("device_id", $device['device_id'])->where("ospfv3IfAreaId", $area->ospfv3AreaId)->count();
-        $area_port_count_enabled = Ospfv3Port::where("device_id", $device['device_id'])->where("ospfv3IfAreaId", $area->ospfv3AreaId)->where("ospfv3IfAdminStatus", "enabled")->count();
+    foreach (DeviceCache::getPrimary()->ospfAreas as $area) {
+        $area_port_count = DeviceCache::getPrimary()->ospfv3Ports()->where('ospfv3IfAreaId', $area->ospfv3AreaId)->count();
+        $area_port_count_enabled = DeviceCache::getPrimary()->ospfv3Ports()->where('ospfv3IfAreaId', $area->ospfv3AreaId)->where('ospfv3IfAdminStatus', 'enabled')->count();
 
         echo '
                       <tbody>
@@ -110,23 +95,19 @@ foreach (Ospfv3Instance::where("device_id", $device['device_id'])->get() as $ins
                       </thead>
                   </div>';
 	// P.port_id does not match up with O.port_id, resulting in empty query.
-    foreach (dbFetchRows("SELECT * FROM `ospfv3_ports` AS O, `ports` AS P WHERE O.`ospfv3IfAdminStatus` = 'enabled' AND O.`device_id` = ? AND P.port_id = O.port_id ORDER BY O.`ospfv3IfAreaId`", [$device['device_id']]) as $ospfport) {
-        $ospfport = cleanPort($ospfport);
-        $port_status_color = 'default';
-
-        if ($ospfport['ospfv3IfAdminStatus'] == 'enabled') {
-            $port_status_color = 'success';
-        }
+    $ospfPorts = DeviceCache::getPrimary()->ospfv3Ports()->where('ospfv3IfAdminStatus', 'enabled')->with('port')->get();
+    foreach ($ospfPorts as $ospfPort) {
+        $port_status_color = $ospfPort->ospfv3IfAdminStatus == 'enabled' ? 'success' : 'default';
 
         echo '
                   <tbody>
                     <tr>
-                      <td>' . generate_port_link($ospfport) . '</td>
-                      <td>' . $ospfport['ospfv3IfType'] . '</td>
-                      <td>' . $ospfport['ospfv3IfState'] . '</td>
-                      <td>' . $ospfport['ospfv3IfMetricValue'] . '</td>
-                      <td><span class="label label-' . $port_status_color . '">' . $ospfport['ospfv3IfAdminStatus'] . '</span></td>
-                      <td>' . $ospfport['ospfv3IfAreaId'] . '</td>
+                      <td>' . \LibreNMS\Util\Url::portLink($ospfPort->port) . '</td>
+                      <td>' . $ospfPort->ospfv3IfType . '</td>
+                      <td>' . $ospfPort->ospfv3IfState . '</td>
+                      <td>' . $ospfPort->ospfv3IfMetricValue . '</td>
+                      <td><span class="label label-' . $port_status_color . '">' . $ospfPort->ospfv3IfAdminStatus . '</span></td>
+                      <td>' . $ospfPort->ospfv3IfAreaId . '</td>
                     </tr>
                   </tbody>';
     }
@@ -146,16 +127,15 @@ foreach (Ospfv3Instance::where("device_id", $device['device_id'])->get() as $ins
                           <th>Status</th>
                         </tr>
                       </thead>';
-    foreach (Ospfv3Nbr::where("device_id", $device['device_id'])->get() as $nbr) {
-        $host = @dbFetchRow('SELECT * FROM `ipv6_addresses` AS A, `ports` AS I, `devices` AS D WHERE A.ipv6_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$nbr['ospfv3NbrRtrId']]);
+    foreach (DeviceCache::getPrimary()->ospfv3Nbrs as $nbr) {
+        $port = PortCache::getByIp(long2ip($nbr->ospfv3NbrRtrId));
 
         $rtr_id = 'unknown';
-        $ospfnbr_status_color = 'default';
-
-        if (is_array($host)) {
-            $rtr_id = generate_device_link($host);
+        if ($port) {
+            $rtr_id = \LibreNMS\Util\Url::deviceLink(DeviceCache::get($port->device_id));
         }
 
+        $ospfnbr_status_color = 'default';
         if ($nbr->ospfv3NbrState == 'full') {
             $ospfnbr_status_color = 'success';
         } elseif ($nbr->ospfv3NbrState == 'down') {
