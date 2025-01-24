@@ -58,7 +58,6 @@ plugins:
   - include_dir_to_nav
   - exclude:
       glob:
-        - "General/Changelogs/*"
         - "Dockerfile"
   - redirects:
       redirect_maps:
@@ -143,7 +142,9 @@ nav:
   - General:
     - Home: index.md
     - Features: Support/Features.md
-    - Changelog: General/Changelog.md
+    - Changelog:
+      - Current Changelog: General/Changelog.md
+      - Historical: General/Changelogs
     - Welcome to Observium users: General/Welcome-to-Observium-users.md
     - 3rd Party Libraries: General/Acknowledgement.md
 
