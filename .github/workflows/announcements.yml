@@ -2,8 +2,8 @@ name: Notify Discord on PR Merge with Specific Tag
 
 on:
   pull_request:
-    tags:
-      - "Breaking-Change"
+    types:
+      - closed
 
 jobs:
   notify-discord:
@@ -13,6 +13,23 @@ jobs:
     steps:
       - name: Check Out Repository
         uses: actions/checkout@v3
+
+      - name: Check for Specific Label
+        id: check_label
+        run: |
+          LABEL_FOUND=false
+          for label in "${{ github.event.pull_request.labels[*].name }}"; do
+            if [[ "$label" == "Breaking-Change" ]]; then
+              LABEL_FOUND=true
+              break
+            fi
+          done
+
+          if [[ "$LABEL_FOUND" != "true" ]]; then
+            echo "PR does not contain the specific label. Skipping."
+            exit 0
+          fi
+
 
       - name: Send Notification to Discord
         env:
