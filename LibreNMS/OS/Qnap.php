@@ -40,7 +40,7 @@ class Qnap extends OS implements OSDiscovery
             'ENTITY-MIB::entPhysicalFirmwareRev',
         ]);
 
-        $device->version = $response->value('ENTITY-MIB::entPhysicalFirmwareRev') ?: null;
+        $device->version = trim($response->value('ENTITY-MIB::entPhysicalFirmwareRev'), '\"') ?: null;
         $device->hardware = $response->value('NAS-MIB::enclosureModel') ?: null;
         $device->serial = $response->value('NAS-MIB::enclosureSerialNum') ?: null;
     }
