@@ -3,6 +3,7 @@
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\StringHelpers;
+use App\Models\Ospfv3Nbr;
 
 global $link_exists;
 
@@ -489,10 +490,13 @@ if (Config::get('autodiscovery.ospf') === true) {
 
 if (Config::get('autodiscovery.ospfv3') === true) {
     echo ' OSPFv3 Discovery: ';
-    $sql = 'SELECT DISTINCT(`ospfv3NbrAddress`),`device_id` FROM `ospfv3_nbrs` WHERE `device_id`=?';
-    foreach (dbFetchRows($sql, [$device['device_id']]) as $nbr) {
+    $ospf_nbrs = Ospfv3Nbr::select("ospfv3NbrAddress", "device_id")
+       ->distinct()
+       ->where("device_id", $device['device_id'])
+       ->get();
+    foreach ($ospf_nbrs as $nbr) {
         try {
-            $ip = IP::parse($nbr['ospfv3NbrAddress']);
+            $ip = IP::parse($nbr->ospfv3NbrAddress);
 
             if ($ip->inNetworks(Config::get('autodiscovery.nets-exclude'))) {
                 echo 'x';

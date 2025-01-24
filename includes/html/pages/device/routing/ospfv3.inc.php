@@ -1,4 +1,8 @@
 <?php
+use App\Models\Ospfv3Nbr;
+use App\Models\Ospfv3Instance;
+use App\Models\Ospfv3Area;
+use App\Models\Ospfv3Port;
 
 $i = 0;
 
@@ -19,24 +23,25 @@ echo '
             <th>Neighbours</th>
           </tr>
         </thead>';
-foreach (dbFetchRows('SELECT * FROM `ospfv3_instances` WHERE `device_id` = ?', [$device['device_id']]) as $instance) {
+foreach (Ospfv3Instance::where("device_id", $device['device_id'])->get() as $instance) {
     $i++;
-    $area_count = dbFetchCell('SELECT COUNT(*) FROM `ospfv3_areas` WHERE `device_id` = ?', [$device['device_id']]);
-    $port_count = dbFetchCell('SELECT COUNT(*) FROM `ospfv3_ports` WHERE `device_id` = ?', [$device['device_id']]);
-    $port_count_enabled = dbFetchCell("SELECT COUNT(*) FROM `ospfv3_ports` WHERE `ospfv3IfAdminStatus` = 'enabled' AND `device_id` = ?", [$device['device_id']]);
-    $nbr_count = dbFetchCell('SELECT COUNT(*) FROM `ospfv3_nbrs` WHERE `device_id` = ?', [$device['device_id']]);
+
+    $area_count = Ospfv3Area::where("device_id", $device['device_id'])->count();
+    $port_count = Ospfv3Port::where("device_id", $device['device_id'])->count();
+    $port_count_enabled = Ospfv3Port::where("device_id", $device['device_id'])->where("ospfv3IfAdminStatus", "enabled")->count();
+    $nbr_count = Ospfv3Nbr::where("device_id", $device['device_id'])->count();
 
     $status_color = $abr_status_color = $asbr_status_color = 'default';
 
-    if ($instance['ospfv3AdminStatus'] == 'enabled') {
+    if ($instance->ospfv3AdminStatus == 'enabled') {
         $status_color = 'success';
     }
 
-    if ($instance['ospfv3AreaBdrRtrStatus'] == 'true') {
+    if ($instance->ospfv3AreaBdrRtrStatus == 'true') {
         $abr_status_color = 'success';
     }
 
-    if ($instance['ospfv3ASBdrRtrStatus'] == 'true') {
+    if ($instance->ospfv3ASBdrRtrStatus == 'true') {
         $asbr_status_color = 'success';
     }
 
@@ -45,9 +50,9 @@ foreach (dbFetchRows('SELECT * FROM `ospfv3_instances` WHERE `device_id` = ?', [
           <tr data-toggle="collapse" data-target="#ospf-panel' . $i . '" class="accordion-toggle">
             <td><button id="ospf-panel_button' . $i . '" class="btn btn-default btn-xs"><span id="ospf-panel_span' . $i . '" class="fa fa-plus"></span></button></td>
             <td>' . long2ip($instance['ospfv3RouterId']) . '</td>
-            <td><span class="label label-' . $status_color . '">' . $instance['ospfv3AdminStatus'] . '</span></td>
-            <td><span class="label label-' . $abr_status_color . '">' . $instance['ospfv3AreaBdrRtrStatus'] . '</span></td>
-            <td><span class="label label-' . $asbr_status_color . '">' . $instance['ospfv3ASBdrRtrStatus'] . '</span></td>
+            <td><span class="label label-' . $status_color . '">' . $instance->ospfv3AdminStatus . '</span></td>
+            <td><span class="label label-' . $abr_status_color . '">' . $instance->ospfv3AreaBdrRtrStatus . '</span></td>
+            <td><span class="label label-' . $asbr_status_color . '">' . $instance->ospfv3ASBdrRtrStatus . '</span></td>
             <td>' . $area_count . '</td>
             <td>' . $port_count . '(' . $port_count_enabled . ')</td>
             <td>' . $nbr_count . '</td>
@@ -72,16 +77,16 @@ foreach (dbFetchRows('SELECT * FROM `ospfv3_instances` WHERE `device_id` = ?', [
                           <th>Status</th>
                         </tr>
                       </thead>';
-    foreach (dbFetchRows('SELECT * FROM `ospfv3_areas` WHERE `device_id` = ?', [$device['device_id']]) as $area) {
-        $area_port_count = dbFetchCell('SELECT COUNT(*) FROM `ospfv3_ports` WHERE `device_id` = ? AND `ospfv3IfAreaId` = ?', [$device['device_id'], $area['ospfv3AreaId']]);
-        $area_port_count_enabled = dbFetchCell("SELECT COUNT(*) FROM `ospfv3_ports` WHERE `ospfv3IfAdminStatus` = 'enabled' AND `device_id` = ? AND `ospfv3IfAreaId` = ?", [$device['device_id'], $area['ospfv3AreaId']]);
+    foreach (Ospfv3Area::where("device_id", $device['device_id'])->get() as $area) {
+        $area_port_count = Ospfv3Port::where("device_id", $device['device_id'])->where("ospfv3IfAreaId", $area->ospfv3AreaId)->count();
+        $area_port_count_enabled = Ospfv3Port::where("device_id", $device['device_id'])->where("ospfv3IfAreaId", $area->ospfv3AreaId)->where("ospfv3IfAdminStatus", "enabled")->count();
 
         echo '
                       <tbody>
                         <tr>
-                          <td>' . $area['ospfv3AreaId'] . '</td>
+                          <td>' . $area->ospfv3AreaId . '</td>
                           <td>' . $area_port_count . '(' . $area_port_count_enabled . ')</td>
-                          <td><span class="label label-' . $status_color . '">' . $instance['ospfv3AdminStatus'] . '</span></td>
+                          <td><span class="label label-' . $status_color . '">' . $instance->ospfv3AdminStatus . '</span></td>
                         </tr>
                       </tbody>';
     }
@@ -141,7 +146,7 @@ foreach (dbFetchRows('SELECT * FROM `ospfv3_instances` WHERE `device_id` = ?', [
                           <th>Status</th>
                         </tr>
                       </thead>';
-    foreach (dbFetchRows('SELECT * FROM `ospfv3_nbrs` WHERE `device_id` = ?', [$device['device_id']]) as $nbr) {
+    foreach (Ospfv3Nbr::where("device_id", $device['device_id'])->get() as $nbr) {
         $host = @dbFetchRow('SELECT * FROM `ipv6_addresses` AS A, `ports` AS I, `devices` AS D WHERE A.ipv6_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$nbr['ospfv3NbrRtrId']]);
 
         $rtr_id = 'unknown';
@@ -151,19 +156,19 @@ foreach (dbFetchRows('SELECT * FROM `ospfv3_instances` WHERE `device_id` = ?', [
             $rtr_id = generate_device_link($host);
         }
 
-        if ($nbr['ospfv3NbrState'] == 'full') {
+        if ($nbr->ospfv3NbrState == 'full') {
             $ospfnbr_status_color = 'success';
-        } elseif ($nbr['ospfv3NbrState'] == 'down') {
+        } elseif ($nbr->ospfv3NbrState == 'down') {
             $ospfnbr_status_color = 'danger';
         }
 
         echo '
                     <tbody>
                       <tr>
-                        <td>' . long2ip($nbr['ospfv3NbrRtrId']) . '</td>
+                        <td>' . long2ip($nbr->ospfv3NbrRtrId) . '</td>
                         <td>' . $rtr_id . '</td>
-                        <td>' . $nbr['ospfv3NbrAddress'] . '</td>
-                        <td><span class="label label-' . $ospfnbr_status_color . '">' . $nbr['ospfv3NbrState'] . '</span></td>
+                        <td>' . $nbr->ospfv3NbrAddress . '</td>
+                        <td><span class="label label-' . $ospfnbr_status_color . '">' . $nbr->ospfv3NbrState . '</span></td>
                       </tr>
                     </tbody>';
     }
