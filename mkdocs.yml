@@ -58,7 +58,6 @@ plugins:
   - include_dir_to_nav
   - exclude:
       glob:
-        - "General/Changelogs/*"
         - "Dockerfile"
   - redirects:
       redirect_maps:
