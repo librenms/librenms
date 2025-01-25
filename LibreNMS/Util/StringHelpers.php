@@ -67,6 +67,7 @@ class StringHelpers
             'sdfsinfo' => 'SDFS info',
             'smart' => 'SMART',
             'ss' => 'Socket Statistics',
+            'text_blob' => 'Text Debug Helper',
             'ups-apcups' => 'UPS apcups',
             'ups-nut' => 'UPS nut',
             'zfs' => 'ZFS',
