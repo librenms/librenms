@@ -108,5 +108,10 @@
     <description>On the 12th of February 2025, we will be merging in pull request 16952 (https://github.com/librenms/librenms/pull/16952) which will remove the ciscoASA table. Please see https://community.librenms.org/t/remove-of-the-ciscoasa-table/26978 for further information.</description>
     <pubDate>Sun, 19 Jan 2025 22:00:00 +0000</pubDate>
   </item>
+  <item>
+    <title>Storage table change</title>
+    <description>The storage table structure has changed and storage_deleted and storage_mib were removed. If you have alert rules that reference those fields, you can remove storage_deleted and change storage_mib to type.</description>
+    <pubDate>Fri, 24 Jan 2025 22:00:00 +0000</pubDate>
+  </item>
 </channel>
 </rss>

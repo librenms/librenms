@@ -700,12 +700,12 @@
     "severity": "critical"
   },
   {
-    "rule": "storage.storage_deleted = 0 && storage.storage_descr = \"/\" && storage.storage_perc >= 90 && storage.storage_perc < 95",
+    "rule": "storage.storage_descr = \"/\" && storage.storage_perc >= 90 && storage.storage_perc < 95",
     "name": "Space on / is >= 90% and < 95% in use",
     "severity":"warning"
   },
   {
-    "rule": "storage.storage_deleted = 0 && storage.storage_descr = \"/\" && storage.storage_perc >= 95",
+    "rule": "storage.storage_descr = \"/\" && storage.storage_perc >= 95",
     "name": "Space on / is >= 95% in use",
     "severity":"critical"
   },
