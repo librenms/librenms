@@ -105,6 +105,8 @@ class SnmpResponse
         }
 
         $oids = Arr::wrap($oids);
+
+        // search for an exact match
         foreach ($oids as $oid) {
             if ($forceNumeric) {
                 // translate all to numeric to make it easier to match
@@ -113,6 +115,15 @@ class SnmpResponse
 
             if (isset($values[$oid]) && $values[$oid] !== '') {
                 return $values[$oid];
+            }
+
+            // if this is a textual oid without an index, match the first one at any index
+            if (! preg_match('/[.[]\d+]?$/', $oid)) {
+                foreach ($values as $key => $value) {
+                    if (preg_match('/^' . preg_quote($oid) . '[.[]/', $key) && $value !== '') {
+                        return $value;
+                    }
+                }
             }
         }
 

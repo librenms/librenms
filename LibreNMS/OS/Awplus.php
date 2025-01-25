@@ -29,6 +29,7 @@ use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Awplus extends OS implements OSDiscovery
 {
@@ -37,9 +38,9 @@ class Awplus extends OS implements OSDiscovery
         //$hardware and $serial use snmp_getnext as the OID for these is not always fixed.
         //However, the first OID is the device baseboard.
 
-        $data = snmp_getnext_multi($this->getDeviceArray(), ['rscBoardName', 'rscBoardSerialNumber'], '-OQs', 'AT-RESOURCE-MIB');
-        $hardware = $data['rscBoardName'];
-        $serial = $data['rscBoardSerialNumber'];
+        $response = SnmpQuery::next(['AT-RESOURCE-MIB::rscBoardName', 'AT-RESOURCE-MIB::rscBoardSerialNumber']);
+        $hardware = $response->value('AT-RESOURCE-MIB::rscBoardName');
+        $serial = $response->value('AT-RESOURCE-MIB::rscBoardSerialNumber');
 
         // SBx8100 platform has line cards show up first in "rscBoardName" above.
         //Instead use sysObjectID.0
