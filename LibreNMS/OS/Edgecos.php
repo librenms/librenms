@@ -20,6 +20,8 @@
  *
  * @link       https://www.librenms.org
  *
+ * @copyright  2018 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  * @copyright  2025 Edgecore
  * @author     Edgecore <support@edgecore.com>
  */
@@ -31,9 +33,12 @@ use App\Models\Device;
 use App\Models\Mempool;
 use App\Models\Transceiver;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
+use LibreNMS\Util\Oid;
 
 class Edgecos extends \LibreNMS\OS implements MempoolsDiscovery, ProcessorDiscovery, TransceiverDiscovery
 {
