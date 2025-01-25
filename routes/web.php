@@ -118,6 +118,8 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('dashboard/widgets/{widget}', 'DashboardWidgetController@remove')->name('dashboard.widget.remove');
     Route::put('dashboard/widgets/{widget}', 'WidgetSettingsController@update')->name('dashboard.widget.settings');
 
+    Route::get('tool/oui-lookup', OuiLookupController::class)->name('tool.oui-lookup');
+
     // Push notifications
     Route::prefix('push')->group(function () {
         Route::get('token', [PushNotificationController::class, 'token'])->name('push.token');
