@@ -92,6 +92,7 @@ abstract class Transport implements TransportInterface
             AlertState::ACKNOWLEDGED => Config::get('alert_colour.acknowledged'),
             AlertState::WORSE => Config::get('alert_colour.worse'),
             AlertState::BETTER => Config::get('alert_colour.better'),
+            AlertState::CHANGED => Config::get('alert_colour.changed'),
         ];
 
         return isset($colors[$state]) ? $colors[$state] : '#337AB7';

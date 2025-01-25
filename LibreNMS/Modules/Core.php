@@ -27,6 +27,7 @@ namespace LibreNMS\Modules;
 
 use App\Models\Device;
 use App\Models\Eventlog;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
@@ -170,7 +171,6 @@ class Core implements Module
         ];
 
         // check yaml files
-        \LibreNMS\Util\OS::loadAllDefinitions();
         $os_defs = Config::get('os');
 
         foreach ($os_defs as $os => $def) {
@@ -266,13 +266,13 @@ class Core implements Module
 
     private function calculateUptime(OS $os, ?string $sysUpTime, DataStorageInterface $datastore): void
     {
-        global $agent_data;
         $device = $os->getDevice();
 
         if (Config::get("os.$device->os.bad_uptime")) {
             return;
         }
 
+        $agent_data = Cache::driver('array')->get('agent_data');
         if (! empty($agent_data['uptime'])) {
             $uptime = round((float) substr($agent_data['uptime'], 0, strpos($agent_data['uptime'], ' ')));
             Log::info("Using UNIX Agent Uptime ($uptime)");

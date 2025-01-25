@@ -173,8 +173,8 @@
             <tr>
                 <td><i class='fa fa-fw fa-print fa-lg icon-theme' aria-hidden='true'></i> <b>{{ __('Toner') }}</b></td>
                 <td class='text-right'>{{ $stat_toner }}</td>
-                <td></td>
-                <td></td>
+                <td><i class='fa fa-fw fa-code-fork fa-lg icon-theme' aria-hidden='true'></i> <b>{{ __('QoS Queues') }}</b></td>
+                <td class='text-right'>{{ $stat_qos }}</td>
             </tr>
         </table>
 

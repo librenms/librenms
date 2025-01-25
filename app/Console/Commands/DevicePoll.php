@@ -56,9 +56,7 @@ class DevicePoll extends LnmsCommand
         try {
             if ($this->getOutput()->isVerbose()) {
                 Log::debug(Version::get()->header());
-                \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
-                LibrenmsConfig::invalidateCache();
-                LibrenmsConfig::reload();
+                LibrenmsConfig::invalidateAndReload();
             }
 
             $module_overrides = Module::parseUserOverrides(explode(',', $this->option('modules') ?? ''));

@@ -2,6 +2,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\EntPhysical;
 use App\Models\Transceiver;
 use Illuminate\Support\Collection;
@@ -13,7 +14,6 @@ use SnmpQuery;
 class Ocnos extends OS implements EntityPhysicalDiscovery, TransceiverDiscovery
 {
     private ?bool $portBreakoutEnabled = null;
-    private ?Collection $ifNamePortIdMap = null;
 
     public function discoverEntityPhysical(): Collection
     {
@@ -231,12 +231,8 @@ class Ocnos extends OS implements EntityPhysicalDiscovery, TransceiverDiscovery
 
             $cmmTransType = $data['IPI-CMM-CHASSIS-MIB::cmmTransType'] ?? 'missing';
 
-            if ($this->ifNamePortIdMap === null) {
-                $this->ifNamePortIdMap = $this->getDevice()->ports()->toBase()->pluck('port_id', 'ifName');
-            }
-
             return new Transceiver([
-                'port_id' => $this->ifNamePortIdMap[$this->guessIfName($cmmTransIndex, $cmmTransType)] ?? 0,
+                'port_id' => (int) PortCache::getIdFromIfName($this->guessIfName($cmmTransIndex, $cmmTransType), $this->getDevice()),
                 'index' => "$cmmStackUnitIndex.$cmmTransIndex",
                 'type' => $cmmTransType,
                 'vendor' => $data['IPI-CMM-CHASSIS-MIB::cmmTransVendorName'] ?? 'missing',

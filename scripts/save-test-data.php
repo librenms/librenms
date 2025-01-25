@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\ModuleTestHelper;
@@ -51,7 +52,6 @@ Parameters:
   -n, --no-save      Don't save database entries, print them out instead
   -f, --file         Save data to file instead of the standard location
   -d, --debug        Enable debug output
-      --snmpsim      Run snmpsimd.py using the collected data for manual testing.
 
 Examples:
   ./save-test-data.php -o ios -v 2960x
@@ -126,7 +126,7 @@ $snmpsim->waitForStartup();
 
 if (! $snmpsim->isRunning()) {
     echo "Failed to start snmpsim, make sure it is installed, working, and there are no bad snmprec files.\n";
-    echo "Run ./scripts/save-test-data.php --snmpsim to see the log output\n";
+    echo $snmpsim->getErrorOutput();
     exit(1);
 }
 
@@ -143,7 +143,6 @@ try {
         }
         echo PHP_EOL;
 
-        \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
         LibrenmsConfig::invalidateAndReload();
         $tester = new ModuleTestHelper($modules, $target_os, $target_variant);
         if (! $no_save && ! empty($output_file)) {

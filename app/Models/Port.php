@@ -397,6 +397,11 @@ class Port extends DeviceRelatedModel
         return $this->hasMany(Pseudowire::class, 'port_id');
     }
 
+    public function qos(): HasMany
+    {
+        return $this->hasMany(Qos::class, 'port_id');
+    }
+
     public function stackChildren(): HasManyThrough
     {
         return $this->hasManyThrough(Port::class, PortStack::class, 'low_port_id', 'port_id', 'port_id', 'high_port_id');

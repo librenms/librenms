@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\AccessPoint;
 use App\Models\Device;
 use App\Models\EntPhysical;
@@ -55,6 +56,7 @@ use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Mac;
 
 class Vrp extends OS implements
     MempoolsDiscovery,
@@ -99,25 +101,30 @@ class Vrp extends OS implements
 
     public function discoverTransceivers(): Collection
     {
-        // Get a map of ifIndex to port_id for proper association with ports
-        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
-
         // EntityPhysicalIndex to ifIndex
         $entityToIfIndex = $this->getIfIndexEntPhysicalMap();
 
         // Walk through the MIB table for transceiver information
-        return \SnmpQuery::walk('HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable')->mapTable(function ($data, $entIndex) use ($entityToIfIndex, $ifIndexToPortId) {
+        return \SnmpQuery::walk('HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable')->mapTable(function ($data, $entIndex) use ($entityToIfIndex) {
             // Skip inactive transceivers
             if ($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType'] === 'inactive') {
                 return null;
             }
+            if ($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalMode'] == 1) {
+                return null;
+            }
+
             // Skip when it is not a plugable optic
             if ($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType'] === '0') {
                 return null;
             }
 
             // Handle cases where required data might not be available (fallback to null)
-            $cable = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalConnectType'] ?? null;
+            $connector = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalConnectType'] ?? null;
+            if ($connector == '-') {
+                $connector = null;
+            }
+
             $distance = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTransferDistance'] ?? '';
             if (preg_match_all("/(([0-9]+)\([^\)]+\))+/i", $distance, $matches)) {
                 $distance = intval(max($matches[2]));
@@ -138,7 +145,7 @@ class Vrp extends OS implements
                 $wavelength = null;
             }
             $ifIndex = $entityToIfIndex[$entIndex];
-            $port_id = $ifIndexToPortId->get($ifIndex) ?? null;
+            $port_id = PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId());
             if (is_null($port_id)) {
                 // Invalid
                 return null;
@@ -148,9 +155,7 @@ class Vrp extends OS implements
             $typeToDesc = ['unknown', 'sc', 'gbic', 'sfp', 'esfp', 'rj45', 'xfp', 'xenpak', 'transponder', 'cfp', 'smb', 'sfpplus', 'cxp', 'qsfp', 'qsfpplus', 'cfp2', 'dwdmsfp', 'msa100glh', 'gps', 'csfp', 'cfp4', 'qsfp28', 'sfpsfpplus', 'gponsfp', 'cfp8', 'sfp28', 'qsfpdd', 'cfp2dco', 'sfp56', 'qsfp56', 'oa'];
 
             $mode = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalMode'] ?? '';
-            $modeToText[1] = 'singleMode';
-            $modeToText[2] = 'multiMode5';
-            $modeToText[3] = 'multiMode6';
+            $modeToText = [null, 'notSupported', 'singleMode', 'multiMode5', 'multiMode6', 'noValue', 'gpsMode'];
             if (isset($modeToText[$mode])) {
                 $mode = ' ' . $modeToText[$mode];
             }
@@ -167,6 +172,10 @@ class Vrp extends OS implements
                 $type .= $mode;
             }
 
+            if (empty($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderName']) && empty($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderPn']) && empty($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVendorSn'])) {
+                return null; //Probably no transceiver around here
+            }
+
             // Create a new Transceiver object with the retrieved data
             return new Transceiver([
                 'port_id' => $port_id,
@@ -175,8 +184,11 @@ class Vrp extends OS implements
                 'type' => $type,
                 'model' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderPn'] ?? null,
                 'serial' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVendorSn'] ?? null,
-                'cable' => $cable,
+                'connector' => $connector,
+                'revision' => null,
+                'cable' => null,
                 'distance' => $distance,
+                'date' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalManufacturedDate'] ?? null,
                 'wavelength' => $wavelength,
                 'entity_physical_index' => $entIndex,
             ]);
@@ -469,21 +481,20 @@ class Vrp extends OS implements
             foreach ($hwAccessOids as $hwAccessOid) {
                 $portAuthSessionEntry = snmpwalk_cache_oid($this->getDeviceArray(), $hwAccessOid, $portAuthSessionEntry, 'HUAWEI-AAA-MIB');
             }
-            // We cache a port_ifName -> port_id map
-            $ifName_map = $this->getDevice()->ports()->pluck('port_id', 'ifName');
 
             // update the DB
             foreach ($portAuthSessionEntry as $authId => $portAuthSessionEntryParameters) {
                 if (! array_key_exists('hwAccessInterface', $portAuthSessionEntryParameters) || ! array_key_exists('hwAccessMACAddress', $portAuthSessionEntryParameters)) {
                     continue;
                 }
-                $mac_address = strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['hwAccessMACAddress']))));
-                $port_id = $ifName_map->get($portAuthSessionEntryParameters['hwAccessInterface'], 0);
-                if ($port_id <= 0) {
+
+                $mac_address = Mac::parse($portAuthSessionEntryParameters['hwAccessMACAddress'])->hex();
+                $port_id = PortCache::getIdFromIfName($portAuthSessionEntryParameters['hwAccessInterface'], $this->getDevice());
+                if ($port_id === null) {
                     continue; //this would happen for an SSH session for instance
                 }
                 $nac->put($mac_address, new PortsNac([
-                    'port_id' => $ifName_map->get($portAuthSessionEntryParameters['hwAccessInterface'] ?? null, 0),
+                    'port_id' => (int) $port_id,
                     'mac_address' => $mac_address,
                     'auth_id' => $authId,
                     'domain' => $portAuthSessionEntryParameters['hwAccessDomain'] ?? '',

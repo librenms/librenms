@@ -54,6 +54,10 @@
             "default": "#f0ad4e",
             "type": "color"
         },
+        "alert_colour.changed": {
+            "default": "#FFD700",
+            "type": "color"
+        },
         "alert.default_copy": {
             "default": true,
             "group": "alerting",
@@ -750,6 +754,12 @@
             "order": 5,
             "type": "boolean"
         },
+        "auth_ldap_userlist_filter": {
+            "group": "auth",
+            "section": "ldap",
+            "order": 30,
+            "type": "text"
+        },
         "auth_ldap_wildcard_ou": {
             "default": false,
             "group": "auth",
@@ -1435,13 +1445,6 @@
             "default": false,
             "type": "boolean"
         },
-        "discovery_modules.transceivers": {
-            "order": 322,
-            "group": "discovery",
-            "section": "discovery_modules",
-            "default": true,
-            "type": "boolean"
-        },
         "discovery_modules.entity-physical": {
             "order": 110,
             "group": "discovery",
@@ -1519,13 +1522,6 @@
             "default": false,
             "type": "boolean"
         },
-        "discovery_modules.cisco-cbqos": {
-            "order": 40,
-            "group": "discovery",
-            "section": "discovery_modules",
-            "default": false,
-            "type": "boolean"
-        },
         "discovery_modules.cisco-otv": {
             "order": 70,
             "group": "discovery",
@@ -1554,11 +1550,25 @@
             "default": true,
             "type": "boolean"
         },
+        "discovery_modules.qos": {
+            "order": 260,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": true,
+            "type": "boolean"
+        },
         "discovery_modules.route": {
             "order": 270,
             "group": "discovery",
             "section": "discovery_modules",
             "default": false,
+            "type": "boolean"
+        },
+        "discovery_modules.transceivers": {
+            "order": 322,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": true,
             "type": "boolean"
         },
         "discovery_modules.sensors": {
@@ -1983,6 +1993,10 @@
             "type": "boolean"
         },
         "enable_ports_junoseatmvp": {
+            "default": false,
+            "type": "boolean"
+        },
+        "enable_proxmox": {
             "default": false,
             "type": "boolean"
         },
@@ -2802,14 +2816,6 @@
                 "section": "voice",
                 "order": 0,
                 "descr": "Transcoder Utilisation"
-            },
-            "type": "graph"
-        },
-        "graph_types.device.cisco-voice-ip": {
-            "default": {
-                "section": "voice",
-                "order": 0,
-                "descr": "IP Real Time Calls"
             },
             "type": "graph"
         },
@@ -4132,15 +4138,21 @@
                 "custom8": "Custom 8"
             }
         },
+        "html_dir": {
+            "type": "directory"
+        },
         "http_auth_header": {
             "default": "REMOTE_USER",
             "group": "auth",
-            "section": "general",
-            "order": 4,
+            "section": "http",
+            "order": 0,
             "type": "text"
         },
-        "html_dir": {
-            "type": "directory"
+        "http_auth_guest": {
+            "group": "auth",
+            "section": "http",
+            "order": 1,
+            "type": "text"
         },
         "http_proxy": {
             "group": "system",
@@ -4180,23 +4192,21 @@
                 "/proc",
                 "/dev",
                 "/compat/linux/proc",
-                "/compat/linux/sys"
+                "/compat/linux/sys",
+                "/sys/fs/cgroup"
             ],
             "type": "array"
         },
-        "ignore_mount_network": {
-            "group": "discovery",
-            "section": "storage",
-            "order": 0,
-            "default": true,
-            "type": "boolean"
-        },
-        "ignore_mount_optical": {
+        "ignore_mount_type": {
             "group": "discovery",
             "section": "storage",
             "order": 1,
-            "default": true,
-            "type": "boolean"
+            "default": [
+                "hrStorageRemovableDisk",
+                "hrStorageNetworkDisk",
+                "hrStorageCompactDisc"
+            ],
+            "type": "array"
         },
         "ignore_mount_regexp": {
             "group": "discovery",
@@ -4213,19 +4223,13 @@
                 "/^\\/dev\\/md0/",
                 "/^\\/var\\/dhcpd\\/dev/",
                 "/UMA/",
-                "/^\\/Volumes\\/OS X Base System/"
+                "/^\\/Volumes\\/OS X Base System/",
+                "/^\\/run\\/user\\//"
             ],
             "type": "array",
             "validate": {
                 "value.*": "is_regex"
             }
-        },
-        "ignore_mount_removable": {
-            "group": "discovery",
-            "section": "storage",
-            "order": 2,
-            "default": true,
-            "type": "boolean"
         },
         "ignore_mount_string": {
             "group": "discovery",
@@ -4384,13 +4388,47 @@
             "section": "influxdbv2",
             "order": 8
         },
+        "influxdbv2.log_file": {
+            "type": "text",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 9
+        },
         "influxdbv2.groups-exclude": {
             "group": "poller",
             "section": "influxdbv2",
-            "order": 9,
+            "order": 10,
             "type": "array",
             "default": [
             ]
+        },
+        "influxdbv2.timeout": {
+            "default": 1,
+            "type": "integer",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 11
+        },
+        "influxdbv2.verify": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 12
+        },
+        "influxdbv2.batch_size": {
+            "default": 1000,
+            "type": "integer",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 13
+        },
+        "influxdbv2.max_retry": {
+            "default": 3,
+            "type": "integer",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 14
         },
         "install_dir": {
             "type": "directory"
@@ -4926,10 +4964,6 @@
             ],
             "type": "array"
         },
-        "os_def_cache_time": {
-            "default": 86400,
-            "type": "integer"
-        },
         "os_group.unix.over": {
             "default": [
                 {
@@ -5198,6 +5232,13 @@
             "default": true,
             "type": "boolean"
         },
+        "poller_modules.qos": {
+            "order": 350,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": true,
+            "type": "boolean"
+        },
         "poller_modules.sensors": {
             "order": 360,
             "group": "poller",
@@ -5268,13 +5309,6 @@
             "default": false,
             "type": "boolean"
         },
-        "poller_modules.transceivers": {
-            "order": 322,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": true,
-            "type": "boolean"
-        },
         "poller_modules.customoid": {
             "default": true,
             "type": "boolean"
@@ -5310,13 +5344,6 @@
         },
         "poller_modules.vminfo": {
             "order": 410,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": false,
-            "type": "boolean"
-        },
-        "poller_modules.wifi": {
-            "order": 430,
             "group": "poller",
             "section": "poller_modules",
             "default": false,
@@ -5406,20 +5433,6 @@
             "default": false,
             "type": "boolean"
         },
-        "poller_modules.cisco-voice": {
-            "order": 150,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": false,
-            "type": "boolean"
-        },
-        "poller_modules.cisco-cbqos": {
-            "order": 70,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": false,
-            "type": "boolean"
-        },
         "poller_modules.cisco-otv": {
             "order": 110,
             "group": "poller",
@@ -5464,6 +5477,13 @@
         },
         "poller_modules.entity-physical": {
             "order": 170,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": true,
+            "type": "boolean"
+        },
+        "poller_modules.transceivers": {
+            "order": 322,
             "group": "poller",
             "section": "poller_modules",
             "default": true,

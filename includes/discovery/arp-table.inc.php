@@ -23,7 +23,9 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use App\Models\Eventlog;
 use LibreNMS\Config;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Mac;
 
 foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
@@ -70,7 +72,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
                 $old_mac = $existing_data[$index]['mac_address'];
                 if ($mac != $old_mac && $mac != '') {
                     d_echo("Changed mac address for $ip from $old_mac to $mac\n");
-                    log_event("MAC change: $ip : " . Mac::parse($old_mac)->readable() . ' -> ' . Mac::parse($mac)->readable(), $device, 'interface', 4, $port_id);
+                    Eventlog::log("MAC change: $ip : " . Mac::parse($old_mac)->readable() . ' -> ' . Mac::parse($mac)->readable(), $device['device_id'], 'interface', Severity::Warning, $port_id);
                     dbUpdate(['mac_address' => $mac], 'ipv4_mac', 'port_id=? AND ipv4_address=? AND context_name=?', [$port_id, $ip, $context_name]);
                 }
                 d_echo("$raw_mac => $ip\n", '.');
@@ -105,7 +107,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
         $entry_mac = $entry['mac_address'];
         $entry_if = $entry['port_id'];
         $entry_ip = $entry['ipv4_address'];
-        if ($arp_table[$entry_if][$entry_ip] != $entry_mac) {
+        if (empty($arp_table[$entry_if][$entry_ip]) || $arp_table[$entry_if][$entry_ip] != $entry_mac) {
             dbDelete('ipv4_mac', '`port_id` = ? AND `mac_address`=? AND `ipv4_address`=? AND `context_name`=?', [$entry_if, $entry_mac, $entry_ip, $context_name]);
             d_echo(null, '-');
         }

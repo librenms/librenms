@@ -1,7 +1,9 @@
 <?php
 
+use App\Models\Eventlog;
 use LibreNMS\Config;
 use LibreNMS\Enum\PortAssociationMode;
+use LibreNMS\Enum\Severity;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Mac;
@@ -688,7 +690,7 @@ foreach ($ports as $port) {
 
             if ($port[$oid] != $current_oid && ! isset($current_oid)) {
                 $port['update'][$oid] = null;
-                log_event($oid . ': ' . $port[$oid] . ' -> NULL', $device, 'interface', 4, $port['port_id']);
+                Eventlog::log($oid . ': ' . $port[$oid] . ' -> NULL', $device['device_id'], 'interface', Severity::Warning, $port['port_id']);
                 d_echo($oid . ': ' . $port[$oid] . ' -> NULL ', $oid . ' ');
             } elseif ($port[$oid] != $current_oid) {
                 // if the value is different, update it
@@ -714,14 +716,14 @@ foreach ($ports as $port) {
                 }
 
                 if ($oid == 'ifSpeed') {
-                    $old = Number::formatSi($port[$oid], 2, 3, 'bps');
-                    $new = Number::formatSi($current_oid, 2, 3, 'bps');
+                    $old = Number::formatSi($port[$oid], 2, 0, 'bps');
+                    $new = Number::formatSi($current_oid, 2, 0, 'bps');
                 } else {
                     $old = $port[$oid];
                     $new = $current_oid;
                 }
 
-                log_event($oid . ': ' . $old . ' -> ' . $new, $device, 'interface', 3, $port['port_id']);
+                Eventlog::log($oid . ': ' . $old . ' -> ' . $new, $device['device_id'], 'interface', Severity::Notice, $port['port_id']);
                 if (Debug::isEnabled()) {
                     d_echo($oid . ': ' . $old . ' -> ' . $new . ' ');
                 } else {
@@ -760,7 +762,7 @@ foreach ($ports as $port) {
                     }
 
                     $port['update'][$attrib_key] = $port_ifAlias[$attrib];
-                    log_event($attrib . ': ' . $port[$attrib_key] . ' -> ' . $log_port, $device, 'interface', 3, $port['port_id']);
+                    Eventlog::log($attrib . ': ' . $port[$attrib_key] . ' -> ' . $log_port, $device['device_id'], 'interface', Severity::Notice, $port['port_id']);
                     unset($log_port);
                 }
             }
@@ -824,9 +826,9 @@ foreach ($ports as $port) {
                 $current_port_stats['ifOutBits_perc'] = Number::calculatePercent($current_port_stats['ifOutBits_rate'], $this_port['ifSpeed'], 0);
             }
 
-            echo 'bps(' . Number::formatSi($current_port_stats['ifInBits_rate'], 2, 3, 'bps') . '/' . Number::formatSi($current_port_stats['ifOutBits_rate'], 2, 3, 'bps') . ')';
+            echo 'bps(' . Number::formatSi($current_port_stats['ifInBits_rate'], 2, 3, 'bps') . '/' . Number::formatSi($current_port_stats['ifOutBits_rate'], 2, 0, 'bps') . ')';
             echo 'bytes(' . Number::formatBi($current_port_stats['ifInOctets_diff'] ?? 0) . '/' . Number::formatBi($current_port_stats['ifOutOctets_diff'] ?? 0) . ')';
-            echo 'pkts(' . Number::formatSi($current_port_stats['ifInUcastPkts_rate'] ?? 0, 2, 3, 'pps') . '/' . Number::formatSi($current_port_stats['ifOutUcastPkts_rate'] ?? 0, 2, 3, 'pps') . ')';
+            echo 'pkts(' . Number::formatSi($current_port_stats['ifInUcastPkts_rate'] ?? 0, 2, 3, 'pps') . '/' . Number::formatSi($current_port_stats['ifOutUcastPkts_rate'] ?? 0, 2, 0, 'pps') . ')';
 
             // Update data stores
             $rrd_name = Rrd::portName($port_id, '');
@@ -902,7 +904,7 @@ foreach ($ports as $port) {
                         // If data has changed, build a query
                         $port['update'][$oid] = $current_oid;
                         echo 'PAgP ';
-                        log_event("$oid -> " . $current_oid, $device, 'interface', 3, $port['port_id']);
+                        Eventlog::log("$oid -> " . $current_oid, $device['device_id'], 'interface', Severity::Notice, $port['port_id']);
                     }
                 }
             }

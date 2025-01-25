@@ -17,6 +17,7 @@ use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
+use App\Models\Eventlog;
 use App\Models\Ipv4Mac;
 use App\Models\Location;
 use App\Models\MplsSap;
@@ -39,6 +40,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Billing;
 use LibreNMS\Config;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidTableColumnException;
 use LibreNMS\Util\Graph;
@@ -204,12 +206,12 @@ function get_port_stats_by_port_hostname(Illuminate\Http\Request $request)
     return check_port_permission($port['port_id'], $device_id, function () use ($request, $port) {
         $in_rate = $port['ifInOctets_rate'] * 8;
         $out_rate = $port['ifOutOctets_rate'] * 8;
-        $port['in_rate'] = Number::formatSi($in_rate, 2, 3, 'bps');
-        $port['out_rate'] = Number::formatSi($out_rate, 2, 3, 'bps');
+        $port['in_rate'] = Number::formatSi($in_rate, 2, 0, 'bps');
+        $port['out_rate'] = Number::formatSi($out_rate, 2, 0, 'bps');
         $port['in_perc'] = Number::calculatePercent($in_rate, $port['ifSpeed']);
         $port['out_perc'] = Number::calculatePercent($out_rate, $port['ifSpeed']);
-        $port['in_pps'] = Number::formatBi($port['ifInUcastPkts_rate'], 2, 3, '');
-        $port['out_pps'] = Number::formatBi($port['ifOutUcastPkts_rate'], 2, 3, '');
+        $port['in_pps'] = Number::formatBi($port['ifInUcastPkts_rate'], 2, 0, '');
+        $port['out_pps'] = Number::formatBi($port['ifOutUcastPkts_rate'], 2, 0, '');
 
         //only return requested columns
         if ($request->has('columns')) {
@@ -1197,13 +1199,13 @@ function update_port_description(Illuminate\Http\Request $request)
     if ($description == 'repoll') {
         // No description provided, clear description
         del_dev_attrib($port, 'ifName:' . $ifName); // "port" object has required device_id
-        log_event("$ifName Port ifAlias cleared via API", $device, 'interface', 3, $port_id);
+        Eventlog::log("$ifName Port ifAlias cleared via API", $device, 'interface', Severity::Notice, $port_id);
 
         return api_success_noresult(200, 'Port description cleared.');
     } else {
         // Prevent poller from overwriting new description
         set_dev_attrib($port, 'ifName:' . $ifName, 1); // see above
-        log_event("$ifName Port ifAlias set via API: $description", $device, 'interface', 3, $port_id);
+        Eventlog::log("$ifName Port ifAlias set via API: $description", $device, 'interface', Severity::Notice, $port_id);
 
         return api_success_noresult(200, 'Port description updated.');
     }
@@ -1740,15 +1742,15 @@ function list_bills(Illuminate\Http\Request $request)
         $overuse = '';
 
         if (strtolower($bill['bill_type']) == 'cdr') {
-            $allowed = Number::formatSi($bill['bill_cdr'], 2, 3, '') . 'bps';
-            $used = Number::formatSi($rate_data['rate_95th'], 2, 3, '') . 'bps';
+            $allowed = Number::formatSi($bill['bill_cdr'], 2, 0, '') . 'bps';
+            $used = Number::formatSi($rate_data['rate_95th'], 2, 0, '') . 'bps';
             if ($bill['bill_cdr'] > 0) {
                 $percent = Number::calculatePercent($rate_data['rate_95th'], $bill['bill_cdr']);
             } else {
                 $percent = '-';
             }
             $overuse = $rate_data['rate_95th'] - $bill['bill_cdr'];
-            $overuse = (($overuse <= 0) ? '-' : Number::formatSi($overuse, 2, 3, ''));
+            $overuse = (($overuse <= 0) ? '-' : Number::formatSi($overuse, 2, 0, ''));
         } elseif (strtolower($bill['bill_type']) == 'quota') {
             $allowed = Billing::formatBytes($bill['bill_quota']);
             $used = Billing::formatBytes($rate_data['total_data']);

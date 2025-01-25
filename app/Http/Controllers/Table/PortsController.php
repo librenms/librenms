@@ -28,10 +28,10 @@ namespace App\Http\Controllers\Table;
 use App\Models\Port;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
-use LibreNMS\Util\Url;
 
 class PortsController extends TableController
 {
@@ -153,8 +153,8 @@ class PortsController extends TableController
 
         return [
             'status' => $status,
-            'device' => Url::deviceLink($port->device),
-            'port' => Url::portLink($port),
+            'device' => Blade::render('<x-device-link :device="$device" />', ['device' => $port->device]),
+            'port' => Blade::render('<x-port-link :port="$port"/>', ['port' => $port]),
             'secondsIfLastChange' => ceil($port->device?->uptime - ($port->ifLastChange / 100)),
             'ifConnectorPresent' => ($port->ifConnectorPresent == 'true') ? 'yes' : 'no',
             'ifSpeed' => $port->ifSpeed,
@@ -165,8 +165,8 @@ class PortsController extends TableController
             'ifOutUcastPkts_rate' => $port->ifOutUcastPkts_rate,
             'ifInErrors' => $port->ifInErrors,
             'ifOutErrors' => $port->ifOutErrors,
-            'ifInErrors_delta' => $port->poll_period ? Number::formatSi($port->ifInErrors_delta / $port->poll_period, 2, 3, 'EPS') : '',
-            'ifOutErrors_delta' => $port->poll_period ? Number::formatSi($port->ifOutErrors_delta / $port->poll_period, 2, 3, 'EPS') : '',
+            'ifInErrors_delta' => $port->poll_period ? Number::formatSi($port->ifInErrors_delta / $port->poll_period, 2, 0, 'EPS') : '',
+            'ifOutErrors_delta' => $port->poll_period ? Number::formatSi($port->ifOutErrors_delta / $port->poll_period, 2, 0, 'EPS') : '',
             'ifType' => Rewrite::normalizeIfType($port->ifType),
             'ifAlias' => htmlentities($port->ifAlias),
             'actions' => (string) view('port.actions', ['port' => $port]),

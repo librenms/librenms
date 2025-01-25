@@ -32,6 +32,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton('device-cache', function () {
             return new \LibreNMS\Cache\Device();
         });
+        $this->app->singleton('port-cache', function () {
+            return new \LibreNMS\Cache\Port();
+        });
         $this->app->singleton('git', function () {
             return new \LibreNMS\Util\Git();
         });
@@ -142,6 +145,7 @@ class AppServiceProvider extends ServiceProvider
     {
         \App\Models\Device::observe(\App\Observers\DeviceObserver::class);
         \App\Models\Package::observe(\App\Observers\PackageObserver::class);
+        \App\Models\Qos::observe(\App\Observers\QosObserver::class);
         \App\Models\Sensor::observe(\App\Observers\SensorObserver::class);
         \App\Models\Service::observe(\App\Observers\ServiceObserver::class);
         \App\Models\Stp::observe(\App\Observers\StpObserver::class);

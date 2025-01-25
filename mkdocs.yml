@@ -31,11 +31,13 @@ theme:
     - navigation.path
     - content.tabs.link
     - content.action.edit
+    - content.code.copy
 site_dir: out
 site_url: https://docs.librenms.org
 markdown_extensions:
   - tables
   - admonition
+  - pymdownx.snippets
   - pymdownx.tasklist
   - pymdownx.tilde
   - pymdownx.superfences
@@ -53,9 +55,9 @@ plugins:
       j2_variable_start_string: '@='
       j2_variable_end_string: '=@'
   - search
+  - include_dir_to_nav
   - exclude:
       glob:
-        - "General/Changelogs/*"
         - "Dockerfile"
   - redirects:
       redirect_maps:
@@ -140,7 +142,9 @@ nav:
   - General:
     - Home: index.md
     - Features: Support/Features.md
-    - Changelog: General/Changelog.md
+    - Changelog:
+      - Current Changelog: General/Changelog.md
+      - Historical: General/Changelogs
     - Welcome to Observium users: General/Welcome-to-Observium-users.md
     - 3rd Party Libraries: General/Acknowledgement.md
 
@@ -158,7 +162,9 @@ nav:
       - Migrating from Observium: Installation/Migrating-from-Observium.md
 
   - Setup:
-    - Applications: Extensions/Applications.md
+    - Application overview: Extensions/Applications.md
+      # Uses plugin include_dir_to_nav
+    - Applications: Extensions/Applications
     - Billing Module: Extensions/Billing-Module.md
     - Dashboards: Extensions/Dashboards.md
     - Interface Description Parsing: Extensions/Interface-Description-Parsing.md

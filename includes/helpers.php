@@ -68,18 +68,6 @@ if (! function_exists('array_pairs')) {
     }
 }
 
-/**
- * Cast string to int or float.
- * Returns 0 if string is not numeric
- *
- * @param  string  $number
- * @return float|int
- */
-function cast_number($number)
-{
-    return \LibreNMS\Util\Number::cast($number);
-}
-
 if (! function_exists('trans_fb')) {
     /**
      * Translate the given message with a fallback string if none exists.

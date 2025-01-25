@@ -36,6 +36,7 @@ use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Version;
 use Log;
+use Symfony\Component\Yaml\Yaml;
 
 class ConfigRepository
 {
@@ -52,8 +53,9 @@ class ConfigRepository
         $cache_ttl = config('librenms.config_cache_ttl');
         $this->config = Cache::driver($cache_ttl == 0 ? 'null' : 'file')->remember('librenms-config', $cache_ttl, function () {
             $this->config = [];
-            // merge all config sources together config_definitions.json > db config > config.php
+            // merge all config sources together config_definitions.json & os defs > db config > config.php
             $this->loadPreUserConfigDefaults();
+            $this->loadAllOsDefinitions();
             $this->loadDB();
             $this->loadUserConfigFile($this->config);
             $this->loadPostUserConfigDefaults();
@@ -155,16 +157,7 @@ class ConfigRepository
     public function getOsSetting($os, $key, $default = null): mixed
     {
         if ($os) {
-            \LibreNMS\Util\OS::loadDefinition($os);
-
-            if (isset($this->config['os'][$os][$key])) {
-                return $this->config['os'][$os][$key];
-            }
-
-            $os_key = "os.$os.$key";
-            if ($this->has($os_key)) {
-                return $this->get($os_key);
-            }
+            return $this->get("os.$os.$key", $default);
         }
 
         return $default;
@@ -184,23 +177,19 @@ class ConfigRepository
     public function getCombined(?string $os, string $key, string $global_prefix = '', array $default = []): array
     {
         $global_key = $global_prefix . $key;
+        $os_key = "os.$os.$key";
 
-        if (! isset($this->config['os'][$os][$key])) {
-            if (! Str::contains($global_key, '.')) {
-                return (array) $this->get($global_key, $default);
-            }
-            if (! $this->has("os.$os.$key")) {
-                return (array) $this->get($global_key, $default);
-            }
+        if (! $this->has($os_key)) {
+            return (array) $this->get($global_key, $default);
         }
 
-        if (! $this->has("os.$os.$key")) {
-            return (array) $this->get($global_key, $default);
+        if (! $this->has($global_key)) {
+            return (array) $this->getOsSetting($os, $key, $default);
         }
 
         return array_unique(array_merge(
             (array) $this->get($global_key),
-            (array) $this->getOsSetting($os, $key)
+            (array) $this->get($os_key)
         ));
     }
 
@@ -560,7 +549,9 @@ class ConfigRepository
         $this->set('time.twelvehour', $now - 43200); // time() - (12 * 60 * 60);
         $this->set('time.day', $now - 86400); // time() - (24 * 60 * 60);
         $this->set('time.twoday', $now - 172800); // time() - (2 * 24 * 60 * 60);
+        $this->set('time.threeday', $now - 259200); // time() - (3 * 24 * 60 * 60);
         $this->set('time.week', $now - 604800); // time() - (7 * 24 * 60 * 60);
+        $this->set('time.tenday', $now - 864000); // time() - (10 * 24 * 60 * 60);
         $this->set('time.twoweek', $now - 1209600); // time() - (2 * 7 * 24 * 60 * 60);
         $this->set('time.month', $now - 2678400); // time() - (31 * 24 * 60 * 60);
         $this->set('time.twomonth', $now - 5356800); // time() - (2 * 31 * 24 * 60 * 60);
@@ -584,5 +575,20 @@ class ConfigRepository
         $this->set('db_pass', config("database.connections.$db.password"));
         $this->set('db_port', config("database.connections.$db.port", 3306));
         $this->set('db_socket', config("database.connections.$db.unix_socket"));
+    }
+
+    /**
+     * Load all OS settings from yaml or cache
+     */
+    private function loadAllOsDefinitions(): void
+    {
+        $os_list = glob($this->get('install_dir') . '/includes/definitions/*.yaml');
+
+        foreach ($os_list as $yaml_file) {
+            $os = basename($yaml_file, '.yaml');
+            $os_def = Yaml::parse(file_get_contents($yaml_file));
+
+            $this->set("os.$os", $os_def);
+        }
     }
 }

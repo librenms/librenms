@@ -7,4 +7,5 @@ RUN \
     'mkdocs-exclude' \
     'mkdocs-git-revision-date-localized-plugin' \
     'mkdocs-macros-plugin' \
+    'mkdocs-include-dir-to-nav' \
   && rm -rf /tmp/*

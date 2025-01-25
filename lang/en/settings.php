@@ -32,6 +32,7 @@ return [
             'ldap' => ['name' => 'LDAP Settings'],
             'radius' => ['name' => 'Radius Settings'],
             'socialite' => ['name' => 'Socialite Settings'],
+            'http' => ['name' => 'HTTP Auth Settings'],
         ],
         'authorization' => [
             'device-group' => ['name' => 'Device Group Settings'],
@@ -454,6 +455,10 @@ return [
             'description' => 'Use full user DN',
             'help' => "Uses a user's full DN as the value of the member attribute in a group instead of member: username using the prefix and suffix. (it's member: uid=username,ou=groups,dc=domain,dc=com)",
         ],
+        'auth_ldap_userlist_filter' => [
+            'description' => 'Custom LDAP User filter',
+            'help' => 'Custom ldap filter to limit the number of responses if you have an ldap directory with thousand of users',
+        ],
         'auth_ldap_wildcard_ou' => [
             'description' => 'Wildcard user OU',
             'help' => 'Search for user matching user name independently of OU set in user suffix. Useful if your users are in different OU. Bind username, if set, still user suffix',
@@ -606,9 +611,6 @@ return [
             'bgp-peers' => [
                 'description' => 'BGP Peers',
             ],
-            'cisco-cbqos' => [
-                'description' => 'Cisco CBQOS',
-            ],
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
             ],
@@ -686,6 +688,10 @@ return [
             ],
             'processors' => [
                 'description' => 'Processors',
+            ],
+
+            'qos' => [
+                'description' => 'QoS',
             ],
 
             'route' => [
@@ -957,6 +963,10 @@ return [
             'description' => 'Field name containing username',
             'help' => 'Can be a ENV or HTTP-header field like REMOTE_USER, PHP_AUTH_USER or a custom variant',
         ],
+        'http_auth_guest' => [
+            'description' => 'Http Auth guest user',
+            'help' => 'If set, allows all http users to authenticate and assigns unknown users to give local username',
+        ],
         'http_proxy' => [
             'description' => 'HTTP Proxy',
             'help' => 'Set this as a fallback if http_proxy environment variable is not available.',
@@ -1073,9 +1083,29 @@ return [
                 'description' => 'Debug',
                 'help' => 'To enable or disable verbose output to CLI',
             ],
+            'log_file' => [
+                'description' => 'Log file',
+                'help' => 'Define another log file if wanted for the debug',
+            ],
             'groups-exclude' => [
                 'description' => 'Excluded device groups',
                 'help' => 'Device groups excluded from sending data to InfluxDBv2',
+            ],
+            'timeout' => [
+                'description' => 'Timeout',
+                'help' => 'Timeout in seconds',
+            ],
+            'verify' => [
+                'description' => 'Verify',
+                'help' => 'Verify the certificate',
+            ],
+            'batch_size' => [
+                'description' => 'Batch size',
+                'help' => 'How many metrics should be bundled before sending',
+            ],
+            'max_retry' => [
+                'description' => 'Max retry',
+                'help' => 'How many reties we should try',
             ],
         ],
         'ipmitool' => [
@@ -1279,6 +1309,9 @@ return [
             'ipmi' => [
                 'description' => 'IPMI',
             ],
+            'qos' => [
+                'description' => 'QoS',
+            ],
             'sensors' => [
                 'description' => 'Sensors',
             ],
@@ -1350,12 +1383,6 @@ return [
             ],
             'cisco-asa-firewall' => [
                 'description' => 'Cisco ASA Firewall',
-            ],
-            'cisco-voice' => [
-                'description' => 'Cisco Voice',
-            ],
-            'cisco-cbqos' => [
-                'description' => 'Cisco CBQOS',
             ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',

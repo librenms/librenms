@@ -156,11 +156,33 @@
                    window.location.href = 'device/device=' + edge_port_map[edge_id].device_id + '/tab=port/port=' + edge_port_map[edge_id].port_id + '/';
                 }
             });
+
+            network.on('showPopup', function (itemId) {
+                let item = null;
+                if(isNaN(itemId)) {
+                    // Edges and special nodes are non-numeric
+                    item = network_edges.get(itemId);
+                } else {
+                    // Nodes are normally numeric
+                    item = network_nodes.get(itemId);
+                }
+                if (item && item.title) {
+                    for (let img of item.title.getElementsByClassName('graph-image')) {
+                        if(img.src.includes('&refreshnum=')) {
+                            let regex = /&refreshnum=\d+/;
+                            img.src = img.src.replace(regex, "&refreshnum=" + Countdown.refreshNum.toString());
+                        } else {
+                            img.src += "&refreshnum=" + Countdown.refreshNum.toString();
+                        }
+                    }
+                }
+            });
         }
     }
 
     $(document).ready(function () {
         Countdown = {
+            refreshNum: 0,
             sec: {{$page_refresh}},
 
             Start: function () {
@@ -170,6 +192,7 @@
                     if (cur.sec <= 0) {
                         refreshMap();
                         cur.sec = {{$page_refresh}};
+                        cur.refreshNum++;
                     }
                 }, 1000);
             },
