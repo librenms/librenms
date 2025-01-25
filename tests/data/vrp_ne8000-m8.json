@@ -13214,37 +13214,24 @@
         "discovery": {
             "storage": [
                 {
-                    "storage_mib": "vrp",
+                    "type": "vrp",
                     "storage_index": "1",
-                    "storage_type": "dsk",
+                    "storage_type": "cfCard",
                     "storage_descr": "cfcard:",
                     "storage_size": 3646947328,
+                    "storage_size_oid": null,
                     "storage_units": 1024,
                     "storage_used": 1350004736,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": null,
+                    "storage_free": 2296942592,
+                    "storage_free_oid": ".1.3.6.1.4.1.2011.6.9.1.4.2.1.4.1",
+                    "storage_perc": 37,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 }
             ]
         },
-        "poller": {
-            "storage": [
-                {
-                    "storage_mib": "vrp",
-                    "storage_index": "1",
-                    "storage_type": "dsk",
-                    "storage_descr": "cfcard:",
-                    "storage_size": 3646947328,
-                    "storage_units": 1024,
-                    "storage_used": 1350004736,
-                    "storage_free": 2296942592,
-                    "storage_perc": 37,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "stp": {
         "discovery": {

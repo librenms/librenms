@@ -180,18 +180,6 @@ function get_port_by_id($port_id)
     }
 }
 
-function get_device_id_by_port_id($port_id)
-{
-    if (is_numeric($port_id)) {
-        $device_id = dbFetchCell('SELECT `device_id` FROM `ports` WHERE `port_id` = ?', [$port_id]);
-        if (is_numeric($device_id)) {
-            return $device_id;
-        } else {
-            return false;
-        }
-    }
-}
-
 function ifclass($ifOperStatus, $ifAdminStatus)
 {
     // fake a port model
@@ -213,21 +201,6 @@ function device_by_id_cache($device_id, $refresh = false)
     $device['lng'] = $model->location->lng ?? null;
 
     return $device;
-}
-
-function truncate($substring, $max = 50, $rep = '...')
-{
-    if (strlen($substring) < 1) {
-        $string = $rep;
-    } else {
-        $string = $substring;
-    }
-    $leave = $max - strlen($rep);
-    if (strlen($string) > $max) {
-        return substr_replace($string, $rep, $leave);
-    } else {
-        return $string;
-    }
 }
 
 function gethostbyid($device_id)

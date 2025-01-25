@@ -320,51 +320,6 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
 
 //end discover_link()
 
-function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, $units, $used = null)
-{
-    if (ignore_storage($device['os'], $descr)) {
-        return;
-    }
-    Log::debug("Discover Storage: $index, $type, $mib, $descr, $size, $units, $used\n");
-
-    if ($descr && $size > '0') {
-        $storage = dbFetchRow('SELECT * FROM `storage` WHERE `storage_index` = ? AND `device_id` = ? AND `storage_mib` = ?', [$index, $device['device_id'], $mib]);
-        if (empty($storage)) {
-            if (Config::getOsSetting($device['os'], 'storage_perc_warn')) {
-                $perc_warn = Config::getOsSetting($device['os'], 'storage_perc_warn');
-            } else {
-                $perc_warn = Config::get('storage_perc_warn', 60);
-            }
-
-            dbInsert(
-                [
-                    'device_id' => $device['device_id'],
-                    'storage_descr' => $descr,
-                    'storage_index' => $index,
-                    'storage_mib' => $mib,
-                    'storage_type' => $type,
-                    'storage_units' => $units,
-                    'storage_size' => $size,
-                    'storage_used' => $used,
-                    'storage_perc_warn' => $perc_warn,
-                ],
-                'storage'
-            );
-
-            echo '+';
-        } else {
-            $updated = dbUpdate(['storage_descr' => $descr, 'storage_type' => $type, 'storage_units' => $units, 'storage_size' => $size], 'storage', '`device_id` = ? AND `storage_index` = ? AND `storage_mib` = ?', [$device['device_id'], $index, $mib]);
-            if ($updated) {
-                echo 'U';
-            } else {
-                echo '.';
-            }
-        }//end if
-
-        $valid[$mib][$index] = 1;
-    }//end if
-}
-
 function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen, $ipv6_origin, $context_name = '')
 {
     global $device;
@@ -587,42 +542,6 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
     }
 
     return 10;
-}
-
-/**
- * Should we ignore this storage device based on teh description? (usually the mount path or drive)
- *
- * @param  string  $os  The OS of the device
- * @param  string  $descr  The description of the storage
- * @return bool
- */
-function ignore_storage($os, $descr)
-{
-    foreach (Config::getCombined($os, 'ignore_mount') as $im) {
-        if ($im == $descr) {
-            Log::debug("ignored $descr (matched: $im)\n");
-
-            return true;
-        }
-    }
-
-    foreach (Config::getCombined($os, 'ignore_mount_string') as $ims) {
-        if (Str::contains($descr, $ims)) {
-            Log::debug("ignored $descr (matched: $ims)\n");
-
-            return true;
-        }
-    }
-
-    foreach (Config::getCombined($os, 'ignore_mount_regexp') as $imr) {
-        if (preg_match($imr, $descr)) {
-            Log::debug("ignored $descr (matched: $imr)\n");
-
-            return true;
-        }
-    }
-
-    return false;
 }
 
 /**

@@ -107,7 +107,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
         $entry_mac = $entry['mac_address'];
         $entry_if = $entry['port_id'];
         $entry_ip = $entry['ipv4_address'];
-        if ($arp_table[$entry_if][$entry_ip] != $entry_mac) {
+        if (empty($arp_table[$entry_if][$entry_ip]) || $arp_table[$entry_if][$entry_ip] != $entry_mac) {
             dbDelete('ipv4_mac', '`port_id` = ? AND `mac_address`=? AND `ipv4_address`=? AND `context_name`=?', [$entry_if, $entry_mac, $entry_ip, $context_name]);
             d_echo(null, '-');
         }
