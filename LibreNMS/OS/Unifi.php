@@ -36,6 +36,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessCcqPolling;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Unifi extends OS implements
     ProcessorDiscovery,
@@ -56,15 +57,19 @@ class Unifi extends OS implements
     public function discoverOS(Device $device): void
     {
         // try the Unifi MIB first, then fall back to dot11manufacturer
-        if ($data = snmp_getnext_multi($this->getDeviceArray(), ['unifiApSystemModel', 'unifiApSystemVersion'], '-OQUs', 'UBNT-UniFi-MIB')) {
-            $device->hardware = $data['unifiApSystemModel'] ?? $device->hardware;
-            $device->version = $data['unifiApSystemVersion'] ?? $device->version;
-        } elseif ($data = snmp_getnext_multi($this->getDeviceArray(), ['dot11manufacturerProductName', 'dot11manufacturerProductVersion'], '-OQUs', 'IEEE802dot11-MIB')) {
-            $device->hardware = $data['dot11manufacturerProductName'] ?? $device->hardware;
-            if (preg_match('/(v[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/', $data['dot11manufacturerProductVersion'], $matches)) {
-                $device->version = $matches[1];
-            }
+        $response = SnmpQuery::next(['UBNT-UniFi-MIB::unifiApSystemModel', 'UBNT-UniFi-MIB::unifiApSystemVersion']);
+        if ($response->isValid()) {
+            $device->hardware = $response->value('UBNT-UniFi-MIB::unifiApSystemModel') ?: null;
+            $device->version = $response->value('UBNT-UniFi-MIB::unifiApSystemVersion') ?: null;
+
+            return;
         }
+
+        $response = SnmpQuery::next(['IEEE802dot11-MIB::dot11manufacturerProductName', 'IEEE802dot11-MIB::dot11manufacturerProductVersion']);
+
+        $device->hardware = $response->value('IEEE802dot11-MIB::dot11manufacturerProductName') ?: null;
+        preg_match('/(v[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/', $response->value('IEEE802dot11-MIB::dot11manufacturerProductVersion'), $matches);
+        $device->version = $matches[1] ?? null;
     }
 
     /**
