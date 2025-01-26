@@ -34,8 +34,6 @@ if (is_numeric($state)) {
         'snmp',
         0
     );
-    //Create Sensor To State Index
-    create_sensor_to_state_index($device, $state_name, $sensor_index);
 }
 
 $state = snmp_get($device, 'hrPrinterDetectedErrorState.1', '-Ovqe', 'HOST-RESOURCES-MIB');
@@ -101,7 +99,4 @@ if ($state) {
         'snmp',
         0
     );
-
-    //Create Sensor To State Index
-    create_sensor_to_state_index($device, $state_name, $sensor_index);
 }

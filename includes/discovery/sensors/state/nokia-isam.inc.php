@@ -35,8 +35,6 @@ foreach ($snmp_data['nokiaIsamEqpBoardTable'] as $index => $data) {
 
         //Discover Sensors
         discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current);
-        //Create Sensor To State Index
-        create_sensor_to_state_index($device, $state_name, $index);
     }
 }
 

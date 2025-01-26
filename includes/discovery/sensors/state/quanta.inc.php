@@ -41,7 +41,6 @@ foreach ($tables as $tablevalue) {
             $oid_for_entry = $tablevalue[5] . '.' . $index;
 
             discover_sensor(null, 'state', $device, $oid_for_entry, $index, $state_name, $descr, 1, 1, null, null, null, null, $entry[$cur_oid], 'snmp');
-            create_sensor_to_state_index($device, $state_name, $index);
         }
     }
 }

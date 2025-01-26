@@ -431,11 +431,6 @@ function create_state_index($state_name, $states = []): void
     }, $states));
 }
 
-function create_sensor_to_state_index($device, $state_name, $index)
-{
-    // no op
-}
-
 function delta_to_bits($delta, $period)
 {
     return round($delta * 8 / $period, 2);

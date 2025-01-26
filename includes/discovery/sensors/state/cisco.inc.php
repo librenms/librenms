@@ -226,9 +226,6 @@ foreach ($tables as $tablevalue) {
                     $descr = $tablevalue['descr'] . $repsegmentnumber;
                 }
                 discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, trim($descr), 1, 1, null, null, null, null, $entry[$state_name], 'snmp', $index, null, null, $state_group);
-
-                //Create Sensor To State Index
-                create_sensor_to_state_index($device, $state_name, $index);
             }
         }
     }
