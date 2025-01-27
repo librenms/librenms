@@ -93,7 +93,7 @@ class SmOs extends OS implements
             'rate',
             $this->getDeviceId(),
             '.1.3.6.1.4.1.3373.1103.15.4.1.17.1',
-            'alfo80hd-tx-rate',
+            'alfo80hdx-tx-rate',
             1,
             'Tx Rate',
             null,
@@ -105,7 +105,7 @@ class SmOs extends OS implements
             'rate',
             $this->getDeviceId(),
             '.1.3.6.1.4.1.3373.1103.15.4.1.18.1',
-            'alfo80hd-rx-rate',
+            'alfo80hdx-rx-rate',
             2,
             'Rx Rate',
             null,
@@ -123,7 +123,7 @@ class SmOs extends OS implements
             'rssi',
             $this->getDeviceId(),
             '.1.3.6.1.4.1.3373.1103.39.2.1.12.1',
-            'alfo80hd-rx',
+            'alfo80hdx-rx',
             1,
             'RSSI'
         );
@@ -160,7 +160,7 @@ class SmOs extends OS implements
 
         $oid = '.1.3.6.1.4.1.3373.1103.39.2.1.13.1';
 
-        $sensors[] =         new WirelessSensor('power', $this->getDeviceId(), $oid, 'alfo80hd-tx', 1, 'Tx Power');
+        $sensors[] = new WirelessSensor('power', $this->getDeviceId(), $oid, 'alfo80hd-tx', 1, 'Tx Power');
         return $sensors;
     }
 
@@ -187,7 +187,7 @@ class SmOs extends OS implements
             'frequency',
             $this->getDeviceId(),
             '.1.3.6.1.4.1.3373.1103.39.2.1.2.1',
-            'alfo80hd-tx-freq',
+            'alfo80hdx-tx-freq',
             1,
             'Tx Frequency',
             null,
