@@ -198,18 +198,20 @@ Output:
 
 ### `list_ip_addresses`
 
-List all IPv4 and IPv6 addresses.
+List all IPv4 and IPv6 or only version specific addresses.
 
-Route: `/api/v0/resources/ip/addresses`
+Route: `/api/v0/resources/ip/addresses/:address_family`
 
 Input:
 
--
+- address_family: optional ipv4 or ipv6 for ip version specific list.
 
 Example:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/addresses
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/addresses/ipv4
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/addresses/ipv6
 ```
 
 Output:
@@ -229,82 +231,6 @@ Output:
         ...
     ],
     "count": 55
-}
-
-```
-
-### `list_ipv4_addresses`
-
-List all IPv4 addresses.
-
-Route: `/api/v0/resources/ipv4/addresses`
-
-Input:
-
--
-
-Example:
-
-```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ipv4/addresses
-```
-
-Output:
-
-```json
-{
-    "status": "ok",
-    "ipv4_addresses": [
-        {
-            "ipv4_address_id": "69",
-            "ipv4_address": "127.0.0.1",
-            "ipv4_prefixlen": "8",
-            "ipv4_network_id": "55",
-            "port_id": "135",
-            "context_name": ""
-        },
-        ...
-    ],
-    "count": 55
-}
-
-```
-
-### `list_ipv6_addresses`
-
-List all IPv6 addresses.
-
-Route: `/api/v0/resources/ipv6/addresses`
-
-Input:
-
--
-
-Example:
-
-```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ipv6/addresses
-```
-
-Output:
-
-```json
-{
-    "status": "ok",
-    "ipv6_addresses": [
-        {
-           "ipv6_address_id": 48966,
-           "ipv6_address": "1234:0000:1c00:aaaa:bbbb:0000:0000:0001",
-           "ipv6_compressed": "1234:0:1c00:aaaa:bbbb::1",
-           "ipv6_prefixlen": 127,
-           "ipv6_origin": "stateful",
-           "ipv6_network_id": "70361",
-           "port_id": 38681726,
-           "context_name": ""
-        },
-        ...
-    ],
-    "count": 8080
 }
 
 ```
@@ -348,18 +274,20 @@ Output:
 
 ### `list_ip_networks`
 
-List all IPv4 and IPv6 networks.
+List all IPv4 and IPv6 or only version specific networks.
 
-Route: `/api/v0/resources/ip/networks`
+Route: `/api/v0/resources/ip/networks/:address_family`
 
 Input:
 
--
+- address_family: optional ipv4 or ipv6 for ip version specific list.
 
 Example:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/networks
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/networks/ipv4
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/networks/ipv6
 ```
 
 Output:
@@ -376,72 +304,6 @@ Output:
         ...
     ],
     "count": 100
-}
-```
-
-### `list_ipv4_networks`
-
-List all IPv4 networks.
-
-Route: `/api/v0/resources/ipv4/networks`
-
-Input:
-
--
-
-Example:
-
-```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ipv4/networks
-```
-
-Output:
-
-```json
-{
-    "status": "ok",
-    "ipv4_networks": [
-        {
-            "ipv4_network_id": "1",
-            "ipv4_network": "127.0.0.0/8",
-            "context_name": ""
-        },
-        ...
-    ],
-    "count": 100
-}
-```
-
-### `list_ipv6_networks`
-
-List all IPv6 networks.
-
-Route: `/api/v0/resources/ipv6/networks`
-
-Input:
-
--
-
-Example:
-
-```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ipv6/networks
-```
-
-Output:
-
-```json
-{
-    "status": "ok",
-    "ipv6_networks": [
-        {
-            "ipv6_network_id": "1014",
-            "ipv6_network": "1234:0:1:1:0:0:1:8f/127",
-            "context_name": ""
-        },
-        ...
-    ],
-    "count": 96447
 }
 ```
 

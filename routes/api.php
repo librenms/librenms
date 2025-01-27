@@ -40,13 +40,9 @@ Route::prefix('v0')->namespace('\App\Api\Controllers')->group(function () {
         Route::prefix('resources')->group(function () {
             Route::get('links/{id}', 'LegacyApiController@get_link')->name('get_link');
             Route::get('locations', 'LegacyApiController@list_locations')->name('list_locations');
-            Route::get('ip/addresses', 'LegacyApiController@list_ip_addresses')->name('list_ip_addresses');
-            Route::get('ipv4/addresses', 'LegacyApiController@list_ipv4_addresses')->name('list_ipv4_addresses');
-            Route::get('ipv6/addresses', 'LegacyApiController@list_ipv6_addresses')->name('list_ipv6_addresses');
+            Route::get('ip/addresses/{address_family?}', 'LegacyApiController@list_ip_addresses')->name('list_ip_addresses');
             Route::get('ip/arp/{query}/{cidr?}', 'LegacyApiController@list_arp')->name('list_arp');
-            Route::get('ip/networks', 'LegacyApiController@list_ip_networks')->name('list_ip_networks');
-            Route::get('ipv4/networks', 'LegacyApiController@list_ipv4_networks')->name('list_ipv4_networks');
-            Route::get('ipv6/networks', 'LegacyApiController@list_ipv6_networks')->name('list_ipv6_networks');
+            Route::get('ip/networks/{address_family?}', 'LegacyApiController@list_ip_networks')->name('list_ip_networks');
             Route::get('ip/networks/{id}/ip', 'LegacyApiController@get_network_ip_addresses')->name('get_network_ip_addresses');
         });
 
