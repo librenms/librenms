@@ -10,6 +10,8 @@
  * the source code distribution for details.
  */
 
+use App\Models\Eventlog;
+
 $role_data = SnmpQuery::walk('CISCO-STACKWISE-MIB::cswSwitchRole')->values();
 $redundant_data = SnmpQuery::enumStrings()->get('CISCO-STACKWISE-MIB::cswRingRedundant.0')->value();
 $entPhysName = SnmpQuery::get('ENTITY-MIB::entPhysicalName.1')->value();
@@ -201,7 +203,7 @@ foreach ($tables as $tablevalue) {
         foreach ($temp as $index => $entry) {
             $state_group = null;
             if ($state_name == 'ciscoEnvMonTemperatureState' && (empty($entry[$tablevalue['descr']]))) {
-                d_echo('Invalid sensor, skipping..');
+                Eventlog::debug('Invalid sensor, skipping..');
             } else {
                 //Discover Sensors
                 $descr = ucwords($entry[$tablevalue['descr']] ?? 'State');

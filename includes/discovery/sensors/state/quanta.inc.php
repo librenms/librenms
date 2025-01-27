@@ -10,7 +10,9 @@
  * the source code distribution for details.
  */
 
-d_echo('Quanta Chassis Power Supply state');
+use App\Models\Eventlog;
+
+Eventlog::debug('Quanta Chassis Power Supply state');
 
 $tables = [
     ['powerSupplyTable', 'boxServicesPowSupplyItemState', 'quantaPowerSupplyStatus', 'Power Supply ', 'NETGEAR-BOXSERVICES-PRIVATE-MIB', '.1.3.6.1.4.1.4413.1.1.43.1.7.1.3'],

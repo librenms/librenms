@@ -22,8 +22,11 @@
  * @copyright  2018 TheGreatDoc
  * @author     TheGreatDoc
  */
+
+use App\Models\Eventlog;
+
 $oids = snmp_walk($device, 'oaPumpTable', '-Osq', 'NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB');
-d_echo($oids . "\n");
+Eventlog::log($oids . "\n");
 
 if ($oids) {
     echo 'GW EYDFA PUMP ';
@@ -80,7 +83,7 @@ foreach (explode("\n", $oids) as $data) {
 }
 
 $oids = trim(snmp_walk($device, 'oaDCPowerTable', '-Osq', 'NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB'));
-d_echo($oids . "\n");
+Eventlog::log($oids . "\n");
 
 if ($oids) {
     echo 'GW EYDFA DC POWER ';

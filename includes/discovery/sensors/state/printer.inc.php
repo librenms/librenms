@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Eventlog;
+
 echo 'Printer Status and Error State ';
 $state = snmp_get($device, 'hrDeviceStatus.1', '-Ovqe', 'HOST-RESOURCES-MIB');
 if (is_numeric($state)) {
@@ -79,7 +81,7 @@ if ($state) {
     $state_name = 'hrPrinterDetectedErrorState';
     create_state_index($state_name, $printer_states);
 
-    d_echo('Printer error state: ' . $state_name . ': ' . $state);
+    Eventlogg::debug('Printer error state: ' . $state_name . ': ' . $state);
     $sensor_index = 0;
     discover_sensor(
         null,
