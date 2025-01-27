@@ -93,7 +93,7 @@ function bill_permitted($bill_id)
 function port_permitted($port_id, $device_id = null)
 {
     if (! is_numeric($device_id)) {
-        $device_id = PortCache::get($port_id)?->device_id;
+        $device_id = PortCache::get((int) $port_id)?->device_id;
     }
 
     if (device_permitted($device_id)) {
