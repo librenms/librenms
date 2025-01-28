@@ -2171,21 +2171,24 @@ storage:
   Columns:
     - { Field: storage_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: storage_mib, Type: varchar(16), 'Null': false, Extra: '' }
+    - { Field: type, Type: varchar(16), 'Null': false, Extra: '' }
     - { Field: storage_index, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: storage_type, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: storage_descr, Type: text, 'Null': false, Extra: '' }
     - { Field: storage_size, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: storage_size_oid, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: storage_units, Type: int, 'Null': false, Extra: '' }
     - { Field: storage_used, Type: bigint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: storage_used_oid, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: storage_free, Type: bigint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: storage_free_oid, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: storage_perc, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: storage_perc_oid, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: storage_perc_warn, Type: int, 'Null': true, Extra: '', Default: '60' }
-    - { Field: storage_deleted, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [storage_id], Unique: true, Type: BTREE }
     storage_device_id_index: { Name: storage_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
-    storage_device_id_storage_mib_storage_index_unique: { Name: storage_device_id_storage_mib_storage_index_unique, Columns: [device_id, storage_mib, storage_index], Unique: true, Type: BTREE }
+    storage_device_id_storage_mib_storage_index_unique: { Name: storage_device_id_storage_mib_storage_index_unique, Columns: [device_id, type, storage_index], Unique: true, Type: BTREE }
 stp:
   Columns:
     - { Field: stp_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

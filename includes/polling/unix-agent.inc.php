@@ -202,10 +202,10 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
             DeviceCache::getPrimary()->serial = $agent_data['dmi']['system-serial-number'];
         }
         DeviceCache::getPrimary()->save();
-
-        // store results in array cache
-        Cache::driver('array')->put('agent_data', $agent_data);
     }
+
+    // store results in array cache
+    Cache::driver('array')->put('agent_data', $agent_data);
 
     if (! empty($agent_sensors)) {
         echo 'Sensors: ';

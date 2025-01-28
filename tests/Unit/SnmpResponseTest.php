@@ -38,12 +38,6 @@ class SnmpResponseTest extends TestCase
         $this->assertTrue($response->isValid());
         $this->assertEquals(['IF-MIB::ifDescr[1]' => 'lo', 'IF-MIB::ifDescr[2]' => 'enp4s0'], $response->values());
         $this->assertEquals('lo', $response->value());
-        $this->assertEquals('lo', $response->value('IF-MIB::ifDescr[1]'));
-        $this->assertEquals('enp4s0', $response->value('IF-MIB::ifDescr[2]'));
-        $this->assertEquals('enp4s0', $response->value('IF-MIB::ifDescr.2'));
-        $this->assertEquals('lo', $response->value(['IF-MIB::ifDescr[1]', 'IF-MIB::ifDescr[2]']));
-        $this->assertEquals('enp4s0', $response->value(['IF-MIB::ifName[2]', 'IF-MIB::ifDescr[2]', 'IF-MIB::ifDescr[1]']));
-        $this->assertEquals('lo', $response->value(['IF-MIB::ifDescr.1', 'IF-MIB::ifDescr.2']));
         $this->assertEquals(['IF-MIB::ifDescr' => [1 => 'lo', 2 => 'enp4s0']], $response->table());
         $this->assertEquals([1 => ['IF-MIB::ifDescr' => 'lo'], 2 => ['IF-MIB::ifDescr' => 'enp4s0']], $response->table(1));
 
@@ -85,8 +79,35 @@ class SnmpResponseTest extends TestCase
         ]], $response->table());
     }
 
+    public function testValueFetching(): void
+    {
+        $response = new SnmpResponse("IF-MIB::ifDescr[1] = lo\nIF-MIB::ifDescr[2] = enp4s0\nIF-MIB::ifAlias[1] = alias one\nIF-MIB::ifAlias[2] = alias two\n\n");
+
+        $this->assertEquals('lo', $response->value());
+        $this->assertEquals('lo', $response->value('IF-MIB::ifDescr[1]'));
+        $this->assertEquals('enp4s0', $response->value('IF-MIB::ifDescr[2]'));
+        $this->assertEquals('enp4s0', $response->value('IF-MIB::ifDescr.2'));
+        $this->assertEquals('lo', $response->value(['IF-MIB::ifDescr[1]', 'IF-MIB::ifDescr[2]']));
+        $this->assertEquals('enp4s0', $response->value(['IF-MIB::ifName[2]', 'IF-MIB::ifDescr[2]', 'IF-MIB::ifDescr[1]']));
+        $this->assertEquals('lo', $response->value(['IF-MIB::ifDescr.1', 'IF-MIB::ifDescr.2']));
+
+        $this->assertEquals('lo', $response->value('IF-MIB::ifDescr'));
+        $this->assertEquals('alias one', $response->value('IF-MIB::ifAlias'));
+        $this->assertEquals('', $response->value('ifAlias'));
+        $this->assertEquals('', $response->value('IF-MIB:'));
+        $this->assertEquals('', $response->value('IF-MIB::ifA'));
+
+        $response = new SnmpResponse("ifName.1 = lo\nifAlias.3 = cust42\nifAlias.4 = cust51\n\n");
+        $this->assertEquals('lo', $response->value('ifName'));
+        $this->assertEquals('lo', $response->value('ifName'));
+        $this->assertEquals('cust42', $response->value('ifAlias'));
+        $this->assertEquals('cust51', $response->value('ifAlias.4'));
+        $this->assertEquals(null, $response->value('ifAlias[4]'));
+    }
+
     public function testEmptyValues(): void
     {
+        // empty values
         $response = new SnmpResponse("IF-MIB::ifAlias[1] = \nIF-MIB::ifAlias[2] = 0\nIF-MIB::ifAlias[3] = \"\"\n\n");
         $this->assertTrue($response->isValid());
         $this->assertEquals('', $response->value());
