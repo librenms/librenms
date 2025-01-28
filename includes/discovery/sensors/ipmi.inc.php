@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use Illuminate\Support\Facades\Log;
 
 // IPMI - We can discover this on poll!
 if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
@@ -21,16 +22,23 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     }
 
     foreach (Config::get('ipmi.type', []) as $ipmi_type) {
-        $results = explode(PHP_EOL, external_exec(array_merge($cmd, ['-I', $ipmi_type, 'sensor'])));
 
-        $results = array_values(array_filter($results, function ($line) {
-            return ! Str::contains($line, 'discrete');
-        }));
+        // Check if the IPMI type is available, catch segfaults of ipmitool/freeipmi.
+        try {
+            Log::debug('Trying IPMI type: '.$ipmi_type);
+            $results = explode(PHP_EOL, external_exec(array_merge($cmd, ['-I', $ipmi_type, 'sensor'])));
 
-        if (! empty($results)) {
-            set_dev_attrib($device, 'ipmi_type', $ipmi_type);
-            echo "$ipmi_type ";
-            break;
+            $results = array_values(array_filter($results, function ($line) {
+                return ! Str::contains($line, 'discrete');
+            }));
+
+            if (! empty($results)) {
+                set_dev_attrib($device, 'ipmi_type', $ipmi_type);
+                echo "$ipmi_type ";
+                break;
+            }
+        } catch (\Exception $e) {
+            Log::error('IPMI Discovery error occurred: '.$e->getMessage());
         }
     }
 
