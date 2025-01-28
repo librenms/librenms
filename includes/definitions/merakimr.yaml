@@ -9,4 +9,4 @@ bad_uptime: true
 discovery:
     -
         sysDescr_regex:
-            - '/^Meraki MR/'
+            - '/^=?Meraki MR/'
