@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('ports', function (Blueprint $table) {
-            $table->dropUnique(['device_id', 'ifIndex']); 
+            $table->dropUnique(['device_id', 'ifIndex']);
         });
     }
 
