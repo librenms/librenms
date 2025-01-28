@@ -2,7 +2,7 @@
 
 Macros are shorthands to either portion of rules or pure SQL enhanced with placeholders.
 
-Macros can be defined through the `lnms` command.  Using is   `config.php` is discouraged but supported. A macro can either be truthful (boolean test) or return a value (integer, float, string) that can be used in the rule.
+Macros can be defined through the `lnms` command. Using the `config.php` is discouraged but supported. A macro can either be truthful (boolean test) or return a value (integer, float, string) that can be used in the rule.
 
 Example for adding a a macro that returns the delta of a sensor:
 
