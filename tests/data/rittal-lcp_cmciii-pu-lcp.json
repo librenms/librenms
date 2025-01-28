@@ -2448,7 +2448,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
-                    "ifIndex": null
+                    "ifIndex": 2
                 },
                 {
                     "entPhysicalIndex": 1001,
@@ -2809,7 +2809,7 @@
                     "entPhysicalContainedIn": 6,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
-                    "ifIndex": null
+                    "ifIndex": 4
                 },
                 {
                     "entPhysicalIndex": 3001,
@@ -3645,7 +3645,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
-                    "ifIndex": null
+                    "ifIndex": 2
                 },
                 {
                     "entPhysicalIndex": 101001,
@@ -3759,7 +3759,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
-                    "ifIndex": null
+                    "ifIndex": 2
                 },
                 {
                     "entPhysicalIndex": 201001,

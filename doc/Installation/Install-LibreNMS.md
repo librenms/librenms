@@ -74,7 +74,7 @@ Connect to the server command line and follow the instructions below.
 === "Debian 12"
     === "NGINX"
         ```
-        apt install apt-transport-https lsb-release ca-certificates wget acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-mbstring php-mysql php-snmp php-xml php-zip python3-dotenv python3-pymysql python3-redis python3-setuptools python3-systemd python3-pip rrdtool snmp snmpd unzip whois
+        apt install lsb-release ca-certificates wget acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-mbstring php-mysql php-snmp php-xml php-zip python3-dotenv python3-pymysql python3-redis python3-setuptools python3-systemd python3-pip rrdtool snmp snmpd unzip whois
         ```
 
 ## Add librenms user
@@ -561,6 +561,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
     semanage fcontext -a -t httpd_log_t "/opt/librenms/logs(/.*)?"
     semanage fcontext -a -t httpd_cache_t '/opt/librenms/cache(/.*)?'
     semanage fcontext -a -t bin_t '/opt/librenms/librenms-service.py'
+    semanage fcontext -a -t httpd_cache_t '/opt/librenms/cache(/.*)?'
     restorecon -RFvv /opt/librenms
     setsebool -P httpd_can_sendmail=1
     setsebool -P httpd_execmem 1
@@ -747,5 +748,5 @@ page](../General/Callback-Stats-and-Privacy.md) on
 what it is and how to enable it.
 
 If you would like to help make LibreNMS better there are [many ways to
-help](../Support/FAQ.md#a-namefaq9-what-can-i-do-to-help). You
+help](../Support/FAQ.md#faq9). You
 can also [back LibreNMS on Open Collective](https://t.libren.ms/donations).

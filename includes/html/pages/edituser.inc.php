@@ -80,7 +80,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
 
         $device_perms = dbFetchRows('SELECT * from devices_perms as P, devices as D WHERE `user_id` = ? AND D.device_id = P.device_id', [$user_data['user_id']]);
         foreach ($device_perms as $device_perm) {
-            echo '<tr><td><strong>' . format_hostname($device_perm) . "</td><td> <a href='edituser/action=deldevperm/user_id=" . $vars['user_id'] . '/device_id=' . $device_perm['device_id'] . "'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a></strong></td></tr>";
+            echo '<tr><td><strong>' . htmlentities(format_hostname($device_perm)) . "</td><td> <a href='edituser/action=deldevperm/user_id=" . $vars['user_id'] . '/device_id=' . $device_perm['device_id'] . "'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a></strong></td></tr>";
             $access_list[] = $device_perm['device_id'];
             $permdone = 'yes';
         }
@@ -270,7 +270,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         foreach ($bill_perms as $bill_perm) {
             echo '<tr>
               <td>
-                <strong>' . $bill_perm['bill_name'] . "</strong></td><td width=50>&nbsp;&nbsp;<a href='edituser/action=delbillperm/user_id=" . $vars['user_id'] . '/bill_id=' . $bill_perm['bill_id'] . "'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a>
+                <strong>' . htmlentities($bill_perm['bill_name']) . "</strong></td><td width=50>&nbsp;&nbsp;<a href='edituser/action=delbillperm/user_id=" . $vars['user_id'] . '/bill_id=' . $bill_perm['bill_id'] . "'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a>
               </td>
             </tr>";
             $bill_access_list[] = $bill_perm['bill_id'];
@@ -306,7 +306,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
             }
 
             if (! $done) {
-                echo "<option value='" . $bill['bill_id'] . "'>" . $bill['bill_name'] . '</option>';
+                echo "<option value='" . $bill['bill_id'] . "'>" . htmlentities($bill['bill_name']) . '</option>';
             }
         }
 

@@ -1,0 +1,944 @@
+-- *********************************************************************
+-- CISCO-NS-MIB.my: Name Server Mib
+--
+-- September 2002, H K Vivek
+--
+-- Copyright (c) 2002 by cisco Systems, Inc.
+-- All rights reserved.
+-- 
+-- *********************************************************************
+ 
+CISCO-NS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Counter32,Integer32              FROM    SNMPv2-SMI
+        MODULE-COMPLIANCE, 
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP               FROM    SNMPv2-CONF
+        SnmpAdminString                  FROM    SNMP-FRAMEWORK-MIB 
+        TruthValue, TEXTUAL-CONVENTION,
+        TimeStamp                        FROM    SNMPv2-TC
+        ciscoMgmt                        FROM    CISCO-SMI
+        FcNameId, FcAddressId, 
+        FcClassOfServices,
+        FcNameIdOrZero                   FROM    CISCO-ST-TC
+        vsanIndex, notifyVsanIndex       FROM    CISCO-VSAN-MIB;       
+          
+
+ciscoNsMIB  MODULE-IDENTITY
+        LAST-UPDATED "200408300000Z"
+        ORGANIZATION "Cisco Systems Inc."
+        CONTACT-INFO 
+                "     Cisco Systems
+                      Customer Service
+                Postal: 170 W Tasman Drive
+                      San Jose, CA  95134
+                      USA
+                Tel: +1 800 553 -NETS
+                E-mail: cs-san@cisco.com"
+        DESCRIPTION
+                "The MIB module for the management of the Cisco
+                 Name Server which realizes the FC-GS3 
+                 requirements for Name Server (NS)."
+        REVISION "200408300000Z"
+        DESCRIPTION
+                "Added fcNameServerPermanentPortName object to
+                 fcNameServerTable."
+        REVISION "200402190000Z"
+        DESCRIPTION
+                "Added notifications fcNameServerEntryAdd,
+                 fcNameServerEntryDelete."
+        REVISION "200303060000Z"
+        DESCRIPTION
+                "Added fcNameServerPortFunction object."
+        REVISION "200210030000Z"
+        DESCRIPTION
+                "Initial version of this MIB."
+        ::= { ciscoMgmt 293 }
+
+
+ciscoNameServerMIBObjects    OBJECT IDENTIFIER ::= { ciscoNsMIB 1 }
+fcNameServerMIBConformance   OBJECT IDENTIFIER ::= { ciscoNsMIB 2 }
+fcNameServerConfiguration    OBJECT IDENTIFIER 
+                             ::= { ciscoNameServerMIBObjects 1 }
+fcNameServerStats            OBJECT IDENTIFIER 
+                             ::= { ciscoNameServerMIBObjects 2 }
+fcNameServerInformation      OBJECT IDENTIFIER 
+                             ::= { ciscoNameServerMIBObjects 3 }
+fcNameServerNotification     OBJECT IDENTIFIER 
+                             ::= { ciscoNameServerMIBObjects 4 }
+fcNameServerNotifications    OBJECT IDENTIFIER 
+                             ::= { fcNameServerNotification 0 }
+
+-- Textual Conventions
+
+FcGs3RejectReasonCode ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "The GS-3 reject reason code for a request.
+             none(1)  - no error.
+             invalidCmdCode(2) - req contains an invalid
+                                 command code.
+             invalidVerLevel(3) - req contains an invalid
+                                  version number.
+             logicalError(4) - there is a logical error.
+             invalidIUSize(5) - Information Unit (IU) size
+                                is invalid.
+             logicalBusy(6) - the module is busy.
+             protocolError(7) - there is a protocol error.
+             unableToPerformCmdReq(8) - the command specified
+                                        in the req could not be
+                                        executed. The details
+                                        of exactly what failed 
+                                        will be in the
+                                        corresponding reason
+                                        code explanation.
+             cmdNotSupported(9) - the command is not
+                                  supported.
+             vendorError(10) - specific vendor error."
+        SYNTAX  INTEGER {
+                  none(1),
+                  invalidCmdCode(2),
+                  invalidVerLevel(3),
+                  logicalError(4),
+                  invalidIUSize(5),
+                  logicalBusy(6),
+                  protocolError(7),
+                  unableToPerformCmdReq(8),
+                  cmdNotSupported(9),
+                  vendorError(10)
+                }
+
+FcNameServerRejReasonExpl ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "The reject reason code explanation.
+             noAdditionalExplanation(1) - no additional 
+                                          explanation.
+             portIdentifierNotRegistered(2) - port Id not
+                                              registered.
+             portNameNotRegistered(3) - port name not registered.
+             nodeNameNotRegistered(4) - node name not registered.
+             classOfServiceNotRegistered(5) - class of service
+                                              not registered.
+             nodeIpAddressNotRegistered(6) - node IP address not
+                                             registered.
+             ipaNotRegistered(7) - Initial Process Associator (IPA)
+                                   not registered.
+             fc4TypeNotRegistered(8) - FC4 type not registered.
+             symbolicPortNameNotRegistered(9) - symbolic port name
+                                                not registered.
+             symbolicNodeNameNotRegistered(10) - symbolic node name
+                                                not registered.
+             portTypeNotRegistered(11) - type of port not registered.
+             portIpAddressNotRegistered(12) - port IP address not
+                                              registered.
+             fabricPortNameNotRegistered(13) - fabric port name not
+                                               registered.
+             hardAddressNotRegistered(14) - hard address not 
+                                            registered
+             fc4DescriptorNotRegistered(15) - FC4 descriptor not
+                                              registered.
+             fc4FeaturesNotRegistered(16) - FC4 features not
+                                            registered.
+             accessDenied(17) - access is denied.
+             unacceptablePortIdentifier(18) - port Id is invalid.
+             databaseEmpty(19) - database is empty.
+             noObjectRegInSpecifiedScope(20) - no object has been
+                                               registered in the
+                                               specified scope."
+        SYNTAX  INTEGER {
+                  noAdditionalExplanation(1),
+                  portIdentifierNotRegistered(2),
+                  portNameNotRegistered(3),
+                  nodeNameNotRegistered(4),
+                  classOfServiceNotRegistered(5),
+                  nodeIpAddressNotRegistered(6),
+                  ipaNotRegistered(7),
+                  fc4TypeNotRegistered(8),
+                  symbolicPortNameNotRegistered(9),
+                  symbolicNodeNameNotRegistered(10),
+                  portTypeNotRegistered(11),
+                  portIpAddressNotRegistered(12),
+                  fabricPortNameNotRegistered(13),
+                  hardAddressNotRegistered(14),
+                  fc4DescriptorNotRegistered(15),
+                  fc4FeaturesNotRegistered(16),
+                  accessDenied(17),
+                  unacceptablePortIdentifier(18),
+                  databaseEmpty(19),
+                  noObjectRegInSpecifiedScope(20)
+                }
+
+--
+-- Proxy Port Table
+--
+
+fcNameServerProxyPortTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF FcNameServerProxyPortEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "This table contains a list of proxy ports on
+                 all configured VSANs on the local switch. Only 
+                 one proxy port is allowed on a VSAN."
+        ::= { fcNameServerConfiguration 1 }
+
+fcNameServerProxyPortEntry OBJECT-TYPE
+        SYNTAX        FcNameServerProxyPortEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "An entry (conceptual row) in this table."
+        INDEX { vsanIndex }
+        ::= { fcNameServerProxyPortTable 1 }
+
+FcNameServerProxyPortEntry ::= SEQUENCE {
+        fcNameServerProxyPortName   FcNameIdOrZero
+}
+
+fcNameServerProxyPortName OBJECT-TYPE
+        SYNTAX        FcNameIdOrZero
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+                "Name of the proxy port which can register/deregister
+                 for other ports on this VSAN. Users can enable 
+                 third party registrations by setting this object. 
+                 In order to disable third party registrations, this 
+                 object should be set to ''H."
+        DEFVAL {''H}
+        ::= { fcNameServerProxyPortEntry 1 }
+
+fcNameServerTableLastChange OBJECT-TYPE
+        SYNTAX        TimeStamp
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "The value of sysUpTime at the time of the last update
+                 to the fcNameServerTable. This includes creation of an
+                 entry, deletion of an entry and modification of an
+                 existing entry. If no updates have taken place since 
+                 the last re-initialization of the local network
+                 management subsystem, then this object contains a zero
+                 value."
+        ::= { fcNameServerConfiguration 2 }
+
+fcNameServerNumRows OBJECT-TYPE
+        SYNTAX        Integer32 (0..2147483647)
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+               "The number of Nx_Ports currently registered with this
+               device fabric wide."
+        ::= { fcNameServerConfiguration 3 }
+
+
+--
+-- fcNameServerTable
+--
+fcNameServerTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF FcNameServerEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+               "This table contains entries for all Nx_Ports 
+               registered with Fx_Ports on all the VSANs configured
+               on the local switch."
+        ::= { fcNameServerConfiguration 4 }
+
+fcNameServerEntry OBJECT-TYPE
+        SYNTAX FcNameServerEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+               "An entry (conceptual row) in the fcNameServerTable.
+               This contains information about an Nx_Port represented
+               by fcNameServerPortIdentifier for a particular VSAN
+               identified by vsanIndex."
+        INDEX { vsanIndex, fcNameServerPortIdentifier }
+        ::= { fcNameServerTable 1 }
+
+FcNameServerEntry ::= SEQUENCE {
+        fcNameServerPortIdentifier         FcAddressId,
+        fcNameServerPortName               FcNameId,
+        fcNameServerNodeName               FcNameId,
+        fcNameServerClassOfSvc             FcClassOfServices,
+        fcNameServerNodeIpAddress          OCTET STRING,
+        fcNameServerProcAssoc              OCTET STRING,
+        fcNameServerFC4Type                OCTET STRING,
+        fcNameServerPortType               INTEGER,
+        fcNameServerPortIpAddress          OCTET STRING,
+        fcNameServerFabricPortName         FcNameId,
+        fcNameServerHardAddress            FcAddressId,
+        fcNameServerSymbolicPortName       SnmpAdminString,
+        fcNameServerSymbolicNodeName       SnmpAdminString,
+        fcNameServerFC4Features            OCTET STRING,
+        fcNameServerPortFunction           BITS,
+        fcNameServerPermanentPortName      FcNameId
+        }
+
+fcNameServerPortIdentifier OBJECT-TYPE
+        SYNTAX               FcAddressId
+        MAX-ACCESS           not-accessible
+        STATUS               current
+        DESCRIPTION
+               "The Fibre Channel Identifier (FC-ID) of this 
+               Nx_Port."
+        ::= { fcNameServerEntry 1 }
+
+fcNameServerPortName OBJECT-TYPE
+        SYNTAX        FcNameId
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+               "The fibre channel Port_Name (WWN) of this Nx_port.
+               If this object is not set, then it will contain the
+               null value '0000000000000000'h."
+        DEFVAL {'0000000000000000'h}
+        ::= { fcNameServerEntry 2 }
+
+fcNameServerNodeName OBJECT-TYPE
+        SYNTAX        FcNameId
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+               "The fibre channel Node_Name (WWN) of this Nx_port.
+               If this object is not set, then it will contain the
+               null value '0000000000000000'h."
+        DEFVAL {'0000000000000000'h}
+        ::= { fcNameServerEntry 3 }
+
+fcNameServerClassOfSvc OBJECT-TYPE
+        SYNTAX        FcClassOfServices
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+               "The class of service indicator. This object is a 
+               array of bits that contain a bit map of the classes of
+               service supported by the associated port. If a bit in
+               this object is 1, it indicates that the class of 
+               service is supported by the associated port. When a 
+               bit is set to 0, it indicates that no class of service
+               is supported by this Nx_port."
+        ::= { fcNameServerEntry 4 }
+
+fcNameServerNodeIpAddress OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (16))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+  	           "The IP address of the node of this Nx_port, as
+		   indicated by the Nx_Port in a GS3 message that it
+		   transmitted.  The GS3 format specifies a 32-bit 
+                   IPv4 address or a 128-bit IPv6 address.  For the 
+                   former, the leftmost 96 bits (12 bytes) are set to 
+                   x'00 00 00 00 00 00 00 00 00 00 FF FF' and the 
+                   rightmost 32 bits are supposed to contain the 
+                   IPv4 address."
+        REFERENCE
+              "ANSI NCITS xxx-200x, Fibre Channel - Generic 
+               Services-3 (FC-GS-3), T11/Project 1356D/Rev 7.01 
+               Section 5.1.4.40 and Section 5.1.2.5"
+        ::= { fcNameServerEntry 5 }
+
+fcNameServerProcAssoc OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (8))
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+                "The Fibre Channel initial process associator (IPA)."
+        ::= { fcNameServerEntry 6 }
+
+fcNameServerFC4Type OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (0..32))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+               "The FC-4 protocol types supported by this Nx_port.
+               This is an array of 256-bits. Each bit in the array 
+               corresponds to a Type value as defined by the fibre
+               channel standards and contained in the Type field of
+               the frame header."
+        REFERENCE
+               "ANSI NCITS xxx-200x, Fibre Channel - Generic
+               Services-3 (FC-GS-3), T11/Project 1356D/Rev 7.01
+               Section 5.1.2.7."
+        ::= { fcNameServerEntry 7 }
+
+fcNameServerPortType OBJECT-TYPE
+        SYNTAX        INTEGER {
+                          unknown(1), -- port type unknown
+                          nPort(2), -- port is N_Port
+                          nlPort(3) -- port is NL_Port
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+               "The port type of this port."
+        ::= { fcNameServerEntry 8 }
+
+fcNameServerPortIpAddress OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (16))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+               "This object contains the IP address of the associated
+               port in either 32-bit IPv4 format or 128-bit IPv6
+               format.
+               When this object contains a IPv4 address, the leftmost
+               96 bits (12 bytes) should contain 
+               x'00 00 00 00 00 00 00 00 00 00 FF FF'. The IPv4
+               address should be present in the rightmost 32 bits.
+               Note that the value of this object is the IP address
+               value that is received in the GS3 message Register
+               IP address (Port) RIPP_ID. It is not validated against
+               any IP address format."
+        REFERENCE
+               "ANSI NCITS xxx-200x, Fibre Channel - Generic
+               Services-3, (FC-GS-3), T11/Project 1356D/Rev 7.01
+               Section 5.1.4.36 and Section 5.1.2.5"            
+        ::= { fcNameServerEntry 9 }
+
+fcNameServerFabricPortName OBJECT-TYPE
+        SYNTAX        FcNameId
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+               "The Fabric Port Name (WWN) of the Fx_port to which
+               this Nx_port is attached. If this object is not set,
+               then it will contain the null value 
+               '0000000000000000'h."
+        DEFVAL {'0000000000000000'h}
+        ::= { fcNameServerEntry 10 }
+
+fcNameServerHardAddress OBJECT-TYPE
+        SYNTAX        FcAddressId
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+               "The format of this object is identical to the format
+               of Hard Address defined in the Discover Address (ADISC)
+               Extended Link Service (FC-PH-2).
+               Hard Address is the 24-bit NL_Port identifier which
+               consists of
+                 - the 8-bit Domain Id in the most significant byte
+                 - the 8-bit Area Id in the next most significant 
+                   byte
+                 - the 8-bit AL-PA(Arbitrated Loop Physical Address)
+                   which an NL_port attempts acquire during FC-AL 
+                   initialization in the least significant byte.
+                   
+               If the port is not an NL_Port, or if it is an NL_Port
+               but does not have a hard address, then all bits are
+               reported as 0s."
+        ::= { fcNameServerEntry 11 }
+
+fcNameServerSymbolicPortName OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (0..255))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+               "The user-defined name of this port. If this object
+               has not been set, then the value of this object is
+               the zero length string."
+        DEFVAL {''H}
+        ::= { fcNameServerEntry 12 }
+
+fcNameServerSymbolicNodeName OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (0..255))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+               "The user-defined name of the node of this port. If 
+               this object has not been set, then the value of this
+               object is the zero length string."
+        DEFVAL {''H}
+        ::= { fcNameServerEntry 13 }
+
+
+fcNameServerFC4Features OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (0..128))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+               "The FC-4 Features associated with this port and the
+               FC-4 Type. Refer to FC-GS3 specification for the 
+               format of this object.
+               This object is an array of 4-bit values, one for each
+               TYPE code value.
+               The 5 most significant bits of the TYPE field will be
+               used to identify the word for the FC-4 Features object.
+                     - Word 0 contains information related to TYPE
+                       code '00' thru' '07';
+                     - Word 1 contains information related to TYPE
+                       code '08' thru' 0F';
+                     - and so forth to Word 31 that contains
+                       information related to TYPE code 'F8'
+                       thru' 'FF'.
+               The 3 least significant bits of the TYPE field will be
+               used to identify the position within the word for the 
+               4-bit FC-4 Features value."
+        REFERENCE
+               "ANSI NCITS xxx-200x, Fibre Channel - Generic
+               Services-3 (FC-GS-3), T11/Project 1356D/Rev 7.01
+               Section 5.1.2.14"
+        ::= { fcNameServerEntry 14 }
+
+fcNameServerPortFunction OBJECT-TYPE
+        SYNTAX        BITS {
+                        trapPort(0),
+                        vep(1),
+                        volOwner(2),
+                        ipfcPort(3),
+                        intPort(4)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        deprecated 
+        DESCRIPTION
+                "The function of this port.
+
+                 trapPort(0) indicates that this port is  
+                 functioning as a Trap Port.
+
+                 vep(1) indicates that this port is 
+                 functioning as a Virtual Enclosure Port
+                 (VEP).
+
+                 volOwner(2) indicates that this port is
+                 functioning as a Volume Owner.
+
+                 ipfcPort(3) indicates that this port is
+                 functioning as a IP-FC port.
+
+                 intPort(4) indicates that this port is
+                 functioning as an internal port."
+        REFERENCE "CISCO-VEDM-MIB"
+        ::= { fcNameServerEntry 15 }
+
+fcNameServerPermanentPortName OBJECT-TYPE
+        SYNTAX        FcNameId
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+               "The Permanent Port Name of this Nx_port.
+                If multiple Port_Name(s) are associated with this
+                Nx_port via FDISC (Discover F_Port Service Parameters), 
+                the Permanent Port Name is the original Port_Name
+                associated with this Nx_port at login.
+                If this object is not set, then it will contain the
+                null value '0000000000000000'h."
+        REFERENCE "Fibre-Channel - Generic Services - 4 T11/
+                   Project 1505-D/Rev 7.91 Section 5.2.3.16"
+        ::= { fcNameServerEntry 16 }
+
+-- Name Server Statistics
+
+fcNameServerTotalRejects OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "The total number of requests rejected by the
+                local switch across all VSANs."
+        ::= { fcNameServerStats 1 }
+
+fcNameServerStatsTable OBJECT-TYPE                                    
+        SYNTAX SEQUENCE OF FcNameServerStatsEntry
+        MAX-ACCESS         not-accessible
+        STATUS             current
+        DESCRIPTION
+                "This table contains statistic counters which are
+                maintained by the Name Server. These counters are
+                maintained per VSAN."
+        ::= { fcNameServerStats 2 }
+
+fcNameServerStatsEntry OBJECT-TYPE
+       SYNTAX        FcNameServerStatsEntry
+       MAX-ACCESS    not-accessible
+       STATUS        current
+       DESCRIPTION
+               "An entry (conceptual row) in this table."
+       INDEX { vsanIndex }
+       ::= { fcNameServerStatsTable 1 }
+
+FcNameServerStatsEntry ::=  SEQUENCE {       
+
+-- Counters for Name Server's GS3 interactions      
+
+       fcNameServerInGetReqs                Counter32,
+       fcNameServerOutGetReqs               Counter32,
+       fcNameServerInRegReqs                Counter32,
+       fcNameServerInDeRegReqs              Counter32,
+       fcNameServerInRscns                  Counter32,
+       fcNameServerOutRscns                 Counter32,
+
+-- Rejected Requests 
+
+       fcNameServerRejects                  Counter32
+       }
+
+fcNameServerInGetReqs OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+               "The total number of Get Requests received by the
+               local switch on this VSAN."
+       ::= { fcNameServerStatsEntry 1 }
+
+fcNameServerOutGetReqs OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+               "The total number of Get Requests sent by the local
+               switch on this VSAN."
+       ::= { fcNameServerStatsEntry 2 }
+
+fcNameServerInRegReqs OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+               "The total number of Registration Requests received 
+               by the local switch on this VSAN."
+       ::= { fcNameServerStatsEntry 3 }
+
+fcNameServerInDeRegReqs OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+               "The total number of De-registration Requests
+               received by the local switch on this VSAN."
+       ::= { fcNameServerStatsEntry 4 }
+
+fcNameServerInRscns OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+               "The total number of RSCN commands received by the
+               local switch on this VSAN."
+       ::= { fcNameServerStatsEntry 5 }
+
+fcNameServerOutRscns OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+               "The total number of RSCN commands sent by the local
+               switch on this VSAN."
+       ::= { fcNameServerStatsEntry 6 }
+
+fcNameServerRejects OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+               "The total number of requests rejected by the local
+               switch on this VSAN."
+       ::= { fcNameServerStatsEntry 7 }
+
+
+-- Notification information objects
+
+fcNameServerRejectReasonCode OBJECT-TYPE
+        SYNTAX        FcGs3RejectReasonCode
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+               "The registration reject reason code. This object
+               contains the reason code corresponding to the most
+               recent Name Server Registration request failure."
+        ::= { fcNameServerInformation 1 }
+
+fcNameServerRejReasonCodeExp OBJECT-TYPE
+        SYNTAX        FcNameServerRejReasonExpl
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+               "The registration reject reason code explanation. This
+               object contains the reason code explanation if the 
+               above object has a reason code corresponding to  
+               'Unable to perform command request'. This object like
+               the one above, corresponds to the most recent  Name
+               Server Registration request rejection."
+        ::= { fcNameServerInformation 2 }
+
+-- Notification control objects
+                                        
+fcNameServerRejReqNotifyEnable OBJECT-TYPE
+        SYNTAX        TruthValue
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+               "This object specifies if the Name Server should
+               generate 'fcNameServerRejectRegNotify' notifications.
+                
+               If value of this object is 'true', then the 
+               notification is generated when a request is rejected. 
+               If it is 'false', the notification is not generated."
+        DEFVAL { false }
+        ::= { fcNameServerConfiguration 5 }
+
+
+-- Notifications
+
+fcNameServerRejectRegNotify NOTIFICATION-TYPE
+        OBJECTS   {fcNameServerPortName,
+                   fcNameServerRejectReasonCode,
+                   fcNameServerRejReasonCodeExp}
+        STATUS    current
+        DESCRIPTION
+                "This notification is generated by the Name Server
+                whenever it rejects a registration request. The Name
+                Server should update the 
+                'fcNameServerRejectReasonCode' and 
+                'fcNameServerRejReasonCodeExp' objects with
+                the corresponding reason code and reason code 
+                explanation before sending the notification. These 
+                two objects are also included along with the 
+                notification to provide the reason for the reject."
+    ::= { fcNameServerNotifications 1 }
+
+fcNameServerDatabaseFull NOTIFICATION-TYPE
+        OBJECTS {notifyVsanIndex}
+        STATUS current
+        DESCRIPTION
+                "This notification is generated by the Name Server
+                when the Name Server cannot allocate space for 
+                a new entry."
+    ::= { fcNameServerNotifications 2 }
+
+fcNameServerEntryAdd NOTIFICATION-TYPE
+        OBJECTS { fcNameServerPortName,
+                  fcNameServerPortType }
+        STATUS current
+        DESCRIPTION
+                "This notification is generated by the Name Server
+                 when a new entry gets added to the Name Server
+                 database."
+    ::= { fcNameServerNotifications 3 }
+
+fcNameServerEntryDelete NOTIFICATION-TYPE
+        OBJECTS { fcNameServerPortName,
+                  fcNameServerPortType }
+        STATUS current
+        DESCRIPTION
+                "This notification is generated by the Name Server
+                 when an existing entry is deleted from the
+                 Name Server database."
+    ::= { fcNameServerNotifications 4 }
+
+-- Conformance
+
+fcNameServerMIBCompliances OBJECT IDENTIFIER 
+                           ::= {fcNameServerMIBConformance 1}
+fcNameServerMIBGroups OBJECT IDENTIFIER 
+                           ::= {fcNameServerMIBConformance 2}
+
+fcNameServerMIBCompliance MODULE-COMPLIANCE
+        STATUS    deprecated
+          -- superceded by fcNameServerMIBComplianceRev1
+        DESCRIPTION
+                "The compliance statement for entities which 
+                implement the name server."
+        MODULE MANDATORY-GROUPS {fcNameServerDBGroup,
+                                 fcNameServerStatsGroup,
+                                 fcNameServerNotifyControlGroup,
+                                 fcNameServerNotifyGroup}   
+                                 
+                                 
+        ::= { fcNameServerMIBCompliances 1 }
+
+fcNameServerMIBCompliance1 MODULE-COMPLIANCE
+        STATUS   deprecated 
+          -- superceded by fcNameServerMIBCompliance2
+        DESCRIPTION
+                "The compliance statement for entities which 
+                implement the name server."
+        MODULE MANDATORY-GROUPS {fcNameServerDBGroup1,
+                                 fcNameServerStatsGroup,
+                                 fcNameServerNotifyControlGroup,
+                                 fcNameServerNotifyGroup}   
+                                 
+                                 
+        ::= { fcNameServerMIBCompliances 2 }
+
+
+fcNameServerMIBCompliance2 MODULE-COMPLIANCE
+        STATUS    deprecated
+              -- superceded by fcNameServerMIBCompliance3 
+        DESCRIPTION
+                "The compliance statement for entities which 
+                implement the name server."
+        MODULE MANDATORY-GROUPS {fcNameServerDBGroup2,
+                                 fcNameServerStatsGroup,
+                                 fcNameServerNotifyControlGroup,
+                                 fcNameServerNotifyGroupRev1}   
+                                 
+                                 
+        ::= { fcNameServerMIBCompliances 3 }
+
+fcNameServerMIBCompliance3 MODULE-COMPLIANCE
+        STATUS    current
+        DESCRIPTION
+                "The compliance statement for entities which
+                implement the name server."
+        MODULE MANDATORY-GROUPS {fcNameServerDBGroup3,
+                                 fcNameServerStatsGroup,
+                                 fcNameServerNotifyControlGroup,
+                                 fcNameServerNotifyGroupRev1}
+
+
+        ::= { fcNameServerMIBCompliances 4 }
+
+-- Units of conformance
+
+fcNameServerDBGroup         OBJECT-GROUP
+        OBJECTS {fcNameServerProxyPortName,
+                 fcNameServerNumRows,
+                 fcNameServerTableLastChange,
+                 fcNameServerPortName,
+                 fcNameServerNodeName,
+                 fcNameServerClassOfSvc,
+                 fcNameServerNodeIpAddress,
+                 fcNameServerProcAssoc,
+                 fcNameServerFC4Type,
+                 fcNameServerPortType,
+                 fcNameServerPortIpAddress,
+                 fcNameServerFabricPortName,
+                 fcNameServerHardAddress,
+                 fcNameServerSymbolicPortName,
+                 fcNameServerSymbolicNodeName,
+                 fcNameServerFC4Features}
+        STATUS deprecated 
+        DESCRIPTION
+               "A collection of objects for displaying and 
+               configuring Name Server objects."
+        ::= { fcNameServerMIBGroups 1 }
+
+fcNameServerStatsGroup         OBJECT-GROUP
+        OBJECTS {fcNameServerTotalRejects,
+                 fcNameServerInGetReqs,
+                 fcNameServerOutGetReqs,
+                 fcNameServerInRegReqs,
+                 fcNameServerInDeRegReqs,
+                 fcNameServerInRscns,
+                 fcNameServerOutRscns,
+                 fcNameServerRejects}
+        STATUS current
+        DESCRIPTION
+               "A collection of objects for displaying Name
+               Server statistics."
+        ::= { fcNameServerMIBGroups 2 }
+
+
+fcNameServerNotifyControlGroup        OBJECT-GROUP
+        OBJECTS {fcNameServerRejectReasonCode,
+                 fcNameServerRejReasonCodeExp,
+                 fcNameServerRejReqNotifyEnable}
+        STATUS current
+        DESCRIPTION
+               "A collection of notification control and 
+               notification information objects for 
+               monitoring Name Server 
+               registrations/de-registrations."
+        ::= { fcNameServerMIBGroups 3 }
+
+fcNameServerNotifyGroup        NOTIFICATION-GROUP
+        NOTIFICATIONS {fcNameServerRejectRegNotify,
+                       fcNameServerDatabaseFull}
+        STATUS deprecated 
+        DESCRIPTION
+               "A collection of notifications for monitoring 
+               Name Server registrations/de-registrations."
+        ::= { fcNameServerMIBGroups 4 }
+
+fcNameServerDBGroup1         OBJECT-GROUP
+        OBJECTS {fcNameServerProxyPortName,
+                 fcNameServerNumRows,
+                 fcNameServerTableLastChange,
+                 fcNameServerPortName,
+                 fcNameServerNodeName,
+                 fcNameServerClassOfSvc,
+                 fcNameServerNodeIpAddress,
+                 fcNameServerProcAssoc,
+                 fcNameServerFC4Type,
+                 fcNameServerPortType,
+                 fcNameServerPortIpAddress,
+                 fcNameServerFabricPortName,
+                 fcNameServerHardAddress,
+                 fcNameServerSymbolicPortName,
+                 fcNameServerSymbolicNodeName,
+                 fcNameServerFC4Features,
+                 fcNameServerPortFunction}
+        STATUS deprecated 
+        DESCRIPTION
+               "A collection of objects for displaying and
+               configuring Name Server objects."
+        ::= { fcNameServerMIBGroups 5 }
+
+fcNameServerNotifyGroupRev1        NOTIFICATION-GROUP
+        NOTIFICATIONS {fcNameServerRejectRegNotify,
+                       fcNameServerDatabaseFull,
+                       fcNameServerEntryAdd,
+                       fcNameServerEntryDelete}
+        STATUS current
+        DESCRIPTION
+               "A collection of notifications for monitoring 
+               Name Server registrations/de-registrations."
+        ::= { fcNameServerMIBGroups 6 }
+
+fcNameServerDBGroup2         OBJECT-GROUP
+        OBJECTS {fcNameServerProxyPortName,
+                 fcNameServerNumRows,
+                 fcNameServerTableLastChange,
+                 fcNameServerPortName,
+                 fcNameServerNodeName,
+                 fcNameServerClassOfSvc,
+                 fcNameServerNodeIpAddress,
+                 fcNameServerProcAssoc,
+                 fcNameServerFC4Type,
+                 fcNameServerPortType,
+                 fcNameServerPortIpAddress,
+                 fcNameServerFabricPortName,
+                 fcNameServerHardAddress,
+                 fcNameServerSymbolicPortName,
+                 fcNameServerSymbolicNodeName,
+                 fcNameServerFC4Features}
+        STATUS current 
+        DESCRIPTION
+               "A collection of objects for displaying and
+               configuring Name Server objects."
+        ::= { fcNameServerMIBGroups 7 }
+
+fcNameServerDBGroup3         OBJECT-GROUP
+        OBJECTS {fcNameServerProxyPortName,
+                 fcNameServerNumRows,
+                 fcNameServerTableLastChange,
+                 fcNameServerPortName,
+                 fcNameServerNodeName,
+                 fcNameServerClassOfSvc,
+                 fcNameServerNodeIpAddress,
+                 fcNameServerProcAssoc,
+                 fcNameServerFC4Type,
+                 fcNameServerPortType,
+                 fcNameServerPortIpAddress,
+                 fcNameServerFabricPortName,
+                 fcNameServerHardAddress,
+                 fcNameServerSymbolicPortName,
+                 fcNameServerSymbolicNodeName,
+                 fcNameServerFC4Features,
+                 fcNameServerPermanentPortName}
+        STATUS current
+        DESCRIPTION
+               "A collection of objects for displaying and
+               configuring Name Server objects."
+        ::= { fcNameServerMIBGroups 8 }
+
+END

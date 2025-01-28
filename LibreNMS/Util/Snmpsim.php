@@ -68,7 +68,15 @@ class Snmpsim extends Process
 
     public function isVenvSetUp(): bool
     {
-        return is_executable($this->getVenvPath('bin/snmpsim-command-responder-lite'));
+        if (! is_executable($this->getVenvPath('bin/snmpsim-command-responder-lite'))) {
+            return false;
+        }
+
+        // check that snmpsim package actually exists
+        $pipCheck = new Process([$this->getVenvPath('bin/pip'), 'show', 'snmpsim']);
+        $pipCheck->run();
+
+        return $pipCheck->isSuccessful();
     }
 
     public function setupVenv($print_output = false): void
@@ -78,7 +86,7 @@ class Snmpsim extends Process
         if (! $this->isVenvSetUp()) {
             Log::info('Setting up snmpsim virtual env in ' . $snmpsim_venv_path);
 
-            $setupProcess = new Process(['python', '-m', 'venv', $snmpsim_venv_path]);
+            $setupProcess = new Process(['/usr/bin/env', 'python3', '-m', 'venv', $snmpsim_venv_path]);
             $setupProcess->setTty($print_output);
             $setupProcess->run();
 
@@ -87,7 +95,7 @@ class Snmpsim extends Process
                 Log::error($setupProcess->getErrorOutput());
             }
 
-            $installProcess = new Process([$snmpsim_venv_path . '/bin/pip', 'install', 'snmpsim']);
+            $installProcess = new Process([$snmpsim_venv_path . '/bin/pip', 'install', 'snmpsim>=1.1.7']);
             $installProcess->setTty($print_output);
             $installProcess->run();
 

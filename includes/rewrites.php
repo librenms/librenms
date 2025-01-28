@@ -90,38 +90,6 @@ function cleanPort($interface, $device = null)
     return $interface;
 }
 
-// Specific rewrite functions
-
-function makeshortif($if)
-{
-    $rewrite_shortif = [
-        'tengigabitethernet' => 'Te',
-        'ten-gigabitethernet' => 'Te',
-        'tengige' => 'Te',
-        'gigabitethernet' => 'Gi',
-        'fastethernet' => 'Fa',
-        'ethernet' => 'Et',
-        'serial' => 'Se',
-        'pos' => 'Pos',
-        'port-channel' => 'Po',
-        'atm' => 'Atm',
-        'null' => 'Null',
-        'loopback' => 'Lo',
-        'dialer' => 'Di',
-        'vlan' => 'Vlan',
-        'tunnel' => 'Tunnel',
-        'serviceinstance' => 'SI',
-        'dwdm' => 'DWDM',
-        'bundle-ether' => 'BE',
-    ];
-
-    $if = \LibreNMS\Util\Rewrite::normalizeIfName($if);
-    $if = strtolower($if);
-    $if = str_replace(array_keys($rewrite_shortif), array_values($rewrite_shortif), $if);
-
-    return $if;
-}
-
 function rewrite_generic_hardware($hardware)
 {
     $rewrite_GenericHW = [

@@ -1,0 +1,396 @@
+-- Namespace: http://viptela.com/app-route
+
+VIPTELA-APP-ROUTE DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    viptela
+        FROM VIPTELA-GLOBAL
+;
+
+viptela-app-route MODULE-IDENTITY
+    LAST-UPDATED "202007010000Z"
+    ORGANIZATION "Viptela, Inc."
+    CONTACT-INFO "Viptela, Inc.  Email:support@viptela.com"
+    DESCRIPTION "This module defines the data model for application-aware routing operational data"
+    REVISION "202007010000Z"
+    DESCRIPTION "Viptela Revision 20.3"
+    REVISION "202002240000Z"
+    DESCRIPTION "Viptela Revision 20.1"
+    REVISION "201911150000Z"
+    DESCRIPTION "Viptela Revision 19.3"
+    REVISION "201908150000Z"
+    DESCRIPTION "Viptela Revision 19.2"
+    REVISION "201811010000Z"
+    DESCRIPTION "Viptela Revision 18.4"
+    REVISION "201808200000Z"
+    DESCRIPTION "Viptela Revision 18.3.1"
+    REVISION "201806250000Z"
+    DESCRIPTION "Viptela Revision 18.3"
+    REVISION "201804250000Z"
+    DESCRIPTION "Viptela Revision 18.2"
+    REVISION "201803150000Z"
+    DESCRIPTION "Viptela Revision 18.1.1"
+    REVISION "201801160000Z"
+    DESCRIPTION "Viptela Revision 17.2.3"
+    REVISION "201711010000Z"
+    DESCRIPTION "Viptela Revision 17.2.1"
+    REVISION "201708010000Z"
+    DESCRIPTION "Viptela Revision 17.2"
+    REVISION "201705250000Z"
+    DESCRIPTION "Viptela Revision 17.1.1"
+    REVISION "201704060000Z"
+    DESCRIPTION "Viptela Revision 17.1"
+    REVISION "201702150000Z"
+    DESCRIPTION "Viptela Revision 16.3.2"
+    REVISION "201702060000Z"
+    DESCRIPTION "Viptela Revision 16.3.1"
+    REVISION "201611160000Z"
+    DESCRIPTION "Viptela Revision 16.3"
+    REVISION "201610250000Z"
+    DESCRIPTION "Viptela Revision 16.2.10"
+    REVISION "201610240000Z"
+    DESCRIPTION "Viptela Revision 16.2.4"
+    REVISION "201608100000Z"
+    DESCRIPTION "Viptela Revision 16.2.2"
+    REVISION "201608010000Z"
+    DESCRIPTION "Viptela Revision 16.2.1"
+    REVISION "201606090000Z"
+    DESCRIPTION "Viptela Revision 16.2"
+    REVISION "201604220000Z"
+    DESCRIPTION "Viptela Revision 16.1.1"
+    REVISION "201603150000Z"
+    DESCRIPTION "Viptela Revision 16.1"
+    REVISION "201601300000Z"
+    DESCRIPTION "Viptela Revision 15.4.3"
+    REVISION "201512280000Z"
+    DESCRIPTION "Viptela Revision 15.4.1"
+    REVISION "201512010000Z"
+    DESCRIPTION "Viptela Revision 15.4.0"
+    REVISION "201510310000Z"
+    DESCRIPTION "Viptela Revision 15.3.5"
+    REVISION "201509270000Z"
+    DESCRIPTION "Viptela Revision 15.3.3"
+    REVISION "201509010000Z"
+    DESCRIPTION "Viptela Revision 15.3.1"
+    REVISION "201507010000Z"
+    DESCRIPTION "Viptela Revision 15.3"
+    ::= { viptela 9 }
+
+UnsignedByte ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedByte"
+    SYNTAX      Unsigned32 (0 .. 255)
+
+UnsignedShort ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedShort"
+    SYNTAX      Unsigned32 (0 .. 65535)
+
+ConfdString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs: and confd: types mapped to strings"
+    SYNTAX      OCTET STRING
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+InetAddressIP ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "confd:inetAddressIP"
+    SYNTAX      OCTET STRING (SIZE (4|16))
+
+-- tagpath /app-route
+appRoute OBJECT IDENTIFIER ::= { viptela-app-route 1 }
+
+-- tagpath /app-route/statistics
+appRouteStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AppRouteStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { viptela-app-route 2 }
+
+-- tagpath /app-route/statistics
+appRouteStatisticsEntry OBJECT-TYPE
+    SYNTAX      AppRouteStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { appRouteStatisticsSrcIp, appRouteStatisticsDstIp, appRouteStatisticsProto, appRouteStatisticsSrcPort, appRouteStatisticsDstPort }
+        ::= { appRouteStatisticsTable 1 }
+
+AppRouteStatisticsEntry ::=
+    SEQUENCE {
+        appRouteStatisticsSrcIp InetAddressIP,
+        appRouteStatisticsDstIp InetAddressIP,
+        appRouteStatisticsProto INTEGER,
+        appRouteStatisticsSrcPort UnsignedShort,
+        appRouteStatisticsDstPort UnsignedShort,
+        appRouteStatisticsRemoteSystemIp IpAddress,
+        appRouteStatisticsLocalColor INTEGER,
+        appRouteStatisticsRemoteColor INTEGER,
+        appRouteStatisticsMeanLoss UnsignedByte,
+        appRouteStatisticsMeanLatency Unsigned32,
+        appRouteStatisticsSlaClassIndex String,
+        appRouteStatisticsMeanJitter Unsigned32
+    }
+
+-- tagpath /app-route/statistics/src-ip
+appRouteStatisticsSrcIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Local TLOC IP address"
+    ::= { appRouteStatisticsEntry 1 }
+
+-- tagpath /app-route/statistics/dst-ip
+appRouteStatisticsDstIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Remote TLOC IP address"
+    ::= { appRouteStatisticsEntry 2 }
+
+-- tagpath /app-route/statistics/proto
+appRouteStatisticsProto OBJECT-TYPE
+    SYNTAX      INTEGER {gre(1),ipsec(2)}
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { appRouteStatisticsEntry 3 }
+
+-- tagpath /app-route/statistics/src-port
+appRouteStatisticsSrcPort OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Local port number"
+    ::= { appRouteStatisticsEntry 4 }
+
+-- tagpath /app-route/statistics/dst-port
+appRouteStatisticsDstPort OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Remote port number"
+    ::= { appRouteStatisticsEntry 5 }
+
+-- tagpath /app-route/statistics/remote-system-ip
+appRouteStatisticsRemoteSystemIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Remote system IP address"
+    ::= { appRouteStatisticsEntry 6 }
+
+-- tagpath /app-route/statistics/local-color
+appRouteStatisticsLocalColor OBJECT-TYPE
+    SYNTAX      INTEGER {default(1),mpls(2),metro-ethernet(3),biz-internet(4),public-internet(5),lte(6),threeG(7),red(8),green(9),blue(10),gold(11),silver(12),bronze(13),custom1(14),custom2(15),custom3(16),private1(17),private2(18),private3(19),private4(20),private5(21),private6(22)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Local TLOC color"
+    ::= { appRouteStatisticsEntry 7 }
+
+-- tagpath /app-route/statistics/remote-color
+appRouteStatisticsRemoteColor OBJECT-TYPE
+    SYNTAX      INTEGER {default(1),mpls(2),metro-ethernet(3),biz-internet(4),public-internet(5),lte(6),threeG(7),red(8),green(9),blue(10),gold(11),silver(12),bronze(13),custom1(14),custom2(15),custom3(16),private1(17),private2(18),private3(19),private4(20),private5(21),private6(22)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Remote TLOC color"
+    ::= { appRouteStatisticsEntry 8 }
+
+-- tagpath /app-route/statistics/mean-loss
+appRouteStatisticsMeanLoss OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average loss in percentage across all the polling intervals"
+    ::= { appRouteStatisticsEntry 9 }
+
+-- tagpath /app-route/statistics/mean-latency
+appRouteStatisticsMeanLatency OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average latency across all the polling intervals"
+    ::= { appRouteStatisticsEntry 10 }
+
+-- tagpath /app-route/statistics/sla-class-index
+appRouteStatisticsSlaClassIndex OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SLA classes (indexes) that this session satisfies"
+    ::= { appRouteStatisticsEntry 11 }
+
+-- tagpath /app-route/statistics/mean-jitter
+appRouteStatisticsMeanJitter OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average jitter across all polling intervals"
+    ::= { appRouteStatisticsEntry 12 }
+
+-- tagpath /app-route/statistics/interval
+appRouteStatisticsIntervalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AppRouteStatisticsIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { viptela-app-route 3 }
+
+-- tagpath /app-route/statistics/interval
+appRouteStatisticsIntervalEntry OBJECT-TYPE
+    SYNTAX      AppRouteStatisticsIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { appRouteStatisticsSrcIp, appRouteStatisticsDstIp, appRouteStatisticsProto, appRouteStatisticsSrcPort, appRouteStatisticsDstPort, appRouteStatisticsIntervalIndex }
+        ::= { appRouteStatisticsIntervalTable 1 }
+
+AppRouteStatisticsIntervalEntry ::=
+    SEQUENCE {
+        appRouteStatisticsIntervalIndex UnsignedByte,
+        appRouteStatisticsIntervalTotalPackets Integer32,
+        appRouteStatisticsIntervalLoss Integer32,
+        appRouteStatisticsIntervalAverageLatency ConfdString,
+        appRouteStatisticsIntervalAverageJitter ConfdString,
+        appRouteStatisticsIntervalTxDataPkts Counter64,
+        appRouteStatisticsIntervalRxDataPkts Counter64
+    }
+
+-- tagpath /app-route/statistics/interval/index
+appRouteStatisticsIntervalIndex OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Polling interval index"
+    ::= { appRouteStatisticsIntervalEntry 1 }
+
+-- tagpath /app-route/statistics/interval/total-packets
+appRouteStatisticsIntervalTotalPackets OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total packets sent"
+    ::= { appRouteStatisticsIntervalEntry 2 }
+
+-- tagpath /app-route/statistics/interval/loss
+appRouteStatisticsIntervalLoss OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Packets lost"
+    ::= { appRouteStatisticsIntervalEntry 3 }
+
+-- tagpath /app-route/statistics/interval/average-latency
+appRouteStatisticsIntervalAverageLatency OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average latency"
+    ::= { appRouteStatisticsIntervalEntry 4 }
+
+-- tagpath /app-route/statistics/interval/average-jitter
+appRouteStatisticsIntervalAverageJitter OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average jitter"
+    ::= { appRouteStatisticsIntervalEntry 5 }
+
+-- tagpath /app-route/statistics/interval/tx-data-pkts
+appRouteStatisticsIntervalTxDataPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Data packets transmitted"
+    ::= { appRouteStatisticsIntervalEntry 6 }
+
+-- tagpath /app-route/statistics/interval/rx-data-pkts
+appRouteStatisticsIntervalRxDataPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Data packets received"
+    ::= { appRouteStatisticsIntervalEntry 7 }
+
+-- tagpath /app-route/sla-class
+appRouteSlaClassTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AppRouteSlaClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { viptela-app-route 4 }
+
+-- tagpath /app-route/sla-class
+appRouteSlaClassEntry OBJECT-TYPE
+    SYNTAX      AppRouteSlaClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { appRouteSlaClassIndex }
+        ::= { appRouteSlaClassTable 1 }
+
+AppRouteSlaClassEntry ::=
+    SEQUENCE {
+        appRouteSlaClassIndex UnsignedByte,
+        appRouteSlaClassName String,
+        appRouteSlaClassLoss UnsignedByte,
+        appRouteSlaClassLatency Unsigned32,
+        appRouteSlaClassJitter Unsigned32
+    }
+
+-- tagpath /app-route/sla-class/index
+appRouteSlaClassIndex OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "SLA class index"
+    ::= { appRouteSlaClassEntry 1 }
+
+-- tagpath /app-route/sla-class/name
+appRouteSlaClassName OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Name of the SLA class"
+    ::= { appRouteSlaClassEntry 2 }
+
+-- tagpath /app-route/sla-class/loss
+appRouteSlaClassLoss OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Configured loss, in percentage"
+    ::= { appRouteSlaClassEntry 3 }
+
+-- tagpath /app-route/sla-class/latency
+appRouteSlaClassLatency OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Configured latency, in milliseconds"
+    ::= { appRouteSlaClassEntry 4 }
+
+-- tagpath /app-route/sla-class/jitter
+appRouteSlaClassJitter OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Configured jitter, in milliseconds"
+    ::= { appRouteSlaClassEntry 5 }
+
+END

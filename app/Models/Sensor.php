@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Models\Keyable;
+use LibreNMS\Util\Number;
 
 class Sensor extends DeviceRelatedModel implements Keyable
 {
@@ -68,18 +71,26 @@ class Sensor extends DeviceRelatedModel implements Keyable
         'percent' => 'percent',
     ];
 
-    // ---- Helper Functions ----
+    // ---- Helper Methods ----
 
-    public function classDescr()
+    public function classDescr(): string
     {
-        $nice = collect([
-            'ber' => 'BER',
-            'dbm' => 'dBm',
-            'eer' => 'EER',
-            'snr' => 'SNR',
-        ]);
+        return __('sensors.' . $this->sensor_class . '.short');
+    }
 
-        return $nice->get($this->sensor_class, ucwords(str_replace('_', ' ', $this->sensor_class)));
+    public function classDescrLong(): string
+    {
+        return __('sensors.' . $this->sensor_class . '.long');
+    }
+
+    public function unit(): string
+    {
+        return __('sensors.' . $this->sensor_class . '.unit');
+    }
+
+    public function unitLong(): string
+    {
+        return __('sensors.' . $this->sensor_class . '.unit_long');
     }
 
     public function icon()
@@ -128,7 +139,40 @@ class Sensor extends DeviceRelatedModel implements Keyable
         }
     }
 
+    /**
+     * Format current value for user display including units.
+     */
+    public function formatValue(): string
+    {
+        return match ($this->sensor_class) {
+            'current', 'power' => Number::formatSi($this->sensor_current, 3, 0, $this->unit()),
+            'dbm' => round($this->sensor_current, 3) . ' ' . $this->unit(),
+            default => $this->sensor_current . ' ' . $this->unit(),
+        };
+    }
+
+    public function currentStatus(): Severity
+    {
+        if ($this->sensor_limit !== null && $this->sensor_current >= $this->sensor_limit) {
+            return Severity::Error;
+        }
+        if ($this->sensor_limit_low !== null && $this->sensor_current <= $this->sensor_limit_low) {
+            return Severity::Error;
+        }
+
+        if ($this->sensor_limit_warn !== null && $this->sensor_current >= $this->sensor_limit_warn) {
+            return Severity::Warning;
+        }
+
+        if ($this->sensor_limit_low_warn !== null && $this->sensor_current <= $this->sensor_limit_low_warn) {
+            return Severity::Warning;
+        }
+
+        return Severity::Ok;
+    }
+
     // ---- Define Relationships ----
+
     public function events(): MorphMany
     {
         return $this->morphMany(Eventlog::class, 'events', 'type', 'reference');
@@ -152,6 +196,25 @@ class Sensor extends DeviceRelatedModel implements Keyable
     public function syncGroup(): string
     {
         return "$this->sensor_class-$this->poller_type";
+    }
+
+    /**
+     * @param  Builder  $query
+     * @return Builder
+     */
+    public function scopeIsCritical($query)
+    {
+        return $query->whereColumn('sensor_current', '<', 'sensor_limit_low')
+            ->orWhereColumn('sensor_current', '>', 'sensor_limit');
+    }
+
+    /**
+     * @param  Builder  $query
+     * @return Builder
+     */
+    public function scopeIsDisabled($query)
+    {
+        return $query->where('sensor_alert', 0);
     }
 
     public function __toString()

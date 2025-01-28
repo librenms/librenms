@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\Rewrite;
+
 $i = 0;
 
 foreach (explode(',', $vars['id']) as $ifid) {
@@ -10,7 +12,7 @@ foreach (explode(',', $vars['id']) as $ifid) {
         $rrd_list[$i]['filename'] = $rrd_file;
         $rrd_list[$i]['descr'] = format_hostname($port) . ' ' . $port['ifDescr'];
         $rrd_list[$i]['descr_in'] = format_hostname($port);
-        $rrd_list[$i]['descr_out'] = makeshortif($port['label']);
+        $rrd_list[$i]['descr_out'] = Rewrite::shortenIfName($port['label']);
         $i++;
     }
 }

@@ -17,6 +17,7 @@ use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
+use App\Models\Eventlog;
 use App\Models\Ipv4Mac;
 use App\Models\Location;
 use App\Models\MplsSap;
@@ -39,6 +40,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Billing;
 use LibreNMS\Config;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidTableColumnException;
 use LibreNMS\Util\Graph;
@@ -204,12 +206,12 @@ function get_port_stats_by_port_hostname(Illuminate\Http\Request $request)
     return check_port_permission($port['port_id'], $device_id, function () use ($request, $port) {
         $in_rate = $port['ifInOctets_rate'] * 8;
         $out_rate = $port['ifOutOctets_rate'] * 8;
-        $port['in_rate'] = Number::formatSi($in_rate, 2, 3, 'bps');
-        $port['out_rate'] = Number::formatSi($out_rate, 2, 3, 'bps');
+        $port['in_rate'] = Number::formatSi($in_rate, 2, 0, 'bps');
+        $port['out_rate'] = Number::formatSi($out_rate, 2, 0, 'bps');
         $port['in_perc'] = Number::calculatePercent($in_rate, $port['ifSpeed']);
         $port['out_perc'] = Number::calculatePercent($out_rate, $port['ifSpeed']);
-        $port['in_pps'] = Number::formatBi($port['ifInUcastPkts_rate'], 2, 3, '');
-        $port['out_pps'] = Number::formatBi($port['ifOutUcastPkts_rate'], 2, 3, '');
+        $port['in_pps'] = Number::formatBi($port['ifInUcastPkts_rate'], 2, 0, '');
+        $port['out_pps'] = Number::formatBi($port['ifOutUcastPkts_rate'], 2, 0, '');
 
         //only return requested columns
         if ($request->has('columns')) {
@@ -1116,6 +1118,21 @@ function get_port_ip_addresses(Illuminate\Http\Request $request)
     });
 }
 
+function get_port_fdb(Illuminate\Http\Request $request)
+{
+    $port_id = $request->route('portid');
+
+    return check_port_permission($port_id, null, function ($port_id) {
+        $fdb = PortsFdb::where('port_id', $port_id)->get();
+
+        if ($fdb->isEmpty()) {
+            return api_error(404, "Port {$port_id} does not have any MAC addresses in fdb");
+        }
+
+        return api_success($fdb, 'macs');
+    });
+}
+
 function get_network_ip_addresses(Illuminate\Http\Request $request)
 {
     $network_id = $request->route('id');
@@ -1127,6 +1144,17 @@ function get_network_ip_addresses(Illuminate\Http\Request $request)
     }
 
     return api_success(array_merge($ipv4, $ipv6), 'addresses');
+}
+
+function get_port_transceiver(Illuminate\Http\Request $request)
+{
+    $port_id = $request->route('portid');
+
+    return check_port_permission($port_id, null, function ($port_id) {
+        $transceivers = Port::find($port_id)->transceivers()->get();
+
+        return api_success($transceivers, 'transceivers');
+    });
 }
 
 function get_port_info(Illuminate\Http\Request $request)
@@ -1171,13 +1199,13 @@ function update_port_description(Illuminate\Http\Request $request)
     if ($description == 'repoll') {
         // No description provided, clear description
         del_dev_attrib($port, 'ifName:' . $ifName); // "port" object has required device_id
-        log_event("$ifName Port ifAlias cleared via API", $device, 'interface', 3, $port_id);
+        Eventlog::log("$ifName Port ifAlias cleared via API", $device, 'interface', Severity::Notice, $port_id);
 
         return api_success_noresult(200, 'Port description cleared.');
     } else {
         // Prevent poller from overwriting new description
         set_dev_attrib($port, 'ifName:' . $ifName, 1); // see above
-        log_event("$ifName Port ifAlias set via API: $description", $device, 'interface', 3, $port_id);
+        Eventlog::log("$ifName Port ifAlias set via API: $description", $device, 'interface', Severity::Notice, $port_id);
 
         return api_success_noresult(200, 'Port description updated.');
     }
@@ -1261,7 +1289,7 @@ function update_device_port_notes(Illuminate\Http\Request $request): JsonRespons
 
     $hostname = $request->route('hostname');
     // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = \DeviceCache::get($hostname);
 
     $data = json_decode($request->getContent(), true);
     $field = 'notes';
@@ -1270,7 +1298,7 @@ function update_device_port_notes(Illuminate\Http\Request $request): JsonRespons
         return api_error(400, 'Port field to patch has not been supplied.');
     }
 
-    if (set_dev_attrib($device_id, 'port_id_notes:' . $portid, $content)) {
+    if ($device->setAttrib('port_id_notes:' . $portid, $content)) {
         return api_success_noresult(200, 'Port ' . $field . ' field has been updated');
     } else {
         return api_error(500, 'Port ' . $field . ' field failed to be updated');
@@ -1714,15 +1742,15 @@ function list_bills(Illuminate\Http\Request $request)
         $overuse = '';
 
         if (strtolower($bill['bill_type']) == 'cdr') {
-            $allowed = Number::formatSi($bill['bill_cdr'], 2, 3, '') . 'bps';
-            $used = Number::formatSi($rate_data['rate_95th'], 2, 3, '') . 'bps';
+            $allowed = Number::formatSi($bill['bill_cdr'], 2, 0, '') . 'bps';
+            $used = Number::formatSi($rate_data['rate_95th'], 2, 0, '') . 'bps';
             if ($bill['bill_cdr'] > 0) {
                 $percent = Number::calculatePercent($rate_data['rate_95th'], $bill['bill_cdr']);
             } else {
                 $percent = '-';
             }
             $overuse = $rate_data['rate_95th'] - $bill['bill_cdr'];
-            $overuse = (($overuse <= 0) ? '-' : Number::formatSi($overuse, 2, 3, ''));
+            $overuse = (($overuse <= 0) ? '-' : Number::formatSi($overuse, 2, 0, ''));
         } elseif (strtolower($bill['bill_type']) == 'quota') {
             $allowed = Billing::formatBytes($bill['bill_quota']);
             $used = Billing::formatBytes($rate_data['total_data']);
@@ -2708,6 +2736,23 @@ function get_fdb(Illuminate\Http\Request $request)
 
         return api_error(404, 'Device does not exist');
     });
+}
+
+function get_transceivers(Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname');
+
+    if (empty($hostname)) {
+        return api_error(500, 'No hostname has been provided');
+    }
+
+    $device = DeviceCache::get($hostname);
+
+    if (! $device) {
+        return api_error(404, "Device $hostname not found");
+    }
+
+    return api_success($device->transceivers()->hasAccess($request->user())->get(), 'transceivers');
 }
 
 function list_fdb(Illuminate\Http\Request $request)

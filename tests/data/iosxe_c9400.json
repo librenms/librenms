@@ -29427,7 +29427,7 @@
                     "vlan": null,
                     "rootBridge": 0,
                     "bridgeAddress": "00eeab8f4200",
-                    "protocolSpecification": "unknown",
+                    "protocolSpecification": "rapidPvstPlus",
                     "priority": 32769,
                     "timeSinceTopologyChange": "2879862",
                     "topChanges": 167,
@@ -34298,5 +34298,87 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "transceivers": {
+        "discovery": {
+            "transceivers": [
+                {
+                    "index": "2072",
+                    "entity_physical_index": 2072,
+                    "type": "10G AOC2M",
+                    "vendor": "CISCO-AVAGO",
+                    "oui": null,
+                    "model": "SFP-10G-AOC2M",
+                    "revision": "V01",
+                    "serial": "A1111111111-A",
+                    "date": null,
+                    "ddm": null,
+                    "encoding": null,
+                    "cable": null,
+                    "distance": null,
+                    "wavelength": null,
+                    "connector": null,
+                    "channels": 1,
+                    "ifIndex": 50
+                },
+                {
+                    "index": "2078",
+                    "entity_physical_index": 2078,
+                    "type": "GE T",
+                    "vendor": "CISCO-AVAGO",
+                    "oui": null,
+                    "model": "ABCU-5710RZ-CS5",
+                    "revision": "",
+                    "serial": "AGM11111111",
+                    "date": null,
+                    "ddm": null,
+                    "encoding": null,
+                    "cable": null,
+                    "distance": null,
+                    "wavelength": null,
+                    "connector": null,
+                    "channels": 1,
+                    "ifIndex": 51
+                },
+                {
+                    "index": "3072",
+                    "entity_physical_index": 3072,
+                    "type": "10G AOC2M",
+                    "vendor": "CISCO-AVAGO",
+                    "oui": null,
+                    "model": "SFP-10G-AOC2M",
+                    "revision": "V01",
+                    "serial": "A4Z2150K132-A",
+                    "date": null,
+                    "ddm": null,
+                    "encoding": null,
+                    "cable": null,
+                    "distance": null,
+                    "wavelength": null,
+                    "connector": null,
+                    "channels": 1,
+                    "ifIndex": 60
+                },
+                {
+                    "index": "3078",
+                    "entity_physical_index": 3078,
+                    "type": "GE T",
+                    "vendor": "CISCO-AVAGO",
+                    "oui": null,
+                    "model": "ABCU-5710RZ-CS5",
+                    "revision": "",
+                    "serial": "AGM204442RB",
+                    "date": null,
+                    "ddm": null,
+                    "encoding": null,
+                    "cable": null,
+                    "distance": null,
+                    "wavelength": null,
+                    "connector": null,
+                    "channels": 1,
+                    "ifIndex": 61
+                }
+            ]
+        }
     }
 }

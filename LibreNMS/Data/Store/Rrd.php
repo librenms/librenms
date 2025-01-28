@@ -25,9 +25,12 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\ImageFormat;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\FileExistsException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Proc;
@@ -108,16 +111,22 @@ class Rrd extends BaseDatastore
 
         $cwd = $this->rrd_dir;
 
-        if (! $this->isSyncRunning()) {
-            $this->sync_process = new Proc($command, $descriptor_spec, $cwd);
-        }
+        try {
+            if (! $this->isSyncRunning()) {
+                $this->sync_process = new Proc($command, $descriptor_spec, $cwd);
+            }
 
-        if ($dual_process && ! $this->isAsyncRunning()) {
-            $this->async_process = new Proc($command, $descriptor_spec, $cwd);
-            $this->async_process->setSynchronous(false);
-        }
+            if ($dual_process && ! $this->isAsyncRunning()) {
+                $this->async_process = new Proc($command, $descriptor_spec, $cwd);
+                $this->async_process->setSynchronous(false);
+            }
 
-        return $this->isSyncRunning() && ($dual_process ? $this->isAsyncRunning() : true);
+            return $this->isSyncRunning() && ($dual_process ? $this->isAsyncRunning() : true);
+        } catch (\Exception $e) {
+            Log::error('Failed to start RRD datastore: ' . $e->getMessage());
+
+            return false;
+        }
     }
 
     public function isSyncRunning()
@@ -335,11 +344,11 @@ class Rrd extends BaseDatastore
         $newrrd = self::name($device['hostname'], $newname);
         if (is_file($oldrrd) && ! is_file($newrrd)) {
             if (rename($oldrrd, $newrrd)) {
-                log_event("Renamed $oldrrd to $newrrd", $device, 'poller', 1);
+                Eventlog::log("Renamed $oldrrd to $newrrd", $device['device_id'], 'poller', Severity::Ok);
 
                 return true;
             } else {
-                log_event("Failed to rename $oldrrd to $newrrd", $device, 'poller', 5);
+                Eventlog::log("Failed to rename $oldrrd to $newrrd", $device['device_id'], 'poller', Severity::Error);
 
                 return false;
             }
@@ -374,7 +383,7 @@ class Rrd extends BaseDatastore
     {
         $host = self::safeName(trim($host, '[]'));
 
-        return implode('/', [$this->rrd_dir, $host]);
+        return Str::finish($this->rrd_dir, '/') . $host;
     }
 
     /**
@@ -667,7 +676,7 @@ class Rrd extends BaseDatastore
      */
     public static function fixedSafeDescr($descr, $length)
     {
-        $result = Rewrite::shortenIfType($descr);
+        $result = Rewrite::shortenIfName($descr);
         $result = str_replace("'", '', $result);            // remove quotes
 
         if (is_numeric($length)) {

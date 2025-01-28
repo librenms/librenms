@@ -547,7 +547,6 @@ class Device extends BaseModel
     {
         return $query->where([
             ['status', '=', 0],
-            ['disable_notify', '=', 0],
             ['ignore', '=', 0],
             ['disabled', '=', 0],
         ]);
@@ -1030,6 +1029,11 @@ class Device extends BaseModel
         return $this->hasMany(LoadbalancerRserver::class, 'device_id');
     }
 
+    public function qos(): HasMany
+    {
+        return $this->hasMany(Qos::class, 'device_id');
+    }
+
     public function slas(): HasMany
     {
         return $this->hasMany(Sla::class, 'device_id');
@@ -1043,6 +1047,11 @@ class Device extends BaseModel
     public function tnmsNeInfo(): HasMany
     {
         return $this->hasMany(TnmsneInfo::class, 'device_id');
+    }
+
+    public function transceivers(): HasMany
+    {
+        return $this->hasMany(Transceiver::class, 'device_id');
     }
 
     public function users(): BelongsToMany

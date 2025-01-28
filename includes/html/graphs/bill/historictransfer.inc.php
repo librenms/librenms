@@ -59,7 +59,7 @@ $graph->xgrid->SetColor('#e0e0e0', '#efefef');
 
 function YCallback($value)
 {
-    return Number::formatBase($value, \LibreNMS\Config::get('billing.base'), 2, 1);
+    return Number::formatBase($value, \LibreNMS\Config::get('billing.base'), 1, 0);
 }
 
 $graph->yaxis->SetFont(FF_FONT1);

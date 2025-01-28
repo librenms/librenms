@@ -29351,7 +29351,7 @@
                     "sensor_index": "1065",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Gi1/0/52 Bias Current",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0061,
@@ -29361,7 +29361,7 @@
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "10152",
+                    "entPhysicalIndex": "1062",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
@@ -29376,7 +29376,7 @@
                     "sensor_index": "3065",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Gi3/0/52 Bias Current",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0057,
@@ -29386,7 +29386,7 @@
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "11152",
+                    "entPhysicalIndex": "3062",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
@@ -29401,7 +29401,7 @@
                     "sensor_index": "1066",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Gi1/0/52 Transmit Power",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": -5,
@@ -29411,7 +29411,7 @@
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "10152",
+                    "entPhysicalIndex": "1062",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
@@ -29426,7 +29426,7 @@
                     "sensor_index": "1067",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Gi1/0/52 Receive Power",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": -4.7,
@@ -29436,7 +29436,7 @@
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "10152",
+                    "entPhysicalIndex": "1062",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
@@ -29451,7 +29451,7 @@
                     "sensor_index": "3066",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Gi3/0/52 Transmit Power",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": -5,
@@ -29461,7 +29461,7 @@
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "11152",
+                    "entPhysicalIndex": "3062",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
@@ -29476,7 +29476,7 @@
                     "sensor_index": "3067",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Gi3/0/52 Receive Power",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": -7.3,
@@ -29486,7 +29486,7 @@
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "11152",
+                    "entPhysicalIndex": "3062",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
@@ -30176,7 +30176,7 @@
                     "sensor_index": "1063",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Gi1/0/52 Module",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 34.6,
@@ -30186,7 +30186,7 @@
                     "sensor_limit_low_warn": -5,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "10152",
+                    "entPhysicalIndex": "1062",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
@@ -30201,7 +30201,7 @@
                     "sensor_index": "3063",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Gi3/0/52 Module",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 31,
@@ -30211,7 +30211,7 @@
                     "sensor_limit_low_warn": -1,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "11152",
+                    "entPhysicalIndex": "3062",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
@@ -30226,7 +30226,7 @@
                     "sensor_index": "1064",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Gi1/0/52 Supply Voltage",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
                     "sensor_current": 3.32,
@@ -30236,7 +30236,7 @@
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "10152",
+                    "entPhysicalIndex": "1062",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
@@ -30251,7 +30251,7 @@
                     "sensor_index": "3064",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Gi3/0/52 Supply Voltage",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
                     "sensor_current": 3.32,
@@ -30261,7 +30261,7 @@
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "11152",
+                    "entPhysicalIndex": "3062",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
@@ -30730,7 +30730,7 @@
                     "vlan": null,
                     "rootBridge": 0,
                     "bridgeAddress": "ac7e8a19bf00",
-                    "protocolSpecification": "unknown",
+                    "protocolSpecification": "rapidPvstPlus",
                     "priority": 32769,
                     "timeSinceTopologyChange": "7184723",
                     "topChanges": 6,
@@ -32052,7 +32052,7 @@
                     "entPhysicalContainedIn": 1062,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 10152
                 },
                 {
                     "entPhysicalIndex": 1064,
@@ -32071,7 +32071,7 @@
                     "entPhysicalContainedIn": 1062,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 10152
                 },
                 {
                     "entPhysicalIndex": 1065,
@@ -32090,7 +32090,7 @@
                     "entPhysicalContainedIn": 1062,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 10152
                 },
                 {
                     "entPhysicalIndex": 1066,
@@ -32109,7 +32109,7 @@
                     "entPhysicalContainedIn": 1062,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 10152
                 },
                 {
                     "entPhysicalIndex": 1067,
@@ -32128,7 +32128,7 @@
                     "entPhysicalContainedIn": 1062,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 10152
                 },
                 {
                     "entPhysicalIndex": 2001,
@@ -34028,7 +34028,7 @@
                     "entPhysicalContainedIn": 3062,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 11152
                 },
                 {
                     "entPhysicalIndex": 3064,
@@ -34047,7 +34047,7 @@
                     "entPhysicalContainedIn": 3062,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 11152
                 },
                 {
                     "entPhysicalIndex": 3065,
@@ -34066,7 +34066,7 @@
                     "entPhysicalContainedIn": 3062,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 11152
                 },
                 {
                     "entPhysicalIndex": 3066,
@@ -34085,7 +34085,7 @@
                     "entPhysicalContainedIn": 3062,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 11152
                 },
                 {
                     "entPhysicalIndex": 3067,
@@ -34104,7 +34104,7 @@
                     "entPhysicalContainedIn": 3062,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 11152
                 }
             ]
         },
@@ -34235,6 +34235,50 @@
                     "ifAlias": "*** Link to acme-fr-s-001 int Gi3/0/2 ***",
                     "ifDescr": "GigabitEthernet3/0/52",
                     "ifName": "Gi3/0/52"
+                }
+            ]
+        }
+    },
+    "transceivers": {
+        "discovery": {
+            "transceivers": [
+                {
+                    "index": "1062",
+                    "entity_physical_index": 1062,
+                    "type": "1000BaseSX SFP",
+                    "vendor": "",
+                    "oui": null,
+                    "model": "GLC-SX-MMD",
+                    "revision": "V01",
+                    "serial": "FNS192717K1",
+                    "date": null,
+                    "ddm": null,
+                    "encoding": null,
+                    "cable": null,
+                    "distance": null,
+                    "wavelength": null,
+                    "connector": null,
+                    "channels": 1,
+                    "ifIndex": 10152
+                },
+                {
+                    "index": "3062",
+                    "entity_physical_index": 3062,
+                    "type": "1000BaseSX SFP",
+                    "vendor": "",
+                    "oui": null,
+                    "model": "GLC-SX-MMD",
+                    "revision": "V01",
+                    "serial": "FNS192717QJ",
+                    "date": null,
+                    "ddm": null,
+                    "encoding": null,
+                    "cable": null,
+                    "distance": null,
+                    "wavelength": null,
+                    "connector": null,
+                    "channels": 1,
+                    "ifIndex": 11152
                 }
             ]
         }

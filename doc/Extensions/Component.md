@@ -45,7 +45,7 @@ mysql> select * from component_prefs limit 1;
 2 rows in set (0.00 sec)
 ```
 
-### Reserved Fields
+### <a name="reserved">Reserved Fields</a>
 
 When this data from both the `component` and `component_prefs` tables
 is returned in one single consolidated array, there is the potential
@@ -63,7 +63,7 @@ Create an instance of the component class:
 $COMPONENT = new LibreNMS\Component();
 ```
 
-### Retrieving Components
+### <a name="get">Retrieving Components</a>
 
 Now you can retrieve an array of the available components:
 
@@ -206,7 +206,7 @@ This will return `True` on success or `False` on failure.
 To edit a component, the procedure is:
 
 1. [Get the Current Components](#get)
-1. [Edit the array](#update-edit)
+1. [Edit the array](#edit-the-array)
 1. [Write the components](#update-write)
 
 ### Edit the Array
@@ -240,7 +240,7 @@ If you need to edit a previously set Attribute/Value pair you can:
 $ARRAY[COMPONENT_ID]['Existing Attribute'] = "New Value";
 ```
 
-### Write the components
+### <a name="update-write">Write the components </a> 
 
 To write component changes back to the database simply:
 
@@ -310,10 +310,6 @@ The data that is written to each alert when it is raised is in the following for
 To see an example of how the component module can used, please see the
 following modules:
 
-- Cisco CBQoS
-  - `includes/discovery/cisco-cbqos.inc.php`
-  - `includes/polling/cisco-cbqos.inc.php`
-  - `html/includes/graphs/device/cbqos_traffic.inc.php`
 - Cisco OTV
   - `includes/discovery/cisco-otv.inc.php`
   - `includes/polling/cisco-otv.inc.php`
