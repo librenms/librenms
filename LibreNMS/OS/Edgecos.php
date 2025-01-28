@@ -3,7 +3,7 @@
 /**
  * Edgecos.php
  *
- * Support for Edgecos devices in LibreNMS
+ * Support for Edgecore devices in LibreNMS
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ use App\Models\Transceiver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
+use LibreNMS\Exceptions\RuntimeException;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
@@ -60,15 +61,17 @@ class Edgecos extends \LibreNMS\OS implements MempoolsDiscovery, ProcessorDiscov
             'mempool_perc_warn' => 90,
         ]);
 
-        if (! empty($data['memoryAllocated.0'])) {
+        if (!empty($data['memoryAllocated.0'])) {
             $mempool->mempool_used_oid = Oid::of('memoryAllocated.0')->toNumeric($mib);
-        } else {
+        } elseif (!empty($data['memoryFreed.0'])) {
             $mempool->mempool_free_oid = Oid::of('memoryFreed.0')->toNumeric($mib);
+        } else {
+            throw new RuntimeException("No memory allocation/free data found for device {$this->getDeviceId()}");
         }
 
         $mempool->fillUsage($data['memoryAllocated.0'] ?? null, $data['memoryTotal.0'] ?? null, $data['memoryFreed.0']);
 
-        return new \Illuminate\Support\Collection([$mempool]);
+        return new Collection([$mempool]);
     }
 
     public function discoverOS(Device $device): void
@@ -81,45 +84,32 @@ class Edgecos extends \LibreNMS\OS implements MempoolsDiscovery, ProcessorDiscov
         $device->serial = $data[1]['swSerialNumber'] ?? null;
     }
 
-    /**
-     * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
-     *
-     * @return array Processors
-     */
     public function discoverProcessors()
     {
         $device = $this->getDevice();
+        $oidTable = [
+            '.1.3.6.1.4.1.259.10.1.24.' => '.1.3.6.1.4.1.259.10.1.24.1.39.2.1.0', // ECS4510
+            '.1.3.6.1.4.1.259.10.1.22.' => '.1.3.6.1.4.1.259.10.1.22.1.39.2.1.0', // ECS3528
+            '.1.3.6.1.4.1.259.10.1.39.' => '.1.3.6.1.4.1.259.10.1.39.1.39.2.1.0', // ECS4110
+            '.1.3.6.1.4.1.259.10.1.45.' => '.1.3.6.1.4.1.259.10.1.45.1.39.2.1.0', // ECS4120
+            '.1.3.6.1.4.1.259.10.1.42.' => '.1.3.6.1.4.1.259.10.1.42.101.1.39.2.1.0', // ECS4210
+            '.1.3.6.1.4.1.259.10.1.27.' => '.1.3.6.1.4.1.259.10.1.27.1.39.2.1.0', // ECS3510
+            '.1.3.6.1.4.1.259.8.1.11.' => '.1.3.6.1.4.1.259.8.1.11.1.39.2.1.0', // ES3510MA
+            '.1.3.6.1.4.1.259.10.1.46.' => '.1.3.6.1.4.1.259.10.1.46.1.39.2.1.0', // ECS4100-52T
+            '.1.3.6.1.4.1.259.10.1.5' => '.1.3.6.1.4.1.259.10.1.5.1.39.2.1.0', // ECS4610-24F
+        ];
 
-        if (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.24.')) { //ECS4510
-            $oid = '.1.3.6.1.4.1.259.10.1.24.1.39.2.1.0';
-        } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.22.')) { //ECS3528
-            $oid = '.1.3.6.1.4.1.259.10.1.22.1.39.2.1.0';
-        } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.39.')) { //ECS4110
-            $oid = '.1.3.6.1.4.1.259.10.1.39.1.39.2.1.0';
-        } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.45.')) { //ECS4120
-            $oid = '.1.3.6.1.4.1.259.10.1.45.1.39.2.1.0';
-        } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.42.')) { //ECS4210
-            $oid = '.1.3.6.1.4.1.259.10.1.42.101.1.39.2.1.0';
-        } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.27.')) { //ECS3510
-            $oid = '.1.3.6.1.4.1.259.10.1.27.1.39.2.1.0';
-        } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.8.1.11.')) { //ES3510MA
-            $oid = '.1.3.6.1.4.1.259.8.1.11.1.39.2.1.0';
-        } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.46.')) { //ECS4100-52T
-            $oid = '.1.3.6.1.4.1.259.10.1.46.1.39.2.1.0';
-        } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.5')) { //ECS4610-24F
-            $oid = '.1.3.6.1.4.1.259.10.1.5.1.39.2.1.0';
-        }
-
-        if (isset($oid)) {
-            return [
-                Processor::discover(
-                    $this->getName(),
-                    $this->getDeviceId(),
-                    $oid,
-                    0
-                ),
-            ];
+        foreach ($oidTable as $prefix => $oid) {
+            if (Str::startsWith($device->sysObjectID, $prefix)) {
+                return [
+                    Processor::discover(
+                        $this->getName(),
+                        $this->getDeviceId(),
+                        $oid,
+                        0
+                    ),
+                ];
+            }
         }
 
         return parent::discoverProcessors();
@@ -133,6 +123,12 @@ class Edgecos extends \LibreNMS\OS implements MempoolsDiscovery, ProcessorDiscov
                     return null;
                 }
 
+                $port_id = PortCache::getIdFromIfIndex($data['EDGECORE-ENTITY-MIB::edgecoreEntityIndex'], $this->getDeviceId());
+
+                if (!$port_id) {
+                    return null; // Skip transceivers without a valid port ID
+                }
+
                 $distance = intval($data['EDGECORE-ENTITY-MIB::edgecoreEntityDistance'] ?? 0);
                 $wavelength = intval($data['EDGECORE-ENTITY-MIB::edgecoreEntityWavelength'] ?? 0);
 
@@ -143,8 +139,6 @@ class Edgecos extends \LibreNMS\OS implements MempoolsDiscovery, ProcessorDiscov
                 if ($wavelength <= 0) {
                     $wavelength = null;
                 }
-
-                $port_id = PortCache::getIdFromIfIndex($data['EDGECORE-ENTITY-MIB::edgecoreEntityIndex'], $this->getDeviceId());
 
                 return new Transceiver([
                     'port_id' => $port_id,
@@ -161,12 +155,7 @@ class Edgecos extends \LibreNMS\OS implements MempoolsDiscovery, ProcessorDiscov
         );
     }
 
-    /**
-     * Find the MIB based on sysObjectID
-     *
-     * @return string
-     */
-    protected function findMib(): ?string
+    protected function findMib(): string
     {
         $table = [
             '.1.3.6.1.4.1.259.6.' => 'ES3528MO-MIB',
@@ -188,6 +177,6 @@ class Edgecos extends \LibreNMS\OS implements MempoolsDiscovery, ProcessorDiscov
             }
         }
 
-        return null;
+        throw new RuntimeException("No MIB found for sysObjectID: " . $this->getDevice()->sysObjectID);
     }
 }
