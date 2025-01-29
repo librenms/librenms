@@ -19,7 +19,6 @@
  *
  * @link       https://www.librenms.org
  *
- * based on
  * @copyright  2021 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
