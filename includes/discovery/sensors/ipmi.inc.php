@@ -22,7 +22,6 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     }
 
     foreach (Config::get('ipmi.type', []) as $ipmi_type) {
-
         // Check if the IPMI type is available, catch segfaults of ipmitool/freeipmi.
         try {
             Log::debug('Trying IPMI type: ' . $ipmi_type);
