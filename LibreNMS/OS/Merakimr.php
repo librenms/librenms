@@ -13,10 +13,7 @@
 
 namespace LibreNMS\OS;
 
-use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
-use LibreNMS\Interfaces\Discovery\OSDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
@@ -25,7 +22,6 @@ class Merakimr extends OS implements
     WirelessFrequencyDiscovery,
     WirelessFrequencyPolling
 {
-
     public function discoverWirelessFrequency()
     {
         $mrRadioChannelOper = $this->getCacheByIndex('dot11CurrentChannel', 'IEEE802dot11-MIB');
@@ -54,5 +50,4 @@ class Merakimr extends OS implements
     {
         return $this->pollWirelessChannelAsFrequency($sensors);
     }
-
 }
