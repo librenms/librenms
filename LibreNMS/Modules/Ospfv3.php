@@ -189,7 +189,6 @@ class Ospfv3 implements Module
 
             Log::info('Total neighbors: ' . $ospf_neighbours->count());
 
-
             if ($instance_count > 0) {
                 // Create device-wide statistics RRD
                 $rrd_def = RrdDefinition::make()
