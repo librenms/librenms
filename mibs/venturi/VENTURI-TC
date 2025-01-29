@@ -1,0 +1,396 @@
+-- --------------------------------------------------------------------------
+-- Copyright (c) 2005-2010 Venturi Wireless, Inc.
+-- --------------------------------------------------------------------------
+
+VENTURI-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+;
+
+VenturiProtocolType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Enumeration of protocol types."
+    SYNTAX     INTEGER {
+        all        (0),
+        other      (1),
+        http       (2),
+        pop3       (3),
+        imap       (4),
+        smtp       (5),
+        ftp        (6),
+        telnet     (7),
+        rtsp       (8)
+    }
+
+VenturiSubscriberType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Enumeration of subscriber types."
+    SYNTAX     INTEGER {
+        client        (1),
+        clientless    (2)
+    }
+
+
+VenturiConditionState ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Enumeration of states of a condition."
+    SYNTAX     INTEGER {
+        cleared       (0),
+        raised        (1)
+    }
+
+VenturiBooleanType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Enumeration of Boolean types."
+    SYNTAX     INTEGER {
+        no         (1),
+        yes        (2)
+    }
+
+VenturiConditionType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Enumeration of types of alarm-able conditions."
+    SYNTAX     INTEGER {
+        softwareStopped                  (1),
+        swapOverload                     (2),
+        networkError                     (3),
+        kernelError                      (4),
+        licenseError                     (5),
+        sharedMemoryError                (6),
+        fileSystemError                  (7),
+        tcpOverload                      (8),
+        cacheOverload                    (9),
+        logOverload                      (10),
+        fanFailure                       (11),
+        powerSupplyFailure               (12),
+        highTemperature                  (13),
+        moduleInitFalure                 (14),
+        radiusServerFailure              (15),
+        lowCriticalBuffers               (16),
+        statsCollectionError             (17),
+        logCollectionError               (18),
+        urlCollectionError               (19),
+        clientStatsCollectionError       (20),
+        clientUpgradeCollectionError     (21),
+        cdcLogCollectionError            (22)
+    }
+
+VenturiPhysicalIfMode ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Enumeration of physical interface modes."
+    SYNTAX     INTEGER {
+        auto                   (1),
+        tenHalf                (2),
+        tenFull                (3),
+        hundredHalf            (4),
+        hundredFull            (5),
+        thousandFull           (6)
+    }
+
+VenturiLogicalIfMode ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Enumeration of logical interface modes."
+    SYNTAX     INTEGER {
+        standalone             (1),
+        bonding                (2) 
+    }
+
+VenturiLicenseName ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "type of license name."
+    SYNTAX     INTEGER {
+        iproute                (0),
+        vvs                    (1),
+        iptrans                (2),
+        radiusAcct             (3),
+        rtsp                   (4)
+    }
+
+VenturiLevel ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Enumeration of types of color types."
+    SYNTAX     INTEGER {
+        levelOne                  (1),
+        levelTwo                  (2),
+        levelThree                (3),
+        levelFour                 (4)
+    }
+
+VenturiImageColorType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Enumeration of types of color types."
+    SYNTAX     INTEGER {
+        none                    (1),
+        lossy                   (2),
+        lossless                (3),
+        noanim                  (4)
+    }
+ 
+VenturiImageColorValue ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Enumeration of types of color value."
+    SYNTAX     INTEGER {
+        colorTwoBit                    (2),
+        colorFourBit                   (4),
+        colorEightBit                  (8),
+        colorSixteenBit                (16),
+        colorThirtytwoBit              (32),
+        colorSixtyfourBit              (64),
+        colorOneTwentyeithyBit         (128),
+        colorTwoFiftySixbit            (256)
+    }
+    
+ VenturiLogLevels ::= TEXTUAL-CONVENTION
+     STATUS     current
+     DESCRIPTION
+         "Enumeration of types of logs."
+     SYNTAX     INTEGER {
+         emergency               (1),
+         alert                   (2),
+         critical                (3),
+         error                   (4),
+         warn                    (5),
+         notice                  (6),
+         info                    (7),
+         verbose                 (8),
+         extraverbose            (9),
+         off                   (100)
+    }
+    
+VenturiThresholdLevels ::= TEXTUAL-CONVENTION
+     STATUS     current
+     DESCRIPTION
+         "Enumeration of types of threshold levels."
+     SYNTAX     INTEGER {
+         off                     (0),
+         emergency               (1),
+         alert                   (2),
+         critical                (3),
+         error                   (4),
+         warn                    (5),
+         notice                  (6),
+         info                    (7),
+         verbose                 (8),
+         extraverbose            (9)
+     }
+
+VenturiTrapType ::= TEXTUAL-CONVENTION
+     STATUS     current
+     DESCRIPTION
+         "Enumeration of types of trap."
+     SYNTAX     INTEGER {
+         v1Trap                    (1),
+         v2Trap                    (2),
+         v2Inform                  (3)    
+    }
+    
+
+VenturiTrapSeverity ::= TEXTUAL-CONVENTION
+     STATUS     current
+     DESCRIPTION
+         "Enumeration of types of trap severity."
+     SYNTAX  INTEGER {
+                 notApplicable(0),
+                 critical(1),
+                 major(2),
+                 minor(3),
+                 warning(4),
+                 informational(5)
+     }
+    
+VenturiFTPDeliveryPeriod ::= TEXTUAL-CONVENTION
+     STATUS     current
+     DESCRIPTION
+         "Enumeration of frequecy of ftp delivery."
+     SYNTAX     INTEGER {
+         fifteenMin              (15),
+         thirtyMin               (30),
+         oneHour                 (60),
+         twoHour                 (120),
+         threeHour               (180),
+         fourHour                (240)        
+    }
+
+VenturiContentRecognitionProtocol ::= TEXTUAL-CONVENTION
+     STATUS     current
+     DESCRIPTION
+         "Enumeration of Content Recognition Protocol."
+     SYNTAX     INTEGER {
+         ftp                    (1),
+         http                   (2),
+         email                  (3)    
+    }
+    
+VenturiPFMode ::= TEXTUAL-CONVENTION
+     STATUS     current
+     DESCRIPTION
+         "Enumeration of types of PF mode."
+     SYNTAX     INTEGER {
+         disabled               (1),
+         pfCache                (2),
+         pfProxy                (3)    
+    }
+
+VenturiCacheMode ::= TEXTUAL-CONVENTION
+     STATUS     current
+     DESCRIPTION
+         "Enumeration of types of Cache mode."
+     SYNTAX     INTEGER {
+         internal               (1),
+         external               (2),
+         nocache                (3)    
+    }
+
+VenturiCacheType ::= TEXTUAL-CONVENTION
+     STATUS     current
+     DESCRIPTION
+         "Enumeration of types of Cache."
+     SYNTAX     INTEGER {
+         parent                 (1),
+         sibling                (2)  
+    }
+
+VenturiClientAuthorization ::= TEXTUAL-CONVENTION
+     STATUS     current
+     DESCRIPTION
+         "Enumeration of types of client authorization."
+     SYNTAX     INTEGER {
+         radius                 (1),
+         sourceIP               (2),
+         none                   (3)
+    }
+VenturiSyslogFacilityType ::= TEXTUAL-CONVENTION
+     STATUS     current
+     DESCRIPTION
+         "Enumeration of types of facilities."
+     SYNTAX     INTEGER {
+         local0                 (0),
+         local1                 (1),
+         local2                 (2),
+         local3                 (3),
+         local4                 (4),
+         local5                 (5),
+         local6                 (6),
+         local7                 (7)
+    }
+
+VenturiUpgradeStatus ::= TEXTUAL-CONVENTION
+     STATUS     current
+     DESCRIPTION
+         "Enumeration of types of upgrade status."
+     SYNTAX     INTEGER {
+         none                   (1),
+         downloading            (2),
+         crcError               (3),
+         ok                     (4)
+    }
+
+VenturiBlockingType ::= TEXTUAL-CONVENTION
+     STATUS     current
+     DESCRIPTION
+         "ip blocking type."
+     SYNTAX     INTEGER {
+         allow                  (1),
+         deny                   (2)
+    }
+
+VenturiPercentageValue ::= TEXTUAL-CONVENTION
+     STATUS     current
+     DESCRIPTION
+         "pecentage value."
+     SYNTAX     INTEGER {
+         ten                   (10),
+         fifteen               (15),
+         twenty                (20),
+         twentyfive            (25),
+         thirty                (30),
+         thirtyfive            (35),
+         forty                 (40),
+         fortyfive             (45),
+         fifty                 (50),
+         fiftyfive             (55),
+         sixty                 (60),
+         sixtyfive             (65),
+         seventy               (70),
+         seventyfive           (75),
+         eighty                (80),
+         eightyfive            (85),
+         ninety                (90),
+         ninetyfive            (95),
+         hundred               (100)
+    }
+    
+VenturiIfConfig ::= TEXTUAL-CONVENTION
+     STATUS     current
+     DESCRIPTION
+         "Interface configuration."
+     SYNTAX     INTEGER {
+         nonforwarding       (1),
+         forwarding          (2)
+    }
+    
+VenturiTransportType ::= TEXTUAL-CONVENTION
+     STATUS     current
+     DESCRIPTION
+         "Type of various transport."
+     SYNTAX     INTEGER {
+         transportNone       (1),
+         transportProxy      (2),
+         transportCache      (3),
+         transportRtspProxy  (4),
+         transportDirectTCP  (5)
+    }
+    
+VenturiLogModuleType ::= TEXTUAL-CONVENTION
+     STATUS     current
+     DESCRIPTION
+         "The Venturi log module."
+     SYNTAX     INTEGER {
+         lmvos         (1),
+         lmvtp         (2),
+         lmvap         (3),
+         lmvcp         (4),
+         lmdb          (5),
+         lmpostq       (6),
+         lmbox         (7),
+         lmlog         (8),
+         lmsnmp        (9),
+         lmcache       (10),
+         lmndb         (11),
+         lmbmc         (12),
+         lmdiag        (13),
+         lmauth        (14),
+         lmstats       (15),
+         lmsmp         (16),
+         lmcrypto      (17),
+         lmuiweb       (18),
+         lmtrans       (19),
+         lmhttpsproxy  (20),
+         lmradius      (21),
+         lmvrtsp       (22),
+         lmstaging     (23),
+         lmcli         (24)
+    }
+
+
+VenturiHexUnsigned32 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "x"
+    STATUS       current
+    DESCRIPTION
+            "An Unsigned32 value that should be displayed in hexadecimal."
+    SYNTAX Unsigned32
+
+END
