@@ -118,7 +118,6 @@ class SmOs extends OS implements
 
     public function discoverWirelessRssi()
     {
-
         $sensors[] = new WirelessSensor(
             'rssi',
             $this->getDeviceId(),
@@ -161,6 +160,7 @@ class SmOs extends OS implements
         $oid = '.1.3.6.1.4.1.3373.1103.39.2.1.13.1';
 
         $sensors[] = new WirelessSensor('power', $this->getDeviceId(), $oid, 'alfo80hd-tx', 1, 'Tx Power');
+
         return $sensors;
     }
 
