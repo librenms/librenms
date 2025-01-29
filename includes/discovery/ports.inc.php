@@ -152,7 +152,8 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
             }
 
             $ports[$port_id] = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `port_id` = ?', [$device['device_id'], $port_id]);
-            echo 'Adding: ' . $snmp_data['ifName'] . '(' . $ifIndex . ')(' . $port_id . ')';
+            d_echo('Adding: ' . $snmp_data['ifName'] . '(' . $ifIndex . ')(' . $port_id . ')');
+            echo '+';
         } elseif ($ports_db[$port_id]['deleted'] == 1) {
             // Port re-discovered after previous deletion?
             $snmp_data['deleted'] = 0;
@@ -172,8 +173,6 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
                 echo '-';
             }
         }
-
-        echo 'X';
     }//end if
 }//end foreach
 
