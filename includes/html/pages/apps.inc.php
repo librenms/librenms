@@ -433,6 +433,25 @@ $graphs['sagan'] = [
     'uptime',
     'alert',
 ];
+$graphs['oslv_monitor'] = [
+    'cpu_percent',
+    'mem_percent',
+    'time',
+    'procs',
+    'sizes',
+    'rss',
+    'vsz',
+    'faults',
+    'rwd_amount',
+    'ops_rwd',
+    'cows',
+    'sock',
+    'recv_sent_msgs',
+    'etime',
+    'swaps',
+    'signals_taken',
+    'switches',
+];
 $graphs['hv-monitor'] = [
     'status',
     'memory',
@@ -542,6 +561,21 @@ $graphs['ss'] = [
     'vsock',
     'xdp',
 ];
+$graphs['http_access_log_combined'] = [
+    'bytes',
+    'codes_general',
+    'codes_1xx',
+    'codes_2xx',
+    'codes_3xx',
+    'codes_4xx',
+    'codes_5xx',
+    'methods',
+    'version',
+    'refer',
+    'user',
+    'log_size',
+    'error_size',
+];
 $graphs['borgbackup'] = [
     'unique_csize',
     'total_csize',
@@ -559,6 +593,14 @@ $graphs['nfs'] = [
     'server_cache',
     'client_rpc',
     'client_cache',
+];
+$graphs['nextcloud'] = [
+    'used',
+    'calendars',
+    'disabled_apps',
+    'enabled_apps',
+    'encryption_enabled',
+    'user_count',
 ];
 $graphs['poudriere'] = [
     'status',
@@ -597,9 +639,9 @@ $link_array = [
     'tab' => 'apps',
 ];
 
-$apps = \LibreNMS\Util\ObjectCache::applications()->flatten();
+$apps = LibreNMS\Util\ObjectCache::applications()->flatten();
 foreach ($apps as $app) {
-    $app_state = \LibreNMS\Util\Html::appStateIcon($app->app_state);
+    $app_state = LibreNMS\Util\Html::appStateIcon($app->app_state);
     if (! empty($app_state['icon'])) {
         $app_state_info = '<font color="' . $app_state['color'] . '"><i title="' . $app_state['hover_text'] . '" class="fa ' . $app_state['icon'] . ' fa-fw fa-lg" aria-hidden="true"></i></font>';
     } else {
@@ -611,7 +653,7 @@ foreach ($apps as $app) {
         echo "<span class='pagemenu-selected'>";
     }
     echo $app_state_info;
-    echo generate_link($app->displayName(), ['page' => 'apps', 'app' => $app->app_type]);
+    echo generate_link(htmlentities($app->displayName()), ['page' => 'apps', 'app' => $app->app_type]);
     if ($vars['app'] == $app->app_type) {
         echo '</span>';
     }

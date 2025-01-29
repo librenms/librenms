@@ -1,0 +1,852 @@
+-- Namespace: http://viptela.com/wlan
+
+VIPTELA-WLAN DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    viptela
+        FROM VIPTELA-GLOBAL
+;
+
+viptela-wlan MODULE-IDENTITY
+    LAST-UPDATED "202007010000Z"
+    ORGANIZATION "Viptela, Inc."
+    CONTACT-INFO "Viptela, Inc.  Email:support@viptela.com"
+    DESCRIPTION "This module defines the data model for WLAN management"
+    REVISION "202007010000Z"
+    DESCRIPTION "Viptela Revision 20.3"
+    REVISION "202002240000Z"
+    DESCRIPTION "Viptela Revision 20.1"
+    REVISION "201911150000Z"
+    DESCRIPTION "Viptela Revision 19.3"
+    REVISION "201908150000Z"
+    DESCRIPTION "Viptela Revision 19.2"
+    REVISION "201811010000Z"
+    DESCRIPTION "Viptela Revision 18.4"
+    REVISION "201808200000Z"
+    DESCRIPTION "Viptela Revision 18.3.1"
+    REVISION "201806250000Z"
+    DESCRIPTION "Viptela Revision 18.3"
+    REVISION "201804250000Z"
+    DESCRIPTION "Viptela Revision 18.2"
+    REVISION "201803150000Z"
+    DESCRIPTION "Viptela Revision 18.1.1"
+    REVISION "201801160000Z"
+    DESCRIPTION "Viptela Revision 17.2.3"
+    REVISION "201711010000Z"
+    DESCRIPTION "Viptela Revision 17.2.1"
+    REVISION "201708010000Z"
+    DESCRIPTION "Viptela Revision 17.2"
+    REVISION "201705250000Z"
+    DESCRIPTION "Viptela Revision 17.1.1"
+    REVISION "201704060000Z"
+    DESCRIPTION "Viptela Revision 17.1"
+    REVISION "201702150000Z"
+    DESCRIPTION "Viptela Revision 16.3.2"
+    REVISION "201702060000Z"
+    DESCRIPTION "Viptela Revision 16.3.1"
+    REVISION "201611160000Z"
+    DESCRIPTION "Viptela Revision 16.3"
+    REVISION "201610250000Z"
+    DESCRIPTION "Viptela Revision 16.2.10"
+    REVISION "201610240000Z"
+    DESCRIPTION "Viptela Revision 16.2.4"
+    REVISION "201608100000Z"
+    DESCRIPTION "Viptela Revision 16.2.2"
+    REVISION "201608010000Z"
+    DESCRIPTION "Viptela Revision 16.2.1"
+    REVISION "201606090000Z"
+    DESCRIPTION "@REVISION-DESCRIPTION"
+    ::= { viptela 18 }
+
+UnsignedByte ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedByte"
+    SYNTAX      Unsigned32 (0 .. 255)
+
+ConfdString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs: and confd: types mapped to strings"
+    SYNTAX      OCTET STRING
+
+InetAddressIP ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "confd:inetAddressIP"
+    SYNTAX      OCTET STRING (SIZE (4|16))
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+HexList ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:"
+    STATUS      current
+    DESCRIPTION "confd:hexList"
+    SYNTAX      OCTET STRING
+
+CountryCode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {australia(36),austria(40),belgium(56),brazil(76),bulgaria(100),canada(124),sri-Lanka(144),china(156),taiwan(158),costa-Rica(188),croatia(191),cyprus(196),czech-Republic(203),denmark(208),estonia(233),finland(246),france(250),germany(276),greece(300),hong-Kong(344),hungary(348),iceland(352),india(356),indonesia(360),ireland(372),italy(380),japan(392),latvia(428),liechtenstein(438),lithuania(440),luxembourg(442),malaysia(458),malta(470),mexico(484),netherlands(528),new-Zealand(554),norway(578),pakistan(586),panama(591),philippines(608),poland(616),portugal(620),puerto-Rico(630),romania(642),saudi-Arabia(682),singapore(702),slovakia(703),vietnam(704),slovenia(705),south-Africa(710),south-Korea(412),spain(724),sweden(752),switzerland(756),thailand(764),turkey(792),united-Kingdom(826),united-States(843)}
+
+WlanSecurityType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {none(0),wpa-personal(1),wpa2-personal(2),wpa-wpa2-personal(3),wpa-enterprise(4),wpa2-enterprise(5),wpa-wpa2-enterprise(6)}
+
+WlanBandStr ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {five-GHz(0),twofour-GHz(1)}
+
+WlanPmfType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {none(0),optional(1),required(2)}
+
+RadiusServers ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+WlanBand ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {fiveGHz(0),twofourGHz(1)}
+
+RadiusServers1 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+WlanGi ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {gi400(400),gi800(800)}
+
+WlanBw ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {bw20(20),bw40(40),bw80(80)}
+
+-- Configure the wireless LAN radio
+-- tagpath /wlan
+wlan OBJECT IDENTIFIER ::= { viptela-wlan 1 }
+
+-- tagpath /wlan/radios
+wlanRadiosTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WlanRadiosEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display WLAN radio information"
+    ::= { wlan 1 }
+
+-- tagpath /wlan/radios
+wlanRadiosEntry OBJECT-TYPE
+    SYNTAX      WlanRadiosEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { IMPLIED wlanRadiosRadioName }
+        ::= { wlanRadiosTable 1 }
+
+WlanRadiosEntry ::=
+    SEQUENCE {
+        wlanRadiosRadioName String,
+        wlanRadiosMode String,
+        wlanRadiosBand WlanBandStr,
+        wlanRadiosMac String,
+        wlanRadiosCountry CountryCode,
+        wlanRadiosChannel UnsignedByte,
+        wlanRadiosChannelBandwidth WlanBw,
+        wlanRadiosFrequency Unsigned32,
+        wlanRadiosGuardInterval WlanGi,
+        wlanRadiosVaps UnsignedByte
+    }
+
+-- tagpath /wlan/radios/radio-name
+wlanRadiosRadioName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 6))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "WLAN radio name: wifi<0-1>"
+    ::= { wlanRadiosEntry 1 }
+
+-- tagpath /wlan/radios/mode
+wlanRadiosMode OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 18))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Radio mode"
+    ::= { wlanRadiosEntry 2 }
+
+-- tagpath /wlan/radios/band
+wlanRadiosBand OBJECT-TYPE
+    SYNTAX      WlanBandStr
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Radio band"
+    ::= { wlanRadiosEntry 3 }
+
+-- tagpath /wlan/radios/mac
+wlanRadiosMac OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 18))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "MAC address in aa:bb:cc:dd:ee:ff format"
+    ::= { wlanRadiosEntry 4 }
+
+-- tagpath /wlan/radios/country
+wlanRadiosCountry OBJECT-TYPE
+    SYNTAX      CountryCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Regulatory country code"
+    ::= { wlanRadiosEntry 5 }
+
+-- tagpath /wlan/radios/channel
+wlanRadiosChannel OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Radio channel"
+    ::= { wlanRadiosEntry 6 }
+
+-- tagpath /wlan/radios/channel-bandwidth
+wlanRadiosChannelBandwidth OBJECT-TYPE
+    SYNTAX      WlanBw
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Channel bandwidth, in MHz"
+    ::= { wlanRadiosEntry 7 }
+
+-- tagpath /wlan/radios/frequency
+wlanRadiosFrequency OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Frequency, in MHz"
+    ::= { wlanRadiosEntry 8 }
+
+-- tagpath /wlan/radios/guard-interval
+wlanRadiosGuardInterval OBJECT-TYPE
+    SYNTAX      WlanGi
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Guard interval, in nanoseconds"
+    ::= { wlanRadiosEntry 9 }
+
+-- tagpath /wlan/radios/vaps
+wlanRadiosVaps OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of virtual access point interfaces"
+    ::= { wlanRadiosEntry 10 }
+
+-- tagpath /wlan/interfaces
+wlanInterfacesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WlanInterfacesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display WLAN interface information"
+    ::= { wlan 2 }
+
+-- tagpath /wlan/interfaces
+wlanInterfacesEntry OBJECT-TYPE
+    SYNTAX      WlanInterfacesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { IMPLIED wlanInterfacesVap }
+        ::= { wlanInterfacesTable 1 }
+
+WlanInterfacesEntry ::=
+    SEQUENCE {
+        wlanInterfacesVap String,
+        wlanInterfacesSsid String,
+        wlanInterfacesBssid String,
+        wlanInterfacesDataSecurity WlanSecurityType,
+        wlanInterfacesMgmtSecurity WlanPmfType,
+        wlanInterfacesBand WlanBandStr,
+        wlanInterfacesMode String,
+        wlanInterfacesDescription String,
+        wlanInterfacesBitRate Unsigned32,
+        wlanInterfacesTxPower Unsigned32,
+        wlanInterfacesMaxClients UnsignedByte,
+        wlanInterfacesAdminStatus String,
+        wlanInterfacesOperStatus String,
+        wlanInterfacesNumClients UnsignedByte
+    }
+
+-- tagpath /wlan/interfaces/vap
+wlanInterfacesVap OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 5))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VAP interface name: vap<0-7>"
+    ::= { wlanInterfacesEntry 1 }
+
+-- tagpath /wlan/interfaces/ssid
+wlanInterfacesSsid OBJECT-TYPE
+    SYNTAX      String (SIZE (4 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Service set identifier (SSID)"
+    ::= { wlanInterfacesEntry 2 }
+
+-- tagpath /wlan/interfaces/bssid
+wlanInterfacesBssid OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 18))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Basic service set identifier (BSSID)"
+    ::= { wlanInterfacesEntry 3 }
+
+-- tagpath /wlan/interfaces/data-security
+wlanInterfacesDataSecurity OBJECT-TYPE
+    SYNTAX      WlanSecurityType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Data frame encryption"
+    ::= { wlanInterfacesEntry 4 }
+
+-- tagpath /wlan/interfaces/mgmt-security
+wlanInterfacesMgmtSecurity OBJECT-TYPE
+    SYNTAX      WlanPmfType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Management frame encryption"
+    ::= { wlanInterfacesEntry 5 }
+
+-- tagpath /wlan/interfaces/band
+wlanInterfacesBand OBJECT-TYPE
+    SYNTAX      WlanBandStr
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Radio band"
+    ::= { wlanInterfacesEntry 6 }
+
+-- tagpath /wlan/interfaces/mode
+wlanInterfacesMode OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 18))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Radio mode"
+    ::= { wlanInterfacesEntry 7 }
+
+-- tagpath /wlan/interfaces/description
+wlanInterfacesDescription OBJECT-TYPE
+    SYNTAX      String (SIZE (4 .. 64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Description"
+    ::= { wlanInterfacesEntry 8 }
+
+-- tagpath /wlan/interfaces/bit-rate
+wlanInterfacesBitRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Bit rate"
+    ::= { wlanInterfacesEntry 9 }
+
+-- tagpath /wlan/interfaces/tx-power
+wlanInterfacesTxPower OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transmit power"
+    ::= { wlanInterfacesEntry 10 }
+
+-- tagpath /wlan/interfaces/max-clients
+wlanInterfacesMaxClients OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of supported clients"
+    ::= { wlanInterfacesEntry 11 }
+
+-- tagpath /wlan/interfaces/admin-status
+wlanInterfacesAdminStatus OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Administrative status"
+    ::= { wlanInterfacesEntry 12 }
+
+-- tagpath /wlan/interfaces/oper-status
+wlanInterfacesOperStatus OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Operational status"
+    ::= { wlanInterfacesEntry 13 }
+
+-- tagpath /wlan/interfaces/num-clients
+wlanInterfacesNumClients OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of active clients"
+    ::= { wlanInterfacesEntry 14 }
+
+-- tagpath /wlan/clients
+wlanClientsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WlanClientsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display WLAN client information"
+    ::= { wlan 3 }
+
+-- tagpath /wlan/clients
+wlanClientsEntry OBJECT-TYPE
+    SYNTAX      WlanClientsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { wlanClientsVap, wlanClientsClientId }
+        ::= { wlanClientsTable 1 }
+
+WlanClientsEntry ::=
+    SEQUENCE {
+        wlanClientsVap String,
+        wlanClientsClientId Unsigned32,
+        wlanClientsMac String,
+        wlanClientsMode String,
+        wlanClientsBand WlanBandStr,
+        wlanClientsChannel Unsigned32,
+        wlanClientsChannelBandwidth WlanBw,
+        wlanClientsDataSecurity WlanSecurityType,
+        wlanClientsRxRate Unsigned32,
+        wlanClientsRssi Unsigned32,
+        wlanClientsAssocTime String
+    }
+
+-- tagpath /wlan/clients/vap
+wlanClientsVap OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 5))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VAP interface name: vap<0-7>"
+    ::= { wlanClientsEntry 1 }
+
+-- tagpath /wlan/clients/client-id
+wlanClientsClientId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Client ID"
+    ::= { wlanClientsEntry 2 }
+
+-- tagpath /wlan/clients/mac
+wlanClientsMac OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 18))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "MAC address in aa:bb:cc:dd:ee:ff format"
+    ::= { wlanClientsEntry 3 }
+
+-- tagpath /wlan/clients/mode
+wlanClientsMode OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 18))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Radio mode"
+    ::= { wlanClientsEntry 4 }
+
+-- tagpath /wlan/clients/band
+wlanClientsBand OBJECT-TYPE
+    SYNTAX      WlanBandStr
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Radio band"
+    ::= { wlanClientsEntry 5 }
+
+-- tagpath /wlan/clients/channel
+wlanClientsChannel OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Radio channel"
+    ::= { wlanClientsEntry 6 }
+
+-- tagpath /wlan/clients/channel-bandwidth
+wlanClientsChannelBandwidth OBJECT-TYPE
+    SYNTAX      WlanBw
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Channel bandwidth, in MHz"
+    ::= { wlanClientsEntry 7 }
+
+-- tagpath /wlan/clients/data-security
+wlanClientsDataSecurity OBJECT-TYPE
+    SYNTAX      WlanSecurityType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Data frame encryption"
+    ::= { wlanClientsEntry 8 }
+
+-- tagpath /wlan/clients/rx-rate
+wlanClientsRxRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Receive rate"
+    ::= { wlanClientsEntry 9 }
+
+-- tagpath /wlan/clients/rssi
+wlanClientsRssi OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Received signal strength"
+    ::= { wlanClientsEntry 10 }
+
+-- tagpath /wlan/clients/assoc-time
+wlanClientsAssocTime OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Association time"
+    ::= { wlanClientsEntry 11 }
+
+-- tagpath /wlan/radius
+wlanRadiusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WlanRadiusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display WLAN RADIUS server information"
+    ::= { wlan 4 }
+
+-- tagpath /wlan/radius
+wlanRadiusEntry OBJECT-TYPE
+    SYNTAX      WlanRadiusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { wlanRadiusVapIfname, wlanRadiusPreference }
+        ::= { wlanRadiusTable 1 }
+
+WlanRadiusEntry ::=
+    SEQUENCE {
+        wlanRadiusVapIfname String,
+        wlanRadiusPreference Unsigned32,
+        wlanRadiusIpAddress InetAddressIP,
+        wlanRadiusVpnId Unsigned32,
+        wlanRadiusPriority Unsigned32,
+        wlanRadiusSourceInterface String,
+        wlanRadiusSourceAddress InetAddressIP,
+        wlanRadiusTag String,
+        wlanRadiusAuthPort Unsigned32,
+        wlanRadiusAuthActive TruthValue,
+        wlanRadiusAuthRTT Unsigned32,
+        wlanRadiusAuthRequests Unsigned32,
+        wlanRadiusAuthRetrans Unsigned32,
+        wlanRadiusAuthAccepts Unsigned32,
+        wlanRadiusAuthRejects Unsigned32,
+        wlanRadiusAuthChallenges Unsigned32,
+        wlanRadiusAuthMalResp Unsigned32,
+        wlanRadiusAuthBadAuth Unsigned32,
+        wlanRadiusAuthPendReqs Unsigned32,
+        wlanRadiusAuthTimeouts Unsigned32,
+        wlanRadiusAuthUnkTypes Unsigned32,
+        wlanRadiusAuthPktsDrop Unsigned32,
+        wlanRadiusAcctPort Unsigned32,
+        wlanRadiusAcctActive TruthValue,
+        wlanRadiusAcctRTT Unsigned32,
+        wlanRadiusAcctRequests Unsigned32,
+        wlanRadiusAcctRetrans Unsigned32,
+        wlanRadiusAcctResponses Unsigned32,
+        wlanRadiusAcctMalResp Unsigned32,
+        wlanRadiusAcctBadAuth Unsigned32,
+        wlanRadiusAcctPendReqs Unsigned32,
+        wlanRadiusAcctTimeouts Unsigned32,
+        wlanRadiusAcctUnkTypes Unsigned32,
+        wlanRadiusAcctPktsDrop Unsigned32
+    }
+
+-- tagpath /wlan/radius/vap-ifname
+wlanRadiusVapIfname OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 5))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "WLAN VAP interface name"
+    ::= { wlanRadiusEntry 1 }
+
+-- tagpath /wlan/radius/preference
+wlanRadiusPreference OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "RADIUS server preference"
+    ::= { wlanRadiusEntry 2 }
+
+-- tagpath /wlan/radius/ip-address
+wlanRadiusIpAddress OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RADIUS server IP address"
+    ::= { wlanRadiusEntry 3 }
+
+-- tagpath /wlan/radius/vpn-id
+wlanRadiusVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RADIUS server VPN"
+    ::= { wlanRadiusEntry 4 }
+
+-- tagpath /wlan/radius/priority
+wlanRadiusPriority OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RADIUS server priority value"
+    ::= { wlanRadiusEntry 5 }
+
+-- tagpath /wlan/radius/source-interface
+wlanRadiusSourceInterface OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Source interface for outgoing RADIUS packets"
+    ::= { wlanRadiusEntry 6 }
+
+-- tagpath /wlan/radius/source-address
+wlanRadiusSourceAddress OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Source IP address for outgoing RADIUS packets"
+    ::= { wlanRadiusEntry 7 }
+
+-- tagpath /wlan/radius/tag
+wlanRadiusTag OBJECT-TYPE
+    SYNTAX      String (SIZE (4 .. 16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RADIUS server tag name"
+    ::= { wlanRadiusEntry 8 }
+
+-- tagpath /wlan/radius/auth-port
+wlanRadiusAuthPort OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RADIUS server authentication port number"
+    ::= { wlanRadiusEntry 9 }
+
+-- tagpath /wlan/radius/auth-active
+wlanRadiusAuthActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RADIUS server is the currently active one for authentication"
+    ::= { wlanRadiusEntry 10 }
+
+-- tagpath /wlan/radius/auth-rtt
+wlanRadiusAuthRTT OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Authentication server round trip time for last message, in seconds"
+    ::= { wlanRadiusEntry 11 }
+
+-- tagpath /wlan/radius/auth-requests
+wlanRadiusAuthRequests OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of access requests sent"
+    ::= { wlanRadiusEntry 12 }
+
+-- tagpath /wlan/radius/auth-retrans
+wlanRadiusAuthRetrans OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of access request retransmissions"
+    ::= { wlanRadiusEntry 13 }
+
+-- tagpath /wlan/radius/auth-accepts
+wlanRadiusAuthAccepts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of access accepts received"
+    ::= { wlanRadiusEntry 14 }
+
+-- tagpath /wlan/radius/auth-rejects
+wlanRadiusAuthRejects OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of access rejects received"
+    ::= { wlanRadiusEntry 15 }
+
+-- tagpath /wlan/radius/auth-challenges
+wlanRadiusAuthChallenges OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of access challenges received"
+    ::= { wlanRadiusEntry 16 }
+
+-- tagpath /wlan/radius/auth-mal-resp
+wlanRadiusAuthMalResp OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of malformed access responses received"
+    ::= { wlanRadiusEntry 17 }
+
+-- tagpath /wlan/radius/auth-bad-auth
+wlanRadiusAuthBadAuth OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of authentication requests with bad authentication"
+    ::= { wlanRadiusEntry 18 }
+
+-- tagpath /wlan/radius/auth-pend-reqs
+wlanRadiusAuthPendReqs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of un-acknowledged access requests"
+    ::= { wlanRadiusEntry 19 }
+
+-- tagpath /wlan/radius/auth-timeouts
+wlanRadiusAuthTimeouts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of authentication request timeouts"
+    ::= { wlanRadiusEntry 20 }
+
+-- tagpath /wlan/radius/auth-unk-types
+wlanRadiusAuthUnkTypes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of authentication messages of unknown type"
+    ::= { wlanRadiusEntry 21 }
+
+-- tagpath /wlan/radius/auth-pkts-drop
+wlanRadiusAuthPktsDrop OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of dropped authentication packets"
+    ::= { wlanRadiusEntry 22 }
+
+-- tagpath /wlan/radius/acct-port
+wlanRadiusAcctPort OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RADIUS server accounting port number"
+    ::= { wlanRadiusEntry 23 }
+
+-- tagpath /wlan/radius/acct-active
+wlanRadiusAcctActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RADIUS server is the currently active one for accounting"
+    ::= { wlanRadiusEntry 24 }
+
+-- tagpath /wlan/radius/acct-rtt
+wlanRadiusAcctRTT OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Accounting server round trip time for last message, in seconds"
+    ::= { wlanRadiusEntry 25 }
+
+-- tagpath /wlan/radius/acct-requests
+wlanRadiusAcctRequests OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of accounting requests sent"
+    ::= { wlanRadiusEntry 26 }
+
+-- tagpath /wlan/radius/acct-retrans
+wlanRadiusAcctRetrans OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of accounting request restransmissions"
+    ::= { wlanRadiusEntry 27 }
+
+-- tagpath /wlan/radius/acct-responses
+wlanRadiusAcctResponses OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of accounting responses received"
+    ::= { wlanRadiusEntry 28 }
+
+-- tagpath /wlan/radius/acct-mal-resp
+wlanRadiusAcctMalResp OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of malformed accounting responses received"
+    ::= { wlanRadiusEntry 29 }
+
+-- tagpath /wlan/radius/acct-bad-auth
+wlanRadiusAcctBadAuth OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of accounting requests with bad authentication"
+    ::= { wlanRadiusEntry 30 }
+
+-- tagpath /wlan/radius/acct-pend-reqs
+wlanRadiusAcctPendReqs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of un-acknowledged accounting requests"
+    ::= { wlanRadiusEntry 31 }
+
+-- tagpath /wlan/radius/acct-timeouts
+wlanRadiusAcctTimeouts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of accounting request timeouts"
+    ::= { wlanRadiusEntry 32 }
+
+-- tagpath /wlan/radius/acct-unk-types
+wlanRadiusAcctUnkTypes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of accounting responses of unknown type"
+    ::= { wlanRadiusEntry 33 }
+
+-- tagpath /wlan/radius/acct-pkts-drop
+wlanRadiusAcctPktsDrop OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of dropped accounting packets"
+    ::= { wlanRadiusEntry 34 }
+    
+END

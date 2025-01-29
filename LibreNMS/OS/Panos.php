@@ -401,7 +401,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
         }
     }
 
-    protected function memValid($storage)
+    protected function memValid($storage): bool
     {
         return $storage['hrStorageType'] == 'hrStorageOther'
             && Str::contains($storage['hrStorageDescr'], $this->validNetBufferMemory)

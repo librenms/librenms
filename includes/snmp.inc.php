@@ -333,45 +333,6 @@ function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = nul
     return false;
 }
 
-/**
- * Calls snmpgetnext for multiple OIDs.  Getnext returns the next oid after the specified oid.
- * For example instead of get sysName.0, you can getnext sysName to get the .0 value.
- *
- * @param  array  $device  Target device
- * @param  array  $oids  The oids to getnext
- * @param  string  $options  Options to pass to snmpgetnext (-OQUs for example)
- * @param  string  $mib  The MIB to use
- * @param  string  $mibdir  Optional mib directory to search
- * @return array|false the output or false if the data could not be fetched
- */
-function snmp_getnext_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir = null, $array = [])
-{
-    $measure = Measurement::start('snmpgetnext');
-    if (! is_array($oids)) {
-        $oids = explode(' ', $oids);
-    }
-    $snmpcmd = [Config::get('snmpgetnext', 'snmpgetnext')];
-    $cmd = gen_snmp_cmd($snmpcmd, $device, $oids, $options, $mib, $mibdir);
-    $data = trim(external_exec($cmd), "\" \n\r");
-
-    foreach (explode("\n", $data) as $entry) {
-        [$oid,$value] = explode('=', $entry, 2);
-        $oid = trim($oid);
-        $value = trim($value, "\" \n\r");
-        $oid = explode('.', $oid, 2)[0] ?? null;
-        if (! Str::contains($value, 'at this OID')) {
-            if (empty($oid)) {
-                continue; // no index or oid
-            } else {
-                $array[$oid] = $value;
-            }
-        }
-    }
-    $measure->manager()->recordSnmp($measure->end());
-
-    return $array;
-}//end snmp_getnext_multi()
-
 function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
 {
     $measure = Measurement::start('snmpwalk');
@@ -422,52 +383,6 @@ function snmpwalk_cache_oid($device, $oid, $array = [], $mib = null, $mibdir = n
         [$oid, $index] = explode('.', $oid, 2);
         if (! strstr($value, 'at this OID') && ! empty($oid)) {
             $array[$index][$oid] = $value;
-        }
-    }
-
-    return $array;
-}//end snmpwalk_cache_oid()
-
-function snmpwalk_cache_numerical_oid($device, $oid, $array = [], $mib = null, $mibdir = null, $snmpflags = '-OQUsn')
-{
-    $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
-
-    if (empty($data)) {
-        return $array;
-    }
-
-    foreach (explode("\n", $data) as $entry) {
-        [$oid,$value] = explode('=', $entry, 2);
-        $oid = trim($oid);
-        $value = trim($value);
-        [$index] = explode('.', strrev($oid), 2);
-        if (! strstr($value, 'at this OID') && isset($oid) && isset($index)) {
-            $array[$index][$oid] = $value;
-        }
-    }
-
-    return $array;
-}//end snmpwalk_cache_oid()
-
-function snmpwalk_cache_long_oid($device, $oid, $noid, $array = [], $mib = null, $mibdir = null, $snmpflags = '-OQnU')
-{
-    $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
-
-    if (empty($data)) {
-        return $array;
-    }
-
-    foreach (explode("\n", $data) as $entry) {
-        [$tmp_oid,$value] = explode('=', $entry, 2);
-        $tmp_oid = trim($tmp_oid);
-        $value = trim($value);
-        $tmp_index = str_replace($noid, '', $tmp_oid);
-        $index = md5($tmp_index);
-        if (! empty($index) && ! empty($oid)) {
-            $array[$index][$oid] = $value;
-            if (empty($array[$index]['orig'])) {
-                $array[$index]['orig'] = $tmp_index;
-            }
         }
     }
 
@@ -530,27 +445,6 @@ function snmpwalk_cache_multi_oid($device, $oid, $array = [], $mib = null, $mibd
 
     return $cache['snmp'][$device['device_id']][$oid];
 }//end snmpwalk_cache_multi_oid()
-
-function snmpwalk_cache_index($device, $oid, $array = [], $mib = null, $mibdir = null)
-{
-    $data = snmp_walk($device, $oid, '-OQUs', $mib, $mibdir);
-
-    if (empty($data)) {
-        return $array;
-    }
-
-    foreach (explode("\n", $data) as $entry) {
-        [$oid,$value] = explode('=', $entry, 2);
-        $oid = trim($oid);
-        $value = trim($value);
-        [$oid, $first] = explode('.', $oid);
-        if (! strstr($value, 'at this OID') && isset($oid) && isset($first)) {
-            $array[$oid][$first] = $value;
-        }
-    }
-
-    return $array;
-}//end snmpwalk_cache_double_oid()
 
 /**
  * Walk an snmp mib oid and group items together based on the index.
@@ -707,17 +601,18 @@ function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $de
     $measure = Measurement::start('snmptranslate');
     $cmd = [Config::get('snmptranslate', 'snmptranslate'), '-M', mibdir($mibdir, $device), '-m', $mib];
 
-    if (Oid::isNumeric($oid)) {
+    $oid = Oid::of($oid);
+    if ($oid->isNumeric()) {
         $default_options = ['-Os', '-Pu'];
     } else {
-        if ($mib != 'ALL' && ! Str::contains($oid, '::')) {
+        if ($mib != 'ALL' && ! $oid->hasMib()) {
             $oid = "$mib::$oid";
         }
         $default_options = ['-On', '-Pu'];
     }
     $options = is_null($options) ? $default_options : $options;
     $cmd = array_merge($cmd, (array) $options);
-    $cmd[] = $oid;
+    $cmd[] = $oid->oid;
 
     $result = trim(external_exec($cmd));
 

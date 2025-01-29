@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
 use App\Events\DevicePolled;
+use App\Facades\LibrenmsConfig;
 use App\Jobs\PollDevice;
 use App\Models\Device;
 use App\Polling\Measure\MeasurementManager;
@@ -33,7 +34,7 @@ class DevicePoll extends LnmsCommand
         $this->addArgument('device spec', InputArgument::REQUIRED);
         $this->addOption('modules', 'm', InputOption::VALUE_REQUIRED);
         $this->addOption('no-data', 'x', InputOption::VALUE_NONE);
-        $this->addOption('dispatch', 'd', InputOption::VALUE_NONE);
+        $this->addOption('dispatch', null, InputOption::VALUE_NONE);
     }
 
     public function handle(MeasurementManager $measurements): int
@@ -55,7 +56,7 @@ class DevicePoll extends LnmsCommand
         try {
             if ($this->getOutput()->isVerbose()) {
                 Log::debug(Version::get()->header());
-                \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
+                LibrenmsConfig::invalidateAndReload();
             }
 
             $module_overrides = Module::parseUserOverrides(explode(',', $this->option('modules') ?? ''));

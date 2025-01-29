@@ -8,7 +8,7 @@ use LibreNMS\Util\Debug;
 $init_modules = ['alerts', 'laravel', 'nodb'];
 require __DIR__ . '/includes/init.php';
 
-$options = getopt('hdvrg:');
+$options = getopt('fhdvrg:');
 
 if (isset($options['h'])) {
     echo <<<'END'
@@ -20,6 +20,14 @@ ping.php: Usage ping.php [-d] [-v] [-r] [-g group(s)]
 
 END;
     exit;
+}
+
+$scheduler = \LibreNMS\Config::get('schedule_type.ping');
+if (! isset($options['f']) && $scheduler != 'legacy' && $scheduler != 'cron') {
+    if (Debug::isEnabled()) {
+        echo "Fast Pings are not enabled for cron scheduling.  Add the -f command argument if you want to force this command to run.\n";
+    }
+    exit(0);
 }
 
 Debug::set(isset($options['d']));
