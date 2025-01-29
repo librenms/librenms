@@ -24235,7 +24235,7 @@
             "transceivers": [
                 {
                     "index": "13073",
-                    "entity_physical_index": 110,
+                    "entity_physical_index": 13073,
                     "type": "10GE CU1.5M",
                     "vendor": "CISCO-TYCO",
                     "oui": null,
@@ -24254,7 +24254,7 @@
                 },
                 {
                     "index": "13091",
-                    "entity_physical_index": 111,
+                    "entity_physical_index": 13091,
                     "type": "10GE CU1.5M",
                     "vendor": "CISCO-TYCO",
                     "oui": null,
@@ -24273,7 +24273,7 @@
                 },
                 {
                     "index": "13109",
-                    "entity_physical_index": 112,
+                    "entity_physical_index": 13109,
                     "type": "10GE CU1.5M",
                     "vendor": "CISCO-TYCO",
                     "oui": null,
@@ -24292,7 +24292,7 @@
                 },
                 {
                     "index": "13127",
-                    "entity_physical_index": 113,
+                    "entity_physical_index": 13127,
                     "type": "10GE CU1.5M",
                     "vendor": "CISCO-TYCO",
                     "oui": null,
@@ -24311,7 +24311,7 @@
                 },
                 {
                     "index": "3073",
-                    "entity_physical_index": 51,
+                    "entity_physical_index": 3073,
                     "type": "10GE CU1.5M",
                     "vendor": "CISCO-TYCO",
                     "oui": null,
@@ -24330,7 +24330,7 @@
                 },
                 {
                     "index": "3091",
-                    "entity_physical_index": 52,
+                    "entity_physical_index": 3091,
                     "type": "10GE CU1.5M",
                     "vendor": "CISCO-TYCO",
                     "oui": null,
@@ -24349,7 +24349,7 @@
                 },
                 {
                     "index": "3109",
-                    "entity_physical_index": 53,
+                    "entity_physical_index": 3109,
                     "type": "10GE CU1.5M",
                     "vendor": "CISCO-TYCO",
                     "oui": null,
@@ -24368,7 +24368,7 @@
                 },
                 {
                     "index": "3127",
-                    "entity_physical_index": 54,
+                    "entity_physical_index": 3127,
                     "type": "10GE CU1.5M",
                     "vendor": "CISCO-TYCO",
                     "oui": null,
@@ -35587,141 +35587,88 @@
         "discovery": {
             "storage": [
                 {
-                    "storage_mib": "cisco-flash",
+                    "type": "cisco-flash",
                     "storage_index": "1.1",
-                    "storage_type": "flash",
-                    "storage_descr": "bootflash(bootflash):",
+                    "storage_type": "FlashMemory",
+                    "storage_descr": "bootflash:",
                     "storage_size": 11250098176,
+                    "storage_size_oid": null,
                     "storage_units": 1,
                     "storage_used": 1958252544,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": null,
+                    "storage_free": 9291845632,
+                    "storage_free_oid": ".1.3.6.1.4.1.9.9.10.1.1.4.1.1.14.1.1",
+                    "storage_perc": 17,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "cisco-flash",
+                    "type": "cisco-flash",
                     "storage_index": "10.1",
-                    "storage_type": "flash",
-                    "storage_descr": "(bootflash-2-1):",
+                    "storage_type": "FlashMemory",
+                    "storage_descr": "bootflash-2-1:",
                     "storage_size": 11250171904,
+                    "storage_size_oid": null,
                     "storage_units": 1,
                     "storage_used": 2154823680,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": null,
+                    "storage_free": 9095348224,
+                    "storage_free_oid": ".1.3.6.1.4.1.9.9.10.1.1.4.1.1.14.10.1",
+                    "storage_perc": 19,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "cisco-flash",
+                    "type": "cisco-flash",
                     "storage_index": "14.1",
-                    "storage_type": "flash",
-                    "storage_descr": "(crashinfo-2-1):",
+                    "storage_type": "FlashMemory",
+                    "storage_descr": "crashinfo-2-1:",
                     "storage_size": 1651507200,
+                    "storage_size_oid": null,
                     "storage_units": 1,
                     "storage_used": 85983232,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": null,
+                    "storage_free": 1565523968,
+                    "storage_free_oid": ".1.3.6.1.4.1.9.9.10.1.1.4.1.1.5.14.1",
+                    "storage_perc": 5,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "cisco-flash",
+                    "type": "cisco-flash",
                     "storage_index": "5.1",
-                    "storage_type": "flash",
-                    "storage_descr": "crashinfo(crashinfo):",
+                    "storage_type": "FlashMemory",
+                    "storage_descr": "crashinfo:",
                     "storage_size": 1651314688,
+                    "storage_size_oid": null,
                     "storage_units": 1,
                     "storage_used": 86441984,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": null,
+                    "storage_free": 1564872704,
+                    "storage_free_oid": ".1.3.6.1.4.1.9.9.10.1.1.4.1.1.5.5.1",
+                    "storage_perc": 5,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "cisco-flash",
+                    "type": "cisco-flash",
                     "storage_index": "7.1",
-                    "storage_type": "flash",
-                    "storage_descr": "disk0(disk0):",
+                    "storage_type": "FlashMemory",
+                    "storage_descr": "disk0:",
                     "storage_size": 236092686336,
+                    "storage_size_oid": null,
                     "storage_units": 1,
                     "storage_used": 13107900416,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": null,
+                    "storage_free": 222984785920,
+                    "storage_free_oid": ".1.3.6.1.4.1.9.9.10.1.1.4.1.1.14.7.1",
+                    "storage_perc": 6,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 }
             ]
         },
-        "poller": {
-            "storage": [
-                {
-                    "storage_mib": "cisco-flash",
-                    "storage_index": "1.1",
-                    "storage_type": "flash",
-                    "storage_descr": "bootflash(bootflash):",
-                    "storage_size": 11250098176,
-                    "storage_units": 1,
-                    "storage_used": 1958252544,
-                    "storage_free": 9291845632,
-                    "storage_perc": 17,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "cisco-flash",
-                    "storage_index": "10.1",
-                    "storage_type": "flash",
-                    "storage_descr": "(bootflash-2-1):",
-                    "storage_size": 11250171904,
-                    "storage_units": 1,
-                    "storage_used": 2154823680,
-                    "storage_free": 9095348224,
-                    "storage_perc": 19,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "cisco-flash",
-                    "storage_index": "14.1",
-                    "storage_type": "flash",
-                    "storage_descr": "(crashinfo-2-1):",
-                    "storage_size": 1651507200,
-                    "storage_units": 1,
-                    "storage_used": 85983232,
-                    "storage_free": 1565523968,
-                    "storage_perc": 5,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "cisco-flash",
-                    "storage_index": "5.1",
-                    "storage_type": "flash",
-                    "storage_descr": "crashinfo(crashinfo):",
-                    "storage_size": 1651314688,
-                    "storage_units": 1,
-                    "storage_used": 86441984,
-                    "storage_free": 1564872704,
-                    "storage_perc": 5,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "cisco-flash",
-                    "storage_index": "7.1",
-                    "storage_type": "flash",
-                    "storage_descr": "disk0(disk0):",
-                    "storage_size": 236092686336,
-                    "storage_units": 1,
-                    "storage_used": 13107900416,
-                    "storage_free": 222984785920,
-                    "storage_perc": 6,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "discovery-protocols": {
         "discovery": {

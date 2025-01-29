@@ -83,23 +83,35 @@ if ($rowCount != -1) {
 }
 
 if (session('preferences.timezone')) {
-    $sql = "SELECT R.severity, D.device_id,name AS alert,rule_id,state,time_logged,DATE_FORMAT(IFNULL(CONVERT_TZ(time_logged, @@global.time_zone, ?),time_logged), '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') as humandate,details $sql";
+    $sql = "SELECT E.id AS alert_log_id, E.details AS alert_log_details, R.severity, D.device_id,name AS alert,rule_id,state,time_logged,DATE_FORMAT(IFNULL(CONVERT_TZ(time_logged, @@global.time_zone, ?),time_logged), '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') as humandate,details $sql";
     $param = array_merge([session('preferences.timezone')], $param);
 } else {
-    $sql = "SELECT R.severity, D.device_id,name AS alert,rule_id,state,time_logged,DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') as humandate,details $sql";
+    $sql = "SELECT E.id AS alert_log_id, E.details AS alert_log_details, R.severity, D.device_id,name AS alert,rule_id,state,time_logged,DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') as humandate,details $sql";
 }
 
 $rulei = 0;
 foreach (dbFetchRows($sql, $param) as $alertlog) {
     $dev = device_by_id_cache($alertlog['device_id']);
-    $log = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? AND `state` = 1 ORDER BY id DESC LIMIT 1', [$alertlog['rule_id'], $alertlog['device_id']]);
-    $alert_log_id = dbFetchCell('SELECT id FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$alertlog['rule_id'], $alertlog['device_id']]);
-    [$fault_detail, $max_row_length] = alert_details($log);
-
-    if (empty($fault_detail)) {
-        $fault_detail = 'Rule created, no faults found';
-    }
     $alert_state = $alertlog['state'];
+    // If it's a new rule created, or a clear/RECOVERED
+    if ($alert_state == '0') {
+        // Get the latest active that is not a clear/RECOVERED
+        // @phpstan-ignore-next-line
+        $last_active_state = dbFetchRows('SELECT id, details FROM alert_log WHERE device_id = ? AND id < ? AND rule_id = ? AND `state` != 0 ORDER BY id DESC LIMIT 1', [$alertlog['device_id'], $alertlog['alert_log_id'], $alertlog['rule_id']]);
+        // It's a real alarm, we can then used it for the details
+        if ($last_active_state) {
+            $alert_log_id = $last_active_state[0]['id'];
+            [$fault_detail, $max_row_length] = alert_details($last_active_state[0]['details']);
+        // It's a rule created log
+        } else {
+            $fault_detail = 'Rule created, no faults found';
+        }
+    // We will display the details of the log in question
+    } else {
+        $alert_log_id = $alertlog['alert_log_id'];
+        [$fault_detail, $max_row_length] = alert_details($alertlog['alert_log_details']);
+    }
+
     if ($alert_state == '0') {
         $status = 'label-success';
     } elseif ($alert_state == '1') {
@@ -110,6 +122,8 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
         $status = 'label-warning';
     } elseif ($alert_state == '4') {
         $status = 'label-primary';
+    } elseif ($alert_state == '5') {
+        $status = 'label-warning';
     }//end if
 
     $response[] = [

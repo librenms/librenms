@@ -32,6 +32,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton('device-cache', function () {
             return new \LibreNMS\Cache\Device();
         });
+        $this->app->singleton('port-cache', function () {
+            return new \LibreNMS\Cache\Port();
+        });
         $this->app->singleton('git', function () {
             return new \LibreNMS\Util\Git();
         });

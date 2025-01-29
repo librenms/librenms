@@ -28,6 +28,7 @@ namespace LibreNMS;
 use App\Models\Device;
 use App\Models\DeviceGraph;
 use DeviceCache;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
@@ -35,6 +36,7 @@ use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\Interfaces\Discovery\StorageDiscovery;
 use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
 use LibreNMS\Interfaces\Discovery\StpPortDiscovery;
 use LibreNMS\Interfaces\Polling\Netstats\IcmpNetstatsPolling;
@@ -50,10 +52,10 @@ use LibreNMS\OS\Traits\BridgeMib;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\OS\Traits\HostResources;
 use LibreNMS\OS\Traits\NetstatsPolling;
-use LibreNMS\OS\Traits\ResolvesPortIds;
 use LibreNMS\OS\Traits\UcdResources;
 use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
+use LibreNMS\OS\Traits\YamlStorageDiscovery;
 use LibreNMS\Util\StringHelpers;
 
 class OS implements
@@ -67,6 +69,7 @@ class OS implements
     IpNetstatsPolling,
     IpForwardNetstatsPolling,
     SnmpNetstatsPolling,
+    StorageDiscovery,
     StpInstancePolling,
     StpPortPolling,
     TcpNetstatsPolling,
@@ -75,15 +78,17 @@ class OS implements
     use HostResources {
         HostResources::discoverProcessors as discoverHrProcessors;
         HostResources::discoverMempools as discoverHrMempools;
+        HostResources::discoverStorage as discoverHrStorage;
     }
     use UcdResources {
         UcdResources::discoverProcessors as discoverUcdProcessors;
         UcdResources::discoverMempools as discoverUcdMempools;
+        UcdResources::discoverStorage as discoverUcdStorage;
     }
     use YamlOSDiscovery;
     use YamlMempoolsDiscovery;
+    use YamlStorageDiscovery;
     use NetstatsPolling;
-    use ResolvesPortIds;
     use BridgeMib;
     use EntityMib;
 
@@ -346,6 +351,23 @@ class OS implements
         }
 
         return $this->discoverUcdMempools();
+    }
+
+    public function discoverStorage(): Collection
+    {
+        if ($this->hasYamlDiscovery('storage')) {
+            $storage = $this->discoverYamlStorage();
+            if ($storage->isNotEmpty()) {
+                return $storage;
+            }
+        }
+
+        $storage = $this->discoverHrStorage();
+        if ($storage->isNotEmpty()) {
+            return $storage;
+        }
+
+        return $this->discoverUcdStorage();
     }
 
     public function getDiscovery($module = null)

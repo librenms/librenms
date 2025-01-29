@@ -25,11 +25,15 @@
 
 namespace LibreNMS\Device;
 
+use App\Models\Eventlog;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Discovery\DiscoveryModule;
 use LibreNMS\Interfaces\Polling\PollerModule;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Number;
 use LibreNMS\Util\StringHelpers;
 
 class Sensor implements DiscoveryModule, PollerModule
@@ -134,7 +138,7 @@ class Sensor implements DiscoveryModule, PollerModule
             $this->valid = is_numeric($this->current);
         }
 
-        d_echo('Discovered ' . get_called_class() . ' ' . print_r($sensor, true));
+        Log::debug('Discovered ' . get_called_class() . ' ' . print_r($sensor, true));
     }
 
     /**
@@ -169,7 +173,7 @@ class Sensor implements DiscoveryModule, PollerModule
             if ($this->sensor_id !== null) {
                 $name = static::$name;
                 $message = "$name Discovered: {$this->type} {$this->subtype} {$this->index} {$this->description}";
-                log_event($message, $this->device_id, static::$table, 3, $this->sensor_id);
+                Eventlog::log($message, $this->device_id, static::$table, Severity::Notice, $this->sensor_id);
                 echo '+';
             }
         }
@@ -321,14 +325,14 @@ class Sensor implements DiscoveryModule, PollerModule
         // process data or run custom polling
         $typeInterface = static::getPollingInterface($type);
         if ($os instanceof $typeInterface) {
-            d_echo("Using OS polling for $type\n");
+            Log::debug("Using OS polling for $type\n");
             $function = static::getPollingMethod($type);
             $data = $os->$function($sensors);
         } else {
             $data = static::processSensorData($sensors, $prefetch);
         }
 
-        d_echo($data);
+        Log::debug($data);
 
         self::recordSensorData($os, $sensors, $data);
     }
@@ -355,7 +359,7 @@ class Sensor implements DiscoveryModule, PollerModule
         array_walk($snmp_data, function (&$oid) {
             preg_match('/-?\d+(\.\d+)?(e-?\d+)?/i', $oid, $matches);
             if (isset($matches[0])) {
-                $oid = cast_number($matches[0]);
+                $oid = Number::cast($matches[0]);
             } else {
                 $oid = trim('"', $oid); // allow string only values
             }
@@ -407,11 +411,11 @@ class Sensor implements DiscoveryModule, PollerModule
         }
 
         if ($divisor && $sensor_value !== 0) {
-            $sensor_value = (cast_number($sensor_value) / $divisor);
+            $sensor_value = (Number::cast($sensor_value) / $divisor);
         }
 
         if ($multiplier) {
-            $sensor_value = (cast_number($sensor_value) * $multiplier);
+            $sensor_value = (Number::cast($sensor_value) * $multiplier);
         }
 
         return $sensor_value;
@@ -574,7 +578,7 @@ class Sensor implements DiscoveryModule, PollerModule
 
             $message = static::$name;
             $message .= " Deleted: $type {$sensor['sensor_type']} {$sensor['sensor_index']} {$sensor['sensor_descr']}";
-            log_event($message, $device_id, static::$table, 3, $sensor['sensor_id']);
+            Eventlog::log($message, $device_id, static::$table, Severity::Notice, $sensor['sensor_id']);
         }
         if (! empty($delete)) {
             dbDelete($table, $where, $params);
