@@ -21,6 +21,7 @@
  * @copyright  2024 Peca Nesovanovic
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
+
 use LibreNMS\Util\Oid;
 
 echo 'eltexPhyTransceiverDiagnosticTable' . PHP_EOL;
@@ -45,7 +46,7 @@ if (! empty($eltexPhyTransceiverDiagnosticTable['txOpticalPower'])) {
             $low_warn_limit = $data['eltexPhyTransceiverDiagnosticHighWarningThreshold'] / -$divisor;
             $low_limit = $data['eltexPhyTransceiverDiagnosticHighAlarmThreshold'] / -$divisor;
             $descr = get_port_by_index_cache($device['device_id'], $ifIndex)['ifName'];
-            $oid = Oid::toNumeric('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.4.1');
+            $oid = Oid::of('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.4.1')->toNumeric();
             discover_sensor(
                 null,
                 'dbm',
@@ -80,7 +81,7 @@ if (! empty($eltexPhyTransceiverDiagnosticTable['rxOpticalPower'])) {
             $low_warn_limit = $data['eltexPhyTransceiverDiagnosticHighWarningThreshold'] / -$divisor;
             $low_limit = $data['eltexPhyTransceiverDiagnosticHighAlarmThreshold'] / -$divisor;
             $descr = get_port_by_index_cache($device['device_id'], $ifIndex)['ifName'];
-            $oid = Oid::toNumeric('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.5.1');
+            $oid = Oid::of('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.5.1')->toNumeric();
             discover_sensor(
                 null,
                 'dbm',

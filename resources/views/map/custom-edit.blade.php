@@ -8,6 +8,7 @@
 @include('map.custom-node-modal')
 @include('map.custom-edge-modal')
 @include('map.custom-map-modal')
+@include('map.custom-legend-modal')
 @include('map.custom-map-list-modal')
 
 <div class="container-fluid">
@@ -16,8 +17,9 @@
       <button type=button value="mapedit" id="map-editButton" class="btn btn-primary" onclick="editMapSettings()">{{ __('map.custom.edit.map.edit') }}</button>
       <button type=button value="mapbg" id="map-bgButton" class="btn btn-primary" onclick="editMapBackground()">{{ __('map.custom.edit.bg.title') }}</button>
       <button type=button value="mapbg" id="map-bgEndAdjustButton" class="btn btn-primary" onclick="endBackgroundMapAdjust()" style="display:none">{{ __('map.custom.edit.bg.adjust_map_finish') }}</button>
-      <button type=button value="editnodedefaults" id="map-nodeDefaultsButton" class="btn btn-primary" onclick="editNodeDefaults()">{{ __('map.custom.edit.node.edit_defaults') }}</button>
-      <button type=button value="editedgedefaults" id="map-edgeDefaultsButton" class="btn btn-primary" onclick="editEdgeDefaults()">{{ __('map.custom.edit.edge.edit_defaults') }}</button>
+      <button type=button value="editnodedefaults" id="map-nodeDefaultsButton" class="btn btn-primary" onclick="nodeEdit(newnodeconf)">{{ __('map.custom.edit.node.edit_defaults') }}</button>
+      <button type=button value="editedgedefaults" id="map-edgeDefaultsButton" class="btn btn-primary" onclick="edgeEditDefaults()">{{ __('map.custom.edit.edge.edit_defaults') }}</button>
+      <button type=button value="togglelegend" id="map-legendToggleButton" class="btn btn-primary" onclick="toggleLegend()">{{ __('map.custom.edit.map.legend_toggle') }}</button>
     </div>
     <div class="col-md-2">
       <center>
@@ -25,6 +27,7 @@
       </center>
     </div>
     <div class="col-md-5 text-right">
+      <button type=button value="mapselectall" id="map-selectallButton" class="btn btn-primary" onclick="network.selectNodes(network_nodes.getIds());" title="{{ __('map.custom.edit.map.multiselect_info') }}">{{ __('map.custom.edit.map.selectall') }}</button>
       <button type=button value="maprender" id="map-renderButton" class="btn btn-primary" style="display: none" onclick="CreateNetwork();">{{ __('map.custom.edit.map.rerender') }}</button>
       <button type=button value="mapsave" id="map-saveDataButton" class="btn btn-primary" style="display: none" onclick="saveMapData();">{{ __('map.custom.edit.map.save') }}</button>
       <button type=button value="maplist" id="map-listButton" class="btn btn-primary" onclick="mapList();">{{ __('map.custom.edit.map.list') }}</button>
@@ -57,7 +60,8 @@
 @endsection
 
 @section('javascript')
-<script type="text/javascript" src="{{ asset('js/vis.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/vis-network.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/vis-data.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/leaflet.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/L.Control.Locate.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/leaflet-image.js') }}"></script>
@@ -95,6 +99,7 @@
     var edge_nodes_map = [];
     var node_device_map = {};
     var custom_image_base = "{{ $base_url }}images/custommap/icons/";
+    var nodeimage_base = '{{ route('maps.nodeimage.show', ['image' => '?' ]) }}'.replace("?", "");
     var network_options = {{ Js::from($map_conf) }}
 
     function edgeNodesRemove(nm_id, edgeid) {
@@ -232,21 +237,17 @@
         // Set up the triggers for adding and editing map items
         options['manipulation']['addNode'] = function (data, callback) {
                 callback(null);
-                $("#nodeModalLabel").text('{{ __('map.custom.edit.node.add') }}');
                 var node = structuredClone(newnodeconf);
                 node.id = "new" + newcount++;
                 node.label = "New Node";
                 node.x = node_align ? Math.round(data.x / node_align) * node_align : data.x;
                 node.y = node_align ? Math.round(data.y / node_align) * node_align : data.y;
                 node.add = true;
-                $(".single-node").show();
-                editNode(node, editNodeSave);
+                nodeEdit(node);
             }
         options['manipulation']['editNode'] = function (data, callback) {
                 callback(null);
-                $("#nodeModalLabel").text('{{ __('map.custom.edit.node.edit') }}');
-                $(".single-node").show();
-                editNode(data, editNodeSave);
+                checkEditNode(data);
             }
         options['manipulation']['deleteNode'] = function (data, callback) {
                 callback(null);
@@ -299,8 +300,7 @@
 
                 var edgedata = {id: edgeid, mid: mid, edge1: edge1, edge2: edge2, add: true}
 
-                $("#edgeModalLabel").text('{{ __('map.custom.edit.edge.add') }}');
-                editEdge(edgedata, editEdgeSave);
+                edgeEdit(edgedata);
             }
         options['manipulation']['editEdge'] = { editWithoutDrag: editExistingEdge };
         options['manipulation']['deleteEdge'] = function (data, callback) {
@@ -329,7 +329,7 @@
                 node = network_nodes.get(node_id);
                 $("#nodeModalLabel").text('{{ __('map.custom.edit.node.edit') }}');
                 $(".single-node").show();
-                editNode(node, editNodeSave);
+                checkEditNode(node);
             } else if (properties.edges.length > 0) {
                 edge_id = properties.edges[0].split("_")[0];
                 edge = network_edges.get(edge_id + "_to");
@@ -341,10 +341,14 @@
             if(data.edges.length > 0 || data.nodes.length > 0) {
                 // Make sure a node is not dragged outside the canvas
                 nodepos = network.getPositions(data.nodes);
+                legendMoved = false;
                 $.each( nodepos, function( nodeid, node ) {
                     if ( nodeid.startsWith("legend_") ) {
-                        // Make sure the moved node is still on the map
-                        fixNodePos(nodeid, node);
+                        // Only move the legend once
+                        if (legendMoved) {
+                            return;
+                        }
+                        legendMoved = true;
 
                         // Get the current node config
                         cur_node = network_nodes.get(nodeid);
@@ -353,7 +357,19 @@
                         legend.x = legend.x + node.x - cur_node.x;
                         legend.y = legend.y + node.y - cur_node.y;
 
+                        // Make sure the top of the legend is still on the map
+                        fixNodePos("legend", legend);
+
                         redrawLegend();
+
+                        // Make sure the bottom of the legend is still on the map
+                        legendEndNode = network_nodes.get("legend_" + (legend.steps - 1))
+                        moveUp = legendEndNode.y - network_height + {{ $vmargin }};
+                        if (moveUp > 0) {
+                            legend.y -= moveUp;
+                            redrawLegend();
+                        }
+
                         return;
                     }
                     let move = fixNodePos(nodeid, node);
@@ -377,8 +393,6 @@
     var newedgeconf = @json($newedge_conf);
     var newnodeconf = @json($newnode_conf);
     var newcount = 1;
-    var port_search_device_id_1 = 0;
-    var port_search_device_id_2 = 0;
 
     // Make sure the new edge config has an appropriate label value
     if (!("label" in newedgeconf)) {
@@ -435,7 +449,32 @@
         return '#ff00ff';
     }
 
+    function toggleLegend() {
+        var width = $("#mapwidth").val();
+        var mapwdith = 100;
+        if (!isNaN(width)) {
+            mapwidth = width;
+        } else if (width.includes("px")) {
+            mapwidth = width.replace("px", "");
+        } else if (width.includes("%")) {
+            mapwidth = window.innerWidth * width.replace("%", "") / 100;
+        }
+
+        // Update the x and y coordinates
+        if (legend.x < 0) {
+            legend.x = mapwidth - 50;
+            legend.y = 100;
+        } else {
+            legend.x = -1;
+            legend.y = -1;
+        }
+        redrawLegend();
+    }
+
     function redrawLegend() {
+        // Save list of selected nodes because we are going to remove and re-add the legend
+        selectedNodes = network.selectionHandler.getSelectedNodes().map((n) => {return n.id});
+
         // Clear out the old legend
         old_nodes = network_nodes.get({filter: function(node) { return node.id.startsWith("legend_") }});
         old_nodes.forEach((node) => {
@@ -450,24 +489,47 @@
             y_pos += y_inc;
 
             if (!(Boolean(legend.hide_invalid))) {
-                let legend_invalid = {id: "legend_invalid", label: "???", title: "Link is down or link speed is not defined", shape: "box", borderWidth: 0, x: legend.x, y: y_pos, font: {face: 'courier new', size: legend.font_size, color: "white"}, color: {background: "black"}};
+                let this_colour = 'black';
+                if(legend.colours) {
+                    this_colour = legend.colours['-1'];
+                }
+                let legend_invalid = {id: "legend_invalid", label: "???", title: "Link is down or link speed is not defined", shape: "box", borderWidth: 0, x: legend.x, y: y_pos, font: {face: 'courier new', size: legend.font_size, color: "white"}, color: {background: this_colour}};
                 y_pos += y_inc;
                 network_nodes.add(legend_invalid);
             }
 
-            let pct_step;
-            if (Boolean(legend.hide_overspeed)) {
-                pct_step = 100.0 / (legend.steps - 1);
+            if(legend.colours) {
+                let i = 0;
+                Object.keys(legend.colours).sort((a,b) => parseInt(a) > parseInt(b)).forEach((pct_key) => {
+                    let this_pct = parseFloat(pct_key);
+                    if(!isNaN(this_pct) && this_pct >= 0.0) {
+                        let legend_step = {id: "legend_" + i.toString(), label: this_pct.toString().padStart(3, " ") + "%", shape: "box", borderWidth: 0, x: legend.x, y: y_pos, font: {face: 'courier new', size: legend.font_size, color: "black"}, color: {background: legend.colours[pct_key]}};
+                        network_nodes.add(legend_step);
+                        y_pos += y_inc;
+                        i++;
+                    }
+                });
             } else {
-                pct_step = 150.0 / (legend.steps - 1);
-            }
-            for (let i=0; i < legend.steps; i++) {
-                let this_pct = Math.round(pct_step * i);
-                let legend_step = {id: "legend_" + i.toString(), label: this_pct.toString().padStart(3, " ") + "%", shape: "box", borderWidth: 0, x: legend.x, y: y_pos, font: {face: 'courier new', size: legend.font_size, color: "black"}, color: {background: legendPctColour(this_pct)}};
-                network_nodes.add(legend_step);
-                y_pos += y_inc;
+                let pct_step;
+                if (Boolean(legend.hide_overspeed)) {
+                    pct_step = 100.0 / (legend.steps - 1);
+                } else {
+                    pct_step = 150.0 / (legend.steps - 1);
+                }
+                for (let i=0; i < legend.steps; i++) {
+                    let this_pct = Math.round(pct_step * i);
+                    let legend_step = {id: "legend_" + i.toString(), label: this_pct.toString().padStart(3, " ") + "%", shape: "box", borderWidth: 0, x: legend.x, y: y_pos, font: {face: 'courier new', size:
+ legend.font_size, color: "black"}, color: {background: legendPctColour(this_pct)}};
+                    network_nodes.add(legend_step);
+                    y_pos += y_inc;
+                }
             }
             network_nodes.flush();
+        }
+
+        // Re-select nodes if multiple nodes are selected
+        if (selectedNodes.length > 1) {
+            network.selectNodes(selectedNodes);
         }
     }
 
@@ -481,7 +543,6 @@
             swapArrows(Boolean(parseInt(data.reverse_arrows)));
         }
         reverse_arrows = parseInt(data.reverse_arrows);
-        redrawLegend();
 
         // update dimensions
         network_options.width = data.width;
@@ -491,11 +552,14 @@
         // Re-create the network because network.setSize() blanks out the map
         CreateNetwork();
 
-        editMapCancel();
+        $('#mapModal').modal('hide');
     }
 
     function editMapCancel() {
+        mapSettingsReset();
         $('#mapModal').modal('hide');
+        $("#savemap-alert").attr("class", "col-sm-12");
+        $("#savemap-alert").text("");
     }
 
     function saveMapData() {
@@ -510,18 +574,23 @@
                 edgeid = node.id.split("_")[0];
                 edge1 = network_edges.get(edgeid + "_from");
                 edge2 = network_edges.get(edgeid + "_to");
-                edges[edgeid] = {id: edgeid, text_colour: edge1.font.color, text_size: edge1.font.size, text_face: edge1.font.face, from: edge1.from, to: edge2.from, showpct: (edge1.label != null && edge1.label.includes("xx%")), showbps: (edge1.label != null && edge1.label.includes("bps")), label: (node.label || ''), port_id: edge1.title, style: edge1.smooth.type, mid_x: node.x, mid_y: node.y, reverse: (edgeid in edge_port_map ? edge_port_map[edgeid].reverse : false)};
+                edges[edgeid] = {id: edgeid, text_colour: edge1.font.color, text_size: edge1.font.size, text_face: edge1.font.face, text_align: edge1.font.align, from: edge1.from, to: edge2.from, showpct: (edge1.label != null && edge1.label.includes("xx%")), showbps: (edge1.label != null && edge1.label.includes("bps")), label: (node.label || ''), fixed_width: (edge1.width || null), port_id: edge1.title, style: edge1.smooth.type, mid_x: node.x, mid_y: node.y, reverse: (edgeid in edge_port_map ? edge_port_map[edgeid].reverse : false)};
             } else {
                 if(node.icon.code) {
                     node.icon = node.icon.code.charCodeAt(0).toString(16);
                 } else {
                     node.icon = null;
                 }
-                if("unselected" in node.image) {
+                if(node.image && "unselected" in node.image) {
                     if(node.image.unselected.indexOf(custom_image_base) == 0) {
                         node.image.unselected = node.image.unselected.replace(custom_image_base, "");
+                        node.nodeimage = null;
+                    } else if(node.image.unselected.indexOf(nodeimage_base) == 0) {
+                        node.nodeimage = node.image.unselected.replace(nodeimage_base, "");
+                        node.image = undefined;
                     } else {
-                        node.image = {};
+                        node.image = undefined;
+                        node.nodeimage = null;
                     }
                 }
                 nodes[node.id] = node;
@@ -537,6 +606,11 @@
                 edges: edges,
                 legend_x: legend.x,
                 legend_y: legend.y,
+                legend_steps: legend.steps,
+                legend_font_size: legend.font_size,
+                legend_hide_invalid: legend.hide_invalid,
+                legend_hide_overspeed: legend.hide_overspeed,
+                legend_colours: legend.colours,
             }),
             contentType: "application/json",
             dataType: 'json',
@@ -567,117 +641,7 @@
         $('#bgModal').modal('show');
     }
 
-    function nodeStyleChange() {
-        var nodestyle = $("#nodestyle").val();
-        if(nodestyle == 'icon') {
-            $("#nodeIconRow").show();
-        } else {
-            $("#nodeIconRow").hide();
-        }
-        if(nodestyle == 'image' || nodestyle == 'circularImage') {
-            $("#nodeImageRow").show();
-        } else {
-            $("#nodeImageRow").hide();
-        }
-    }
-
-    function nodeDeviceSelect(e) {
-        var id = e.params.data.id;
-        var name = e.params.data.text;
-        $("#device_id").val(id);
-        $("#device_name").text(name);
-        $("#nodelabel").val(name.split(".")[0].split(" ")[0]);
-        $("#device_image").val(e.params.data.icon);
-        $("#nodeDeviceSearchRow").hide();
-        $("#nodeMapLinkRow").hide();
-        $("#deviceiconimage").show();
-        $("#nodeDeviceRow").show();
-    }
-
-    function nodeDeviceClear() {
-        $("#devicesearch").val('');
-        $("#devicesearch").trigger('change');
-        $("#device_id").val("");
-        $("#device_name").text("");
-        $("#device_image").val("");
-        $("#nodeDeviceRow").hide();
-        $("#deviceiconimage").hide();
-        $("#nodeDeviceSearchRow").show();
-        $("#nodeMapLinkRow").show();
-
-        // Reset device style if we were using the device image
-        if(($("#nodestyle").val() == "image" || $("#nodestyle").val() == "circularImage") && !$("#nodeimage").val()){
-            $("#nodestyle").val(newnodeconf.shape);
-            $("#nodeImageRow").hide();
-            setNodeImage();
-        }
-    }
-
-    function nodeMapLinkChange() {
-        if($("#maplink").val()) {
-            $("#nodeDeviceSearchRow").hide();
-        } else {
-            $("#nodeDeviceSearchRow").show();
-        }
-    }
-
-    function setNodeImage() {
-        // If the selected option is not visible, select the top option
-        if($("#nodeimage option:selected").css('display') == 'none') {
-            $("#nodeimage").val($("#nodeimage option:eq(1)").val());
-        }
-        // Set the image preview src
-        if($("#nodeimage").val()) {
-            $("#nodeimagepreview").attr("src", custom_image_base + $("#nodeimage").val());
-        } else {
-            $("#nodeimagepreview").attr("src", $("#device_image").val());
-        }
-    }
-
-    function setNodeIcon() {
-        var newcode = $("#nodeicon").val();
-        $("#nodeiconpreview").text(String.fromCharCode(parseInt(newcode, 16)));
-    }
-
-    function editNodeDefaults() {
-        $("#nodeModalLabel").text('{{ __('map.custom.edit.node.defaults_title') }}');
-        $(".single-node").hide();
-        var node = structuredClone(newnodeconf);
-        editNode(node, editNodeDefaultsSave);
-    }
-
-    function editNodeDefaultsSave() {
-        newnodeconf.shape = $("#nodestyle").val();
-        newnodeconf.font.face = $("#nodetextface").val();
-        newnodeconf.font.size = $("#nodetextsize").val();
-        newnodeconf.font.color = $("#nodetextcolour").val();
-        newnodeconf.color.background = $("#nodecolourbg").val();
-        newnodeconf.color.border = $("#nodecolourbdr").val();
-        if(newnodeconf.shape == "icon") {
-            newnodeconf.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt($("#nodeicon").val(), 16)), size: $("#nodesize").val(), color: newnodeconf.color.border};
-        } else {
-            newnodeconf.icon = {};
-        }
-        if(newnodeconf.shape == "image" || newnodeconf.shape == "circularImage") {
-            newnodeconf.image = {unselected: custom_image_base + $("#nodeimage").val()};
-        } else {
-            delete newnodeconf.image;
-        }
-        $("#map-saveDataButton").show();
-    }
-
-    function checkColourReset(itemColour, defaultColour, resetControlId) {
-        if(!itemColour || itemColour.toLowerCase() == defaultColour.toLowerCase()) {
-            $("#" + resetControlId).attr('disabled','disabled');
-        } else {
-            $("#" + resetControlId).removeAttr('disabled');
-        }
-    }
-
-    function editNode(data, callback) {
-        $("#devicesearch").val('');
-        $("#devicesearch").trigger('change');
-
+    function checkEditNode(data) {
         // If we have an ID that is non numeric, we can check node type further
         if(data.id && isNaN(data.id)) {
             // Editing a mid point node triggers editing the edge
@@ -689,222 +653,11 @@
 
             // Legend nodes cannot be edited
             if (data.id.startsWith("legend_") ) {
+                $('#mapLegendModal').modal({backdrop: 'static', keyboard: false}, 'show');
                 return;
             }
         }
-
-        if(data.id in node_device_map) {
-            // Nodes is linked to a device
-            $("#device_id").val(node_device_map[data.id].device_id);
-            $("#device_name").text(node_device_map[data.id].device_name);
-            // Hide device selection row
-            $("#nodeDeviceSearchRow").hide();
-            $("#nodeMapLinkRow").hide();
-            // Show device image as an option
-            $("#deviceiconimage").show();
-            $("#device_image").val(node_device_map[data.id].device_image);
-        } else {
-            // Node is not linked to a device
-            $("#device_id").val("");
-            $("#device_name").text("");
-            // Hide the selected device row
-            $("#nodeDeviceRow").hide();
-            // Hide device image as an option
-            $("#deviceiconimage").hide();
-            $("#device_image").val("");
-        }
-        if(data.title && data.title.toString().startsWith("map:")) {
-            // Hide device selection row
-            $("#nodeDeviceSearchRow").hide();
-            $("#maplink").val(data.title.replace("map:",""));
-        }
-        $("#nodelabel").val(data.label);
-        $("#nodestyle").val(data.shape);
-        // Show or hide the image selection if the shape is an image type
-        if(data.shape == "image" || data.shape == "circularImage") {
-            $("#nodeImageRow").show();
-            if(data.image.unselected.indexOf(custom_image_base) == 0) {
-                $("#nodeimage").val(data.image.unselected.replace(custom_image_base, ""));
-            } else {
-                $("#nodeimage").val("");
-            }
-        } else {
-            $("#nodeImageRow").hide();
-            $("#nodeimage").val("");
-        }
-        setNodeImage();
-        // Show or hide the icon selection if the shape is icon
-        if(data.shape == "icon") {
-            $("#nodeicon").val(data.icon.code.charCodeAt(0).toString(16));
-            $("#nodeIconRow").show();
-        } else {
-            $("#nodeIconRow").hide();
-        }
-        $("#nodesize").val(data.size);
-        $("#nodetextface").val(data.font.face);
-        $("#nodetextsize").val(data.font.size);
-        $("#nodetextcolour").val(data.font.color);
-        if(data.color && data.color.background) {
-            $("#nodecolourbg").val(data.color.background);
-            $("#nodecolourbdr").val(data.color.border);
-        } else {
-            // The background colour is blank because a device has been selected - start with defaults
-            $("#nodecolourbg").val(newnodeconf.color.background);
-            $("#nodecolourbdr").val(newnodeconf.color.border);
-        }
-
-        checkColourReset(data.font.color, newnodeconf.font.color, "nodecolourtextreset");
-        checkColourReset(data.color.background, newnodeconf.color.background, "nodecolourbgreset");
-        checkColourReset(data.color.border, newnodeconf.color.border, "nodecolourbdrreset");
-
-        if(data.id) {
-            $("#node-saveButton").on("click", {data: data}, callback);
-            $("#node-saveButton").show();
-            $("#node-saveDefaultsButton").hide();
-        } else {
-            $("#node-saveButton").hide();
-            $("#node-saveDefaultsButton").show();
-        }
-        $('#nodeModal').modal({backdrop: 'static', keyboard: false}, 'show');
-    }
-
-    function editNodeSave(event) {
-        node = event.data.data;
-
-        editNodeHide();
-
-        if($("#device_id").val()) {
-            node.title = $("#device_id").val();
-        } else if($("#maplink").val()) {
-            node.title = "map:" + $("#maplink").val();
-        } else {
-            node.title = '';
-        }
-        // Update the node with the selected values on success and run the callback
-        node.label = $("#nodelabel").val();
-        node.shape = $("#nodestyle").val();
-        node.font.face = $("#nodetextface").val();
-        node.font.size = parseInt($("#nodetextsize").val());
-        node.font.color = $("#nodetextcolour").val();
-        node.color = {highlight: {}, hover: {}};
-        node.color.background = node.color.highlight.background = node.color.hover.background = $("#nodecolourbg").val();
-        node.color.border = node.color.highlight.border = node.color.hover.border = $("#nodecolourbdr").val();
-        node.size = $("#nodesize").val();
-        if(node.shape == "image" || node.shape == "circularImage") {
-            if($("#nodeimage").val()) {
-                node.image = {unselected: custom_image_base + $("#nodeimage").val()};
-            } else {
-                node.image = {unselected: $("#device_image").val()};
-            }
-        } else {
-            node.image = {};
-        }
-        if(node.shape == "icon") {
-            node.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt($("#nodeicon").val(), 16)), size: $("#nodesize").val(), color: node.color.border};
-        } else {
-            node.icon = {};
-        }
-        if(node.add) {
-            delete node.add;
-            network_nodes.add(node);
-        } else {
-            network_nodes.update(node);
-        }
-
-        if(node.id) {
-            if($("#device_id").val()) {
-                node_device_map[node.id] = {device_id: $("#device_id").val(), device_name: $("#device_name").text(), device_image: $("#device_image").val()}
-            } else {
-                delete node_device_map[node.id];
-            }
-        }
-
-        $("#map-saveDataButton").show();
-        $("#map-renderButton").show();
-    }
-
-    function editNodeCancel(event) {
-        editNodeHide();
-    }
-
-    function editNodeHide() {
-        $("#node-saveButton").off("click");
-    }
-
-    function updateEdgePortSearch(node1_id, node2_id, edge_id) {
-        node1 = network_nodes.get(node1_id);
-        node2 = network_nodes.get(node2_id);
-
-        if(isNaN(node1.title) && isNaN(node2.title)) {
-            // Neither node has a device - clear port config
-            $("#port_id").val("");
-            $("#edgePortRow").hide();
-            $("#edgePortReverseRow").hide();
-            $("#edgePortSearchRow").hide();
-            return;
-        }
-        if(edge_id in edge_port_map) {
-            $("#port_id").val(edge_port_map[edge_id].port_id);
-            $("#port_name").text(edge_port_map[edge_id].port_name);
-            $("#portreverse").bootstrapSwitch('state', edge_port_map[edge_id].reverse);
-            $("#edgePortRow").show();
-            $("#edgePortReverseRow").show();
-            $("#edgePortSearchRow").hide();
-        } else {
-            $("#port_id").val("");
-            $("#portreverse").bootstrapSwitch('state', false);
-            $("#edgePortRow").hide();
-            $("#edgePortReverseRow").hide();
-            $("#edgePortSearchRow").show();
-        }
-        port_search_device_id_1 = (node1.id in node_device_map) ? node_device_map[node1.id].device_id : 0;
-        port_search_device_id_2 = (node2.id in node_device_map) ? node_device_map[node2.id].device_id : 0;
-    }
-
-    function edgePortSelect(e) {
-        var id = e.params.data.id;
-        var name = e.params.data.text;
-        var reverse = e.params.data.device_id != port_search_device_id_1;
-        $("#port_id").val(id);
-        $("#port_name").text(name);
-        $("#portreverse").bootstrapSwitch('state', reverse);
-
-        $("#edgePortSearchRow").hide();
-        $("#edgePortRow").show();
-        $("#edgePortReverseRow").show();
-    }
-
-    function edgePortClear() {
-        $("#portsearch").val('');
-        $("#portsearch").trigger('change');
-        $("#port_id").val("");
-        $("#port_name").text("");
-        $("#edgePortSearchRow").show();
-        $("#edgePortRow").hide();
-        $("#edgePortReverseRow").hide();
-    }
-
-    function editEdgeDefaults() {
-        $("#edgeModalLabel").text('{{ __('map.custom.edit.edge.defaults_title') }}');
-        $("#divEdgeFrom").hide();
-        $("#divEdgeTo").hide();
-        $("#edgePortRow").hide();
-        $("#edgePortReverseRow").hide();
-        $("#edgePortSearchRow").hide();
-        $("#edgeRecenterRow").hide();
-        $("#edgelabel").hide();
-
-        $("#edgestyle").val(newedgeconf.smooth.type);
-        $("#edgetextface").val(newedgeconf.font.face);
-        $("#edgetextsize").val(newedgeconf.font.size);
-        $("#edgetextcolour").val(newedgeconf.font.color);
-        $("#edgetextshow").bootstrapSwitch('state', (newedgeconf.label.includes('xx%') || newedgeconf.label.includes('true')));
-        $("#edgebpsshow").bootstrapSwitch('state', (newedgeconf.label.includes('bps')));
-        $('#edgecolourtextreset').attr('disabled', 'disabled');
-
-        $("#edge-saveButton").hide();
-        $("#edge-saveDefaultsButton").show();
-        $('#edgeModal').modal({backdrop: 'static', keyboard: false}, 'show');
+        nodeEdit(data);
     }
 
     function edgeLabel(show_pct, show_bps, default_val) {
@@ -924,134 +677,6 @@
         return default_val;
     }
 
-    function editEdgeDefaultsSave() {
-        editEdgeHide();
-        newedgeconf.smooth.type = $("#edgestyle").val();
-        newedgeconf.font.face = $("#edgetextface").val();
-        newedgeconf.font.size = $("#edgetextsize").val();
-        newedgeconf.font.color = $("#edgetextcolour").val();
-        newedgeconf.label = edgeLabel($("#edgetextshow").prop('checked'), $("#edgebpsshow").prop('checked'), '');
-        $("#map-saveDataButton").show();
-    }
-
-    function editEdge(edgedata, callback) {
-        $("#portsearch").val('');
-        $("#portsearch").trigger('change');
-        var nodes = network_nodes.get({
-          fields: ['id', 'label'],
-          filter: function (item) {
-            // We do not want to be able to link to the mid nodes
-            return (!item.id.endsWith("_mid"));
-          },
-        });
-        $("#edgefrom").find('option').remove().end();
-        $("#edgeto").find('option').remove().end();
-        $.each( nodes, function( node_idx, node ) {
-            $("#edgefrom").append('<option value="' + node.id + '">' + node.label+ '</option>');
-            $("#edgeto").append('<option value="' + node.id + '">' + node.label+ '</option>');
-        });
-        $("#edgefrom").val(edgedata.edge1.from);
-        $("#edgeto").val(edgedata.edge2.from);
-
-        updateEdgePortSearch($("#edgefrom").val(), $("#edgeto").val(), edgedata.id);
-        checkColourReset(edgedata.edge1.font.color, newedgeconf.font.color, "edgecolourtextreset");
-
-        $("#edgestyle").val(edgedata.edge1.smooth.type);
-        $("#edgetextface").val(edgedata.edge1.font.face);
-        $("#edgetextsize").val(edgedata.edge1.font.size);
-        $("#edgetextcolour").val(edgedata.edge1.font.color);
-        $("#edgetextshow").bootstrapSwitch('state', (edgedata.edge1.label != null && edgedata.edge1.label.includes('xx%')));
-        $("#edgebpsshow").bootstrapSwitch('state', (edgedata.edge1.label != null && edgedata.edge1.label.includes('bps')));
-        $("#edgelabel").val('label' in edgedata.mid ? edgedata.mid.label : '');
-
-        $("#edgeRecenterRow").show();
-        $("#divEdgeFrom").show();
-        $("#divEdgeTo").show();
-        $("#edgelabel").show();
-        $("#edge-saveButton").show();
-        $("#edge-saveDefaultsButton").hide();
-        $("#edge-saveButton").on("click", {data: edgedata}, callback);
-
-        $('#edgeModal').modal({backdrop: 'static', keyboard: false}, 'show');
-    }
-
-    function editEdgeSave(event) {
-        edgedata = event.data.data;
-
-        edgeNodesUpdate(edgedata.id, $("#edgefrom").val(), $("#edgeto").val(), edgedata.edge1.from, edgedata.edge2.from);
-
-        editEdgeHide();
-        edgedata.edge1.smooth.type = $("#edgestyle").val();
-        edgedata.edge2.smooth.type = $("#edgestyle").val();
-        edgedata.edge1.from = $("#edgefrom").val();
-        edgedata.edge2.from = $("#edgeto").val();
-        edgedata.edge1.font.face = edgedata.edge2.font.face = $("#edgetextface").val();
-        edgedata.edge1.font.size = edgedata.edge2.font.size = $("#edgetextsize").val();
-        edgedata.edge1.font.color = edgedata.edge2.font.color = $("#edgetextcolour").val();
-        edgedata.edge1.label = edgedata.edge2.label = edgeLabel($("#edgetextshow").prop('checked'), $("#edgebpsshow").prop('checked'), null);
-        edgedata.edge1.title = edgedata.edge2.title = $("#port_id").val();
-	let newlabel = $("#edgelabel").val() || '';
-	if (newlabel == '' && edgedata.mid.label != '') {
-            $("#map-renderButton").show();
-	}
-        edgedata.mid.label = newlabel;
-
-        if(edgedata.id) {
-            if($("#port_id").val()) {
-                edge_port_map[edgedata.id] = {port_id: $("#port_id").val(), port_name: $("#port_name").text(), reverse: $("#portreverse")[0].checked}
-            } else {
-                delete edge_port_map[edgedata.id];
-            }
-        }
-
-        // Special case for curved lines
-        if(edgedata.edge2.smooth.type == "curvedCW") {
-            edgedata.edge2.smooth.type = "curvedCCW";
-        } else if (edgedata.edge2.smooth.type == "curvedCCW") {
-            edgedata.edge2.smooth.type = "curvedCW";
-        }
-
-        if(edgedata.add) {
-            network_nodes.add([edgedata.mid]);
-            network_nodes.flush();
-            network_edges.add([edgedata.edge1, edgedata.edge2]);
-            network_edges.flush();
-        } else {
-            network_edges.update([edgedata.edge1, edgedata.edge2]);
-            network_nodes.update([edgedata.mid]);
-
-            if($("#edgerecenter").is(":checked")) {
-                var pos = network.getPositions([edgedata.edge1.from, edgedata.edge2.from]);
-                const mid_pos = getMidPos(edgedata.id, edgedata.edge1.from, edgedata.edge2.from);
-
-                edgedata.mid.x = mid_pos.x;
-                edgedata.mid.y = mid_pos.y;
-                network_nodes.update([edgedata.mid]);
-                $("#map-renderButton").show();
-            }
-
-            // Blank labels need to be selected to update.  Select both to ensure this happens
-            if(! edgedata.edge1.label) {
-                network_edges.flush();
-                network.selectEdges([edgedata.edge2.id]);
-                // Redraw to make sure the above change is reflected in the view before we select the next edge
-                network.redraw();
-                // Select the first edge, which will trigger another update
-                network.selectEdges([edgedata.edge1.id]);
-            }
-        }
-        $("#edgerecenter").prop( "checked", false );
-        $("#map-saveDataButton").show();
-    }
-
-    function editEdgeCancel(event) {
-        editEdgeHide();
-    }
-
-    function editEdgeHide() {
-        $("#edge-saveButton").off("click");
-    }
-
     function editExistingEdge (edge, callback) {
         if(callback) {
             callback(null);
@@ -1069,8 +694,7 @@
 
         var edgedata = {id: edgeinfo[0], mid: mid, edge1: edge1, edge2: edge2}
 
-        $("#edgeModalLabel").text("Edit Edge");
-        editEdge(edgedata, editEdgeSave);
+        edgeEdit(edgedata);
     }
 
     function deleteEdge(edgeid) {
@@ -1094,11 +718,13 @@
                 $.each( data.nodes, function( nodeid, node) {
                     var node_cfg = {};
                     node_cfg.id = nodeid;
+                    node_cfg.device_id = node.device_id;
+                    node_cfg.linked_map_id = node.linked_map_id;
                     if(node.device_id) {
                         node_device_map[nodeid] = {device_id: node.device_id, device_name: node.device_name, device_image: node.device_image};
-                        node_cfg.title = node.device_id;
+                        node_cfg.title = "Device " + node.device_id;
                     } else if(node.linked_map_id) {
-                        node_cfg.title = "map:" + node.linked_map_id;
+                        node_cfg.title = "Link to map " + node.linked_map_id;
                     } else {
                         node_cfg.title = null;
                     }
@@ -1107,7 +733,7 @@
                     node_cfg.borderWidth = node.border_width;
                     node_cfg.x = node.x_pos;
                     node_cfg.y = node.y_pos;
-                    node_cfg.font = {face: node.text_face, size: node.text_size, color: node.text_colour};
+                    node_cfg.font = {face: node.text_face, size: node.text_size, color: node.text_colour, background: '#FFFFFF'};
                     node_cfg.size = node.size;
                     node_cfg.color = {background: node.colour_bg, border: node.colour_bdr};
                     if(node.style == "icon") {
@@ -1118,16 +744,21 @@
                     if(node.style == "image" || node.style == "circularImage") {
                         if(node.image) {
                             node_cfg.image = {unselected: custom_image_base + node.image};
+                        } else if(node.nodeimage) {
+                            node_cfg.image = {unselected: nodeimage_base + node.nodeimage};
                         } else if (node.device_image) {
                             node_cfg.image = {unselected: node.device_image};
                         } else {
                             // If we do not get a valid image from the database, use defaults
                             node_cfg.shape = newnodeconf.shape;
                             node_cfg.icon = newnodeconf.icon;
-                            node_cfg.image = newnodeconf.image;
+                            node_cfg.image = newnodeconf.image || undefined;
                         }
                     } else {
-                        node_cfg.image = {};
+                        node_cfg.image = undefined;
+                    }
+                    if(! ["ellipse", "circle", "database", "box", "text"].includes(node.style)) {
+                        node_cfg.font.background = "#FFFFFF";
                     }
 
                     if (network_nodes.get(nodeid)) {
@@ -1153,8 +784,11 @@
                         arrows = {to: {enabled: true, scaleFactor: 0.6}, from: {enabled: false}};
                     }
 
-                    var edge1 = {id: edgeid + "_from", from: edge.custom_map_node1_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}, smooth: {type: edge.style}};
-                    var edge2 = {id: edgeid + "_to", from: edge.custom_map_node2_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}, smooth: {type: edge.style}};
+                    var edge1 = {id: edgeid + "_from", from: edge.custom_map_node1_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, smooth: {type: edge.style}, arrowStrikethrough: false};
+                    var edge2 = {id: edgeid + "_to", from: edge.custom_map_node2_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, smooth: {type: edge.style}, arrowStrikethrough: false};
+                    if(edge.fixed_width) {
+                        edge1.width = edge2.width = parseFloat(edge.fixed_width) || null;
+                    }
 
                     // Special case for curved lines
                     if(edge2.smooth.type == "curvedCW") {
@@ -1230,41 +864,12 @@
         }).observe(targetNode, {attributes: false, childList: true, subtree: false});
     }
 
-    function startBackgroundMapAdjust() {
-        $('#map-editButton,#map-nodeDefaultsButton,#map-edgeDefaultsButton,#map-bgButton').hide();
-        $('#map-bgEndAdjustButton').show();
-    }
-
-    function endBackgroundMapAdjust() {
-        $('#map-editButton,#map-nodeDefaultsButton,#map-edgeDefaultsButton,#map-bgButton').show();
-        $('#map-bgEndAdjustButton').hide();
-
-        document.getElementById('custom-map-bg-geo-map').style.zIndex = '1';
-        const leaflet = get_map('custom-map-bg-geo-map');
-        if (leaflet) {
-            disable_map_interaction(leaflet)
-        }
-        editMapBackground();
-    }
-
     $(document).ready(function () {
-        init_select2('#devicesearch', 'device', {limit: 100}, '', '{{ __('map.custom.edit.node.device_select') }}', {dropdownParent: $('#nodeModal')});
-        $("#devicesearch").on("select2:select", nodeDeviceSelect);
-
-        init_select2('#portsearch', 'port', function(params) {
-            return {
-                limit: 100,
-                devices: [port_search_device_id_1, port_search_device_id_2],
-                term: params.term,
-                page: params.page || 1
-            }
-        }, '', '{{ __('map.custom.edit.edge.port_select') }}', {dropdownParent: $('#edgeModal')});
-        $("#portsearch").on("select2:select", edgePortSelect);
-
         refreshMap();
 
         // watch for addNode/editNode
-        observeEditMode();    });
+        observeEditMode();
+   });
 </script>
 @endsection
 

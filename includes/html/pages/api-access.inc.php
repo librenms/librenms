@@ -17,9 +17,7 @@ use App\Models\User;
 use LibreNMS\Authentication\LegacyAuth;
 
 if (Auth::user()->hasGlobalAdmin()) {
-    if (empty($_POST['token'])) {
-        $_POST['token'] = bin2hex(openssl_random_pseudo_bytes(16));
-    } ?>
+?>
   <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">
     <div class="modal-dialog modal-sm">
       <div class="modal-content">
@@ -62,14 +60,6 @@ if (Auth::user()->hasGlobalAdmin()) {
         echo '<option value="' . $user->user_id . '">' . htmlentities($user->username) . ' (' . htmlentities($user->auth_type) . ')</option>';
     } ?>
                 </select>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="token" class="col-sm-2 control-label">Token: </label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" id="token" name="token" value="<?php echo htmlspecialchars($_POST['token']); ?>" readonly>
-              </div>
-              <div class="col-sm-2">
               </div>
             </div>
             <div class="form-group">
@@ -147,10 +137,10 @@ if (Auth::user()->hasGlobalAdmin()) {
 
         echo '
         <tr id="' . $api->id . '" ' . $color . '>
-          <td>' . $user_details->username . '</td>
-          <td>' . $user_details->auth_type . '</td>
-          <td>' . $api->token_hash . '</td>
-          <td><button class="btn btn-info btn-xs" data-toggle="modal" data-target="#display-qr" data-token_hash="' . $api->token_hash . '"><i class="fa fa-qrcode" ></i></button></td>
+          <td>' . htmlentities($user_details->username) . '</td>
+          <td>' . htmlentities($user_details->auth_type) . '</td>
+          <td>' . htmlentities($api->token_hash) . '</td>
+          <td><button class="btn btn-info btn-xs" data-toggle="modal" data-target="#display-qr" data-token_hash="' . htmlentities($api->token_hash) . '"><i class="fa fa-qrcode" ></i></button></td>
           <td>' . htmlspecialchars($api->description) . '</td>
           <td><input type="checkbox" name="token-status" data-token_id="' . $api->id . '" data-off-text="No" data-on-text="Yes" data-on-color="danger" ' . $api_disabled . ' data-size="mini"></td>
           <td><button type="button" class="btn btn-danger btn-xs" id="' . $api->id . '" data-token_id="' . $api->id . '" data-toggle="modal" data-target="#confirm-delete">Delete</button></td>

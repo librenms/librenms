@@ -14,11 +14,13 @@ print_optionbar_start();
 if (! isset($vars['vm'])) {
     echo generate_link('<span class="pagemenu-selected"><b>Totals</b></span>', $link_array);
 } else {
+    $vars['vm'] = htmlspecialchars($vars['vm']);
     echo generate_link('<b>Totals</b>', $link_array);
 }
 echo '<b> | VMs: </b>';
 $vm_links = [];
 foreach ($app->data['VMs'] as $vm) {
+    $vm = htmlspecialchars($vm);
     $label = $vm;
 
     if ($vars['vm'] == $vm) {
@@ -32,6 +34,13 @@ echo implode(', ', $vm_links);
 if (! isset($vars['vmif']) && ! isset($vars['vmdisk'])) {
     if (! isset($vars['vmpage'])) {
         $vars['vmpage'] = 'general';
+    }
+} else {
+    if (isset($vars['vmif'])) {
+        $vars['vmif'] = htmlspecialchars($vars['vmif']);
+    }
+    if (isset($vars['vmdisk'])) {
+        $vars['vmdisk'] = htmlspecialchars($vars['vmdisk']);
     }
 }
 
@@ -62,6 +71,7 @@ if (isset($vars['vm'])) {
     echo '<br><b>Disks:</b> ';
     $disk_links = [];
     foreach ($app->data['VMdisks'][$vars['vm']] as $index => $disk) {
+        $disk = htmlspecialchars($disk);
         $label = $disk;
 
         if ($vars['vmdisk'] == $disk) {
@@ -90,7 +100,7 @@ if (isset($vars['vm'])) {
 }
 
 if (isset($vars['vmif']) and isset($vars['vm'])) {
-    $mac = $app->data['VMifs'][$vars['vm']][$vars['vmif']]['mac'];
+    $mac = htmlspecialchars($app->data['VMifs'][$vars['vm']][$vars['vmif']]['mac']);
     $port = Port::with('device')->firstWhere(['ifPhysAddress' => str_replace(':', '', $mac)]);
 
     echo "\n<br>\n" .
@@ -119,7 +129,7 @@ if (isset($vars['vmif']) and isset($vars['vm'])) {
     // Mainly for CBSD
     $port = Port::with('device')->firstWhere(['device_id' => $app->device_id, 'ifName' => $app->data['VMifs'][$vars['vm']][$vars['vmif']]['if']]);
     if (! isset($port)) {
-        echo '<b>HV if:</b> ' . $app->data['VMifs'][$vars['vm']][$vars['vmif']]['if'] . "\n";
+        echo '<b>HV if:</b> ' . htmlspecialchars($app->data['VMifs'][$vars['vm']][$vars['vmif']]['if']) . "\n";
     } else {
         echo '<b>HV if:</b> ' .
             generate_port_link([

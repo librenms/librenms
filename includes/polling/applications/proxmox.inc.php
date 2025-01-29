@@ -57,7 +57,7 @@ if (\LibreNMS\Config::get('enable_proxmox') && ! empty($agent_data['app'][$name]
     $proxmox = str_replace("<<<app-proxmox>>>\n", '', $proxmox);
 }
 
-if ($proxmox) {
+if (! empty($proxmox)) {
     $pmxlines = explode("\n", $proxmox);
     $pmxcluster = array_shift($pmxlines);
     dbUpdate(

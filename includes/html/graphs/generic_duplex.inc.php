@@ -1,4 +1,7 @@
 <?php
+
+use App\Facades\Rrd;
+
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -33,9 +36,9 @@ if (! isset($in_text)) {
     $in_text = 'In';
 }
 
-$unit_text = str_pad(truncate($unit_text, $length), $length);
-$in_text = str_pad(truncate($in_text, $length), $length);
-$out_text = str_pad(truncate($out_text, $length), $length);
+$unit_text = Rrd::fixedSafeDescr($unit_text, $length);
+$in_text = Rrd::fixedSafeDescr($in_text, $length);
+$out_text = Rrd::fixedSafeDescr($out_text, $length);
 
 $rrd_options .= ' DEF:' . $out . '=' . $rrd_filename . ':' . $ds_out . ':AVERAGE';
 $rrd_options .= ' DEF:' . $in . '=' . $rrd_filename . ':' . $ds_in . ':AVERAGE';

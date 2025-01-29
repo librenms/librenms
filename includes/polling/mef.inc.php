@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Eventlog;
+
 echo 'MEF Links: ';
 
 /*
@@ -39,7 +41,7 @@ if (! empty($db_info_list)) {
                 // FIXME - this should loop building a query and then run the query after the loop (bad geert!)
                 dbUpdate([$property => $mef_info[$property]], 'mefinfo', '`id` = ?', [$db_info['id']]);
                 if ($db_info['mefIdent'] != null) {
-                    log_event('MEF Link : ' . $db_info['mefIdent'] . ' (' . preg_replace('/^mef/', '', $db_info[$property]) . ') -> ' . $mef_info[$property], $device);
+                    Eventlog::log('MEF Link : ' . $db_info['mefIdent'] . ' (' . preg_replace('/^mef/', '', $db_info[$property]) . ') -> ' . $mef_info[$property], $device['device_id']);
                 }
             }
         }

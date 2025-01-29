@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'config:clear' => [
+        'description' => 'Clear config cache.  This will allow any changes that have been made since the last full config load to be reflected in the current config.',
+    ],
     'config:get' => [
         'description' => 'Get configuration value',
         'arguments' => [
@@ -264,5 +267,8 @@ return [
         'password-request' => "Please enter the user's password",
         'success' => 'Successfully added user: :username',
         'wrong-auth' => 'Warning! You will not be able to log in with this user because you are not using MySQL auth',
+    ],
+    'maintenance:database-cleanup' => [
+        'description' => 'Database cleanup of orphaned items.',
     ],
 ];
