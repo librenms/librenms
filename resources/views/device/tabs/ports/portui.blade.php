@@ -1,0 +1,265 @@
+<style>
+    .switch-container {
+        border: 2px solid black;
+        margin: 10px;
+        padding: 10px;
+        display: inline-block;
+    }
+
+    .module-container {
+        border: 1px solid gray;
+        margin: 5px;
+        padding: 10px;
+        display: inline-block;
+    }
+
+    .block-container {
+        border: 1px solid gray;
+        margin: 5px;
+        padding: 10px;
+        display: inline-block;
+    }
+
+    .port-table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .port-cell {
+        border: 4px solid;
+        text-align: center;
+        padding: 10px;
+		width: 70px;
+    }
+
+    .border-up {
+        border-color: MediumSeaGreen;
+    }
+
+    .border-down {
+        border-color: darkblue;
+    }
+
+    .border-disabled {
+        border-color: darkgrey;
+    }
+
+    .bg-up {
+        background-color: lightgreen;
+    }
+
+    .bg-down {
+        background-color: darkgrey;
+    }
+
+    .port-name {
+        font-weight: bold;
+    }
+
+    .vlan-info {
+        font-size: 12px;
+    }
+
+    .empty-cell {
+        border: 2px solid transparent;
+        background-color: transparent;
+    }
+	
+    /* Tooltip container */
+    .port-cell .tooltip {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        text-align: left;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        z-index: 10;
+        white-space: nowrap;
+    }
+
+    .port-cell:hover .tooltip {
+        display: block;
+    }
+</style>
+
+<?php
+//echo "<pre>";
+
+//echo print_r($data['ports'], true)
+
+function transformPorts($portsPaginator, $rowHeight = 2): array
+{
+    $result = [];
+
+	$i = 0;
+	$col = 0;
+	$block = 0;
+    foreach ($portsPaginator->items() as $port) {
+		$tmp = array();
+        // Extract ifName and split into components
+		foreach(array("ifType", "ifName", "ifOperStatus", "ifAdminStatus", "ifVlan") as $field)
+			$$field = $port[$field] ?? null;
+			
+        if ($ifName) {
+			// only physical ports, ignore wifi, subinterfaces, loopback
+			if(preg_match("/(lo|br|wifi|[.][0-9]+|ovpn|tun|tap|sit|enc)/i", $ifName))
+				continue;
+			if($ifType != "ethernetCsmacd")
+				continue;
+
+			// See if we have a prefix like GigabitEthernet
+			preg_match("/^([a-z-_]+)/i", $ifName, $prefix);
+			
+			// figure out the layout, count parts, split accordingly
+            $parts = explode('/', $ifName);
+			switch(count($parts)) {
+					case 3:
+						$switch = $parts[0];
+						$module = floatval($parts[1]) ?? null;
+						$portNumber = $parts[2] ?? '1';
+						break;
+					case 2:
+						$switch = 0;
+						$module = floatval($parts[0]);
+						$portNumber = $parts[1] ?? '1';
+						break;
+					default:
+						/// Just the 1 item?
+						$switch = 0;
+						$module = 0;
+						$portNumber = $parts[0] ?? '1';
+						$rowHeight = 1;
+			}
+			// Check if ascii prefix has changed, if so, increment module
+			if((isset($prevprefix) && ($prevprefix != $prefix[0])))
+				$block = $block + 1;
+			
+			// reset block count on new module, switch
+			if((isset($prevmodule)) && ($prevmodule != $module))
+				$block = 0;
+			if((isset($prevswitch)) && ($prevswitch != $switch))
+				$block = 0;
+			
+			$col = floor($i / $rowHeight);
+            // Build the multi-dimensional array
+			foreach(array("ifType", "ifName", "ifOperStatus", "ifAdminStatus", "ifVlan") as $field)
+				$tmp[$field] = $$field;
+
+			$result[$switch][$module][$block][$col][][$ifName] = $tmp;
+			
+			$prevmodule = $module;
+			$prevswitch = $switch;
+			if(isset($prefix[0]))
+				$prevprefix = $prefix[0];
+
+			$i++;
+        }
+    }
+
+    return $result;
+}
+
+$columnHeight = 2;
+$transformedPorts = transformPorts($data['ports'], 2);
+$portui = $transformedPorts;
+//echo print_r($portui, true);
+
+function generateVisualTableWithAttributes(array $data): string
+{
+    $html = '<div class="visual-table">';
+
+    foreach ($data as $switch => $modules) {
+        // Create a container for the switch
+        $html .= '<div class="switch-container">';
+        //$html .= "<h3>Switch: $switch</h3>";
+        $html .= "Switch: $switch</br>";
+
+        foreach ($modules as $module => $blocks) {
+            // Create a container for the module
+            $html .= '<div class="module-container">';
+            //$html .= "<h4>Module: $module</h4>";
+            $html .= "Module: $module</br>";
+
+			foreach ($blocks as $block => $columns) {
+				// Create a container for the block
+				$html .= '<div class="block-container">';
+				//$html .= "<h4>Module: $module</h4>";
+				//$html .= "Block: $block</br>";
+				$html .= '<table class="port-table">';
+				// Get the maximum rows across columns
+				$rowCount = max(array_map('count', $columns));
+				for ($row = 0; $row < $rowCount; $row++) {
+					$html .= '<tr>';
+					foreach ($columns as $col => $ports) {
+						$portData = $ports[$row] ?? null; // Retrieve port data if it exists
+						if ($portData) {
+							foreach ($portData as $portName => $attributes) {
+								$adminStatus = $attributes['ifAdminStatus'] ?? 'down';
+								$operStatus = $attributes['ifOperStatus'] ?? 'down';
+								$vlan = $attributes['ifVlan'] ?? 'Unknown';
+
+								// Determine the CSS classes based on statuses
+								$borderClass = match ($adminStatus) {
+									'up' => 'border-up',
+									'disabled' => 'border-disabled',
+									default => 'border-down',
+								};
+
+								$bgClass = ($operStatus === 'up') ? 'bg-up' : 'bg-down';
+
+							   // Add the port cell with custom tooltip
+							   $tooltipContent = <<<TOOLTIP
+	<div>Port: $portName</div>
+	<div>Admin Status: $adminStatus</div>
+	<div>Oper Status: $operStatus</div>
+	<div>VLAN: $vlan</div>
+	TOOLTIP;
+								$html .= "<td class='port-cell $borderClass $bgClass' >
+											<div class='port-name'>$portName</div>
+											<div class='tooltip'>$tooltipContent</div>
+										  </td>";							
+								
+							}
+						} else {
+							// Empty cell
+							$html .= "<td class='port-cell empty-cell'></td>";
+						}
+					}
+					$html .= '</tr>';
+				}
+				$html .= '</table>';
+				$html .= '</div>'; // End block container
+			}
+
+            $html .= '</table>';
+            $html .= '</div>'; // End module container
+        }
+
+        $html .= '</div>'; // End switch container
+    }
+
+    $html .= '</div>';
+
+    return $html;
+}
+
+//echo "</pre>";
+?>
+
+		<?php
+		// Example usage with your updated array:
+		echo generateVisualTableWithAttributes($portui);
+
+		?>
+
+<x-panel body-class="!tw-p-0">
+    <table id="ports-ui" class="table table-condensed table-hover table-striped tw-mt-1 !tw-mb-0">
+        <thead>
+        </thead>
+		</table>
+</x-panel>
