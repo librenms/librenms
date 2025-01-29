@@ -61,4 +61,3 @@ class Ospfv3Instance extends DeviceRelatedModel
         return $this->hasMany(\App\Models\UserWidget::class, 'dashboard_id');
     }
 }
-

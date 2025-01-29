@@ -841,7 +841,7 @@ function list_ospfv3(Illuminate\Http\Request $request)
     $device_id = \App\Facades\DeviceCache::get($hostname)->device_id;
 
     $ospf_neighbours = \App\Models\OspfNbr::whereHasAccess(Auth::user())
-        ->when($device_id, fn($q) => $q->where('device_id', $device_id))
+        ->when($device_id, fn ($q) => $q->where('device_id', $device_id))
         ->whereNotNull('ospfv3NbrState')->where('ospfv3NbrState', '!=', '')
         ->get();
 

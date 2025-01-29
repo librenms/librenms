@@ -26,7 +26,7 @@ return new class extends Migration
             $table->integer('ospfv3NbrOptions');
             $table->integer('ospfv3NbrPriority');
             $table->string('ospfv3NbrState', 32);
-            $table->integer('ospfv3NbrEvents')->nullable();;
+            $table->integer('ospfv3NbrEvents')->nullable();
             $table->integer('ospfv3NbrLsRetransQLen');
             $table->string('ospfv3NbrHelloSuppressed', 32);
             $table->string('context_name', 128)->nullable();

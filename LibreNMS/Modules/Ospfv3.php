@@ -86,7 +86,7 @@ class Ospfv3 implements Module
 
             $ospf_instances = new Collection();
             foreach ($ospf_instances_poll as $ospf_instance_id => $ospf_entry) {
-                if (empty(long2ip($ospf_entry['ospfv3RouterId']))	) {
+                if (empty(long2ip($ospf_entry['ospfv3RouterId']))) {
                     continue; // skip invalid data
                 }
                 foreach (['ospfv3RxNewLsas', 'ospfv3OriginateNewLsas', 'ospfv3AreaBdrRtrStatus', 'ospfv3ExtLsaCount', 'ospfv3ASBdrRtrStatus', 'ospfv3VersionNumber', 'ospfv3AdminStatus'] as $column) {

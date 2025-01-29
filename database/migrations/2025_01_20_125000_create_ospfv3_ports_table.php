@@ -31,9 +31,9 @@ return new class extends Migration
             $table->string('ospfv3IfState', 32)->nullable();
             $table->string('ospfv3IfDesignatedRouter', 32)->nullable();
             $table->string('ospfv3IfBackupDesignatedRouter', 32)->nullable();
-            $table->integer('ospfv3IfEvents')->nullable();;
+            $table->integer('ospfv3IfEvents')->nullable();
             $table->string('ospfv3IfDemand', 32)->nullable();
-            $table->integer('ospfv3IfMetricValue')->nullable();;
+            $table->integer('ospfv3IfMetricValue')->nullable();
             $table->string('context_name', 128)->nullable();
             $table->unique(['device_id', 'ospfv3_port_id', 'context_name']);
         });

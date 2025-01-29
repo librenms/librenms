@@ -97,7 +97,7 @@ foreach ($instances as $instance) {
                         </tr>
                       </thead>
                   </div>';
-	// P.port_id does not match up with O.port_id, resulting in empty query.
+    // P.port_id does not match up with O.port_id, resulting in empty query.
     $ospfPorts = DeviceCache::getPrimary()->ospfv3Ports()->where('ospfv3IfAdminStatus', 'enabled')->with('port')->get();
     foreach ($ospfPorts as $ospfPort) {
         $port_status_color = $ospfPort->ospfv3IfAdminStatus == 'enabled' ? 'success' : 'default';

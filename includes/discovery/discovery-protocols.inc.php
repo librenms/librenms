@@ -1,9 +1,9 @@
 <?php
 
+use App\Models\Ospfv3Nbr;
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\StringHelpers;
-use App\Models\Ospfv3Nbr;
 
 global $link_exists;
 
@@ -490,9 +490,9 @@ if (Config::get('autodiscovery.ospf') === true) {
 
 if (Config::get('autodiscovery.ospfv3') === true) {
     echo ' OSPFv3 Discovery: ';
-    $ospf_nbrs = Ospfv3Nbr::select("ospfv3NbrAddress", "device_id")
+    $ospf_nbrs = Ospfv3Nbr::select('ospfv3NbrAddress', 'device_id')
        ->distinct()
-       ->where("device_id", $device['device_id'])
+       ->where('device_id', $device['device_id'])
        ->get();
     foreach ($ospf_nbrs as $nbr) {
         try {
