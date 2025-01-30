@@ -1,8 +1,28 @@
-First we define our graphs in `includes/definitions.inc.php` to share
-our work and contribute in the development of LibreNMS. :-) (or place
-in `config.php` if you don't plan to contribute)
+First we define our graphs in `misc/config_definitions.json` to share
+our work and contribute in the development of LibreNMS. :-) 
 
-```php
+```json
+        "graph_types.device.pulse_sessions": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Active Sessions"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.pulse_users": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Active Users"
+            },
+            "type": "graph"
+        },
+```
+
+Alternatively, place in `config.php` if you don't plan to contribute.
+
+```config.php
 // Pulse Secure Graphs
 $config['graph_types']['device']['pulse_sessions'] = ['section' => 'firewall', 'order' => 0, 'descr' => 'Active Sessions'];
 $config['graph_types']['device']['pulse_users'] = ['section' => 'firewall', 'order' => 0, 'descr' => 'Active Users'];
