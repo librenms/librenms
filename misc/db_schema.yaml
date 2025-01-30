@@ -1637,9 +1637,9 @@ ports:
     - { Field: poll_period, Type: 'int unsigned', 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_id], Unique: true, Type: BTREE }
-    ports_device_id_ifindex_unique: { Name: ports_device_id_ifindex_unique, Columns: [device_id, ifIndex], Unique: true, Type: BTREE }
     ports_ifalias_port_descr_descr_portname_index: { Name: ports_ifalias_port_descr_descr_portname_index, Columns: [ifAlias, port_descr_descr, portName], Unique: false, Type: BTREE }
     ports_ifdescr_ifname_index: { Name: ports_ifdescr_ifname_index, Columns: [ifDescr, ifName], Unique: false, Type: BTREE }
+    ports_device_id_ifindex_index: { Name: ports_device_id_ifindex_index, Columns: [device_id, ifIndex], Unique: false, Type: BTREE }
 ports_adsl:
   Columns:
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }

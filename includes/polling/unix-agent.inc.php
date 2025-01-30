@@ -45,8 +45,6 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
     $agent_end = microtime(true);
     $agent_time = round(($agent_end - $agent_start) * 1000);
 
-    $agent_raw = "<<<app-proxmox>>>\nblah";
-
     if (! empty($agent_raw)) {
         echo 'execution time: ' . $agent_time . 'ms';
 
