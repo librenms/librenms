@@ -135,7 +135,7 @@ class DevicePoll extends LnmsCommand
     {
         $enabled = Config::get('scheduler.poll.enabled');
 
-        if (! Config::get('scheduler.poll.enabled')) {
+        if (! $enabled) {
             $this->error('Scheduler based polling is disabled');
 
             return 1;

@@ -29,6 +29,8 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    protected $retries = 30;
+
     public int $uniqueFor = 3600;
     private ?\App\Models\Device $device = null;
     private ?array $deviceArray = null;
@@ -118,6 +120,16 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
         }
 
         DevicePolled::dispatch($this->device);
+    }
+
+    /**
+     * Calculate the number of seconds to wait before retrying the job.
+     *
+     * @return array<int, int>
+     */
+    public function backoff(): array
+    {
+        return [15, 30, 45, 60, 150];
     }
 
     private function pollModules(): void
