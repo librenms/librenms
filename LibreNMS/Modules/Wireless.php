@@ -115,7 +115,7 @@ class Wireless implements Module
                 }
 
                 return $model;
-            })->filter(fn(WirelessSensor $sensor) => is_numeric($sensor->sensor_current));
+            })->filter(fn (WirelessSensor $sensor) => is_numeric($sensor->sensor_current));
 
             // sync only models for this type
             $synced = $this->syncModels($os->getDevice(), 'wirelessSensors', $sensors, $existingSensors->get($type, new Collection));
@@ -256,7 +256,7 @@ class Wireless implements Module
 
     public static function channelToFrequency(int $channel): int
     {
-        return match($channel) {
+        return match ($channel) {
             1 => 2412,
             2 => 2417,
             3 => 2422,

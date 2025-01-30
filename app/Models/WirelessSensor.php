@@ -100,7 +100,6 @@ class WirelessSensor extends DeviceRelatedModel implements Keyable
 
         $sensor_value = Number::extract($sensor_value);
 
-
         if ($this->sensor_divisor) {
             $sensor_value = $sensor_value / $this->sensor_divisor;
         }

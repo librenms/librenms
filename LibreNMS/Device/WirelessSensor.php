@@ -131,7 +131,6 @@ class WirelessSensor
         ]);
     }
 
-
     /**
      * Return a list of valid types with metadata about each type
      * $class => array(
@@ -246,6 +245,6 @@ class WirelessSensor
      */
     public static function channelToFrequency($channel): int
     {
-         return Wireless::channelToFrequency((int) $channel);
+        return Wireless::channelToFrequency((int) $channel);
     }
 }
