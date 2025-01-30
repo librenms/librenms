@@ -25,18 +25,28 @@
 
 namespace LibreNMS\Device;
 
-use LibreNMS\Config;
-use LibreNMS\OS;
-use LibreNMS\Util\StringHelpers;
+use LibreNMS\Modules\Wireless;
 
-class WirelessSensor extends Sensor
+class WirelessSensor
 {
-    protected static $name = 'Wireless Sensor';
-    protected static $table = 'wireless_sensors';
-    protected static $data_name = 'wireless-sensor';
-    protected static $translation_prefix = 'wireless';
-
-    private $access_point_ip;
+    protected $type;
+    protected $device_id;
+    protected $oids;
+    protected $subtype;
+    protected $index;
+    protected $description;
+    protected $current;
+    protected $multiplier;
+    protected $divisor;
+    protected $aggregator;
+    protected $high_limit;
+    protected $low_limit;
+    protected $high_warn;
+    protected $low_warn;
+    protected $entPhysicalIndex;
+    protected $entPhysicalMeasured;
+    protected string $rrd_type = 'GAUGE';
+    protected $access_point_ip;
 
     /**
      * Sensor constructor. Create a new sensor to be discovered.
@@ -47,7 +57,7 @@ class WirelessSensor extends Sensor
      * @param  string  $subtype  the type of sensor an additional identifier to separate out sensors of the same class, generally this is the os name
      * @param  int|string  $index  the index of this sensor, must be stable, generally the index of the oid
      * @param  string  $description  A user visible description of this sensor, may be truncated in some places (like graphs)
-     * @param  int|float  $current  The current value of this sensor, will seed the db and may be used to guess limits
+     * @param  int|float|null  $current  The current value of this sensor, will seed the db and may be used to guess limits
      * @param  int  $multiplier  a number to multiply the value(s) by
      * @param  int  $divisor  a number to divide the value(s) by
      * @param  string  $aggregator  an operation to combine multiple numbers. Supported: sum, avg
@@ -79,44 +89,48 @@ class WirelessSensor extends Sensor
         $entPhysicalMeasured = null
     ) {
         $this->access_point_ip = $access_point_id;
-        parent::__construct(
-            $type,
-            $device_id,
-            $oids,
-            $subtype,
-            $index,
-            $description,
-            $current,
-            $multiplier,
-            $divisor,
-            $aggregator,
-            $high_limit,
-            $low_limit,
-            $high_warn,
-            $low_warn,
-            $entPhysicalIndex,
-            $entPhysicalMeasured
-        );
+        $this->type = $type;
+        $this->device_id = $device_id;
+        $this->oids = (array) $oids;
+        $this->subtype = $subtype;
+        $this->index = $index;
+        $this->description = $description;
+        $this->current = $current;
+        $this->multiplier = $multiplier;
+        $this->divisor = $divisor;
+        $this->aggregator = $aggregator;
+        $this->entPhysicalIndex = $entPhysicalIndex;
+        $this->entPhysicalMeasured = $entPhysicalMeasured;
+        $this->high_limit = $high_limit;
+        $this->low_limit = $low_limit;
+        $this->high_warn = $high_warn;
+        $this->low_warn = $low_warn;
+        $this->rrd_type = $this->type == 'errors' ? 'COUNTER' : 'GAUGE';
     }
 
-    protected function toArray()
+    public function toModel(): \App\Models\WirelessSensor
     {
-        $sensor = parent::toArray();
-        $sensor['access_point_id'] = $this->access_point_ip;
-
-        return $sensor;
+        return new \App\Models\WirelessSensor([
+            'sensor_class' => $this->type,
+            'sensor_type' => $this->subtype,
+            'sensor_index' => $this->index,
+            'sensor_descr' => $this->description,
+            'sensor_current' => $this->current,
+            'sensor_multiplier' => $this->multiplier,
+            'sensor_divisor' => $this->divisor,
+            'sensor_aggregator' => $this->aggregator,
+            'sensor_limit' => $this->high_limit,
+            'sensor_limit_warn' => $this->high_warn,
+            'sensor_limit_low' => $this->low_limit,
+            'sensor_limit_low_warn' => $this->low_warn,
+            'entPhysicalIndex' => $this->entPhysicalIndex,
+            'entPhysicalMeasured' => $this->entPhysicalMeasured,
+            'sensor_oids' => $this->oids,
+            'access_point_ip' => $this->access_point_ip,
+            'rrd_type' => $this->rrd_type,
+        ]);
     }
 
-    public static function runDiscovery(OS $os)
-    {
-        $types = array_keys(self::getTypes());
-        $submodules = Config::get('discovery_submodules.wireless', $types);
-        $types = array_intersect($types, $submodules);
-
-        foreach ($types as $type) {
-            static::discoverType($os, $type);
-        }
-    }
 
     /**
      * Return a list of valid types with metadata about each type
@@ -131,7 +145,7 @@ class WirelessSensor extends Sensor
      * @param  int  $device_id  when filtering, only return types valid for this device_id
      * @return array
      */
-    public static function getTypes($valid = false, $device_id = null)
+    public static function getTypes($valid = false, $device_id = null): array
     {
         // Add new types here translations/descriptions/units in lang/<lang>/wireless.php
         // FIXME I'm really bad with icons, someone please help!
@@ -212,95 +226,26 @@ class WirelessSensor extends Sensor
         ];
 
         if ($valid) {
-            $sql = 'SELECT `sensor_class` FROM `wireless_sensors`';
-            $params = [];
-            if (isset($device_id)) {
-                $sql .= ' WHERE `device_id`=?';
-                $params[] = $device_id;
-            }
-            $sql .= ' GROUP BY `sensor_class`';
+            $sensors = \App\Models\WirelessSensor::query()
+                ->when($device_id, fn ($q) => $q->where('device_id', $device_id))
+                ->groupBy('sensor_class')
+                ->pluck('sensor_class');
 
-            $sensors = dbFetchColumn($sql, $params);
-
-            return array_intersect_key($types, array_flip($sensors));
+            return array_intersect_key($types, $sensors->flip()->all());
         }
 
         return $types;
     }
 
-    protected static function getDiscoveryInterface($type)
-    {
-        return StringHelpers::toClass($type, 'LibreNMS\\Interfaces\\Discovery\\Sensors\\Wireless') . 'Discovery';
-    }
-
-    protected static function getDiscoveryMethod($type)
-    {
-        return 'discoverWireless' . StringHelpers::toClass($type, null);
-    }
-
-    protected static function getPollingInterface($type)
-    {
-        return StringHelpers::toClass($type, 'LibreNMS\\Interfaces\\Polling\\Sensors\\Wireless') . 'Polling';
-    }
-
-    protected static function getPollingMethod($type)
-    {
-        return 'pollWireless' . StringHelpers::toClass($type, null);
-    }
-
     /**
      * Convert a WiFi channel to a Frequency in MHz
+     * Legacy compat, use \LibreNMS\Modules\Wireless::channelToFrequency()
      *
      * @param  int  $channel
      * @return int
      */
     public static function channelToFrequency($channel): int
     {
-        $channels = [
-            1 => 2412,
-            2 => 2417,
-            3 => 2422,
-            4 => 2427,
-            5 => 2432,
-            6 => 2437,
-            7 => 2442,
-            8 => 2447,
-            9 => 2452,
-            10 => 2457,
-            11 => 2462,
-            12 => 2467,
-            13 => 2472,
-            14 => 2484,
-            34 => 5170,
-            36 => 5180,
-            38 => 5190,
-            40 => 5200,
-            42 => 5210,
-            44 => 5220,
-            46 => 5230,
-            48 => 5240,
-            52 => 5260,
-            56 => 5280,
-            60 => 5300,
-            64 => 5320,
-            100 => 5500,
-            104 => 5520,
-            108 => 5540,
-            112 => 5560,
-            116 => 5580,
-            120 => 5600,
-            124 => 5620,
-            128 => 5640,
-            132 => 5660,
-            136 => 5680,
-            140 => 5700,
-            149 => 5745,
-            153 => 5765,
-            157 => 5785,
-            161 => 5805,
-            165 => 5825,
-        ];
-
-        return $channels[$channel] ?? 0;
+         return Wireless::channelToFrequency((int) $channel);
     }
 }

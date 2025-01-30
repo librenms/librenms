@@ -128,9 +128,15 @@ class OSModulesTest extends DBTestCase
                 continue;
             }
 
-            if ($expected_data[$module]['poller'] !== 'matches discovery') {
-                $expected = $expected_data[$module]['poller'] ?? null;
+            if (isset($expected_data[$module]['poller'])) {
+                if ($expected_data[$module]['poller'] !== 'matches discovery') {
+                    $expected = $expected_data[$module]['poller']; // we have specific poller data, update expected
+                }
+                // pass through discovery expected data
+            } else {
+                $expected = null; // no poller data, clear discovery's expected
             }
+
             $actual = $results[$module]['poller'] ?? null;
             $this->checkTestData($expected, $actual, 'Polled', $os, $module, $filename, $helper, $phpunit_debug);
         }
