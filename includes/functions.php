@@ -28,7 +28,7 @@ function parse_modules($type, $options)
 
     if (! empty($options['m'])) {
         // get all modules in the correct order and disable all
-        $modules = array_map(fn($v) => false, Config::get("{$type}_modules", []));
+        $modules = array_map(fn ($v) => false, Config::get("{$type}_modules", []));
 
         foreach (explode(',', $options['m']) as $module) {
             // parse submodules (only supported by some modules)
