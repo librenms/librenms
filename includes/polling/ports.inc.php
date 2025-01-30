@@ -237,7 +237,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
             $walk_base = $total_port_count - $polled_port_count < 5 || $polled_port_count / $total_port_count > 0.9;
 
             if ($walk_base) {
-                Log::info("Not enough ports for selected port polling, walking base OIDs instead");
+                Log::info('Not enough ports for selected port polling, walking base OIDs instead');
                 foreach ($table_base_oids as $oid) {
                     $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'IF-MIB');
                 }
