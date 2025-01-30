@@ -1188,13 +1188,6 @@
                 "icon": "Icon"
             }
         },
-        "custom_map.node_warnings": {
-            "default": false,
-            "type": "boolean",
-            "group": "webui",
-            "section": "custom-map",
-            "order": 46
-        },
         "custom_map.reverse_arrows": {
             "default": false,
             "type": "boolean",
@@ -6373,8 +6366,8 @@
         },
         "uptime_warning": {
             "group": "webui",
-            "section": "dashboard",
-            "order": 2,
+            "section": "device",
+            "order": 7,
             "default": 86400,
             "type": "integer",
             "validate": {

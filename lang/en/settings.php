@@ -584,10 +584,6 @@ return [
                 'description' => 'Node Display Type',
                 'help' => 'Default display type for nodes',
             ],
-            'node_warnings' => [
-                'description' => 'Node Warnings',
-                'help' => 'Show nodes in warning state with different colour',
-            ],
             'reverse_arrows' => [
                 'description' => 'Reverse Edge Arrows',
                 'help' => 'Default arrow direction. Towards center (default) or towards ends',
@@ -1837,7 +1833,7 @@ return [
         ],
         'uptime_warning' => [
             'description' => 'Show Device as warning if Uptime below (seconds)',
-            'help' => 'Shows Device as warning if Uptime is below this value. Default 24h',
+            'help' => 'Shows Device as warning if Uptime is below this value. Custom maps status will reflect this setting. 0 disables warning. Default 24h',
         ],
         'virsh' => [
             'description' => 'Path to virsh',
