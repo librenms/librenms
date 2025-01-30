@@ -27,12 +27,10 @@ function parse_modules($type, $options)
     $override = false;
 
     if (! empty($options['m'])) {
-        // parse options and ensure order of modules
-        // https://github.com/librenms/librenms/pull/16856 for why the below is here
-        $modules = array_intersect(array_keys(Config::get("{$type}_modules", [])), explode(',', $options['m']));
+        // get all modules in the correct order and disable all
+        $modules = array_map(fn($v) => false, Config::get("{$type}_modules", []));
 
-        Config::set("{$type}_modules", []);
-        foreach ($modules as $module) {
+        foreach (explode(',', $options['m']) as $module) {
             // parse submodules (only supported by some modules)
             if (Str::contains($module, '/')) {
                 [$module, $submodule] = explode('/', $module, 2);
@@ -43,10 +41,13 @@ function parse_modules($type, $options)
 
             $dir = $type == 'poller' ? 'polling' : $type;
             if (is_file("includes/$dir/$module.inc.php")) {
-                Config::set("{$type}_modules.$module", 1);
+                $modules[$module] = true; // enable module
                 $override = true;
             }
         }
+
+        // filter disabled modules and set in global config
+        Config::set("{$type}_modules", array_filter($modules));
 
         // display selected modules
         $modules = array_map(function ($module) use ($type) {
