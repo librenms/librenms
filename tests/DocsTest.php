@@ -30,17 +30,6 @@ use Symfony\Component\Yaml\Yaml;
 class DocsTest extends TestCase
 {
     private $hidden_pages = [
-        'General/Changelogs/2013.md',
-        'General/Changelogs/2014.md',
-        'General/Changelogs/2015.md',
-        'General/Changelogs/2016.md',
-        'General/Changelogs/2017.md',
-        'General/Changelogs/2018.md',
-        'General/Changelogs/2019.md',
-        'General/Changelogs/2020.md',
-        'General/Changelogs/2021.md',
-        'General/Changelogs/2022.md',
-        'General/Changelogs/2023.md',
     ];
 
     /**
@@ -54,6 +43,7 @@ class DocsTest extends TestCase
         // Define paths to exclude
         $exclude_paths = [
             '*/Extensions/Applications/*',
+            '*/General/Changelogs/*',
         ];
 
         // Build the exclusion part of the find command

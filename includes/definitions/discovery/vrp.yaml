@@ -27,6 +27,16 @@ modules:
                         oid: hwEntityCpuUsageThreshold
                         op: '='
                         value: 0
+    storage:
+        data:
+            -
+                oid: HUAWEI-FLASH-MAN-MIB::hwStorageTable
+                descr: HUAWEI-FLASH-MAN-MIB::hwStorageName
+                type: HUAWEI-FLASH-MAN-MIB::hwStorageType
+                size: HUAWEI-FLASH-MAN-MIB::hwStorageSpace
+                free: HUAWEI-FLASH-MAN-MIB::hwStorageSpaceFree
+                free_num_oid: '.1.3.6.1.4.1.2011.6.9.1.4.2.1.4.{{ $index }}'
+                units: 1024
     sensors:
         pre-cache:
             data:
