@@ -29,7 +29,7 @@
         border: 4px solid;
         text-align: center;
         padding: 10px;
-		width: 70px;
+		width: 50px;
     }
 
     .border-up {
@@ -88,7 +88,7 @@
 </style>
 
 <?php
-//echo "<pre>";
+echo "<pre>";
 
 //echo print_r($data['ports'], true)
 
@@ -99,8 +99,7 @@ function transformPorts($portsPaginator, $rowHeight = 2): array
 	$i = 0;
 	$col = 0;
 	$block = 0;
-    foreach ($portsPaginator->items() as $port) {
-		$tmp = array();
+    foreach ($portsPaginator->items() as $port_id => $port) {
         // Extract ifName and split into components
 		foreach(array("ifType", "ifName", "ifOperStatus", "ifAdminStatus", "ifVlan") as $field)
 			$$field = $port[$field] ?? null;
@@ -124,13 +123,13 @@ function transformPorts($portsPaginator, $rowHeight = 2): array
 						$portNumber = $parts[2] ?? '1';
 						break;
 					case 2:
-						$switch = 0;
+						$switch = 1;
 						$module = floatval($parts[0]);
 						$portNumber = $parts[1] ?? '1';
 						break;
 					default:
 						/// Just the 1 item?
-						$switch = 0;
+						$switch = 1;
 						$module = 0;
 						$portNumber = $parts[0] ?? '1';
 						$rowHeight = 1;
@@ -147,10 +146,10 @@ function transformPorts($portsPaginator, $rowHeight = 2): array
 			
 			$col = floor($i / $rowHeight);
             // Build the multi-dimensional array
-			foreach(array("ifType", "ifName", "ifOperStatus", "ifAdminStatus", "ifVlan") as $field)
-				$tmp[$field] = $$field;
+			//foreach(array("ifType", "ifName", "ifOperStatus", "ifAdminStatus", "ifVlan") as $field)
+			//	$tmp[$field] = $$field;
 
-			$result[$switch][$module][$block][$col][][$ifName] = $tmp;
+			$result[$switch][$module][$block][$col][][$ifName] = $port_id;
 			
 			$prevmodule = $module;
 			$prevswitch = $switch;
@@ -166,14 +165,16 @@ function transformPorts($portsPaginator, $rowHeight = 2): array
 
 $columnHeight = 2;
 $transformedPorts = transformPorts($data['ports'], 2);
-$portui = $transformedPorts;
+$transform = $transformedPorts;
 //echo print_r($portui, true);
 
-function generateVisualTableWithAttributes(array $data): string
+// echo print_r($data['ports'], true);
+
+function generateVisualTableWithAttributes(array $transform, $sourcedata): string
 {
     $html = '<div class="visual-table">';
 
-    foreach ($data as $switch => $modules) {
+    foreach ($transform as $switch => $modules) {
         // Create a container for the switch
         $html .= '<div class="switch-container">';
         //$html .= "<h3>Switch: $switch</h3>";
@@ -196,12 +197,16 @@ function generateVisualTableWithAttributes(array $data): string
 				for ($row = 0; $row < $rowCount; $row++) {
 					$html .= '<tr>';
 					foreach ($columns as $col => $ports) {
-						$portData = $ports[$row] ?? null; // Retrieve port data if it exists
+						$portData = $ports[$row] ?? null; // Retrieve port data if it exists						
 						if ($portData) {
-							foreach ($portData as $portName => $attributes) {
-								$adminStatus = $attributes['ifAdminStatus'] ?? 'down';
-								$operStatus = $attributes['ifOperStatus'] ?? 'down';
-								$vlan = $attributes['ifVlan'] ?? 'Unknown';
+							foreach ($portData as $portName => $port_id) {
+								// Get last part for just number
+								$portnum = array_reverse(explode("/", strval($portName)));
+								// Lookup port by port_id from transform array
+								$attr = $sourcedata[$port_id];
+								$adminStatus = $attr->ifAdminStatus ?? 'down';
+								$operStatus = $attr->ifOperStatus ?? 'down';
+								$vlan = $attr->ifVlan ?? 'Unknown';
 
 								// Determine the CSS classes based on statuses
 								$borderClass = match ($adminStatus) {
@@ -220,7 +225,7 @@ function generateVisualTableWithAttributes(array $data): string
 	<div>VLAN: $vlan</div>
 	TOOLTIP;
 								$html .= "<td class='port-cell $borderClass $bgClass' >
-											<div class='port-name'>$portName</div>
+							<div class='port-name'>{$portnum[0]}</div>
 											<div class='tooltip'>$tooltipContent</div>
 										  </td>";							
 								
@@ -248,12 +253,12 @@ function generateVisualTableWithAttributes(array $data): string
     return $html;
 }
 
-//echo "</pre>";
+echo "</pre>";
 ?>
 
 		<?php
 		// Example usage with your updated array:
-		echo generateVisualTableWithAttributes($portui);
+		echo generateVisualTableWithAttributes($transform, $data['ports']);
 
 		?>
 

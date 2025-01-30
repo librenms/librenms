@@ -283,6 +283,7 @@ class PortsController implements DeviceTab
         $tabs = [
             ['name' => __('Basic'), 'url' => 'basic'],
             ['name' => __('Detail'), 'url' => ''],
+            ['name' => __('Physical'), 'url' => 'portui'],
         ];
 
         if ($device->macs()->exists()) {
