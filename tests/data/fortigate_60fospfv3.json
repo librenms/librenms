@@ -7999,5 +7999,42 @@
                 }
             ]
         }
+    },
+    "ospfv3": {
+        "poller": {
+            "ospfv3_instances": [
+                {
+                    "ospfv3_instance_id": 0,
+                    "ospfv3RouterId": "10.150.9.254",
+                    "ospfv3AdminStatus": "enabled",
+                    "ospfv3VersionNumber": "version3",
+                    "ospfv3AreaBdrRtrStatus": "false",
+                    "ospfv3ASBdrRtrStatus": "true",
+                    "ospfv3ExtLsaCount": 83,
+                    "ospfv3OriginateNewLsas": 9,
+                    "ospfv3RxNewLsas": 274417,
+                    "ospfv3ExtAreaLsdbLimit": -1,
+                    "ospfv3AsScopeLsaCount": 83,
+                    "ospfv3ExitOverflowInterval": 0,
+                    "ospfv3AsScopeLsaCksumSum": 2867087,
+                    "context_name": ""
+                }
+            ],
+            "ospfv3_areas": [
+                {
+                    "ospfv3AreaId": "150",
+                    "ospfv3AreaImportAsExtern": "importExternal",
+                    "ospfv3AreaSpfRuns": 0,
+                    "ospfv3AreaBdrRtrCount": 0,
+                    "ospfv3AreaAsBdrRtrCount": 0,
+                    "ospfv3AreaScopeLsaCount": 0,
+                    "ospfv3AreaScopeLsaCksumSum": 0,
+                    "ospfv3AreaSummary": "sendAreaSummary",
+                    "ospfv3AreaStubMetric": "1",
+                    "ospfv3AreaStubMetricType": "comparableCost",
+                    "context_name": ""
+                }
+            ]
+        }
     }
 }
