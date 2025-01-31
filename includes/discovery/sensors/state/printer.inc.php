@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Eventlog;
 use Illuminate\Support\Facades\Log;
 
 echo 'Printer Status and Error State ';

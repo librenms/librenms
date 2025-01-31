@@ -10,7 +10,7 @@
  * the source code distribution for details.
  */
 
-use App\Models\Eventlog;
+use Illuminate\Support\Facades\Log;
 
 $role_data = SnmpQuery::walk('CISCO-STACKWISE-MIB::cswSwitchRole')->values();
 $redundant_data = SnmpQuery::enumStrings()->get('CISCO-STACKWISE-MIB::cswRingRedundant.0')->value();
