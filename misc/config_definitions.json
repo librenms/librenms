@@ -3887,7 +3887,7 @@
             "default": {
                 "section": "system",
                 "order": 0,
-                "descr": "Capacity Clients"
+                "descr": "Client Capacity"
             },
             "type": "graph"
         },
@@ -3895,7 +3895,7 @@
             "default": {
                 "section": "system",
                 "order": 0,
-                "descr": "Capacity Bandwidth"
+                "descr": "Bandwidth Capacity"
             },
             "type": "graph"
         },
