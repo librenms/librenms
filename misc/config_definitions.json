@@ -3883,6 +3883,102 @@
             },
             "type": "graph"
         },
+        "graph_types.device.venturi_capacity_clients": {
+            "default": {
+                "section": "system",
+                "order": 0,
+                "descr": "Capacity Clients"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.venturi_capacity_bandwidth": {
+            "default": {
+                "section": "system",
+                "order": 0,
+                "descr": "Capacity Bandwidth"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.venturi_subscriber_counts": {
+            "default": {
+                "section": "network",
+                "order": 0,
+                "descr": "Subscriber Counts"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.venturi_subscriber_failures": {
+            "default": {
+                "section": "network",
+                "order": 0,
+                "descr": "Subscriber Failures"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.venturi_subscriber_traffic": {
+            "default": {
+                "section": "network",
+                "order": 0,
+                "descr": "Subscriber Traffic"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.venturi_transport_traffic": {
+            "default": {
+                "section": "network",
+                "order": 0,
+                "descr": "Transport Traffic"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.venturi_transport_traffic_rexmit": {
+            "default": {
+                "section": "network",
+                "order": 0,
+                "descr": "Transport Traffic Retransmitted"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.venturi_transport_compressor_traffic": {
+            "default": {
+                "section": "network",
+                "order": 0,
+                "descr": "Transport Compressor Traffic"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.venturi_transport_packets": {
+            "default": {
+                "section": "network",
+                "order": 0,
+                "descr": "Transport Packets"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.venturi_transport_packets_rexit": {
+            "default": {
+                "section": "network",
+                "order": 0,
+                "descr": "Transport Packets Retransmitted"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.venturi_transport_undeliverables": {
+            "default": {
+                "section": "network",
+                "order": 0,
+                "descr": "Transport Undeliverables"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.venturi_transport_connections": {
+            "default": {
+                "section": "network",
+                "order": 0,
+                "descr": "Transport Packets Undeliverables"
+            },
+            "type": "graph"
+        },
         "graph_types.device.vpdn_sessions_l2tp": {
             "default": {
                 "section": "vpdn",
