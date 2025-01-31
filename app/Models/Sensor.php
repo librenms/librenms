@@ -171,6 +171,18 @@ class Sensor extends DeviceRelatedModel implements Keyable
         return Severity::Ok;
     }
 
+    public function hasTresholds(): bool
+    {
+        return $this->sensor_limit_low !== null
+            || $this->sensor_limit_low_warn !== null
+            || $this->sensor_limit_warn !== null
+            || $this->sensor_limit !== null;
+    }
+
+    public function doesntHaveTresholds(): bool
+    {
+        return ! $this->hasTresholds();
+    }
     // ---- Define Relationships ----
 
     public function events(): MorphMany
