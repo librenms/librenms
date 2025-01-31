@@ -173,12 +173,12 @@ class Ospfv3 implements Module
             $ospf_neighbours = SnmpQuery::context($context_name)
                 ->hideMib()->enumStrings()
                 ->walk('OSPFV3-MIB::ospfv3NbrTable')
-                ->mapTable(function ($ospf_nbr, $ifIndex, $instance, $instanceId) use ($context_name, $os) {
+                ->mapTable(function ($ospf_nbr, $ifIndex, $ospfv3NbrIfInstId, $ospfv3NbrRtrId) use ($context_name, $os) {
                     // get neighbor port_id
                     // Needs searching by Link-Local addressing, but those do not appear to be indexed.
                     $ip = $ospf_nbr['ospfv3NbrAddress'];
                     $ospf_nbr['port_id'] = PortCache::getIdFromIp($ip, $context_name); // search all devices
-                    $ospf_nbr['ospfv3NbrRtrId'] = long2ip($ospf_nbr['ospfv3NbrRtrId']);
+                    $ospf_nbr['ospfv3NbrRtrId'] = long2ip($ospfv3NbrRtrId);
 
                     return Ospfv3Nbr::updateOrCreate([
                         'device_id' => $os->getDeviceId(),
