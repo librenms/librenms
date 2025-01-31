@@ -6126,7 +6126,7 @@
             "entPhysical": [
                 {
                     "entPhysicalIndex": 1,
-                    "entPhysicalDescr": "Fortinet FGT_60F, HW Serial#: FGT60FTK2209FEEX",
+                    "entPhysicalDescr": "Fortinet FGT_60F, HW Serial#: FGT60FTK1111FEEX",
                     "entPhysicalClass": "chassis",
                     "entPhysicalName": "FGT_60F",
                     "entPhysicalHardwareRev": "",
