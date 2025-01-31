@@ -48,9 +48,10 @@ class Venturi extends OS implements OSPolling
         ], '-OQUs');
 
         // venturi_capacity_clients
-        if (is_numeric($data['VENTURI-SERVER-SYSTEM-MIB::vServerMaxClients.0'],
-                       $data['VENTURI-SERVER-SYSTEM-MIB::vServerMaxClientless.0'],
-                       )) {
+        if (is_numeric(
+                $data['VENTURI-SERVER-SYSTEM-MIB::vServerMaxClients.0'],
+                $data['VENTURI-SERVER-SYSTEM-MIB::vServerMaxClientless.0'],
+            )) {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('MaxClient', 'GAUGE', 0)
                 ->addDataset('MaxClientless', 'GAUGE', 0);
@@ -76,11 +77,12 @@ class Venturi extends OS implements OSPolling
         }
 
         // venturi_subscriber_counts
-        if (is_numeric($data['VENTURI-SERVER-STATS-MIB::vServerSubscriberTotalCount.1.0'],
-                       $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberTotalCount.2.0'],
-                       $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberCurrCount.1.0'],
-                       $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberCurrCount.2.0'],
-                       )) {
+        if (is_numeric(
+                $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberTotalCount.1.0'],
+                $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberTotalCount.2.0'],
+                $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberCurrCount.1.0'],
+                $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberCurrCount.2.0'],
+            )) {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('TotalClientCount', 'GAUGE', 0)
                 ->addDataset('TotalClientlessCount', 'GAUGE', 0)
@@ -98,19 +100,20 @@ class Venturi extends OS implements OSPolling
         }
 
         // venturi_subscriber_failures
-        if (is_numeric($data['VENTURI-SERVER-STATS-MIB::vServerSubscriberAuthenticationFailures.1.0'],
-                       $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberAuthenticationFailures.2.0'],
-                       $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberAbortedConnections.1.0'],
-                       $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberAbortedConnections.2.0'],
-                       $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberReassignmentFailures.1.0'],
-                       $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberReassignmentFailures.2.0'],
-                       $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberStandbyCount.1.0'],
-                       $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberStandbyCount.2.0'],
-                       $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberInactiveCount.1.0'],
-                       $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberInactiveCount.2.0'],
-                       $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberReassignmentCount.1.0'],
-                       $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberReassignmentCount.2.0'],
-                       )) {
+        if (is_numeric(
+                $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberAuthenticationFailures.1.0'],
+                $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberAuthenticationFailures.2.0'],
+                $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberAbortedConnections.1.0'],
+                $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberAbortedConnections.2.0'],
+                $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberReassignmentFailures.1.0'],
+                $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberReassignmentFailures.2.0'],
+                $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberStandbyCount.1.0'],
+                $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberStandbyCount.2.0'],
+                $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberInactiveCount.1.0'],
+                $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberInactiveCount.2.0'],
+                $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberReassignmentCount.1.0'],
+                $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberReassignmentCount.2.0'],
+            )) {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('ClientAuthenticationFailures', 'COUNTER', 0)
                 ->addDataset('ClientlessAuthenticationFailures', 'COUNTER', 0)
@@ -144,9 +147,10 @@ class Venturi extends OS implements OSPolling
         }
 
         // venturi_subscriber_traffic
-        if (is_numeric($data['VENTURI-SERVER-STATS-MIB::vServerSubscriberByteCount.0'],
-                       $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberByteCount.0'],
-                       )) {
+        if (is_numeric(
+                $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberByteCount.0'],
+                $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberByteCount.0'],
+            )) {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('ClientTraffic', 'COUNTER', 0)
                 ->addDataset('ClientlessTraffic', 'COUNTER', 0);
@@ -160,9 +164,10 @@ class Venturi extends OS implements OSPolling
         }
 
         // venturi_transport_traffic
-        if (is_numeric($data['VENTURI-SERVER-STATS-MIB::vServerTransportBytesSent.0'],
-                       $data['VENTURI-SERVER-STATS-MIB::vServerTransportBytesRecd.0'],
-                       )) {
+        if (is_numeric(
+                $data['VENTURI-SERVER-STATS-MIB::vServerTransportBytesSent.0'],
+                $data['VENTURI-SERVER-STATS-MIB::vServerTransportBytesRecd.0'],
+           )) {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('TransportTrafficTx', 'COUNTER', 0)
                 ->addDataset('TransportTrafficRx', 'COUNTER', 0);
@@ -188,9 +193,10 @@ class Venturi extends OS implements OSPolling
         }
 
         // venturi_transport_compressor_traffic
-        if (is_numeric($data['VENTURI-SERVER-STATS-MIB::vServerTransportBytesToComp.0'],
-                       $data['VENTURI-SERVER-STATS-MIB::vServerTransportBytesFromComp.0'],
-                       )) {
+        if (is_numeric(
+                $data['VENTURI-SERVER-STATS-MIB::vServerTransportBytesToComp.0'],
+                $data['VENTURI-SERVER-STATS-MIB::vServerTransportBytesFromComp.0'],
+            )) {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('TrafficToCompressor', 'COUNTER', 0)
                 ->addDataset('TrafficFromCompressor', 'COUNTER', 0);
@@ -262,6 +268,5 @@ class Venturi extends OS implements OSPolling
             $datastore->put($this->getDeviceArray(), 'venturi_transport_connections', $tags, $fields);
             $this->enableGraph('venturi_transport_connections');
         }
-
     }
 }
