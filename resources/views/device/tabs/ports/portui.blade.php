@@ -121,18 +121,20 @@ function transformPorts($portsPaginator, $rowHeight = 2): array
 						$switch = $parts[0];
 						$module = floatval($parts[1]) ?? null;
 						$portNumber = $parts[2] ?? '1';
+						$Height = $rowHeight;
 						break;
 					case 2:
 						$switch = 1;
 						$module = floatval($parts[0]);
 						$portNumber = $parts[1] ?? '1';
+						$Height = $rowHeight;
 						break;
 					default:
 						/// Just the 1 item?
 						$switch = 1;
 						$module = 0;
 						$portNumber = $parts[0] ?? '1';
-						$rowHeight = 1;
+						$Height = 1;
 			}
 			// Check if ascii prefix has changed, if so, increment module
 			if((isset($prevprefix) && ($prevprefix != $prefix[0])))
@@ -144,7 +146,7 @@ function transformPorts($portsPaginator, $rowHeight = 2): array
 			if((isset($prevswitch)) && ($prevswitch != $switch))
 				$block = 0;
 			
-			$col = floor($i / $rowHeight);
+			$col = floor($i / $Height);
             // Build the multi-dimensional array
 			//foreach(array("ifType", "ifName", "ifOperStatus", "ifAdminStatus", "ifVlan") as $field)
 			//	$tmp[$field] = $$field;
