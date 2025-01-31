@@ -102,7 +102,6 @@ class Ospfv3 implements Module
                     'context_name' => $context_name,
                 ], $ospf_entry);
 
-
                 $ospf_instances->push($instance);
             }
 
