@@ -31,7 +31,7 @@ return new class extends Migration
             $table->integer('ospfv3NbrLsRetransQLen');
             $table->string('ospfv3NbrHelloSuppressed', 32);
             $table->string('context_name', 128)->nullable();
-            $table->unique(['device_id', 'ospfv3_nbr_id', 'context_name']);
+            $table->unique(['device_id', 'ospfv3_instance_id', 'ospfv3_nbr_id', 'context_name'], 'ospfv3_nbrs_device_id_ospfv3_nbr_id_context_name_unique');
         });
     }
 

@@ -3,8 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -36,7 +35,7 @@ return new class extends Migration
             $table->string('ospfv3IfDemand', 32)->nullable();
             $table->integer('ospfv3IfMetricValue')->nullable();
             $table->string('context_name', 128)->nullable();
-            $table->unique(['device_id', 'ospfv3_port_id', 'context_name']);
+            $table->unique(['device_id', 'ospfv3_instance_id', 'ospfv3_port_id', 'context_name'], 'ospfv3_ports_device_id_ospfv3_port_id_context_name_unique');
         });
     }
 
