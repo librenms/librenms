@@ -3,10 +3,10 @@
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
-$name = 'text_blob';
+$name = 'text_debug';
 
 try {
-    $returned = json_app_get($device, $name, 1);
+    $returned = json_app_get($device, 'text_blob', 1);
 } catch (JsonAppException $e) {
     echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
 
