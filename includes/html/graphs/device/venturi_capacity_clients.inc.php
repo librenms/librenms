@@ -7,8 +7,8 @@ require 'includes/html/graphs/common.inc.php';
 $i = 0;
 
 foreach ([
-    'MaxClient' => 'Max Client',
-    'MaxClientless' => 'Max Clientless',
+    'MaxClient' => 'Client',
+    'MaxClientless' => 'Clientless',
 ] as $ds => $descr) {
     $rrd_list[$i]['filename'] = $rrd_filename;
     $rrd_list[$i]['descr'] = $descr;
@@ -18,7 +18,6 @@ foreach ([
 
 $unit_text = 'Capacity Clients';
 
-$units = 'clients';
 $total_units = 'Clients';
 $colours = 'psychedelic';
 
