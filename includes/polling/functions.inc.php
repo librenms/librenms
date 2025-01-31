@@ -71,7 +71,7 @@ function poll_sensor($device, $class)
     $sensor_cache = sensor_precache($device, $class);
 
     foreach ($sensors as $sensor) {
-        echo 'Checking (' . $sensor['poller_type'] . ") $class " . $sensor['sensor_descr'] . '... ' . PHP_EOL;
+        Log::info('Checking (' . $sensor['poller_type'] . ") $class " . $sensor['sensor_descr'] . '... ');
 
         if ($sensor['poller_type'] == 'snmp') {
             $mibdir = null;
@@ -113,15 +113,15 @@ function poll_sensor($device, $class)
                 $sensor['new_value'] = $sensor_value;
                 $all_sensors[] = $sensor;
             } else {
-                echo "no agent data!\n";
+                Log::info('no agent data!');
                 continue;
             }
         } elseif ($sensor['poller_type'] == 'ipmi') {
-            echo " already polled.\n";
+            Log::info(' already polled.');
             // ipmi should probably move here from the ipmi poller file (FIXME)
             continue;
         } else {
-            echo "unknown poller type!\n";
+            Log::info('unknown poller type!');
             continue;
         }//end if
     }
@@ -198,7 +198,7 @@ function record_sensor_data($device, $all_sensors)
 
         $rrd_def = RrdDefinition::make()->addDataset('sensor', $sensor['rrd_type']);
 
-        echo "$sensor_value $unit\n";
+        Log::info("$sensor_value $unit");
 
         $fields = [
             'sensor' => $sensor_value,
