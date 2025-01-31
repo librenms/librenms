@@ -48,7 +48,7 @@ class Venturi extends OS implements OSPolling
         ], '-OQUs');
 
         // venturi_capacity_clients
-        if (is_numeric(
+        if (isset(
                 $data['VENTURI-SERVER-SYSTEM-MIB::vServerMaxClients.0'],
                 $data['VENTURI-SERVER-SYSTEM-MIB::vServerMaxClientless.0'],
             )) {
@@ -65,7 +65,7 @@ class Venturi extends OS implements OSPolling
         }
 
         // venturi_capacity_bandwidth
-        if (is_numeric($data['VENTURI-SERVER-SYSTEM-MIB::vServerMaxTcpBandwidth.0'])) {
+        if (isset($data['VENTURI-SERVER-SYSTEM-MIB::vServerMaxTcpBandwidth.0'])) {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('MaxTcpBandwidth', 'GAUGE', 0);
             $fields = [
@@ -77,7 +77,7 @@ class Venturi extends OS implements OSPolling
         }
 
         // venturi_subscriber_counts
-        if (is_numeric(
+        if (isset(
                 $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberTotalCount.1.0'],
                 $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberTotalCount.2.0'],
                 $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberCurrCount.1.0'],
@@ -100,7 +100,7 @@ class Venturi extends OS implements OSPolling
         }
 
         // venturi_subscriber_failures
-        if (is_numeric(
+        if (isset(
                 $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberAuthenticationFailures.1.0'],
                 $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberAuthenticationFailures.2.0'],
                 $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberAbortedConnections.1.0'],
@@ -147,7 +147,7 @@ class Venturi extends OS implements OSPolling
         }
 
         // venturi_subscriber_traffic
-        if (is_numeric(
+        if (isset(
                 $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberByteCount.0'],
                 $data['VENTURI-SERVER-STATS-MIB::vServerSubscriberByteCount.0'],
             )) {
@@ -164,7 +164,7 @@ class Venturi extends OS implements OSPolling
         }
 
         // venturi_transport_traffic
-        if (is_numeric(
+        if (isset(
                 $data['VENTURI-SERVER-STATS-MIB::vServerTransportBytesSent.0'],
                 $data['VENTURI-SERVER-STATS-MIB::vServerTransportBytesRecd.0'],
            )) {
@@ -181,7 +181,7 @@ class Venturi extends OS implements OSPolling
         }
 
         // venturi_transport_traffic_rexmit
-        if (is_numeric($data['VENTURI-SERVER-STATS-MIB::vServerTransportBytesRetransmitted.0'])) {
+        if (isset($data['VENTURI-SERVER-STATS-MIB::vServerTransportBytesRetransmitted.0'])) {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('Retransmitted', 'COUNTER', 0);
             $fields = [
@@ -193,7 +193,7 @@ class Venturi extends OS implements OSPolling
         }
 
         // venturi_transport_compressor_traffic
-        if (is_numeric(
+        if (isset(
                 $data['VENTURI-SERVER-STATS-MIB::vServerTransportBytesToComp.0'],
                 $data['VENTURI-SERVER-STATS-MIB::vServerTransportBytesFromComp.0'],
             )) {
@@ -210,7 +210,7 @@ class Venturi extends OS implements OSPolling
         }
 
         // venturi_transport_packets
-        if (is_numeric($data['VENTURI-SERVER-STATS-MIB::vServerTransportPacketsSent.0'],
+        if (isset($data['VENTURI-SERVER-STATS-MIB::vServerTransportPacketsSent.0'],
                        $data['VENTURI-SERVER-STATS-MIB::vServerTransportPacketsRecd.0'],
                        )) {
             $rrd_def = RrdDefinition::make()
@@ -226,7 +226,7 @@ class Venturi extends OS implements OSPolling
         }
 
         // venturi_transport_packets_rexit
-        if (is_numeric($data['VENTURI-SERVER-STATS-MIB::vServerTransportPacketsRetransmitted.0'])) {
+        if (isset($data['VENTURI-SERVER-STATS-MIB::vServerTransportPacketsRetransmitted.0'])) {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('Retransmitted', 'COUNTER', 0);
             $fields = [
@@ -238,7 +238,7 @@ class Venturi extends OS implements OSPolling
         }
 
         // venturi_transport_undeliverables
-        if (is_numeric($data['VENTURI-SERVER-STATS-MIB::vServerTransportUndeliverableToClients.0'],
+        if (isset($data['VENTURI-SERVER-STATS-MIB::vServerTransportUndeliverableToClients.0'],
                        $data['VENTURI-SERVER-STATS-MIB::vServerTransportUndeliverableToComp.0'],
                        )) {
             $rrd_def = RrdDefinition::make()
@@ -254,7 +254,7 @@ class Venturi extends OS implements OSPolling
         }
 
         // venturi_transport_connections
-        if (is_numeric($data['VENTURI-SERVER-STATS-MIB::vServerTransportTotalConnections.0'],
+        if (isset($data['VENTURI-SERVER-STATS-MIB::vServerTransportTotalConnections.0'],
                        $data['VENTURI-SERVER-STATS-MIB::vServerTransportCurrentConnections.0'],
                        )) {
             $rrd_def = RrdDefinition::make()
