@@ -23,7 +23,6 @@
  * @author     TheGreatDoc
  */
 
-use App\Models\Eventlog;
 use Illuminate\Support\Facades\Log;
 
 $oids = snmp_walk($device, 'oaPumpTable', '-Osq', 'NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB');
@@ -84,7 +83,7 @@ foreach (explode("\n", $oids) as $data) {
 }
 
 $oids = trim(snmp_walk($device, 'oaDCPowerTable', '-Osq', 'NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB'));
-Log::debug($oids . "\n");
+Log::debug($oids);
 
 if ($oids) {
     echo 'GW EYDFA DC POWER ';
