@@ -19,7 +19,7 @@ foreach ([
 $unit_text = 'Capacity Clients';
 
 $total_units = 'Clients';
-$colours = 'psychedelic';
+$colours = 'mixed';
 
 $scale_min = '0';
 
