@@ -1,14 +1,16 @@
 <?php
 
-$rrd_filename = Rrd::name($device['hostname'], 'venturi_capacity_clients');
+$rrd_filename = Rrd::name($device['hostname'], 'venturi_subscriber_counts');
 
 require 'includes/html/graphs/common.inc.php';
 
 $i = 0;
 
 foreach ([
-    'MaxClient' => 'Client',
-    'MaxClientless' => 'Clientless',
+    'TotalClientCount' => 'Total Client',
+    'TotalClientlessCount' => 'Total Clientless',
+    'CurrentClientCount' => 'Current Client',
+    'CurrentClientlessCount' => 'Current Clientless',
 ] as $ds => $descr) {
     $rrd_list[$i]['filename'] = $rrd_filename;
     $rrd_list[$i]['descr'] = $descr;
@@ -16,7 +18,7 @@ foreach ([
     $i++;
 }
 
-$unit_text = 'Capacity';
+$unit_text = 'Counts';
 
 $total_units = 'Clients';
 $colours = 'mixed';
