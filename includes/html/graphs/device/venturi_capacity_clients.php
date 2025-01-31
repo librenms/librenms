@@ -24,4 +24,4 @@ $colours = 'psychedelic';
 
 $scale_min = '0';
 
-require 'includes/html/graphs/generic_multi_line.inc.php';;
+require 'includes/html/graphs/generic_multi_line.inc.php';
