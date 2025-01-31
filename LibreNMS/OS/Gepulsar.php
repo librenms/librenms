@@ -27,14 +27,20 @@ namespace LibreNMS\OS;
 use App\Models\Device;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Gepulsar extends OS implements OSDiscovery
 {
     public function discoverOS(Device $device): void
     {
-        $info = snmp_getnext_multi($this->getDeviceArray(), ['ne843Ps1Sn', 'ne843Ps1Verw', 'ne843Ps1Brc'], '-OQUs', 'NE843-MIB');
-        $device->version = $info['ne843Ps1Verw'];
-        $device->hardware = $info['ne843Ps1Brc'];
-        $device->serial = $info['ne843Ps1Sn'];
+        $info = SnmpQuery::get([
+            'NE843-MIB::ne843Ps1Sn.0',
+            'NE843-MIB::ne843Ps1Verw.0',
+            'NE843-MIB::ne843Ps1Brc.0',
+        ])->values();
+
+        $device->version = $info['NE843-MIB::ne843Ps1Verw.0'] ?? null;
+        $device->hardware = $info['NE843-MIB::ne843Ps1Brc.0'] ?? null;
+        $device->serial = $info['NE843-MIB::ne843Ps1Sn.0'] ?? null;
     }
 }
