@@ -93,7 +93,6 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
         }
         echo PHP_EOL;
 
-
         if (! empty($data['IP-MIB::ipNetToPhysicalPhysAddress']['ipv6'])) {
             Log::info('IPv6 ND: ');
             foreach ($data['IP-MIB::ipNetToPhysicalPhysAddress']['ipv6'] as $ipv6 => $raw_mac) {
@@ -112,8 +111,6 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
                 }
             }
         }
-
-
     }
 
     unset(
@@ -133,7 +130,6 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
         dbBulkInsert($insert_data, 'ipv4_mac');
     }
 
-
     // remove stale entries
     foreach ($existing_data as $entry) {
         $entry_mac = $entry['mac_address'];
@@ -147,7 +143,6 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
 
     // remove entries that no longer have an owner
     dbDeleteOrphans('ipv4_mac', ['ports.port_id', 'devices.device_id']);
-
 
     echo PHP_EOL;
     unset(
