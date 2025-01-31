@@ -16,6 +16,7 @@ return new class extends Migration
             $table->increments('id');
             $table->unsignedInteger('device_id');
             $table->unsignedInteger('port_id');
+            $table->unsignedInteger('ospfv3_instance_id');
             $table->string('ospfv3_port_id', 32);
             $table->integer('ospfv3IfIndex');
             $table->integer('ospfv3IfInstId');

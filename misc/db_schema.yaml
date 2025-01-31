@@ -1485,6 +1485,7 @@ ospfv3_nbrs:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: port_id, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: ospfv3_instance_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3_nbr_id, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfv3NbrIfId, Type: 'int', 'Null': false, Extra: '' }
     - { Field: ospfv3NbrIfIndex, Type: 'int', 'Null': false, Extra: '' }
@@ -1501,12 +1502,13 @@ ospfv3_nbrs:
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    ospfv3_nbrs_device_id_ospfv3_nbr_id_context_name_unique: { Name: ospfv3_nbrs_device_id_ospfv3_nbr_id_context_name_unique, Columns: [device_id, ospfv3_nbr_id, context_name], Unique: true, Type: BTREE }
+    ospfv3_nbrs_device_id_ospfv3_nbr_id_context_name_unique: { Name: ospfv3_nbrs_device_id_ospfv3_nbr_id_context_name_unique, Columns: [device_id, ospfv3_instance_id, ospfv3_nbr_id, context_name], Unique: true, Type: BTREE }
 ospfv3_ports:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3_instance_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3_port_id, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfv3IfIndex, Type: 'int', 'Null': false, Extra: '' }
     - { Field: ospfv3IfInstId, Type: int, 'Null': false, Extra: '' }
@@ -1528,7 +1530,7 @@ ospfv3_ports:
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    ospfv3_ports_device_id_ospfv3_port_id_context_name_unique: { Name: ospfv3_ports_device_id_ospfv3_port_id_context_name_unique, Columns: [device_id, ospfv3_port_id, context_name], Unique: true, Type: BTREE }
+    ospfv3_ports_device_id_ospfv3_port_id_context_name_unique: { Name: ospfv3_ports_device_id_ospfv3_port_id_context_name_unique, Columns: [device_id, ospfv3_instance_id, ospfv3_port_id, context_name], Unique: true, Type: BTREE }
 packages:
   Columns:
     - { Field: pkg_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

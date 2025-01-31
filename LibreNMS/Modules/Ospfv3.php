@@ -94,6 +94,7 @@ class Ospfv3 implements Module
                     }
                 }
                 $ospf_entry['ospfv3RouterId'] = long2ip($ospf_entry['ospfv3RouterId']);
+                $ospf_entry['ospfv3_instance_id'] = $ospf_instance_id;
 
                 $instance = Ospfv3Instance::updateOrCreate([
                     'device_id' => $os->getDeviceId(),
@@ -146,14 +147,16 @@ class Ospfv3 implements Module
             $ospf_ports = SnmpQuery::context($context_name)
                 ->hideMib()->enumStrings()
                 ->walk('OSPFV3-MIB::ospfv3IfTable')
-                ->mapTable(function ($ospf_port, $ifIndex) use ($context_name, $os) {
+                ->mapTable(function ($ospf_port, $ifIndex, $ospf_instance_id) use ($context_name, $os) {
                     // find port_id
                     $ospf_port['port_id'] = (int) PortCache::getIdFromIfIndex($ifIndex, $os->getDeviceId());
+                    $ospf_port['ospfv3_instance_id'] = $ospf_instance_id;
                     $ospf_port['ospfv3IfDesignatedRouter'] = long2ip($ospf_port['ospfv3IfDesignatedRouter']);
                     $ospf_port['ospfv3IfBackupDesignatedRouter'] = long2ip($ospf_port['ospfv3IfBackupDesignatedRouter']);
 
                     return Ospfv3Port::updateOrCreate([
                         'device_id' => $os->getDeviceId(),
+                        'ospfv3_instance_id' => $ospf_instance_id,
                         'ospfv3_port_id' => $ifIndex,
                         'context_name' => $context_name,
                     ], $ospf_port);
@@ -173,15 +176,17 @@ class Ospfv3 implements Module
             $ospf_neighbours = SnmpQuery::context($context_name)
                 ->hideMib()->enumStrings()
                 ->walk('OSPFV3-MIB::ospfv3NbrTable')
-                ->mapTable(function ($ospf_nbr, $ifIndex, $ospfv3NbrIfInstId, $ospfv3NbrRtrId) use ($context_name, $os) {
+                ->mapTable(function ($ospf_nbr, $ifIndex, $ospf_instance_id, $ospfv3NbrRtrId) use ($context_name, $os) {
                     // get neighbor port_id
                     // Needs searching by Link-Local addressing, but those do not appear to be indexed.
                     $ip = $ospf_nbr['ospfv3NbrAddress'];
                     $ospf_nbr['port_id'] = PortCache::getIdFromIp($ip, $context_name); // search all devices
+                    $ospf_nbr['ospfv3_instance_id'] = $ospf_instance_id;
                     $ospf_nbr['ospfv3NbrRtrId'] = long2ip($ospfv3NbrRtrId);
 
                     return Ospfv3Nbr::updateOrCreate([
                         'device_id' => $os->getDeviceId(),
+                        'ospfv3_instance_id' => $ospf_instance_id,
                         'ospfv3_nbr_id' => $ifIndex,
                         'context_name' => $context_name,
                     ], $ospf_nbr);
