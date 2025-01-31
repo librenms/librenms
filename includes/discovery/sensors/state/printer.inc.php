@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Eventlog;
+use Illuminate\Support\Facades\Log;
 
 echo 'Printer Status and Error State ';
 $state = snmp_get($device, 'hrDeviceStatus.1', '-Ovqe', 'HOST-RESOURCES-MIB');
@@ -81,7 +82,7 @@ if ($state) {
     $state_name = 'hrPrinterDetectedErrorState';
     create_state_index($state_name, $printer_states);
 
-    Eventlogg::debug('Printer error state: ' . $state_name . ': ' . $state);
+    Log::debug('Printer error state: ' . $state_name . ': ' . $state);
     $sensor_index = 0;
     discover_sensor(
         null,

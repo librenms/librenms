@@ -203,7 +203,7 @@ foreach ($tables as $tablevalue) {
         foreach ($temp as $index => $entry) {
             $state_group = null;
             if ($state_name == 'ciscoEnvMonTemperatureState' && (empty($entry[$tablevalue['descr']]))) {
-                Eventlog::debug('Invalid sensor, skipping..');
+                Log::debug('Invalid sensor, skipping..');
             } else {
                 //Discover Sensors
                 $descr = ucwords($entry[$tablevalue['descr']] ?? 'State');
