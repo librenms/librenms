@@ -1,9 +1,13 @@
 mib: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB:CISCO-UNIFIED-COMPUTING-PROCESSOR-MIB:CISCO-UNIFIED-COMPUTING-MEMORY-MIB:CISCO-UNIFIED-COMPUTING-STORAGE-MIB:CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB
 modules:
     os:
-        sysDescr_regex: '/Firmware Version (?<version>[^\s]+)/'
-        hardware: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeBoardModel.1
-        serial: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeBoardSerial.1
+        sysDescr_regex: '/Firmware Version (?<version>[^\s]+\))/'
+        hardware: 
+            - CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeBoardModel.1
+            - CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeBoardModel.0
+        serial: 
+            - CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeBoardSerial.1
+            - CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeBoardSerial.0
     sensors:
         current:
             data:
