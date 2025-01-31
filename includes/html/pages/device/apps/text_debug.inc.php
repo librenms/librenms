@@ -4,7 +4,7 @@ $link_array = [
     'page' => 'device',
     'device' => $device['device_id'],
     'tab' => 'apps',
-    'app' => 'text_blob',
+    'app' => 'text_debug',
 ];
 
 $blobs = $app->data['blobs'] ?? [];
@@ -52,12 +52,12 @@ print_optionbar_end();
 
 $graphs = [];
 if (isset($vars['blob_name'])) {
-    $graphs['text_blob_size'] = 'Blob Size';
-    $graphs['text_blob_exit_value'] = 'Exit Value';
-    $graphs['text_blob_exit_signal'] = 'Exit Signal';
-    $graphs['text_blob_coredumped'] = 'Coredumped';
+    $graphs['text_debug_size'] = 'Blob Size';
+    $graphs['text_debug_exit_value'] = 'Exit Value';
+    $graphs['text_debug_exit_signal'] = 'Exit Signal';
+    $graphs['text_debug_coredumped'] = 'Coredumped';
 } else {
-    $graphs['text_blob_total_size'] = 'Total Size Of Blobs';
+    $graphs['text_debug_total_size'] = 'Total Size Of Blobs';
 }
 
 foreach ($graphs as $key => $text) {
