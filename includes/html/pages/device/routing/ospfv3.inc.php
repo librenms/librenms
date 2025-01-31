@@ -37,7 +37,7 @@ foreach ($instances as $instance) {
         <tbody>
           <tr data-toggle="collapse" data-target="#ospf-panel' . $i . '" class="accordion-toggle">
             <td><button id="ospf-panel_button' . $i . '" class="btn btn-default btn-xs"><span id="ospf-panel_span' . $i . '" class="fa fa-plus"></span></button></td>
-            <td>' . long2ip($instance->ospfv3RouterId) . '</td>
+            <td>' . $instance->ospfv3RouterId . '</td>
             <td><span class="label label-' . $status_color . '">' . $instance->ospfv3AdminStatus . '</span></td>
             <td><span class="label label-' . $abr_status_color . '">' . $instance->ospfv3AreaBdrRtrStatus . '</span></td>
             <td><span class="label label-' . $asbr_status_color . '">' . $instance->ospfv3ASBdrRtrStatus . '</span></td>
@@ -131,7 +131,7 @@ foreach ($instances as $instance) {
                         </tr>
                       </thead>';
     foreach (DeviceCache::getPrimary()->ospfv3Nbrs as $nbr) {
-        $port = PortCache::getByIp(long2ip($nbr->ospfv3NbrRtrId));
+        $port = PortCache::getByIp($nbr->ospfv3NbrRtrId);
 
         $rtr_id = 'unknown';
         if ($port) {
@@ -148,7 +148,7 @@ foreach ($instances as $instance) {
         echo '
                     <tbody>
                       <tr>
-                        <td>' . long2ip($nbr->ospfv3NbrRtrId) . '</td>
+                        <td>' . $nbr->ospfv3NbrRtrId . '</td>
                         <td>' . $rtr_id . '</td>
                         <td>' . $nbr->ospfv3NbrAddress . '</td>
                         <td><span class="label label-' . $ospfnbr_status_color . '">' . $nbr->ospfv3NbrState . '</span></td>
