@@ -65,7 +65,7 @@ foreach ($instances as $instance) {
                           <th>Status</th>
                         </tr>
                       </thead>';
-    foreach (DeviceCache::getPrimary()->ospfAreas as $area) {
+    foreach (DeviceCache::getPrimary()->ospfv3Areas as $area) {
         $area_port_count = DeviceCache::getPrimary()->ospfv3Ports()->where('ospfv3IfAreaId', $area->ospfv3AreaId)->count();
         $area_port_count_enabled = DeviceCache::getPrimary()->ospfv3Ports()->where('ospfv3IfAreaId', $area->ospfv3AreaId)->where('ospfv3IfAdminStatus', 'enabled')->count();
 
