@@ -1,4 +1,4 @@
-## Text Blob
+## Text Debug
 
 The purpose of this is to assist with debugging/triaging, especially
 in cases where syslog-ng has a complex config will likely die before
