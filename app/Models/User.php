@@ -146,7 +146,7 @@ class User extends Authenticatable
 
     public function getNotifications(string $type = null): int|Collection
     {
-        return match($type) {
+        return match ($type) {
             'total' => $this->notifications()->count(),
             'read' => $this->notifications()->wherePivot('key', $type)->wherePivot('value', 1)->get(),
             'unread' => Notification::whereNotIn('notifications_id', fn ($q) => $q->select('notifications_id')->from('notifications_attribs')->where('user_id', $this->user_id)->where('key', 'read')->where('value', 1))->get(),
