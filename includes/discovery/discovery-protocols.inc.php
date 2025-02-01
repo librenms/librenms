@@ -401,7 +401,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
 
                 if ($remote_device['os'] == 'xos') {
                     $slot_port = explode(':', $remote_port_name);
-                    if (sizeof($slot_port) == 2) {
+                    if (count($slot_port) == 2) {
                         $n_slot = (int) $slot_port[0];
                         $n_port = (int) $slot_port[1];
                     } else {
