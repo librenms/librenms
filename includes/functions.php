@@ -11,6 +11,7 @@
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\StateTranslation;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
@@ -56,7 +57,7 @@ function parse_modules($type, $options)
             return $module . ($submodules ? '(' . implode(',', $submodules) . ')' : '');
         }, array_keys(Config::get("{$type}_modules", [])));
 
-        d_echo("Override $type modules: " . implode(', ', $modules) . PHP_EOL);
+        Log::debug('Override ' . $type . ' modules: ' . implode(', ', $modules));
     }
 
     return $override;
@@ -222,14 +223,14 @@ function is_port_valid($port, $device)
     if (empty($port['ifDescr'])) {
         // If these are all empty, we are just going to show blank names in the ui
         if (empty($port['ifAlias']) && empty($port['ifName'])) {
-            d_echo("ignored: empty ifDescr, ifAlias and ifName\n");
+            Log::debug('ignored: empty ifDescr, ifAlias and ifName');
 
             return false;
         }
 
         // ifDescr should not be empty unless it is explicitly allowed
         if (! Config::getOsSetting($device['os'], 'empty_ifdescr', Config::get('empty_ifdescr', false))) {
-            d_echo("ignored: empty ifDescr\n");
+            Log::debug('ignored: empty ifDescr');
 
             return false;
         }
@@ -247,7 +248,7 @@ function is_port_valid($port, $device)
 
     foreach (Config::getCombined($device['os'], 'bad_if') as $bi) {
         if (Str::contains($ifDescr, $bi, ignoreCase: true)) {
-            d_echo("ignored by ifDescr: $ifDescr (matched: $bi)\n");
+            Log::debug("ignored by ifDescr: $ifDescr (matched: $bi)");
 
             return false;
         }
@@ -255,7 +256,7 @@ function is_port_valid($port, $device)
 
     foreach (Config::getCombined($device['os'], 'bad_if_regexp') as $bir) {
         if (preg_match($bir . 'i', $ifDescr)) {
-            d_echo("ignored by ifDescr: $ifDescr (matched: $bir)\n");
+            Log::debug("ignored by ifDescr: $ifDescr (matched: $bir)");
 
             return false;
         }
@@ -263,7 +264,7 @@ function is_port_valid($port, $device)
 
     foreach (Config::getCombined($device['os'], 'bad_ifname_regexp') as $bnr) {
         if (preg_match($bnr . 'i', $ifName)) {
-            d_echo("ignored by ifName: $ifName (matched: $bnr)\n");
+            Log::debug("ignored by ifName: $ifName (matched: $bnr)");
 
             return false;
         }
@@ -271,7 +272,7 @@ function is_port_valid($port, $device)
 
     foreach (Config::getCombined($device['os'], 'bad_ifalias_regexp') as $bar) {
         if (preg_match($bar . 'i', $ifAlias)) {
-            d_echo("ignored by ifAlias: $ifAlias (matched: $bar)\n");
+            Log::debug("ignored by ifAlias: $ifAlias (matched: $bar)");
 
             return false;
         }
@@ -279,7 +280,7 @@ function is_port_valid($port, $device)
 
     foreach (Config::getCombined($device['os'], 'bad_iftype') as $bt) {
         if (Str::contains($ifType, $bt)) {
-            d_echo("ignored by ifType: $ifType (matched: $bt )\n");
+            Log::debug("ignored by ifType: $ifType (matched: $bt )");
 
             return false;
         }
@@ -287,7 +288,7 @@ function is_port_valid($port, $device)
 
     foreach (Config::getCombined($device['os'], 'bad_ifoperstatus') as $bos) {
         if (Str::contains($ifOperStatus, $bos)) {
-            d_echo("ignored by ifOperStatus: $ifOperStatus (matched: $bos)\n");
+            Log::debug("ignored by ifOperStatus: $ifOperStatus (matched: $bos)");
 
             return false;
         }
@@ -313,21 +314,21 @@ function port_fill_missing_and_trim(&$port, $device)
     // When devices do not provide data, populate with other data if available
     if (! isset($port['ifDescr']) || $port['ifDescr'] == '') {
         $port['ifDescr'] = $port['ifName'];
-        d_echo(' Using ifName as ifDescr');
+        Log::debug(' Using ifName as ifDescr');
     }
     $attrib = DeviceCache::get($device['device_id'] ?? null)->getAttrib('ifName:' . $port['ifName']);
     if (! empty($attrib)) {
         // ifAlias overridden by user, don't update it
         unset($port['ifAlias']);
-        d_echo(' ifAlias overriden by user');
+        Log::debug(' ifAlias overriden by user');
     } elseif (! isset($port['ifAlias']) || $port['ifAlias'] == '') {
         $port['ifAlias'] = $port['ifDescr'];
-        d_echo(' Using ifDescr as ifAlias');
+        Log::debug(' Using ifDescr as ifAlias');
     }
 
     if (! isset($port['ifName']) || $port['ifName'] == '') {
         $port['ifName'] = $port['ifDescr'];
-        d_echo(' Using ifDescr as ifName');
+        Log::debug(' Using ifDescr as ifName');
     }
 }
 
@@ -430,11 +431,6 @@ function create_state_index($state_name, $states = []): void
             'state_generic_value' => $state['generic'],
         ]);
     }, $states));
-}
-
-function create_sensor_to_state_index($device, $state_name, $index)
-{
-    // no op
 }
 
 function delta_to_bits($delta, $period)
@@ -723,7 +719,7 @@ function is_disk_valid($disk, $device)
 {
     foreach (Config::getCombined($device['os'], 'bad_disk_regexp') as $bir) {
         if (preg_match($bir . 'i', $disk['diskIODevice'])) {
-            d_echo("Ignored Disk: {$disk['diskIODevice']} (matched: $bir)\n");
+            Log::debug("Ignored Disk: {$disk['diskIODevice']} (matched: $bir)");
 
             return false;
         }

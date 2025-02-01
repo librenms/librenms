@@ -90,7 +90,6 @@ foreach ($octetSetup as $entry) {
                 'snmp',
                 $port_number
             );
-            create_sensor_to_state_index($device, $entry['state_name'], $port_number);
         }
     }
     unset($octetString, $states, $octetSetup, $port_number);

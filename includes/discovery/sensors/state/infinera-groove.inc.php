@@ -39,8 +39,5 @@ foreach ($pre_cache['infineragroove_slotTable'] as $index => $data) {
         // discover sensors
         $descr = 'slot-' . str_replace('.', '/', $index) . ' (' . $data['slotActualCardType'] . ')';
         discover_sensor(null, 'state', $device, $num_oid . $index, $index, $state_name, $descr, '1', '1', null, null, null, null, $data['cardMode'], 'snmp', $index);
-
-        // create sensor to state index
-        create_sensor_to_state_index($device, $state_name, $index);
     }
 }

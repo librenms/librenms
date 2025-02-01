@@ -93,8 +93,6 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
             null,
             'HA'
         );
-
-        create_sensor_to_state_index($device, $stateName, $index);
     }
 }
 

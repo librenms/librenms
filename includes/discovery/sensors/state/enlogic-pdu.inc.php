@@ -41,8 +41,6 @@ foreach ($pre_cache['enlogic_pdu_status'] as $index => $data) {
         $descr = "Load state #$index";
         //Discover Sensors
         discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current);
-        //Create Sensor To State Index
-        create_sensor_to_state_index($device, $state_name, $index);
     }
 }
 
@@ -65,8 +63,6 @@ foreach ($pre_cache['enlogic_pdu_input'] as $index => $data) {
 
             //Discover Sensors
             discover_sensor(null, 'state', $device, $oid, $tmp_index, $state_name, $descr, 1, 1, null, null, null, null, $current);
-            //Create Sensor To State Index
-            create_sensor_to_state_index($device, $state_name, $tmp_index);
         }
 
         $oid = '.1.3.6.1.4.1.38446.1.3.4.1.4.' . $index;
@@ -86,8 +82,6 @@ foreach ($pre_cache['enlogic_pdu_input'] as $index => $data) {
 
             //Discover Sensors
             discover_sensor(null, 'state', $device, $oid, $tmp_index, $state_name, $descr, 1, 1, null, null, null, null, $current);
-            //Create Sensor To State Index
-            create_sensor_to_state_index($device, $state_name, $tmp_index);
         }
     }
 }
@@ -112,8 +106,6 @@ foreach ($pre_cache['enlogic_pdu_circuit'] as $index => $data) {
             $descr = "Circuit breaker state {$data['pduCircuitBreakerLabel']}";
             //Discover Sensors
             discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current);
-            //Create Sensor To State Index
-            create_sensor_to_state_index($device, $state_name, $index);
         }
     }
 }

@@ -22,8 +22,11 @@
  * @copyright  2018 TheGreatDoc
  * @author     TheGreatDoc
  */
+
+use Illuminate\Support\Facades\Log;
+
 $oids = snmp_walk($device, 'oaPumpTable', '-Osq', 'NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB');
-d_echo($oids . "\n");
+Log::debug($oids . "\n");
 
 if ($oids) {
     echo 'GW EYDFA PUMP ';
@@ -80,7 +83,7 @@ foreach (explode("\n", $oids) as $data) {
 }
 
 $oids = trim(snmp_walk($device, 'oaDCPowerTable', '-Osq', 'NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB'));
-d_echo($oids . "\n");
+Log::debug($oids);
 
 if ($oids) {
     echo 'GW EYDFA DC POWER ';
@@ -186,6 +189,5 @@ foreach ($oids as $oid) {
     $descr = 'Power Supply ' . $n;
     $sensor_index = 'PowerSupplyState' . $n;
     discover_sensor(null, 'state', $device, $oid, $sensor_index, $state_name, $descr, 1, 1, null, null, null, null, $value, 'snmp');
-    create_sensor_to_state_index($device, $state_name, $sensor_index);
     $n++;
 }
