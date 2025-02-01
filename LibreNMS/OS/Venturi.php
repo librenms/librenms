@@ -84,8 +84,8 @@ class Venturi extends OS implements OSPolling
             $data['clientless.0']['vServerSubscriberCurrCount'],
         )) {
             $rrd_def = RrdDefinition::make()
-                ->addDataset('TotalClientCount', 'GAUGE', 0)
-                ->addDataset('TotalClientlessCount', 'GAUGE', 0)
+                ->addDataset('TotalClientCount', 'COUNTER', 0)
+                ->addDataset('TotalClientlessCount', 'COUNTER', 0)
                 ->addDataset('CurrentClientCount', 'GAUGE', 0)
                 ->addDataset('CurrentClientlessCount', 'GAUGE', 0);
             $fields = [
