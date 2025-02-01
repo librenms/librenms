@@ -211,7 +211,7 @@ echo "
     <label for='os' class='col-sm-2 control-label'>OS (optional)</label>
     <div class='col-sm-4'>
     <input id='os' class='form-control' name='os' value='" . htmlspecialchars(Config::get("os.{$device->os}.text")) . "'/>
-    <input type='hidden' id='os_id' class='form-control' name='os_id' value='" . htmlspecialchars($string)->os . "'/>
+    <input type='hidden' id='os_id' class='form-control' name='os_id' value='" . htmlspecialchars($device->os) . "'/>
     </div>
     </div>
     </div>
