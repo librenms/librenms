@@ -33,8 +33,18 @@ class Zebra extends OS
 {
     public function discoverOS(Device $device): void
     {
-        parent::discoverOS($device); // yaml
-
         $device->features = Str::contains($device->sysDescr, 'ireless') ? 'wireless' : 'wired';
+
+        // clarified on 140Xi4
+        $data =  snmp_get_multi_oid($this->getDeviceArray(),
+            ['.1.3.6.1.4.1.10642.1.3.0',
+            '.1.3.6.1.4.1.10642.1.2.0',
+            '.1.3.6.1.4.1.10642.1.1.0',
+            '.1.3.6.1.4.1.10642.1.4.0']
+        );
+        $device->purpose = $data['.1.3.6.1.4.1.10642.1.3.0'] ?? null;
+        $device->version  = $data['.1.3.6.1.4.1.10642.1.2.0'] ?? null;
+        $device->hardware = $data['.1.3.6.1.4.1.10642.1.1.0'] ?? null;
+        $device->sysName  = $data['.1.3.6.1.4.1.10642.1.4.0'] ?? null;
     }
 }
