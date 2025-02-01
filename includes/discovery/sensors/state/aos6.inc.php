@@ -26,7 +26,6 @@ foreach ($aos6_fan_oids as $index => $data) {
         if (! empty($current)) {
             create_state_index($state_name, $states);
             discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current);
-            create_sensor_to_state_index($device, $state_name, $index);
         }
     }
 }
@@ -51,7 +50,6 @@ if (($stack_left < $stacking) && ($stack_alone < $stacking_non)) {
             ];
             create_state_index($stack_state_namea, $states_stacka);
             discover_sensor(null, 'state', $device, $oid_stackport_a, $stackindexa, $stack_state_namea, $descr_stacka, 1, 1, null, null, null, null, $current_stacka);
-            create_sensor_to_state_index($device, $stack_state_namea, $stackindexa);
         }
     }
 }
@@ -69,7 +67,6 @@ if (($stack_left < $stacking) && ($stack_alone < $stacking_non)) {
             ];
             create_state_index($stack_state_nameb, $states_stackb);
             discover_sensor(null, 'state', $device, $oid_stackport_b, $stackindexb, $stack_state_nameb, $descr_stackb, 1, 1, null, null, null, null, $current_stackb);
-            create_sensor_to_state_index($device, $stack_state_nameb, $stackindexb);
         }
     }
 }
