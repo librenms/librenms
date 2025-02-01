@@ -7,8 +7,8 @@ require 'includes/html/graphs/common.inc.php';
 $i = 0;
 
 foreach ([
-    'ClientTraffic' => 'TotClient',
-    'ClientlessTraffic' => 'TotClientless',
+    'Client' => 'TotClient',
+    'Clientless' => 'TotClientless',
 ] as $ds => $descr) {
     $rrd_list[$i]['filename'] = $rrd_filename;
     $rrd_list[$i]['descr'] = $descr;

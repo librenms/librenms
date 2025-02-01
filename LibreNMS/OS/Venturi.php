@@ -165,15 +165,15 @@ class Venturi extends OS implements OSPolling
 
         // venturi_transport_traffic
         if (isset(
-            $data['client.0']['vServerTransportBytesSent'],
-            $data['clientless.0']['vServerTransportBytesRecd'],
+            $data[0]['vServerTransportBytesSent'],
+            $data[0]['vServerTransportBytesRecd'],
         )) {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('TransportTrafficTx', 'COUNTER', 0)
                 ->addDataset('TransportTrafficRx', 'COUNTER', 0);
             $fields = [
-                'TransportTrafficTx' => $data['client.0']['vServerTransportBytesSent'],
-                'TransportTrafficRx' => $data['clientless.0']['vServerTransportBytesRecd'],
+                'TransportTrafficTx' => $data[0]['vServerTransportBytesSent'],
+                'TransportTrafficRx' => $data[0]['vServerTransportBytesRecd'],
             ];
             $tags = compact('rrd_def');
             $datastore->put($this->getDeviceArray(), 'venturi_transport_traffic', $tags, $fields);

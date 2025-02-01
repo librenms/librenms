@@ -7,11 +7,6 @@ require 'includes/html/graphs/common.inc.php';
 $ds_in = 'TransportTrafficRx';
 $ds_out = 'TransportTrafficRx';
 
-$unit_text = 'Transport';
+$multiplier = 8;
 
-$colours = 'mixed';
-
-$scale_min = '0';
-
-#require 'includes/html/graphs/generic_multi_line.inc.php';
 require 'includes/html/graphs/generic_data.inc.php';
