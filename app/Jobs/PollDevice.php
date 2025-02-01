@@ -236,8 +236,13 @@ EOH, $this->device->hostname, $group ? " ($group)" : '', $this->device->device_i
             return $default_modules;
         }
 
-        // ensure order of modules
-        $ordered_modules = array_fill_keys(array_keys(array_intersect_key($default_modules, $this->module_overrides)), true);
+        // ensure order of modules, preserve submodules
+        $ordered_modules = [];
+        foreach ($default_modules as $module => $enabled) {
+            if (isset($this->module_overrides[$module])) {
+                $ordered_modules[$module] = $this->module_overrides[$module];
+            }
+        }
 
         return $ordered_modules;
     }
