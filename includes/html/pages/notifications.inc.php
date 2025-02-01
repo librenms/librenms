@@ -24,7 +24,8 @@
 use App\Models\User;
 use LibreNMS\ObjectCache;
 
-$notifications = new ObjectCache('notifications');
+$total = Auth::user()->notifications()->count();
+
 ?>
 <div class="container">
   <div class="row">
@@ -32,14 +33,14 @@ $notifications = new ObjectCache('notifications');
       <h1><a href="/notifications">Notifications</a></h1>
       <h4>
 <?php
-echo '<strong class="count-notif">' . $notifications['count'] . '</strong> Unread Notifications ';
+echo '<strong class="count-notif">' . $total . '</strong> Unread Notifications ';
 
 if (Auth::user()->hasGlobalAdmin()) {
     echo '<button class="btn btn-success pull-right fa fa-plus new-notif" data-toggle="tooltip" data-placement="bottom" title="Create new notification" style="margin-top:-10px;"></button>';
 }
 
-if ($notifications['count'] > 0 && ! isset($vars['archive'])) {
-    echo '<button class="btn btn-success pull-right fa fa-eye read-all-notif" data-toggle="tooltip" data-placement="bottom" title="Mark all as Read" style="margin-top:-10px;"></button>';
+if ($total > 0 && ! isset($vars['archive'])) {
+    echo '<button class="btn btn-success pull-right fa fa-eye read-all-notif tw-mr-2" data-toggle="tooltip" data-placement="bottom" title="Mark all as Read" style="margin-top:-10px;"></button>';
 }
 ?>
       </h4>
@@ -76,20 +77,21 @@ if ($notifications['count'] > 0 && ! isset($vars['archive'])) {
 <?php if (! isset($vars['archive'])) { ?>
 <div class="container">
     <?php
-    foreach ($notifications['sticky'] as $notif) {
-        if (is_numeric($notif['source'])) {
-            $notif['source'] = dbFetchCell('select username from users where user_id =?', [$notif['source']]);
+    /** @var Notification $notif */
+    foreach (Auth::user()->getNotifications('sticky') as $notif) {
+        if (is_numeric($notif->source)) {
+            $notif->source = User::where('user_id')->value('username');
         }
         echo '<div class="well"><div class="row"> <div class="col-md-12">';
 
-        $class = $notif['severity'] == 2 ? 'text-danger' : 'text-warning';
-        echo "<h4 class='$class' id='{$notif['notifications_id']}'>";
-        echo "<strong><i class='fa fa-bell-o'></i>&nbsp;" . htmlentities($notif['title']) . '</strong>';
+        $class = $notif->severity == 2 ? 'text-danger' : 'text-warning';
+        echo "<h4 class='$class' id='{$notif->notifications_id}'>";
+        echo "<strong><i class='fa fa-bell-o'></i>&nbsp;" . htmlentities($notif->title) . '</strong>';
         echo "<span class='pull-right'>";
 
-        if ($notif['user_id'] != Auth::id()) {
-            $sticky_user = User::find($notif['user_id']);
-            echo "<code>Sticky by {$sticky_user->username}</code>";
+        if ($notif != Auth::id()) {
+            $sticky_user = User::find($notif->user_id);
+            echo "<code>Sticky by " . htmlentities($sticky_user->username) . "</code>";
         } else {
             echo '<button class="btn btn-primary fa fa-bell-slash-o unstick-notif" data-toggle="tooltip" data-placement="bottom" title="Remove Sticky" style="margin-top:-10px;"></button>';
         }
@@ -99,33 +101,33 @@ if ($notifications['count'] > 0 && ! isset($vars['archive'])) {
     </div>
     <div class="row">
       <div class="col-md-12">
-        <blockquote<?php echo $notif['severity'] == 2 ? ' style="border-color: darkred;"' : '' ?>>
-          <p><?php echo \LibreNMS\Util\Clean::html($notif['body'], ['HTML.Allowed' => 'br']); ?></p>
-          <footer><?php echo $notif['datetime']; ?> | Source: <code><?php echo $notif['source']; ?></code></footer>
+        <blockquote<?php echo $notif->severity == 2 ? ' style="border-color: darkred;"' : '' ?>>
+          <p><?php echo \LibreNMS\Util\Clean::html($notif->body, ['HTML.Allowed' => 'br']); ?></p>
+          <footer><?php echo $notif->datetime; ?> | Source: <code><?php echo htmlentities($notif->source); ?></code></footer>
         </blockquote>
       </div>
     </div>
   </div>
     <?php
     } ?>
-    <?php    if ($notifications['sticky_count'] != 0) { ?>
+    <?php    if (Auth::user()->getNotifications('sticky_count') != 0) { ?>
 <hr/>
     <?php    } ?>
     <?php
-    foreach ($notifications['unread'] as $notif) {
-        if (is_numeric($notif['source'])) {
-            $source_user = User::find($notif['source']);
-            $notif['source'] = $source_user->username;
+    foreach (Auth::user()->getNotifications('unread') as $notif) {
+        if (is_numeric($notif->source)) {
+            $source_user = User::find($notif->source);
+            $notif->source = $source_user->username;
         }
         echo '<div class="well"><div class="row"> <div class="col-md-12">';
         d_echo($notif);
         $class = 'text-success';
-        if ($notif['severity'] == 1) {
+        if ($notif->severity == 1) {
             $class = 'text-warning';
-        } elseif ($notif['severity'] == 2) {
+        } elseif ($notif->severity == 2) {
             $class = 'text-danger';
         }
-        echo "<h4 class='$class' id='{$notif['notifications_id']}'>" . htmlentities($notif['title']) . "<span class='pull-right'>";
+        echo "<h4 class='$class' id='{$notif->notifications_id}'>" . htmlentities($notif->title) . "<span class='pull-right'>";
 
         if (Auth::user()->hasGlobalAdmin()) {
             echo '<button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button>';
@@ -138,9 +140,9 @@ if ($notifications['count'] > 0 && ! isset($vars['archive'])) {
     </div>
     <div class="row">
       <div class="col-md-12">
-          <blockquote<?php echo $notif['severity'] == 2 ? ' style="border-color: darkred;"' : '' ?>>
-          <p><?php echo \LibreNMS\Util\Clean::html($notif['body'], ['HTML.Allowed' => 'br']); ?></p>
-          <footer><?php echo $notif['datetime']; ?> | Source: <code><?php echo $notif['source']; ?></code></footer>
+          <blockquote<?php echo $notif->severity == 2 ? ' style="border-color: darkred;"' : '' ?>>
+          <p><?php echo \LibreNMS\Util\Clean::html($notif->body, ['HTML.Allowed' => 'br']); ?></p>
+          <footer><?php echo $notif->datetime; ?> | Source: <code><?php echo htmlentities($notif->source); ?></code></footer>
         </blockquote>
       </div>
     </div>
@@ -161,14 +163,15 @@ if ($notifications['count'] > 0 && ! isset($vars['archive'])) {
     </div>
   </div>
     <?php
-    foreach ($notifications['read'] as $notif) {
+    $read = Auth::user()->getNotifications('read');
+    foreach ($read as $notif) {
         echo '<div class="well"><div class="row"> <div class="col-md-12"><h4';
-        if ($notif['severity'] == 1) {
+        if ($notif->severity == 1) {
             echo ' class="text-warning"';
-        } elseif ($notif['severity'] == 2) {
+        } elseif ($notif->severity == 2) {
             echo ' class="text-danger"';
         }
-        echo  " id='{$notif['notifications_id']}'>" . htmlentities($notif['title']);
+        echo  " id='{$notif->notifications_id}'>" . htmlentities($notif->title);
 
         if (Auth::user()->isAdmin()) {
             echo '<span class="pull-right"><button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button></span>';
@@ -178,9 +181,9 @@ if ($notifications['count'] > 0 && ! isset($vars['archive'])) {
     </div>
     <div class="row">
       <div class="col-md-12">
-          <blockquote<?php echo $notif['severity'] == 2 ? ' style="border-color: darkred;"' : '' ?>>
-          <p><?php echo \LibreNMS\Util\Clean::html($notif['body'], ['HTML.Allowed' => 'br']); ?></p>
-          <footer><?php echo $notif['datetime']; ?> | Source: <code><?php echo $notif['source']; ?></code></footer>
+          <blockquote<?php echo $notif->severity == 2 ? ' style="border-color: darkred;"' : '' ?>>
+          <p><?php echo \LibreNMS\Util\Clean::html($notif->body, ['HTML.Allowed' => 'br']); ?></p>
+          <footer><?php echo $notif->datetime; ?> | Source: <code><?php echo htmlentities($notif->source); ?></code></footer>
         </blockquote>
       </div>
     </div>
