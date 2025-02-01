@@ -16,10 +16,8 @@ foreach ([
 }
 
 $unit_text = 'Capacity';
-
 $total_units = 'Bits';
 $colours = 'mixed';
-
 $scale_min = '0';
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

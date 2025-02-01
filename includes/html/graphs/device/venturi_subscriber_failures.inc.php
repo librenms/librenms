@@ -27,10 +27,8 @@ foreach ([
 }
 
 $unit_text = 'Failures';
-
 $total_units = 'Count';
-$colours = 'mixed';
-
+$colours = 'mega';
 $scale_min = '0';
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

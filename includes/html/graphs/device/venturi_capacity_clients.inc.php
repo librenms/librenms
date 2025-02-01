@@ -17,10 +17,8 @@ foreach ([
 }
 
 $unit_text = 'Capacity';
-
 $total_units = 'Clients';
 $colours = 'mixed';
-
 $scale_min = '0';
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = Rrd::name($device['hostname'], 'venturi_subscriber_traffic');
+$rrd_filename = Rrd::name($device['hostname'], 'venturi_transport_traffic_rexmit');
 
 require 'includes/html/graphs/common.inc.php';
 

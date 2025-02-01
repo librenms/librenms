@@ -19,10 +19,8 @@ foreach ([
 }
 
 $unit_text = 'Counts';
-
 $total_units = 'Clients';
 $colours = 'mixed';
-
 $scale_min = '0';
 
 require 'includes/html/graphs/generic_multi_line.inc.php';
