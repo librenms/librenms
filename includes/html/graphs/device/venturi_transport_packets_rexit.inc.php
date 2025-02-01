@@ -1,16 +1,13 @@
 <?php
 
-$rrd_filename = Rrd::name($device['hostname'], 'venturi_subscriber_counts');
+$rrd_filename = Rrd::name($device['hostname'], 'venturi_transport_packets_rexit');
 
 require 'includes/html/graphs/common.inc.php';
 
 $i = 0;
 
 foreach ([
-    'TotalClientCount' => 'TotClient',
-    'TotalClientlessCount' => 'TotClientless',
-    'CurrentClientCount' => 'CurClient',
-    'CurrentClientlessCount' => 'CurClientless',
+    'Retransmitted' => 'Retransmitted',
 ] as $ds => $descr) {
     $rrd_list[$i]['filename'] = $rrd_filename;
     $rrd_list[$i]['descr'] = $descr;
@@ -18,8 +15,8 @@ foreach ([
     $i++;
 }
 
-$unit_text = 'Counts';
-$total_units = 'Clients';
+$unit_text = 'Packets';
+$total_units = 'count';
 $colours = 'mega';
 $scale_min = '0';
 
