@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use LibreNMS\Authentication\LegacyAuth;
 use NotificationChannels\WebPush\HasPushSubscriptions;
@@ -143,6 +144,18 @@ class User extends Authenticatable
         return false;
     }
 
+    public function getNotifications(string $type = null): int|Collection
+    {
+        return match($type) {
+            'total' => $this->notifications()->count(),
+            'read' => $this->notifications()->wherePivot('key', $type)->wherePivot('value', 1)->get(),
+            'unread' => Notification::whereNotIn('notifications_id', fn ($q) => $q->select('notifications_id')->from('notifications_attribs')->where('user_id', $this->user_id)->where('key', 'read')->where('value', 1))->get(),
+            'sticky' => Notification::whereIn('notifications_id', fn ($q) => $q->select('notifications_id')->from('notifications_attribs')->where('key', 'sticky')->where('value', 1))->get(),
+            'sticky_count' => Notification::whereIn('notifications_id', fn ($q) => $q->select('notifications_id')->from('notifications_attribs')->where('key', 'sticky')->where('value', 1)->select('notifications_id'))->count(),
+            default => $this->notifications,
+        };
+    }
+
     /**
      * Checks if this user has a browser push notification transport configured.
      *
@@ -269,6 +282,11 @@ class User extends Authenticatable
     public function dashboards(): HasMany
     {
         return $this->hasMany(\App\Models\Dashboard::class, 'user_id');
+    }
+
+    public function notifications(): BelongsToMany
+    {
+        return $this->belongsToMany(Notification::class, 'notifications_attribs', 'user_id', 'notifications_id', 'user_id', 'notifications_id');
     }
 
     public function notificationAttribs(): HasMany
