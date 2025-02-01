@@ -51,7 +51,10 @@ trait SyncsModels
                 // update
                 foreach ($existing_rows as $index => $existing_row) {
                     if ($index == 0) {
-                        $existing_row->fill($models->get($exist_key)->getAttributes())->save();
+                        // fill attributes, ignoring mutators and fillable
+                        $merged = array_merge($existing_row->getAttributes(), $models->get($exist_key)->getAttributes());
+                        $existing_row->setRawAttributes($merged);
+                        $existing_row->save();
                     } else {
                         // delete extra rows at this key
                         $existing_row->delete();

@@ -115,7 +115,7 @@ class Ewc extends OS implements
             $sensors[] = new WirelessSensor(
                 'clients',
                 $this->getDeviceId(),
-                '1.3.6.1.4.1.4329.15.3.5.2.2.1.14.' . $index,
+                '.1.3.6.1.4.1.4329.15.3.5.2.2.1.14.' . $index,
                 'ewc',
                 $index,
                 "Clients ($name)",
@@ -131,7 +131,7 @@ class Ewc extends OS implements
             $sensors[] = new WirelessSensor(
                 'clients',
                 $this->getDeviceId(),
-                '1.3.6.1.4.1.4329.15.3.3.4.5.1.2.' . $index,
+                '.1.3.6.1.4.1.4329.15.3.3.4.5.1.2.' . $index,
                 'ewc',
                 $name,
                 "SSID: $name"

@@ -81,10 +81,6 @@ vrf:
         excluded_fields: [vrf_id, device_id]
         joins:
             - { custom: "LEFT JOIN (SELECT ifVrf, GROUP_CONCAT(ifIndex ORDER BY ifIndex ASC SEPARATOR ',') as ifIndices FROM ports GROUP BY ifVrf) p ON p.ifVrf = vrfs.vrf_id", select: ["p.ifIndices"] }
-wireless:
-    wireless_sensors:
-        excluded_fields: [device_id, sensor_id, access_point_id, lastupdate]
-        order_by: sensor_class, sensor_type, sensor_index
 cisco-mac-accounting:
     mac_accounting:
         excluded_fields: [ma_id, port_id, poll_time, poll_prev, poll_period, cipMacHCSwitchedBytes_input_rate, cipMacHCSwitchedBytes_output_rate, cipMacHCSwitchedPkts_input_rate, cipMacHCSwitchedPkts_output_rate]
