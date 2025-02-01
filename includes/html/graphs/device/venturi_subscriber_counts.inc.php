@@ -7,10 +7,10 @@ require 'includes/html/graphs/common.inc.php';
 $i = 0;
 
 foreach ([
-    'TotalClientCount' => 'Total Client',
-    'TotalClientlessCount' => 'Total Clientless',
-    'CurrentClientCount' => 'Current Client',
-    'CurrentClientlessCount' => 'Current Clientless',
+    'TotalClientCount' => 'TotClient',
+    'TotalClientlessCount' => 'TotClientless',
+    'CurrentClientCount' => 'CurClient',
+    'CurrentClientlessCount' => 'CurClientless',
 ] as $ds => $descr) {
     $rrd_list[$i]['filename'] = $rrd_filename;
     $rrd_list[$i]['descr'] = $descr;
