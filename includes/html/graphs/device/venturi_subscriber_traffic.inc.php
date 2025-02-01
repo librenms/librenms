@@ -16,10 +16,8 @@ foreach ([
     $i++;
 }
 
-$units = 'KB';
-$unit_text = 'KBps';
+$unit_text = 'Traffic';
 
-$total_units = 'Traffic';
 $colours = 'mixed';
 
 $scale_min = '0';
