@@ -485,7 +485,7 @@ function get_port_id($ports_mapped, $port, $port_association_mode)
  */
 function ResolveGlues($tables, $target, $x = 0, $hist = [], $last = [])
 {
-    if (sizeof($tables) == 1 && $x != 0) {
+    if (count($tables) == 1 && $x != 0) {
         if (dbFetchCell('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME = ?', [$tables[0], $target]) == 1) {
             return array_merge($last, [$tables[0] . '.' . $target]);
         } else {
@@ -518,7 +518,7 @@ function ResolveGlues($tables, $target, $x = 0, $hist = [], $last = [])
             }
 
             $glues = dbFetchRows('SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME LIKE "%\_id"', [$table]);
-            if (sizeof($glues) == 1 && $glues[0]['COLUMN_NAME'] != $target) {
+            if (count($glues) == 1 && $glues[0]['COLUMN_NAME'] != $target) {
                 //Search for new candidates to expand
                 $ntables = [];
                 [$tmp] = explode('_', $glues[0]['COLUMN_NAME'], 2);

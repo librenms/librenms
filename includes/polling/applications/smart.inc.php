@@ -263,25 +263,25 @@ foreach ($data['disks'] as $disk_id => $disk) {
 }
 
 // log any disks with failed tests found
-if (sizeof($new_disks_with_failed_tests) > 0) {
+if (count($new_disks_with_failed_tests) > 0) {
     $log_message = 'SMART found new disks with failed tests: ' . json_encode($new_disks_with_failed_tests);
     Eventlog::log($log_message, $device['device_id'], 'application', Severity::Error);
 }
 
 // log when there when we go to having no failed disks from having them previously
-if (sizeof($data['disks_with_failed_tests']) == 0 && sizeof($old_data['disks_with_failed_tests']) > 0) {
+if (count($data['disks_with_failed_tests']) == 0 && count($old_data['disks_with_failed_tests']) > 0) {
     $log_message = 'SMART is no longer finding any disks with failed tests';
     Eventlog::log($log_message, $device['device_id'], 'application', Severity::Ok);
 }
 
 // log any disks with failed tests found
-if (sizeof($new_disks_with_failed_health) > 0) {
+if (count($new_disks_with_failed_health) > 0) {
     $log_message = 'SMART found new disks with failed health checks: ' . json_encode($new_disks_with_failed_health);
     Eventlog::log($log_message, $device['device_id'], 'application', Severity::Error);
 }
 
 // log when there when we go to having no failed disks from having them previously
-if (sizeof($data['disks_with_failed_health']) == 0 && sizeof($old_data['disks_with_failed_health']) > 0) {
+if (count($data['disks_with_failed_health']) == 0 && count($old_data['disks_with_failed_health']) > 0) {
     $log_message = 'SMART is no longer finding any disks with failed health checks';
     Eventlog::log($log_message, $device['device_id'], 'application', Severity::Ok);
 }
