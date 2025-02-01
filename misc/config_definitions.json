@@ -3971,14 +3971,6 @@
             },
             "type": "graph"
         },
-        "graph_types.device.venturi_transport_connections": {
-            "default": {
-                "section": "network",
-                "order": 0,
-                "descr": "Transport Packets Undeliverables"
-            },
-            "type": "graph"
-        },
         "graph_types.device.vpdn_sessions_l2tp": {
             "default": {
                 "section": "vpdn",
