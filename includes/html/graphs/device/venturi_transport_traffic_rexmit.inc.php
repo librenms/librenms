@@ -7,8 +7,7 @@ require 'includes/html/graphs/common.inc.php';
 $i = 0;
 
 foreach ([
-    'ClientTraffic' => 'Client',
-    'ClientlessTraffic' => 'Clientless',
+    'Retransmitted' => 'Retransmitted',
 ] as $ds => $descr) {
     $rrd_list[$i]['filename'] = $rrd_filename;
     $rrd_list[$i]['descr'] = $descr;
@@ -18,7 +17,7 @@ foreach ([
 
 $multiplier = 8;
 $unit_text = 'Traffic';
-$colours = 'ornages';
+$colours = 'mega';
 $simple_rrd = 1;
 
 require 'includes/html/graphs/generic_multi_simplex_seperated.inc.php';
