@@ -42,7 +42,6 @@ foreach ($modulation as $link => $linkEntry) {
                 $state_name,
                 $os->getLinkLabel($link) . ' Rx ' . $os->getRadioLabel($radio)
             );
-            create_sensor_to_state_index($device, $state_name, "rx-$index");
         }
         if (isset($radioEntry['linkAcmTxModulation'])) {
             discover_sensor(
@@ -54,7 +53,6 @@ foreach ($modulation as $link => $linkEntry) {
                 $state_name,
                 $os->getLinkLabel($link) . ' Tx ' . $os->getRadioLabel($radio)
             );
-            create_sensor_to_state_index($device, $state_name, "tx-$index");
         }
     }
 }
