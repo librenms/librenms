@@ -33,11 +33,11 @@ jobs:
 
       - name: Send Notification to Discord
         env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL_ANNOUNCEMENT }}
+          DISCORD_WEBHOOK_URL: "${{ secrets.DISCORD_WEBHOOK_URL_ANNOUNCEMENT }}"
         run: |
-          PR_TITLE=${{ github.event.pull_request.title }}
-          PR_MESSAGE=${{ github.event.pull_request.body }}
-          PR_URL=${{ github.event.pull_request.html_url }}
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_MESSAGE="${{ github.event.pull_request.body }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
 
           curl -X POST -H "Content-Type: application/json" \
           -d "{
