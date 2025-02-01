@@ -90,16 +90,54 @@
 <?php
 echo "<pre>";
 
-//echo print_r($data['ports'], true)
+function fastFindLine($filePath, $prefix) {
+    $file = new SplFileObject($filePath);
+	$prefix .= ":";
+    while (!$file->eof()) {
+        $line = $file->fgets();
+        if (strncmp($line, $prefix, strlen($prefix)) === 0) {
+            return $line;
+        }
+    }
+    return null;
+}
 
-function transformPorts($portsPaginator, $rowHeight = 2): array
+function transformPortsIndexedByIfName($portsPaginator) {
+    $result = [];
+    foreach ($portsPaginator->items() as $port_id => $port) {
+		$ifName = $port->ifName;
+		$result[$ifName] = $port;
+	}
+	return $result;
+}
+// Ports indexed by ifName
+function findHighestSwitchPort($indexports) {
+	// Only works on ports deliminated with /
+	// Cisco, Aruba
+	$switch = 1;
+	$indexports = array_reverse($indexports);
+	foreach($indexports as $ifName => $port) {
+		$parts = explode('/', $ifName);
+		switch(count($parts)) {
+			case 3:
+				$switch = $parts[0];
+				break;
+		}
+		// echo "found highest switch port $ifName";
+		return $switch;
+		
+	}
+	return $switch;
+}
+
+function transformPorts($ports, $rowHeight = 2): array
 {
     $result = [];
 
 	$i = 0;
 	$col = 0;
 	$block = 0;
-    foreach ($portsPaginator->items() as $port_id => $port) {
+    foreach ($ports->items() as $port_id => $port) {
         // Extract ifName and split into components
 		foreach(array("ifType", "ifName", "ifOperStatus", "ifAdminStatus", "ifVlan") as $field)
 			$$field = $port[$field] ?? null;
@@ -135,6 +173,7 @@ function transformPorts($portsPaginator, $rowHeight = 2): array
 						$module = 0;
 						$portNumber = $parts[0] ?? '1';
 						$Height = 1;
+						break;
 			}
 			// Check if ascii prefix has changed, if so, increment module
 			if((isset($prevprefix) && ($prevprefix != $prefix[0])))
@@ -151,7 +190,7 @@ function transformPorts($portsPaginator, $rowHeight = 2): array
 			//foreach(array("ifType", "ifName", "ifOperStatus", "ifAdminStatus", "ifVlan") as $field)
 			//	$tmp[$field] = $$field;
 
-			$result[$switch][$module][$block][$col][][$ifName] = $port_id;
+			$result[$module][$block][$col][][$ifName] = "rj45";
 			
 			$prevmodule = $module;
 			$prevswitch = $switch;
@@ -165,102 +204,131 @@ function transformPorts($portsPaginator, $rowHeight = 2): array
     return $result;
 }
 
-$columnHeight = 2;
-$transformedPorts = transformPorts($data['ports'], 2);
-$transform = $transformedPorts;
-//echo print_r($portui, true);
 
-// echo print_r($data['ports'], true);
-
-function generateVisualTableWithAttributes(array $transform, $sourcedata): string
+function generateVisualTableWithAttributes($switches = 1, array $transform, $sourcedata): string
 {
     $html = '<div class="visual-table">';
 
-    foreach ($transform as $switch => $modules) {
+    for ($switch = 1; $switch <= $switches; $switch++) {
         // Create a container for the switch
         $html .= '<div class="switch-container">';
         //$html .= "<h3>Switch: $switch</h3>";
         $html .= "Switch: $switch</br>";
+		//foreach($transform as $modules) {
 
-        foreach ($modules as $module => $blocks) {
-            // Create a container for the module
-            $html .= '<div class="module-container">';
-            //$html .= "<h4>Module: $module</h4>";
-            $html .= "Module: $module</br>";
-
-			foreach ($blocks as $block => $columns) {
-				// Create a container for the block
-				$html .= '<div class="block-container">';
+			foreach ($transform as $module => $blocks) {
+				// Create a container for the module
+				$html .= '<div class="module-container">';
 				//$html .= "<h4>Module: $module</h4>";
-				//$html .= "Block: $block</br>";
-				$html .= '<table class="port-table">';
-				// Get the maximum rows across columns
-				$rowCount = max(array_map('count', $columns));
-				for ($row = 0; $row < $rowCount; $row++) {
-					$html .= '<tr>';
-					foreach ($columns as $col => $ports) {
-						$portData = $ports[$row] ?? null; // Retrieve port data if it exists						
-						if ($portData) {
-							foreach ($portData as $portName => $port_id) {
-								// Get last part for just number
-								$portnum = array_reverse(explode("/", strval($portName)));
-								// Lookup port by port_id from transform array
-								$attr = $sourcedata[$port_id];
-								$adminStatus = $attr->ifAdminStatus ?? 'down';
-								$operStatus = $attr->ifOperStatus ?? 'down';
-								$vlan = $attr->ifVlan ?? 'Unknown';
+				$html .= "Module: $module</br>";
 
-								// Determine the CSS classes based on statuses
-								$borderClass = match ($adminStatus) {
-									'up' => 'border-up',
-									'disabled' => 'border-disabled',
-									default => 'border-down',
-								};
+				foreach ($blocks as $block => $columns) {
+					// Create a container for the block
+					$html .= '<div class="block-container">';
+					//$html .= "<h4>Module: $module</h4>";
+					$html .= "Block: $block</br>";
+					$html .= '<table class="port-table">';
+					// Get the maximum rows across columns
+					$rowCount = max(array_map('count', $columns));
+					for ($row = 0; $row < $rowCount; $row++) {
+						$html .= '<tr>';
+						foreach ($columns as $col => $ports) {
+							$portData = $ports[$row] ?? null; // Retrieve port data if it exists						
+							if ($portData) {
+								foreach ($portData as $portName => $phy) {
+									// Get last part for just number
+									$portnum = array_reverse(explode("/", strval($portName)));
+									// Lookup port by port_id from transform array
+									$attr = $sourcedata[$portName];
+									$adminStatus = $attr->ifAdminStatus ?? 'down';
+									$operStatus = $attr->ifOperStatus ?? 'down';
+									$vlan = $attr->ifVlan ?? 'Unknown';
 
-								$bgClass = ($operStatus === 'up') ? 'bg-up' : 'bg-down';
+									// Determine the CSS classes based on statuses
+									$borderClass = match ($adminStatus) {
+										'up' => 'border-up',
+										'disabled' => 'border-disabled',
+										default => 'border-down',
+									};
 
-							   // Add the port cell with custom tooltip
-							   $tooltipContent = <<<TOOLTIP
-	<div>Port: $portName</div>
-	<div>Admin Status: $adminStatus</div>
-	<div>Oper Status: $operStatus</div>
-	<div>VLAN: $vlan</div>
-	TOOLTIP;
-								$html .= "<td class='port-cell $borderClass $bgClass' >
-							<div class='port-name'>{$portnum[0]}</div>
-											<div class='tooltip'>$tooltipContent</div>
-										  </td>";							
-								
+									$bgClass = ($operStatus === 'up') ? 'bg-up' : 'bg-down';
+
+								   // Add the port cell with custom tooltip
+								   $tooltipContent = <<<TOOLTIP
+		<div>Port: $portName</div>
+		<div>Admin Status: $adminStatus</div>
+		<div>Oper Status: $operStatus</div>
+		<div>VLAN: $vlan</div>
+		TOOLTIP;
+									$html .= "<td class='port-cell $borderClass $bgClass' >
+								<div class='port-name'>{$portnum[0]}</div>
+												<div class='tooltip'>$tooltipContent</div>
+											  </td>";							
+									
+								}
+							} else {
+								// Empty cell
+								$html .= "<td class='port-cell empty-cell'></td>";
 							}
-						} else {
-							// Empty cell
-							$html .= "<td class='port-cell empty-cell'></td>";
 						}
+						$html .= '</tr>';
 					}
-					$html .= '</tr>';
+					$html .= '</table>';
+					$html .= '</div>'; // End block container
 				}
+
 				$html .= '</table>';
-				$html .= '</div>'; // End block container
-			}
-
-            $html .= '</table>';
-            $html .= '</div>'; // End module container
-        }
-
+				$html .= '</div>'; // End module container
+				}
+		//}
         $html .= '</div>'; // End switch container
-    }
-
+	}
     $html .= '</div>';
 
     return $html;
 }
 
+
+$columnHeight = 2;
+$indexports = transformPortsIndexedByIfName($data['ports']);
+$switches = findHighestSwitchPort($indexports);
+
+// Find model name or systemname
+$prefix = $device->sysName;
+//echo "Found model $prefix from device, ";
+// Deduce hints file from icon
+$brand = substr(basename($device->icon), 0, -4);
+// echo print_r($device, true);
+$filePath = "../resources/views/device/tabs/ports/hints/{$brand}.hints";
+if(file_exists($filePath)) {
+	$line = fastFindLine($filePath, $prefix);
+	if(!empty($line)) {
+		echo "Found prefix $prefix in {$brand} hints, ";
+		echo print_r(substr($line, strlen($prefix)+1), true);
+		$transformedPorts = json_decode(substr($line, strlen($prefix)+1), true);
+	}
+}
+
+if(!isset($transformedPorts)) {
+	if (empty($transformedPorts)) {
+		echo "No hints file found, auto generating";
+		$transformedPorts = transformPorts($data['ports'], 2);
+	}
+}
+
+// $transform = $transformedPorts;
+// echo json_encode($transform);
+
+
+
 echo "</pre>";
 ?>
 
 		<?php
+
+
 		// Example usage with your updated array:
-		echo generateVisualTableWithAttributes($transform, $data['ports']);
+		echo generateVisualTableWithAttributes($switches, $transformedPorts, $indexports);
 
 		?>
 
