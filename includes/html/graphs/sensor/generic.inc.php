@@ -20,7 +20,7 @@ $rrd_options .= ' DEF:sensor_min=' . $rrd_filename . ':sensor:MIN';
 $rrd_options .= ' AREA:sensor_max' . $variance_color;
 $rrd_options .= ' AREA:sensor_min' . $background_color;
 
-if ($sensor->hasTresholds()) {
+if ($sensor->hasThresholds()) {
     $rrd_options .= ' COMMENT:"Alert thresholds\:"';
     $rrd_options .= ($sensor->sensor_limit_low) ? '  LINE1.5:' . $sensor->sensor_limit_low . '#00008b:"low = ' . Number::formatSi($sensor->sensor_limit_low, 2, 3, $sensor->unit()) . '":dashes' : '';
     $rrd_options .= ($sensor->sensor_limit_low_warn) ? ' LINE1.5:' . $sensor->sensor_limit_low_warn . '#005bdf:"low_warn = ' . Number::formatSi($sensor->sensor_limit_low_warn, 2, 3, $sensor->unit()) . '":dashes' : '';
@@ -31,7 +31,7 @@ if ($sensor->hasTresholds()) {
 // Workaround because rrdtool has trouble detecting the
 // range if the sensor is constant and no thresholds are
 // defined, so it's forced to +-1% of the min/max.
-if ($sensor->doesntHaveTresholds()) {
+if ($sensor->doesntHaveThresholds()) {
     $rrd_options .= ' CDEF:canvas_max=sensor_max,1.01,*';
     $rrd_options .= ' LINE0:canvas_max#000000ff::dashes'; // Hidden for scale only
     $rrd_options .= ' CDEF:canvas_min=sensor_min,0.99,*';

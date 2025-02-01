@@ -171,7 +171,7 @@ class Sensor extends DeviceRelatedModel implements Keyable
         return Severity::Ok;
     }
 
-    public function hasTresholds(): bool
+    public function hasThresholds(): bool
     {
         return $this->sensor_limit_low !== null
             || $this->sensor_limit_low_warn !== null
@@ -179,9 +179,9 @@ class Sensor extends DeviceRelatedModel implements Keyable
             || $this->sensor_limit !== null;
     }
 
-    public function doesntHaveTresholds(): bool
+    public function doesntHaveThresholds(): bool
     {
-        return ! $this->hasTresholds();
+        return ! $this->hasThresholds();
     }
     // ---- Define Relationships ----
 
