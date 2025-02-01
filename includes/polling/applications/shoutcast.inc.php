@@ -50,7 +50,7 @@ foreach ($servers as $item => $server) {
             'rrd_name' => ['app', $name, $app->app_id, $host . '_' . $port],
             'rrd_def' => $rrd_def,
         ];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
     }//end if
 }//end foreach
 

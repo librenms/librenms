@@ -126,7 +126,7 @@ if ($device['os_group'] == 'cisco') {
 
         if (isset($address)) {
             $tags = compact('address', 'rrd_name', 'rrd_def');
-            data_update($device, 'ipsectunnel', $tags, $fields);
+            app('Datastore')->put($device, 'ipsectunnel', $tags, $fields);
 
             // $os->enableGraph('ipsec_tunnels');
         }
