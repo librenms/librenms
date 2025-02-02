@@ -1,6 +1,6 @@
-This folder holds the hints for physical port layouts. This makes it possible to assign physical port layouts for which the automatic generation is ill-suited.
+This folder holds the hints files for physical port layouts. This makes it possible to assign physical port layouts for which the automatic generation is ill-suited.
 
-Examples are the Aruba CX6100 with 49-52 on the left side of the chassis, or the CX8325 which is 3 rows of ports.
+Examples are the Aruba CX6100 with 49-52 on the left side of the chassis, or the CX8325 which is 3 rows of ports. Or the fs S5850 with ports in the middle.
 
 - The file naming is {$brand}.hints where brand is based on the icon name assigned in LibreNMS e.g. "ubiquiti.svg" becomes ubiquiti.hints.
 
