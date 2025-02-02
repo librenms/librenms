@@ -57,11 +57,7 @@ function parse_modules($type, $options)
             return $module . ($submodules ? '(' . implode(',', $submodules) . ')' : '');
         }, array_keys(Config::get("{$type}_modules", [])));
 
-<<<<<<< HEAD
         Log::debug('Override ' . $type . ' modules: ' . implode(', ', $modules));
-=======
-        Log::debug("Override $type modules: " . implode(', ', $modules));
->>>>>>> 675fa60b3 (Remove newlines in Log::debug)
     }
 
     return $override;
@@ -228,10 +224,14 @@ function is_port_valid($port, $device)
         // If these are all empty, we are just going to show blank names in the ui
         if (empty($port['ifAlias']) && empty($port['ifName'])) {
 <<<<<<< HEAD
+<<<<<<< HEAD
             Log::debug('ignored: empty ifDescr, ifAlias and ifName');
 =======
             Log::debug("ignored: empty ifDescr, ifAlias and ifName");
 >>>>>>> 675fa60b3 (Remove newlines in Log::debug)
+=======
+            Log::debug('ignored: empty ifDescr, ifAlias and ifName');
+>>>>>>> 0fc629736 (Fix StyleCI)
 
             return false;
         }
@@ -239,10 +239,14 @@ function is_port_valid($port, $device)
         // ifDescr should not be empty unless it is explicitly allowed
         if (! Config::getOsSetting($device['os'], 'empty_ifdescr', Config::get('empty_ifdescr', false))) {
 <<<<<<< HEAD
+<<<<<<< HEAD
             Log::debug('ignored: empty ifDescr');
 =======
             Log::debug("ignored: empty ifDescr");
 >>>>>>> 675fa60b3 (Remove newlines in Log::debug)
+=======
+            Log::debug('ignored: empty ifDescr');
+>>>>>>> 0fc629736 (Fix StyleCI)
 
             return false;
         }
