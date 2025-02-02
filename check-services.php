@@ -13,6 +13,7 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Config;
 use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Debug;
@@ -46,6 +47,14 @@ if (isset($options['h'])) {
             $where = "AND `hostname` = '?'";
             $params[] = $options['h'];
         }
+    }
+} else {
+    $scheduler = Config::get('schedule_type.services');
+    if ($scheduler != 'legacy' && $scheduler != 'cron') {
+        if (Debug::isEnabled()) {
+            echo "Services are not enabled for cron scheduling\n";
+        }
+        exit(0);
     }
 }
 

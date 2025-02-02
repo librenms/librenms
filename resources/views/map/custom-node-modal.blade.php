@@ -34,7 +34,7 @@
                             <div class="form-group row single-node" id="nodeMapLinkRow">
                                 <label for="maplink" class="col-sm-3 control-label">{{ __('map.custom.edit.node.map_link') }}</label>
                                 <div class="col-sm-9">
-                                    <select name="maplink" id="maplink" class="form-control" onchange="nodeMapLinkChange();">
+                                    <select name="maplink" id="maplink" class="form-control">
                                         <option value="" style="color:#999;">{{ __('map.custom.edit.node.map_select') }}</option>
                                         @foreach($maps as $map)
                                             <option value="{{$map->custom_map_id}}">{{$map->name}}</option>
@@ -176,14 +176,6 @@
         }
     }
 
-    function nodeMapLinkChange() {
-        if($("#maplink").val()) {
-            $("#nodeDeviceSearchRow").hide();
-        } else {
-            $("#nodeDeviceSearchRow").show();
-        }
-    }
-
     function nodeSetIcon() {
         var newcode = $("#nodeicon").val();
         $("#nodeiconpreview").text(String.fromCharCode(parseInt(newcode, 16)));
@@ -194,11 +186,14 @@
         if($("#nodeimage option:selected").css('display') == 'none') {
             $("#nodeimage").val($("#nodeimage option:eq(1)").val());
         }
+        let imgsrc = $("#nodeimage").val();
         // Set the image preview src
-        if($("#nodeimage").val()) {
-            $("#nodeimagepreview").attr("src", custom_image_base + $("#nodeimage").val());
-        } else {
+        if(! imgsrc) {
             $("#nodeimagepreview").attr("src", $("#device_image").val());
+        } else if (isNaN(imgsrc)) {
+            $("#nodeimagepreview").attr("src", custom_image_base + imgsrc);
+        } else {
+            $("#nodeimagepreview").attr("src", '{{ route('maps.nodeimage.show', ['image' => '?' ]) }}'.replace("?", imgsrc));
         }
     }
 
@@ -221,10 +216,12 @@
         var name = e.params.data.text;
         $("#device_id").val(id);
         $("#device_name").text(name);
-        $("#nodelabel").val(name.split(".")[0].split(" ")[0]);
+        if (! $("#maplink").val()) {
+            // Update the node label if we are not linked to a map
+            $("#nodelabel").val(name.split(".")[0].split(" ")[0]);
+        }
         $("#device_image").val(e.params.data.icon);
         $("#nodeDeviceSearchRow").hide();
-        $("#nodeMapLinkRow").hide();
         $("#deviceiconimage").show();
         $("#nodeDeviceRow").show();
     }
@@ -238,7 +235,6 @@
         $("#nodeDeviceRow").hide();
         $("#deviceiconimage").hide();
         $("#nodeDeviceSearchRow").show();
-        $("#nodeMapLinkRow").show();
 
         // Reset device style if we were using the device image
         if(($("#nodestyle").val() == "image" || $("#nodestyle").val() == "circularImage") && !$("#nodeimage").val()){
@@ -257,14 +253,16 @@
 
         $("#node-saveButton").off("click");
 
-        if($("#device_id").val()) {
-            node.title = $("#device_id").val();
-        } else if($("#maplink").val()) {
-            node.title = "map:" + $("#maplink").val();
+        if($("#maplink").val()) {
+            node.title = "Link to map " + $("#maplink").val();
+        } else if($("#device_id").val()) {
+            node.title = "Device " + $("#device_id").val();
         } else {
             node.title = '';
         }
         // Update the node with the selected values on success and run the callback
+        node.device_id = $("#device_id").val();
+        node.linked_map_id = $("#maplink").val();
         node.label = $("#nodelabel").val();
         node.shape = $("#nodestyle").val();
         node.font.face = $("#nodetextface").val();
@@ -275,18 +273,24 @@
         node.color.border = node.color.highlight.border = node.color.hover.border = $("#nodecolourbdr").val();
         node.size = $("#nodesize").val();
         if(node.shape == "image" || node.shape == "circularImage") {
-            if($("#nodeimage").val()) {
-                node.image = {unselected: custom_image_base + $("#nodeimage").val()};
-            } else {
+            let imgsrc = $("#nodeimage").val();
+            if(! imgsrc) {
                 node.image = {unselected: $("#device_image").val()};
+            } else if(isNaN(imgsrc)) {
+                node.image = {unselected: custom_image_base + imgsrc};
+            } else {
+                node.image = {unselected: '{{ route('maps.nodeimage.show', ['image' => '?' ]) }}'.replace("?", imgsrc)};
             }
         } else {
-            node.image = {};
+            node.image = undefined;
         }
         if(node.shape == "icon") {
             node.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt($("#nodeicon").val(), 16)), size: $("#nodesize").val(), color: node.color.border};
         } else {
             node.icon = {};
+        }
+        if(! ["ellipse", "circle", "database", "box", "text"].includes(node.style)) {
+            node.font.background = "#FFFFFF";
         }
         if(node.add) {
             delete node.add;
@@ -322,19 +326,17 @@
         $("#devicesearch").val('');
         $("#devicesearch").trigger('change');
 
-        if(nodeconf.id in node_device_map) {
+        $("#device_id").val(nodeconf.device_id || '');
+        if(nodeconf.device_id) {
             // Nodes is linked to a device
-            $("#device_id").val(node_device_map[nodeconf.id].device_id);
             $("#device_name").text(node_device_map[nodeconf.id].device_name);
             // Hide device selection row
             $("#nodeDeviceSearchRow").hide();
-            $("#nodeMapLinkRow").hide();
             // Show device image as an option
             $("#deviceiconimage").show();
             $("#device_image").val(node_device_map[nodeconf.id].device_image);
         } else {
             // Node is not linked to a device
-            $("#device_id").val("");
             $("#device_name").text("");
             // Hide the selected device row
             $("#nodeDeviceRow").hide();
@@ -342,10 +344,9 @@
             $("#deviceiconimage").hide();
             $("#device_image").val("");
         }
-        if(nodeconf.title && nodeconf.title.toString().startsWith("map:")) {
+        if(nodeconf.linked_map_id) {
             // Hide device selection row
-            $("#nodeDeviceSearchRow").hide();
-            $("#maplink").val(nodeconf.title.replace("map:",""));
+            $("#maplink").val(nodeconf.linked_map_id);
         } else {
             $("#maplink").val("");
         }
@@ -357,6 +358,8 @@
             $("#nodeImageRow").show();
             if(nodeconf.image.unselected.indexOf(custom_image_base) == 0) {
                 $("#nodeimage").val(nodeconf.image.unselected.replace(custom_image_base, ""));
+            } else if(nodeconf.image.unselected.indexOf(nodeimage_base) == 0) {
+                $("#nodeimage").val(nodeconf.image.unselected.replace(nodeimage_base, ""));
             } else {
                 $("#nodeimage").val("");
             }
@@ -417,7 +420,12 @@
             newnodeconf.icon = {};
         }
         if(newnodeconf.shape == "image" || newnodeconf.shape == "circularImage") {
-            newnodeconf.image = {unselected: custom_image_base + $("#nodeimage").val()};
+            let imgsrc = $("#nodeimage").val();
+            if(isNaN(imgsrc)) {
+                newnodeconf.image = {unselected: custom_image_base + imgsrc};
+            } else {
+                newnodeconf.image = {unselected: '{{ route('maps.nodeimage.show', ['image' => '?' ]) }}'.replace("?", imgsrc)};
+            }
         } else {
             delete newnodeconf.image;
         }

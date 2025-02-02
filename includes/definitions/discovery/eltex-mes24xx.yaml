@@ -17,6 +17,11 @@ modules:
                 total: ARICENT-ISS-MIB::issSwitchMaxRAMUsage
                 used: ARICENT-ISS-MIB::issSwitchCurrentRAMUsage
                 descr: 'System Memory'
+    storage:
+        data:
+            -
+                descr: Internal Flash
+                percent_used: ARICENT-ISS-MIB::issSwitchCurrentFlashUsage
     sensors:
         pre-cache:
             data:

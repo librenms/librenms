@@ -19,18 +19,22 @@
  *
  * @copyright  2022 PipoCanaja
  * @author     PipoCanaja
+ * @author     Peca Nesovanovic
  */
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\EntPhysical;
+use App\Models\Transceiver;
 use Illuminate\Support\Collection;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS\Shared\Radlan;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
-class EltexMes23xx extends Radlan
+class EltexMes23xx extends Radlan implements TransceiverDiscovery
 {
     use EntityMib {
         EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
@@ -41,7 +45,7 @@ class EltexMes23xx extends Radlan
         $inventory = $this->discoverBaseEntityPhysical();
 
         // add in transceivers
-        $trans = SnmpQuery::hideMib()->enumStrings()->walk('ELTEX-MES-PHYSICAL-DESCRIPTION-MIB::eltPhdTransceiverInfoTable')->table(1);
+        $trans = SnmpQuery::hideMib()->enumStrings()->cache()->walk('ELTEX-MES-PHYSICAL-DESCRIPTION-MIB::eltPhdTransceiverInfoTable')->table(1);
         $ifIndexToEntIndexMap = array_flip($this->getIfIndexEntPhysicalMap());
 
         foreach ($trans as $ifIndex => $data) {
@@ -62,6 +66,25 @@ class EltexMes23xx extends Radlan
         }
 
         return $inventory;
+    }
+
+    public function discoverTransceivers(): Collection
+    {
+        return SnmpQuery::hideMib()->enumStrings()->cache()->walk('ELTEX-MES-PHYSICAL-DESCRIPTION-MIB::eltPhdTransceiverInfoTable')
+            ->mapTable(function ($data, $ifIndex) {
+                return new Transceiver([
+                    'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
+                    'index' => $ifIndex,
+                    'connector' => $data['eltPhdTransceiverInfoConnectorType'] ? strtoupper($data['eltPhdTransceiverInfoConnectorType']) : null,
+                    'distance' => $data['eltPhdTransceiverInfoTransferDistance'] ?? null,
+                    'model' => $data['eltPhdTransceiverInfoPartNumber'] ?? null,
+                    'revision' => $data['eltPhdTransceiverInfoVendorRev'] ?? null,
+                    'serial' => $data['eltPhdTransceiverInfoSerialNumber'] ?? null,
+                    'vendor' => $data['eltPhdTransceiverInfoVendorName'] ?? null,
+                    'wavelength' => $data['eltPhdTransceiverInfoWaveLength'] ?? null,
+                    'entity_physical_index' => $ifIndex,
+                ]);
+            });
     }
 
     /**

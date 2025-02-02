@@ -50,7 +50,6 @@ foreach ($contacts['emu2_contacts'] as $id => $contact) {
     }
 
     discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $currentstate, 'snmp', $index);
-    create_sensor_to_state_index($device, $state_name, $index);
 }
 
 // Output Relay discovery
@@ -80,7 +79,6 @@ foreach ($relays['emu2_relays'] as $id => $relay) {
     }
 
     discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $currentstate, 'snmp', $index);
-    create_sensor_to_state_index($device, $state_name, $index);
 }
 
 // Outlet discovery
@@ -110,5 +108,4 @@ foreach ($outlets['emu2_outlets'] as $id => $outlet) {
     }
 
     discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $currentstate, 'snmp', $index);
-    create_sensor_to_state_index($device, $state_name, $index);
 }

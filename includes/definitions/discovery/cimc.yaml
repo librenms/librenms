@@ -1,9 +1,13 @@
-mib: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB:CISCO-UNIFIED-COMPUTING-PROCESSOR-MIB:CISCO-UNIFIED-COMPUTING-MEMORY-MIB
+mib: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB:CISCO-UNIFIED-COMPUTING-PROCESSOR-MIB:CISCO-UNIFIED-COMPUTING-MEMORY-MIB:CISCO-UNIFIED-COMPUTING-STORAGE-MIB:CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB
 modules:
     os:
-        sysDescr_regex: '/Firmware Version (?<version>[^\s]+)/'
-        hardware: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeBoardModel.1
-        serial: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeBoardSerial.1
+        sysDescr_regex: '/Firmware Version (?<version>[^\s]+\))/'
+        hardware: 
+            - CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeBoardModel.1
+            - CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeBoardModel.0
+        serial: 
+            - CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeBoardSerial.1
+            - CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeBoardSerial.0
     sensors:
         current:
             data:
@@ -75,4 +79,209 @@ modules:
                     warn_limit: 40
                     descr: 'CPU {{ $index }} Temperature'
                     index: 'cpu.{{ $index }}'
-
+        state:
+            data:
+                -
+                    oid: cucsStorageLocalDiskTable
+                    value: cucsStorageLocalDiskOperability
+                    num_oid: '.1.3.6.1.4.1.9.9.719.1.45.4.1.9.{{ $index }}'
+                    descr: 'Physical Drive {{ $cucsStorageLocalDiskRn }}'
+                    index: 'local-disk-operability.{{ $index }}'
+                    group: 'Local Storage'
+                    skip_values:
+                        -
+                            oid: cucsStorageLocalDiskOperability
+                            op: '='
+                            value: '6'
+                    states:
+                        - { value:  0, generic: 3, graph: 0, descr: unknown }
+                        - { value:  1, generic: 0, graph: 0, descr: operable }
+                        - { value:  2, generic: 2, graph: 0, descr: inoperable }
+                        - { value:  3, generic: 2, graph: 0, descr: degraded }
+                        - { value:  4, generic: 2, graph: 0, descr: poweroff }
+                        - { value:  5, generic: 2, graph: 0, descr: powerproblem }
+                        - { value:  6, generic: 3, graph: 0, descr: removed }
+                        - { value:  7, generic: 2, graph: 0, descr: voltage problem }
+                        - { value:  8, generic: 2, graph: 0, descr: thermal problem }
+                        - { value:  9, generic: 2, graph: 0, descr: performance problem }
+                        - { value:  10, generic: 2, graph: 0, descr: accessibility problem }
+                        - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
+                        - { value:  13, generic: 1, graph: 0, descr: disabled }
+                -
+                    oid: cucsStorageLocalLunTable
+                    value: cucsStorageLocalLunOperability
+                    num_oid: '.1.3.6.1.4.1.9.9.719.1.45.8.1.9.{{ $index }}'
+                    descr: 'Virtual Drive {{ $cucsStorageLocalLunRn }}'
+                    index: 'virtual-drive-operability.{{ $index }}'
+                    group: 'Local Storage'
+                    states:
+                        - { value:  0, generic: 3, graph: 0, descr: unknown }
+                        - { value:  1, generic: 0, graph: 0, descr: operable }
+                        - { value:  2, generic: 2, graph: 0, descr: inoperable }
+                        - { value:  3, generic: 2, graph: 0, descr: degraded }
+                        - { value:  4, generic: 2, graph: 0, descr: poweroff }
+                        - { value:  5, generic: 2, graph: 0, descr: powerproblem }
+                        - { value:  6, generic: 3, graph: 0, descr: removed }
+                        - { value:  7, generic: 2, graph: 0, descr: voltage problem }
+                        - { value:  8, generic: 2, graph: 0, descr: thermal problem }
+                        - { value:  9, generic: 2, graph: 0, descr: performance problem }
+                        - { value:  10, generic: 2, graph: 0, descr: accessibility problem }
+                        - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
+                        - { value:  13, generic: 1, graph: 0, descr: disabled }
+                -
+                    oid: cucsStorageControllerTable
+                    value: cucsStorageControllerOperability
+                    num_oid: '.1.3.6.1.4.1.9.9.719.1.45.1.1.7.{{ $index }}'
+                    descr: 'Storage Controller {{ $index }}'
+                    index: 'storage-controller-operability.{{ $index }}'
+                    group: 'Storage Controller'
+                    states:
+                        - { value:  0, generic: 3, graph: 0, descr: unknown }
+                        - { value:  1, generic: 0, graph: 0, descr: operable }
+                        - { value:  2, generic: 2, graph: 0, descr: inoperable }
+                        - { value:  3, generic: 2, graph: 0, descr: degraded }
+                        - { value:  4, generic: 2, graph: 0, descr: poweroff }
+                        - { value:  5, generic: 2, graph: 0, descr: powerproblem }
+                        - { value:  6, generic: 3, graph: 0, descr: removed }
+                        - { value:  7, generic: 2, graph: 0, descr: voltage problem }
+                        - { value:  8, generic: 2, graph: 0, descr: thermal problem }
+                        - { value:  9, generic: 2, graph: 0, descr: performance problem }
+                        - { value:  10, generic: 2, graph: 0, descr: accessibility problem }
+                        - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
+                        - { value:  13, generic: 1, graph: 0, descr: disabled }
+                -
+                    oid: cucsStorageFlexFlashControllerTable
+                    value: cucsStorageFlexFlashControllerOperability
+                    num_oid: '.1.3.6.1.4.1.9.9.719.1.45.35.1.11.{{ $index }}'
+                    descr: 'Flex Flash Controller {{ $index }}'
+                    index: 'flexflash-controller-operability.{{ $index }}'
+                    group: 'Storage Controller'
+                    states:
+                        - { value:  0, generic: 3, graph: 0, descr: unknown }
+                        - { value:  1, generic: 0, graph: 0, descr: operable }
+                        - { value:  2, generic: 2, graph: 0, descr: inoperable }
+                        - { value:  3, generic: 2, graph: 0, descr: degraded }
+                        - { value:  4, generic: 2, graph: 0, descr: poweroff }
+                        - { value:  5, generic: 2, graph: 0, descr: powerproblem }
+                        - { value:  6, generic: 3, graph: 0, descr: removed }
+                        - { value:  7, generic: 2, graph: 0, descr: voltage problem }
+                        - { value:  8, generic: 2, graph: 0, descr: thermal problem }
+                        - { value:  9, generic: 2, graph: 0, descr: performance problem }
+                        - { value:  10, generic: 2, graph: 0, descr: accessibility problem }
+                        - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
+                        - { value:  13, generic: 1, graph: 0, descr: disabled }
+                -
+                    oid: cucsStorageRaidBatteryTable
+                    value: cucsStorageRaidBatteryOperability
+                    num_oid: '.1.3.6.1.4.1.9.9.719.1.45.11.1.9.{{ $index }}'
+                    descr: 'RAID Battery {{ $index }}'
+                    index: 'raid-battery-operability.{{ $index }}'
+                    group: 'Storage Controller'
+                    states:
+                        - { value:  0, generic: 3, graph: 0, descr: unknown }
+                        - { value:  1, generic: 0, graph: 0, descr: operable }
+                        - { value:  2, generic: 2, graph: 0, descr: inoperable }
+                        - { value:  3, generic: 2, graph: 0, descr: degraded }
+                        - { value:  4, generic: 2, graph: 0, descr: poweroff }
+                        - { value:  5, generic: 2, graph: 0, descr: powerproblem }
+                        - { value:  6, generic: 3, graph: 0, descr: removed }
+                        - { value:  7, generic: 2, graph: 0, descr: voltage problem }
+                        - { value:  8, generic: 2, graph: 0, descr: thermal problem }
+                        - { value:  9, generic: 2, graph: 0, descr: performance problem }
+                        - { value:  10, generic: 2, graph: 0, descr: accessibility problem }
+                        - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
+                        - { value:  13, generic: 1, graph: 0, descr: disabled }
+                -
+                    oid: cucsEquipmentFanTable
+                    value: cucsEquipmentFanOperability
+                    num_oid: '.1.3.6.1.4.1.9.9.719.1.15.12.1.10.{{ $index }}'
+                    descr: 'Module {{ $cucsEquipmentFanModule }}/{{ $cucsEquipmentFanRn }}'
+                    index: 'fan-operability.{{ $index }}'
+                    group: 'Fans'
+                    states:
+                        - { value:  0, generic: 3, graph: 0, descr: unknown }
+                        - { value:  1, generic: 0, graph: 0, descr: operable }
+                        - { value:  2, generic: 2, graph: 0, descr: inoperable }
+                        - { value:  3, generic: 2, graph: 0, descr: degraded }
+                        - { value:  4, generic: 2, graph: 0, descr: poweroff }
+                        - { value:  5, generic: 2, graph: 0, descr: powerproblem }
+                        - { value:  6, generic: 3, graph: 0, descr: removed }
+                        - { value:  7, generic: 2, graph: 0, descr: voltage problem }
+                        - { value:  8, generic: 2, graph: 0, descr: thermal problem }
+                        - { value:  9, generic: 2, graph: 0, descr: performance problem }
+                        - { value:  10, generic: 2, graph: 0, descr: accessibility problem }
+                        - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
+                        - { value:  13, generic: 1, graph: 0, descr: disabled }
+                -
+                    oid: cucsEquipmentPsuTable
+                    value: cucsEquipmentPsuOperability
+                    num_oid: '.1.3.6.1.4.1.9.9.719.1.15.56.1.8.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    index: 'power-supply-operability.{{ $index }}'
+                    group: 'Power Supply'
+                    states:
+                        - { value:  0, generic: 3, graph: 0, descr: unknown }
+                        - { value:  1, generic: 0, graph: 0, descr: operable }
+                        - { value:  2, generic: 2, graph: 0, descr: inoperable }
+                        - { value:  3, generic: 2, graph: 0, descr: degraded }
+                        - { value:  4, generic: 2, graph: 0, descr: poweroff }
+                        - { value:  5, generic: 2, graph: 0, descr: powerproblem }
+                        - { value:  6, generic: 3, graph: 0, descr: removed }
+                        - { value:  7, generic: 2, graph: 0, descr: voltage problem }
+                        - { value:  8, generic: 2, graph: 0, descr: thermal problem }
+                        - { value:  9, generic: 2, graph: 0, descr: performance problem }
+                        - { value:  10, generic: 2, graph: 0, descr: accessibility problem }
+                        - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
+                        - { value:  13, generic: 1, graph: 0, descr: disabled }
+                -
+                    oid: cucsMemoryUnitTable
+                    value: cucsMemoryUnitOperability
+                    num_oid: '.1.3.6.1.4.1.9.9.719.1.30.11.1.14.{{ $index }}'
+                    descr: '{{ $cucsMemoryUnitLocation }}'
+                    index: 'memory-operability.{{ $index }}'
+                    group: 'Memory'
+                    skip_values:
+                        -
+                            oid: cucsMemoryUnitOperability
+                            op: '='
+                            value: '0'
+                    states:
+                        - { value:  0, generic: 3, graph: 0, descr: unknown }
+                        - { value:  1, generic: 0, graph: 0, descr: operable }
+                        - { value:  2, generic: 2, graph: 0, descr: inoperable }
+                        - { value:  3, generic: 2, graph: 0, descr: degraded }
+                        - { value:  4, generic: 2, graph: 0, descr: poweroff }
+                        - { value:  5, generic: 2, graph: 0, descr: powerproblem }
+                        - { value:  6, generic: 3, graph: 0, descr: removed }
+                        - { value:  7, generic: 2, graph: 0, descr: voltage problem }
+                        - { value:  8, generic: 2, graph: 0, descr: thermal problem }
+                        - { value:  9, generic: 2, graph: 0, descr: performance problem }
+                        - { value:  10, generic: 2, graph: 0, descr: accessibility problem }
+                        - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
+                        - { value:  13, generic: 1, graph: 0, descr: disabled }
+                -
+                    oid: cucsProcessorUnitTable
+                    value: cucsProcessorUnitOperability
+                    num_oid: '.1.3.6.1.4.1.9.9.719.1.41.9.1.10.{{ $index }}'
+                    descr: 'Proccessor {{ $cucsProcessorUnitRn }}'
+                    index: 'proccessor-operability.{{ $index }}'
+                    group: 'Proccessor'
+                    skip_values:
+                        -
+                            oid: cucsProcessorUnitPresence
+                            op: '='
+                            value: '11'
+                    states:
+                        - { value:  0, generic: 3, graph: 0, descr: unknown }
+                        - { value:  1, generic: 0, graph: 0, descr: operable }
+                        - { value:  2, generic: 2, graph: 0, descr: inoperable }
+                        - { value:  3, generic: 2, graph: 0, descr: degraded }
+                        - { value:  4, generic: 2, graph: 0, descr: poweroff }
+                        - { value:  5, generic: 2, graph: 0, descr: powerproblem }
+                        - { value:  6, generic: 3, graph: 0, descr: removed }
+                        - { value:  7, generic: 2, graph: 0, descr: voltage problem }
+                        - { value:  8, generic: 2, graph: 0, descr: thermal problem }
+                        - { value:  9, generic: 2, graph: 0, descr: performance problem }
+                        - { value:  10, generic: 2, graph: 0, descr: accessibility problem }
+                        - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
+                        - { value:  13, generic: 1, graph: 0, descr: disabled }

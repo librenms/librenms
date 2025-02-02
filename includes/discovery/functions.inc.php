@@ -20,6 +20,7 @@ use App\Models\Ipv4Network;
 use App\Models\Ipv6Address;
 use App\Models\Ipv6Network;
 use App\Models\Port;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Device\YamlDiscovery;
@@ -30,6 +31,7 @@ use LibreNMS\OS;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
+use LibreNMS\Util\Number;
 use LibreNMS\Util\UserFuncHelper;
 
 /**
@@ -43,13 +45,13 @@ use LibreNMS\Util\UserFuncHelper;
  */
 function discover_new_device($hostname, $device, $method, $interface = null)
 {
-    d_echo("discovering $hostname\n");
+    Log::debug("discovering $hostname\n");
 
     if (IP::isValid($hostname)) {
         $ip = $hostname;
         if (! Config::get('discovery_by_ip', false)) {
-            d_echo('Discovery by IP disabled, skipping ' . $hostname);
-            log_event("$method discovery of " . $hostname . ' failed - Discovery by IP disabled', $device['device_id'], 'discovery', 4);
+            Log::debug('Discovery by IP disabled, skipping ' . $hostname);
+            Eventlog::log("$method discovery of " . $hostname . ' failed - Discovery by IP disabled', $device['device_id'], 'discovery', Severity::Warning);
 
             return false;
         }
@@ -63,30 +65,30 @@ function discover_new_device($hostname, $device, $method, $interface = null)
 
         $ip = gethostbyname($hostname);
         if ($ip == $hostname) {
-            d_echo("name lookup of $hostname failed\n");
-            log_event("$method discovery of " . $hostname . ' failed - Check name lookup', $device['device_id'], 'discovery', 5);
+            Log::debug("name lookup of $hostname failed\n");
+            Eventlog::log("$method discovery of " . $hostname . ' failed - Check name lookup', $device['device_id'], 'discovery', Severity::Error);
 
             return false;
         }
     } else {
-        d_echo("Discovery failed: '$hostname' is not a valid ip or dns name\n");
+        Log::debug("Discovery failed: '$hostname' is not a valid ip or dns name\n");
 
         return false;
     }
 
-    d_echo("ip lookup result: $ip\n");
+    Log::debug("ip lookup result: $ip\n");
 
     $hostname = rtrim($hostname, '.'); // remove trailing dot
 
     $ip = IP::parse($ip, true);
     if ($ip->inNetworks(Config::get('autodiscovery.nets-exclude'))) {
-        d_echo("$ip in an excluded network - skipping\n");
+        Log::debug("$ip in an excluded network - skipping\n");
 
         return false;
     }
 
     if (! $ip->inNetworks(Config::get('nets'))) {
-        d_echo("$ip not in a matched network - skipping\n");
+        Log::debug("$ip not in a matched network - skipping\n");
 
         return false;
     }
@@ -154,9 +156,9 @@ function discover_device(&$device, $force_module = false)
     foreach ($discovery_modules as $module => $module_status) {
         $os_module_status = Config::getOsSetting($device['os'], "discovery_modules.$module");
         $device_module_status = DeviceCache::getPrimary()->getAttrib('discover_' . $module);
-        d_echo('Modules status: Global' . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
-        d_echo('OS' . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
-        d_echo('Device' . ($device_module_status !== null ? ($device_module_status ? '+ ' : '- ') : '  '));
+        Log::debug('Modules status: Global' . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
+        Log::debug('OS' . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
+        Log::debug('Device' . ($device_module_status !== null ? ($device_module_status ? '+ ' : '- ') : '  '));
         if ($force_module === true ||
             $device_module_status ||
             ($os_module_status && $device_module_status === null) ||
@@ -206,7 +208,7 @@ function discover_sensor($unused, $class, $device, $oid, $index, $type, $descr, 
     $low_warn_limit = set_null($low_warn_limit);
     $warn_limit = set_null($warn_limit);
     $high_limit = set_null($high_limit);
-    $current = cast_number($current);
+    $current = Number::cast($current);
 
     if (! is_numeric($divisor)) {
         $divisor = 1;
@@ -239,14 +241,14 @@ function discover_sensor($unused, $class, $device, $oid, $index, $type, $descr, 
 
 function discover_juniAtmVp(&$valid, $device, $port_id, $vp_id, $vp_descr)
 {
-    d_echo("Discover Juniper ATM VP: $port_id, $vp_id, $vp_descr\n");
+    Log::debug("Discover Juniper ATM VP: $port_id, $vp_id, $vp_descr\n");
 
     if (dbFetchCell('SELECT COUNT(*) FROM `juniAtmVp` WHERE `port_id` = ? AND `vp_id` = ?', [$port_id, $vp_id]) == '0') {
         $inserted = dbInsert(['port_id' => $port_id, 'vp_id' => $vp_id, 'vp_descr' => $vp_descr], 'juniAtmVp');
-        d_echo("( $inserted inserted )\n");
+        Log::debug("( $inserted inserted )\n");
 
         // FIXME vv no $device!
-        log_event('Juniper ATM VP Added: port ' . $port_id . ' vp ' . $vp_id . ' descr' . $vp_descr, $device, 'juniAtmVp', 3, $inserted);
+        Eventlog::log('Juniper ATM VP Added: port ' . $port_id . ' vp ' . $vp_id . ' descr' . $vp_descr, $device, 'juniAtmVp', 3, $inserted);
     } else {
         echo '.';
     }
@@ -260,7 +262,7 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
 {
     global $link_exists;
 
-    d_echo("Discover link: $local_port_id, $protocol, $remote_port_id, $remote_hostname, $remote_port, $remote_platform, $remote_version, $remote_device_id\n");
+    Log::debug("Discover link: $local_port_id, $protocol, $remote_port_id, $remote_hostname, $remote_port, $remote_platform, $remote_version, $remote_device_id\n");
 
     if (dbFetchCell(
         'SELECT COUNT(*) FROM `links` WHERE `remote_hostname` = ? AND `local_port_id` = ? AND `protocol` = ? AND `remote_port` = ?',
@@ -289,7 +291,7 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
         $inserted = dbInsert($insert_data, 'links');
 
         echo '+';
-        d_echo("( $inserted inserted )");
+        Log::debug("( $inserted inserted )");
     } else {
         $sql = 'SELECT `id`,`local_device_id`,`remote_platform`,`remote_version`,`remote_device_id`,`remote_port_id` FROM `links`';
         $sql .= ' WHERE `remote_hostname` = ? AND `local_port_id` = ? AND `protocol` = ? AND `remote_port` = ?';
@@ -310,58 +312,13 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
         } else {
             $updated = dbUpdate($update_data, 'links', '`id` = ?', [$id]);
             echo 'U';
-            d_echo("( $updated updated )");
+            Log::debug("( $updated updated )");
         }//end if
     }//end if
     $link_exists[$local_port_id][$remote_hostname][$remote_port] = 1;
 }
 
 //end discover_link()
-
-function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, $units, $used = null)
-{
-    if (ignore_storage($device['os'], $descr)) {
-        return;
-    }
-    d_echo("Discover Storage: $index, $type, $mib, $descr, $size, $units, $used\n");
-
-    if ($descr && $size > '0') {
-        $storage = dbFetchRow('SELECT * FROM `storage` WHERE `storage_index` = ? AND `device_id` = ? AND `storage_mib` = ?', [$index, $device['device_id'], $mib]);
-        if (empty($storage)) {
-            if (Config::getOsSetting($device['os'], 'storage_perc_warn')) {
-                $perc_warn = Config::getOsSetting($device['os'], 'storage_perc_warn');
-            } else {
-                $perc_warn = Config::get('storage_perc_warn', 60);
-            }
-
-            dbInsert(
-                [
-                    'device_id' => $device['device_id'],
-                    'storage_descr' => $descr,
-                    'storage_index' => $index,
-                    'storage_mib' => $mib,
-                    'storage_type' => $type,
-                    'storage_units' => $units,
-                    'storage_size' => $size,
-                    'storage_used' => $used,
-                    'storage_perc_warn' => $perc_warn,
-                ],
-                'storage'
-            );
-
-            echo '+';
-        } else {
-            $updated = dbUpdate(['storage_descr' => $descr, 'storage_type' => $type, 'storage_units' => $units, 'storage_size' => $size], 'storage', '`device_id` = ? AND `storage_index` = ? AND `storage_mib` = ?', [$device['device_id'], $index, $mib]);
-            if ($updated) {
-                echo 'U';
-            } else {
-                echo '.';
-            }
-        }//end if
-
-        $valid[$mib][$index] = 1;
-    }//end if
-}
 
 function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen, $ipv6_origin, $context_name = '')
 {
@@ -382,7 +339,7 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
     ])->value('port_id');
 
     if ($port_id && $ipv6_prefixlen > '0' && $ipv6_prefixlen < '129' && $ipv6_compressed != '::1') {
-        d_echo('IPV6: Found port id: ' . $port_id);
+        Log::debug('IPV6: Found port id: ' . $port_id);
 
         $ipv6netDB = Ipv6Network::updateOrCreate([
             'ipv6_network' => $ipv6_network,
@@ -391,13 +348,13 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
         ]);
 
         if ($ipv6netDB->wasChanged()) {
-            d_echo('IPV6: Update DB ipv6_networks');
+            Log::debug('IPV6: Update DB ipv6_networks');
         }
 
         $ipv6_network_id = Ipv6Network::where('ipv6_network', $ipv6_network)->where('context_name', $context_name)->value('ipv6_network_id');
 
         if ($ipv6_network_id) {
-            d_echo('IPV6: Found network id: ' . $ipv6_network_id);
+            Log::debug('IPV6: Found network id: ' . $ipv6_network_id);
 
             $ipv6adrDB = Ipv6Address::updateOrCreate([
                 'ipv6_address' => $ipv6_address,
@@ -411,7 +368,7 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
             ]);
 
             if ($ipv6adrDB->wasChanged()) {
-                d_echo('IPV6: Update DB ipv6_addresses');
+                Log::debug('IPV6: Update DB ipv6_addresses');
             }
 
             $full_address = "$ipv6_address/$ipv6_prefixlen";
@@ -440,14 +397,14 @@ function discover_process_ipv4(&$valid_v4, $device, int $ifIndex, $ipv4_address,
     try {
         $ipv4 = new IPv4($ipv4_address . '/' . $cidr);
     } catch (InvalidIpException $e) {
-        d_echo('Invalid data: ' . $ipv4_address);
+        Log::debug('Invalid data: ' . $ipv4_address);
 
         return;
     }
     $ipv4_network = $ipv4->getNetworkAddress() . '/' . $ipv4->cidr;
 
     if ($ipv4_address != '0.0.0.0' && $ifIndex > 0) {
-        $port_id = get_port_by_index_cache($device['device_id'], $ifIndex)['port_id'];
+        $port_id = \App\Facades\PortCache::getIdFromIfIndex($ifIndex, $device['device_id']);
 
         if (is_numeric($port_id)) {
             $dbIpv4Net = Ipv4Network::updateOrCreate([
@@ -486,7 +443,7 @@ function discover_process_ipv4(&$valid_v4, $device, int $ifIndex, $ipv4_address,
             $full_address = $ipv4_address . '/' . $cidr . '|' . $ifIndex;
             $valid_v4[$full_address] = 1;
         } else {
-            d_echo('No port id found for ifindex: ' . $ifIndex . PHP_EOL);
+            Log::debug('No port id found for ifindex: ' . $ifIndex . PHP_EOL);
         }
     }
 }
@@ -505,7 +462,7 @@ function check_entity_sensor($string, $device)
 
     foreach ($fringe as $bad) {
         if (preg_match($bad . 'i', $string)) {
-            d_echo("Ignored entity sensor: $bad : $string");
+            Log::debug("Ignored entity sensor: $bad : $string");
 
             return false;
         }
@@ -588,42 +545,6 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
 }
 
 /**
- * Should we ignore this storage device based on teh description? (usually the mount path or drive)
- *
- * @param  string  $os  The OS of the device
- * @param  string  $descr  The description of the storage
- * @return bool
- */
-function ignore_storage($os, $descr)
-{
-    foreach (Config::getCombined($os, 'ignore_mount') as $im) {
-        if ($im == $descr) {
-            d_echo("ignored $descr (matched: $im)\n");
-
-            return true;
-        }
-    }
-
-    foreach (Config::getCombined($os, 'ignore_mount_string') as $ims) {
-        if (Str::contains($descr, $ims)) {
-            d_echo("ignored $descr (matched: $ims)\n");
-
-            return true;
-        }
-    }
-
-    foreach (Config::getCombined($os, 'ignore_mount_regexp') as $imr) {
-        if (preg_match($imr, $descr)) {
-            d_echo("ignored $descr (matched: $imr)\n");
-
-            return true;
-        }
-    }
-
-    return false;
-}
-
-/**
  * @param  OS  $os
  * @param  $sensor_type
  * @param  $pre_cache
@@ -639,8 +560,8 @@ function discovery_process($os, $sensor_class, $pre_cache)
             $sensor_options = $discovery[$sensor_class]['options'];
         }
 
-        d_echo("Dynamic Discovery ($sensor_class): ");
-        d_echo($discovery[$sensor_class]);
+        Log::debug("Dynamic Discovery ($sensor_class): ");
+        Log::debug($discovery[$sensor_class]);
 
         foreach ($discovery[$sensor_class]['data'] as $data) {
             $tmp_name = $data['oid'];
@@ -651,8 +572,8 @@ function discovery_process($os, $sensor_class, $pre_cache)
 
             $raw_data = (array) $pre_cache[$tmp_name];
 
-            d_echo("Data $tmp_name: ");
-            d_echo($raw_data);
+            Log::debug("Data $tmp_name: ");
+            Log::debug($raw_data);
             $count = 0;
 
             foreach ($raw_data as $index => $snmp_data) {
@@ -695,14 +616,14 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     try {
                         $data['num_oid'] = YamlDiscovery::computeNumericalOID($os, $data);
                     } catch (\Exception $e) {
-                        d_echo('Error: We cannot find a numerical OID for ' . $data['value'] . '. Skipping this one...');
+                        Log::debug('Error: We cannot find a numerical OID for ' . $data['value'] . '. Skipping this one...');
                         $skippedFromYaml = true;
                         // Because we don't have a num_oid, we have no way to add this sensor.
                     }
                 }
 
                 if ($skippedFromYaml === false && is_numeric($value)) {
-                    d_echo("Sensor fetched value: $value\n");
+                    Log::debug("Sensor fetched value: $value\n");
 
                     // process the oid (num_oid will contain index or str2num replacement calls)
                     $oid = trim(YamlDiscovery::replaceValues('num_oid', $index, null, $data, []));
@@ -713,9 +634,35 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     // process the group
                     $group = trim(YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache)) ?: null;
 
-                    $divisor = (int) (isset($data['divisor']) ? (YamlDiscovery::replaceValues('divisor', $index, $count, $data, $pre_cache) ?: 1) : ($sensor_options['divisor'] ?? 1));
-                    $multiplier = (int) (isset($data['multiplier']) ? (YamlDiscovery::replaceValues('multiplier', $index, $count, $data, $pre_cache) ?: 1) : ($sensor_options['multiplier'] ?? 1));
+                    // process the divisor - cannot be 0
+                    if (isset($data['divisor'])) {
+                        $divisor = (int) YamlDiscovery::replaceValues('divisor', $index, $count, $data, $pre_cache);
+                    } elseif (isset($sensor_options['divisor'])) {
+                        $divisor = (int) $sensor_options['divisor'];
+                    } else {
+                        $divisor = 1;
+                    }
+                    if ($divisor == 0) {
+                        Log::warning('Divisor is not a nonzero number, defaulting to 1');
+                        $divisor = 1;
+                    }
 
+                    // process the multiplier - zero is valid
+                    if (isset($data['multiplier'])) {
+                        $multiplier = YamlDiscovery::replaceValues('multiplier', $index, $count, $data, $pre_cache);
+                    } elseif (isset($sensor_options['multiplier'])) {
+                        $multipler = $sensor_options['multiplier'];
+                    } else {
+                        $multiplier = 1;
+                    }
+                    if (is_numeric($multiplier)) {
+                        $multiplier = (int) $multiplier;
+                    } else {
+                        Log::warning('Multiplier $multiplier is not a valid number, defaulting to 1');
+                        $multiplier = 1;
+                    }
+
+                    // process the limits
                     $limits = ['low_limit', 'low_warn_limit', 'warn_limit', 'high_limit'];
                     foreach ($limits as $limit) {
                         if (isset($data[$limit]) && is_numeric($data[$limit])) {
@@ -767,10 +714,6 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     }
 
                     discover_sensor(null, $sensor_class, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function, $group, $data['rrd_type'] ?? 'GAUGE');
-
-                    if ($sensor_class === 'state') {
-                        create_sensor_to_state_index($device, $sensor_name, $uindex);
-                    }
                 }
             }
         }
@@ -808,7 +751,7 @@ function sensors($types, $os, $pre_cache = [])
 
 function build_bgp_peers($device, $data, $peer2)
 {
-    d_echo("Peers : $data\n");
+    Log::debug("Peers : $data\n");
     $remove = [
         'ARISTA-BGP4V2-MIB::aristaBgp4V2PeerRemoteAs.1.',
         'ALCATEL-IND1-BGP-MIB::alaBgpPeerAS.',
@@ -849,7 +792,7 @@ function build_bgp_peers($device, $data, $peer2)
                 //if ASN is negative -> overflow int32 -> original number is max(INT32) - min(INT32) + 1 + value
                 $peer_as = 4294967296 + $peer_as;
             }
-            d_echo("Found peer $peer_ip (AS$peer_as)\n");
+            Log::debug("Found peer $peer_ip (AS$peer_as)\n");
             $peerlist[] = [
                 'ip' => $peer_ip,
                 'as' => $peer_as,
@@ -864,8 +807,8 @@ function build_bgp_peers($device, $data, $peer2)
 
 function build_cbgp_peers($device, $peer, $af_data, $peer2)
 {
-    d_echo('afi data :: ');
-    d_echo($af_data);
+    Log::debug('afi data :: ');
+    Log::debug($af_data);
 
     $af_list = [];
     foreach ($af_data as $k => $v) {
@@ -873,7 +816,7 @@ function build_cbgp_peers($device, $peer, $af_data, $peer2)
             [,$k] = explode('.', $k, 2);
         }
 
-        d_echo("AFISAFI = $k\n");
+        Log::debug("AFISAFI = $k\n");
 
         $afisafi_tmp = explode('.', $k);
         if ($device['os_group'] === 'vrp') {
@@ -984,7 +927,7 @@ function can_skip_discovery($sysName, $sysDescr = '', $platform = '')
     if ($sysName) {
         foreach ((array) Config::get('autodiscovery.xdp_exclude.sysname_regexp') as $needle) {
             if (preg_match($needle . 'i', $sysName)) {
-                d_echo("$sysName - regexp '$needle' matches '$sysName' - skipping device discovery \n");
+                Log::debug("$sysName - regexp '$needle' matches '$sysName' - skipping device discovery \n");
 
                 return true;
             }
@@ -994,7 +937,7 @@ function can_skip_discovery($sysName, $sysDescr = '', $platform = '')
     if ($sysDescr) {
         foreach ((array) Config::get('autodiscovery.xdp_exclude.sysdesc_regexp') as $needle) {
             if (preg_match($needle . 'i', $sysDescr)) {
-                d_echo("$sysName - regexp '$needle' matches '$sysDescr' - skipping device discovery \n");
+                Log::debug("$sysName - regexp '$needle' matches '$sysDescr' - skipping device discovery \n");
 
                 return true;
             }
@@ -1004,7 +947,7 @@ function can_skip_discovery($sysName, $sysDescr = '', $platform = '')
     if ($platform) {
         foreach ((array) Config::get('autodiscovery.cdp_exclude.platform_regexp') as $needle) {
             if (preg_match($needle . 'i', $platform)) {
-                d_echo("$sysName - regexp '$needle' matches '$platform' - skipping device discovery \n");
+                Log::debug("$sysName - regexp '$needle' matches '$platform' - skipping device discovery \n");
 
                 return true;
             }
@@ -1088,7 +1031,7 @@ function find_device_id($name = '', $ip = '', $mac_address = '')
         if (count($ids) == 1) {
             return (int) $ids[0];
         } elseif (count($ids) > 1) {
-            d_echo("find_device_id: more than one device found with sysName '$name'.\n");
+            Log::debug("find_device_id: more than one device found with sysName '$name'.\n");
             // don't do anything, try other methods, if any
         }
     }

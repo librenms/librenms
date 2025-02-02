@@ -209,36 +209,17 @@ then you can run the following command to help troubleshoot services.
 These settings are related and should be investigated and set accordingly.
 The below values are not defaults or recommended.
 
-```php
-$config['service_poller_enabled']           = true;
-```
-```php
-$config['service_poller_workers']           = 16;
-```
-```php
-$config['service_poller_frequency']         = 300;
-```
-```php
-$config['service_poller_down_retry']        = 5;
-```
-```php
-$config['service_discovery_enabled']        = true;
-```
-```php
-$config['service_discovery_workers']        = 16;
-```
-```php
-$config['service_discovery_frequency']      = 3600;
-```
-```php
-$config['service_services_enabled']         = true;
-```
-```php
-$config['service_services_workers']         = 16;
-```
-```php
-$config['service_services_frequency']       = 60;
-```
+!!! setting "poller/scheduledtasks"
+    ```bash
+    lnms config:set schedule_type.services dispatcher
+    ```
+
+!!! setting "poller/dispatcherservice"
+    ```bash
+    lnms config:set service_services_workers 16
+    lnms config:set service_discovery_workers 300
+    ```
+Please also see [Dispatcher Service](../Extensions/Dispatcher-Service.md)
 
 ### Service checks polling logic
 

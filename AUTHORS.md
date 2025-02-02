@@ -218,6 +218,7 @@ LibreNMS contributors:
 - Thom Cleary <me@thomcat.rocks> (thomcatdotrocks)
 - Kayck Matias <kayckmatias04@gmail.com> [KayckMatias](https://github.com/KayckMatias/)
 - Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
+- Cas de Reuver <cas@reuver.co> (casdr)
 
 Observium was written by:
 - Adam Armstrong

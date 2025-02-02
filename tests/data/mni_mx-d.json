@@ -7321,14 +7321,14 @@
             "wireless_sensors": [
                 {
                     "sensor_deleted": 0,
-                    "sensor_class": "rate",
+                    "sensor_class": "power",
                     "sensor_index": "0",
-                    "sensor_type": "mni-rx-rate",
-                    "sensor_descr": "MNI Receive Rate",
+                    "sensor_type": "mni-rx",
+                    "sensor_descr": "MNI Receive",
                     "sensor_divisor": 1,
-                    "sensor_multiplier": 1000000,
+                    "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
-                    "sensor_current": 106000000,
+                    "sensor_current": -42,
                     "sensor_prev": null,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
@@ -7338,7 +7338,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.3323.13.1.4.1.1.17.1\"]",
+                    "sensor_oids": "[\".1.3.6.1.4.1.3323.13.1.4.1.1.3.1\"]",
                     "rrd_type": "GAUGE"
                 },
                 {
@@ -7365,14 +7365,14 @@
                 },
                 {
                     "sensor_deleted": 0,
-                    "sensor_class": "power",
+                    "sensor_class": "rate",
                     "sensor_index": "0",
-                    "sensor_type": "mni-rx",
-                    "sensor_descr": "MNI Receive",
+                    "sensor_type": "mni-rx-rate",
+                    "sensor_descr": "MNI Receive Rate",
                     "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
+                    "sensor_multiplier": 1000000,
                     "sensor_aggregator": "sum",
-                    "sensor_current": -42,
+                    "sensor_current": 106000000,
                     "sensor_prev": null,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
@@ -7382,7 +7382,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.3323.13.1.4.1.1.3.1\"]",
+                    "sensor_oids": "[\".1.3.6.1.4.1.3323.13.1.4.1.1.17.1\"]",
                     "rrd_type": "GAUGE"
                 }
             ]
@@ -7391,15 +7391,15 @@
             "wireless_sensors": [
                 {
                     "sensor_deleted": 0,
-                    "sensor_class": "rate",
+                    "sensor_class": "power",
                     "sensor_index": "0",
-                    "sensor_type": "mni-rx-rate",
-                    "sensor_descr": "MNI Receive Rate",
+                    "sensor_type": "mni-rx",
+                    "sensor_descr": "MNI Receive",
                     "sensor_divisor": 1,
-                    "sensor_multiplier": 1000000,
+                    "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
-                    "sensor_current": 106000000,
-                    "sensor_prev": 106000000,
+                    "sensor_current": -42,
+                    "sensor_prev": -42,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -7408,7 +7408,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.3323.13.1.4.1.1.17.1\"]",
+                    "sensor_oids": "[\".1.3.6.1.4.1.3323.13.1.4.1.1.3.1\"]",
                     "rrd_type": "GAUGE"
                 },
                 {
@@ -7435,15 +7435,15 @@
                 },
                 {
                     "sensor_deleted": 0,
-                    "sensor_class": "power",
+                    "sensor_class": "rate",
                     "sensor_index": "0",
-                    "sensor_type": "mni-rx",
-                    "sensor_descr": "MNI Receive",
+                    "sensor_type": "mni-rx-rate",
+                    "sensor_descr": "MNI Receive Rate",
                     "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
+                    "sensor_multiplier": 1000000,
                     "sensor_aggregator": "sum",
-                    "sensor_current": -42,
-                    "sensor_prev": -42,
+                    "sensor_current": 106000000,
+                    "sensor_prev": 106000000,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -7452,7 +7452,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.3323.13.1.4.1.1.3.1\"]",
+                    "sensor_oids": "[\".1.3.6.1.4.1.3323.13.1.4.1.1.17.1\"]",
                     "rrd_type": "GAUGE"
                 }
             ]
