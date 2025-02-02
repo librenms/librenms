@@ -336,22 +336,22 @@ function convert($size)
     return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
  }
 
-//echo convert(memory_get_usage(true)); // 123 kb
-
 $columnHeight = 2;
-// Find model name or systemname
-$modelname = $device->sysName;
-//echo "Found model $prefix from device, ";
+// Find hardware, model name or systemname for hints
+$hardware  = $device->hardware;
+if(!isset($hardware))
+	$hardware = $device->sysName; // Try using sysName
+
 // Deduce hints file from icon
 $brand = substr(basename($device->icon), 0, -4);
-// echo print_r($device, true);
+//echo print_r($device, true);
 $filePath = "../resources/views/device/tabs/ports/hints/{$brand}.hints";
 if(file_exists($filePath)) {
-	$line = fastFindLine($filePath, $modelname);
+	$line = fastFindLine($filePath, $hardware);
 	if(!empty($line)) {
-		echo "Found prefix $modelname in {$brand} hints, ";
-		// echo print_r(substr($line, strlen("{$modelname}:")), true);
-		$transformedPorts = json_decode(substr($line, strlen($modelname)), true);
+		echo "Found SKU $hardware in {$brand} hints ";
+		// echo print_r(substr($line, strlen("{$hardware}:")), true);
+		$transformedPorts = json_decode(substr($line, strlen($hardware)+1), true);
 	}
 }
 
@@ -361,14 +361,12 @@ if(!isset($transformedPorts)) {
 		$transformedPorts = transformPorts($data['ports'], 2);
 	}
 }
-// echo convert(memory_get_usage(true)); // 123 kb
 
 $indexports = transformPortsIndexedByIfName($data['ports']);
 $switchstart = findLowestSwitchIndex($indexports);
 $switchend = findHighestSwitchIndex($indexports);
 
 // echo "Found highest switch: ". print_r($switches, true);
- 
 // $transform = $transformedPorts;
 // echo "<br/>". json_encode($transformedPorts);
 // echo convert(memory_get_usage(true)); // 123 kb

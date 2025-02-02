@@ -34,3 +34,4 @@ Examples are the Aruba CX6100 with 49-52 on the left side of the chassis, or the
 	$portmap[0][1][3][][TenGigabitethernet1/0/2] = "rj45"
 
 	Then convert this PHP array to a single json string which can be included in the appropriate hints file.
+	A site like https://www.cleancss.com/php-beautify/ can be used to easily convert the string into multi-line for easier editing, just make sure to flatten it to a line
