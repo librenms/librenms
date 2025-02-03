@@ -120,7 +120,6 @@ modules:
                     descr: 'Alarm'
                     group: 'Alarms'
                     index: '{{ $index }}'
-                    type: 'state'
                     states:
                         - { descr: Communication Lost, graph: 0, value: 1, generic: 2 }
                         - { descr: Low Battery, graph: 0, value: 2, generic: 1 }
