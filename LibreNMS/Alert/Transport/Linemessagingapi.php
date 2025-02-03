@@ -38,7 +38,7 @@ class Linemessagingapi extends Transport
 
         $res = Http::client()
         ->withToken($this->config['line-messaging-token'])
-        ->asForm()
+        ->asJson()
         ->post($apiURL, $data);
 
         if ($res->successful()) {
