@@ -24,7 +24,7 @@ foreach ($log_files as $index => $log_file) {
     ];
 }
 
-if (sizeof($rrd_list)) {
+if (count($rrd_list)) {
     d_echo('No relevant log file RRDs found');
 }
 
