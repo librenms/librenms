@@ -1,4 +1,4 @@
 modules:
     os:
-        sysDescr_regex: '/PLANET (?<hardware>\S+) .*(?<version>Ver\S+)?/'
+        sysDescr_regex: '/PLANET,?\s(?<hardware>[^,\s]+)(?:(?!v|V).)+(?<version>(?:v|V)\S+)?/'
         version: ENTITY-MIB::entPhysicalSoftwareRev.1
