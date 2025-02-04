@@ -332,6 +332,8 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
         foreach ($lldp_if_array as $entry_key => $lldp_instance) {
             if ($device['os'] == 'aos7') {
                 $ifName = $lldp_local[$entry_key]['lldpLocPortDesc'];
+            } elseif ($device['os'] == 'routeros') {
+                $ifIndex = $entry_key;
             } elseif (is_numeric($dot1d_array[$entry_key]['dot1dBasePortIfIndex'])) {
                 $ifIndex = $dot1d_array[$entry_key]['dot1dBasePortIfIndex'];
             } else {
