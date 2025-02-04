@@ -194,7 +194,7 @@ foreach ($rule_list as $rule) {
     $col = 'success';
     $extra = '';
     $status_msg = '';
-    if (sizeof($sub) == 1) {
+    if (count($sub) == 1) {
         $sub = $sub[0];
         if ((int) $sub['state'] === AlertState::CLEAR) {
             $ico = 'check';

@@ -99,8 +99,6 @@ if (! empty($oids)) {
         }
 
         discover_sensor(null, 'state', $device, $num_oid . $num_index, $index, $state_name, $description, '1', '1', null, null, null, null, $currentValue, 'snmp', null, null, null, 'Line cards');
-        //Create Sensor To State Index
-        create_sensor_to_state_index($device, $state_name, $index);
         $num_index = $num_index + 1;
     }
 }

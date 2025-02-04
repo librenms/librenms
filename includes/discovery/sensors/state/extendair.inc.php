@@ -57,7 +57,6 @@ foreach ($sensors as $sensor) {
 
         $descr = $sensor['descr'];
         discover_sensor(null, 'state', $device, $cur_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp);
-        create_sensor_to_state_index($device, $state_name, $index);
     }
 }
 
