@@ -202,14 +202,14 @@ class ServiceTemplateController extends Controller
             }, $updated)) > 0;
         } elseif ($template->type == 'dynamic') {
             $template->rules = json_decode($request->rules);
-        } elseif ($template->type == 'groups') {
-            // sync device_group_ids from input
-            $updated = $template->groups()->sync($request->get('groups', []));
-            // check for attached/detached/updated
-            $device_groups_updated = array_sum(array_map(function ($device_group_ids) {
-                return count($device_group_ids);
-            }, $updated)) > 0;
         }
+            
+        // sync device_group_ids from input
+        $updated = $template->groups()->sync($request->get('groups', []));
+        // check for attached/detached/updated
+        $device_groups_updated = array_sum(array_map(function ($device_group_ids) {
+            return count($device_group_ids);
+        }, $updated)) > 0;
 
         if ($template->isDirty() || $devices_updated || isset($device_groups_updated)) {
             try {
