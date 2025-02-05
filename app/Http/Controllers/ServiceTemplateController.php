@@ -203,7 +203,7 @@ class ServiceTemplateController extends Controller
         } elseif ($template->type == 'dynamic') {
             $template->rules = json_decode($request->rules);
         }
-            
+
         // sync device_group_ids from input
         $updated = $template->groups()->sync($request->get('groups', []));
         // check for attached/detached/updated
