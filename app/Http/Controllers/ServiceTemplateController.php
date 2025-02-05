@@ -211,9 +211,9 @@ class ServiceTemplateController extends Controller
             return count($device_group_ids);
         }, $updated)) > 0;
 
-        if ($template->isDirty() || $devices_updated || isset($device_groups_updated)) {
+        if ($template->isDirty() || $devices_updated) {
             try {
-                if ($template->save() || $devices_updated || isset($device_groups_updated)) {
+                if ($template->save() || $devices_updated) {
                     $toast->success(__('Service Template :name updated', ['name' => $template->name]));
                 } else {
                     $toast->error(__('Failed to save'));
