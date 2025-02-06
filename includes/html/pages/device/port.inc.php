@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Port;
 use App\Models\PortAdsl;
 use App\Models\PortsNac;
 use App\Models\PortVdsl;
@@ -10,14 +9,14 @@ use LibreNMS\Util\Url;
 
 $vars['view'] = basename($vars['view'] ?? 'graphs');
 
-$port = \App\Models\Port::find($vars['port']);
+$port = \App\Facades\PortCache::get($vars['port']);
 
 $port_details = 1;
 
 $hostname = $device['hostname'];
 $ifname = $port->ifDescr;
 $ifIndex = $port->ifIndex;
-$speed = \LibreNMS\Util\Number::formatSi($port->ifSpeed, 2, 3, 'bps');
+$speed = \LibreNMS\Util\Number::formatSi($port->ifSpeed, 2, 0, 'bps');
 
 $ifalias = $port->getLabel();
 
@@ -97,6 +96,10 @@ if ($port->fdbEntries()->exists()) {
 $menu_options['events'] = 'Eventlog';
 $menu_options['notes'] = (get_dev_attrib($device, 'port_id_notes:' . $port->port_id) ?? '') == '' ? 'Notes' : 'Notes*';
 
+if ($port->transceivers()->exists()) {
+    $menu_options['transceiver'] = __('port.transceiver');
+}
+
 if (dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ? AND `entPhysicalIndex` = ?  AND entPhysicalIndex_measured = 'ports'", [$device['device_id'], $port->ifIndex])) {
     $menu_options['sensors'] = 'Health';
 }
@@ -119,19 +122,11 @@ if (dbFetchCell("SELECT COUNT(*) FROM `ports_vlans` WHERE `port_id` = '" . $port
     $menu_options['vlans'] = 'VLANs';
 }
 
-// Are there any CBQoS components for this device?
-$component = new LibreNMS\Component();
-$options = [];         // Re-init array in case it has been declared previously.
-$options['filter']['type'] = ['=', 'Cisco-CBQOS'];
-$components = $component->getComponents($device['device_id'], $options);
-$components = $components[$device['device_id']] ?? [];        // We only care about our device id.
-if (count($components) > 0) {
-    $menu_options['cbqos'] = 'CBQoS';
+if ($port->qos()->count() > 0) {
+    $menu_options['qos'] = 'QoS';
 }
 
-$portModel = Port::find($port->port_id);
-
-if (LibreNMS\Plugins::countHooks('port_container') || \PluginManager::hasHooks(PortTabHook::class, ['port' => $portModel])) {
+if (LibreNMS\Plugins::countHooks('port_container') || \PluginManager::hasHooks(PortTabHook::class, ['port' => $port])) {
     // Checking if any plugin implements the port_container. If yes, allow to display the menu_option
     $menu_options['plugins'] = 'Plugins';
 }

@@ -27,6 +27,9 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use App\Models\EntPhysical;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
@@ -43,6 +46,7 @@ use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\Number;
+use SnmpQuery;
 
 class ArubaInstant extends OS implements
     OSDiscovery,
@@ -60,7 +64,7 @@ class ArubaInstant extends OS implements
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
-        $device->serial = snmp_getnext($this->getDeviceArray(), 'aiAPSerialNum', '-Oqv', 'AI-AP-MIB');
+        $device->serial = SnmpQuery::next('AI-AP-MIB::aiAPSerialNum')->value();
     }
 
     /**
@@ -69,22 +73,16 @@ class ArubaInstant extends OS implements
      *
      * @return array Processors
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): array
     {
-        $processors = [];
-        $ai_mib = 'AI-AP-MIB';
-        $ai_ap_data = $this->getCacheTable('aiAccessPointEntry', $ai_mib);
+        return SnmpQuery::cache()->walk('AI-AP-MIB::aiAccessPointTable')
+            ->mapTable(function ($data, $aiAPMACAddress) {
+                $mac = Mac::parse($aiAPMACAddress);
+                $oid = '.1.3.6.1.4.1.14823.2.3.3.1.2.1.1.7.' . $mac->oid();
+                $description = $data['AI-AP-MIB::aiAPSerialNum'];
 
-        foreach ($ai_ap_data as $ai_ap => $ai_ap_oid) {
-            $value = $ai_ap_oid['aiAPCPUUtilization'];
-            $mac = Mac::parse($ai_ap);
-            $combined_oid = sprintf('%s::%s.%s', $ai_mib, 'aiAPCPUUtilization', $mac->oid());
-            $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On');
-            $description = $ai_ap_data[$ai_ap]['aiAPSerialNum'];
-            $processors[] = Processor::discover('aruba-instant', $this->getDeviceId(), $oid, $mac->hex(), $description, 1, $value);
-        } // end foreach
-
-        return $processors;
+                return Processor::discover('aruba-instant', $this->getDeviceId(), $oid, $mac->hex(), $description, 1, $data['AI-AP-MIB::aiAPCPUUtilization']);
+            })->all();
     }
 
     /**
@@ -93,56 +91,47 @@ class ArubaInstant extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessClients()
+    public function discoverWirelessClients(): array
     {
         $sensors = [];
-        $device = $this->getDeviceArray();
-        $ai_mib = 'AI-AP-MIB';
-
-        if (intval(explode('.', $device['version'])[0]) >= 8 && intval(explode('.', $device['version'])[1]) >= 4) {
+        if (version_compare($this->getDevice()->version, '8.4.0.0', '>=')) {
             // version is at least 8.4.0.0
-            $ssid_data = $this->getCacheTable('aiWlanSSIDEntry', $ai_mib);
-
-            $ap_data = array_merge_recursive(
-                $this->getCacheTable('aiAccessPointEntry', $ai_mib),
-                $this->getCacheTable('aiRadioClientNum', $ai_mib)
-            );
+            $ap_data = SnmpQuery::cache()->walk('AI-AP-MIB::aiAccessPointTable')->table(1); // aiAPMACAddress
+            $ssid_data = SnmpQuery::walk('AI-AP-MIB::aiWlanSSIDTable')->table(1); // aiSSIDIndex
+            $client_num = SnmpQuery::walk('AI-AP-MIB::aiRadioClientNum')->table(2); // aiRadioAPMACAddress, aiRadioIndex
 
             $oids = [];
             $total_clients = 0;
 
             // Clients Per SSID
             foreach ($ssid_data as $index => $entry) {
-                $combined_oid = sprintf('%s::%s.%s', $ai_mib, 'aiSSIDClientNum', $index);
-                $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On');
-                $description = sprintf('SSID %s Clients', $entry['aiSSID']);
+                $oid = '.1.3.6.1.4.1.14823.2.3.3.1.1.7.1.4.' . $index;
+                $description = sprintf('SSID %s Clients', $entry['AI-AP-MIB::aiSSID']);
                 $oids[] = $oid;
-                $total_clients += $entry['aiSSIDClientNum'];
-                $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oid, 'aruba-instant', $index, $description, $entry['aiSSIDClientNum']);
+                $total_clients += $entry['AI-AP-MIB::aiSSIDClientNum'];
+                $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oid, 'aruba-instant', $index, $description, $entry['AI-AP-MIB::aiSSIDClientNum']);
             }
 
             // Total Clients across all SSIDs
             $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oids, 'aruba-instant', 'total-clients', 'Total Clients', $total_clients);
 
             // Clients Per Radio
-            foreach ($ap_data as $index => $entry) {
-                foreach ($entry['aiRadioClientNum'] as $radio => $value) {
-                    $combined_oid = sprintf('%s::%s.%s.%s', $ai_mib, 'aiRadioClientNum', Mac::parse($index)->oid(), $radio);
-                    $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On');
-                    $description = sprintf('%s Radio %s', $entry['aiAPSerialNum'], $radio);
-                    $sensor_index = sprintf('%s.%s', Mac::parse($index)->hex(), $radio);
-                    $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oid, 'aruba-instant', $sensor_index, $description, $value);
+            foreach ($client_num as $index => $entry) {
+                foreach ($entry as $radio => $value) {
+                    $mac = Mac::parse($index);
+                    $oid = '.1.3.6.1.4.1.14823.2.3.3.1.2.2.1.21.' . $mac->oid() . '.' . $radio;
+                    $description = sprintf('%s Radio %s', $ap_data[$index]['AI-AP-MIB::aiAPSerialNum'], $radio);
+                    $sensor_index = sprintf('%s.%s', $mac->hex(), $radio);
+                    $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oid, 'aruba-instant', $sensor_index, $description, $value['AI-AP-MIB::aiRadioClientNum']);
                 }
             }
         } else {
             // version is lower than 8.4.0.0
             // fetch the MAC addresses of currently connected clients, then count them to get an overall total
-            $client_data = $this->getCacheTable('aiClientMACAddress', $ai_mib);
+            $client_data = SnmpQuery::walk('AI-AP-MIB::aiClientMACAddress')->table(1);  // aiClientMACAddress
 
             $total_clients = count($client_data);
-
-            $combined_oid = sprintf('%s::%s', $ai_mib, 'aiClientMACAddress');
-            $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On');
+            $oid = '.1.3.6.1.4.1.14823.2.3.3.1.2.4.1.1';
 
             $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oid, 'aruba-instant', 'total-clients', 'Total Clients', $total_clients);
         }
@@ -156,16 +145,14 @@ class ArubaInstant extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessApCount()
+    public function discoverWirelessApCount(): array
     {
         $sensors = [];
-        $ai_mib = 'AI-AP-MIB';
-        $ap_data = $this->getCacheTable('aiAPSerialNum', $ai_mib);
+        $ap_data = SnmpQuery::walk('AI-AP-MIB::aiAPSerialNum')->table(1);
 
         $total_aps = count($ap_data);
 
-        $combined_oid = sprintf('%s::%s', $ai_mib, 'aiAPSerialNum');
-        $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On');
+        $oid = '.1.3.6.1.4.1.14823.2.3.3.1.2.1.1.4';
 
         $sensors[] = new WirelessSensor('ap-count', $this->getDeviceId(), $oid, 'aruba-instant', 'total-aps', 'Total APs', $total_aps);
 
@@ -178,10 +165,24 @@ class ArubaInstant extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessFrequency()
+    public function discoverWirelessFrequency(): array
     {
-        // instant
-        return $this->discoverInstantRadio('frequency', 'aiRadioChannel');
+        $sn = SnmpQuery::cache()->walk('AI-AP-MIB::aiAPSerialNum')->table(1);
+
+        return SnmpQuery::walk('AI-AP-MIB::aiRadioChannel')
+            ->mapTable(function ($data, $aiRadioAPMACAddress, $aiRadioIndex) use ($sn) {
+                $mac = Mac::parse($aiRadioAPMACAddress);
+
+                return new WirelessSensor(
+                    'frequency',
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.14823.2.3.3.1.2.2.1.4.' . $mac->oid() . '.' . $aiRadioIndex,
+                    'aruba-instant',
+                    $mac->hex() . ".$aiRadioIndex",
+                    sprintf('%s Radio %s', $sn[$aiRadioAPMACAddress]['AI-AP-MIB::aiAPSerialNum'], $aiRadioIndex),
+                    WirelessSensor::channelToFrequency($this->decodeChannel($data['AI-AP-MIB::aiRadioChannel']))
+                );
+            })->all();
     }
 
     /**
@@ -190,10 +191,25 @@ class ArubaInstant extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessNoiseFloor()
+    public function discoverWirelessNoiseFloor(): array
     {
-        // instant
-        return $this->discoverInstantRadio('noise-floor', 'aiRadioNoiseFloor');
+        $sn = SnmpQuery::cache()->walk('AI-AP-MIB::aiAPSerialNum')->table(1);
+
+        return SnmpQuery::walk('AI-AP-MIB::aiRadioNoiseFloor')
+            ->mapTable(function ($data, $aiRadioAPMACAddress, $aiRadioIndex) use ($sn) {
+                $mac = Mac::parse($aiRadioAPMACAddress);
+
+                return new WirelessSensor(
+                    'noise-floor',
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.14823.2.3.3.1.2.2.1.6.' . $mac->oid() . '.' . $aiRadioIndex,
+                    'aruba-instant',
+                    $mac->hex() . ".$aiRadioIndex",
+                    sprintf('%s Radio %s', $sn[$aiRadioAPMACAddress]['AI-AP-MIB::aiAPSerialNum'], $aiRadioIndex),
+                    $data['AI-AP-MIB::aiRadioNoiseFloor'] * -1,
+                    -1,
+                );
+            })->all();
     }
 
     /**
@@ -202,10 +218,24 @@ class ArubaInstant extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessPower()
+    public function discoverWirelessPower(): array
     {
-        // instant
-        return $this->discoverInstantRadio('power', 'aiRadioTransmitPower', '%s Radio %s: Tx Power');
+        $sn = SnmpQuery::cache()->walk('AI-AP-MIB::aiAPSerialNum')->table(1);
+
+        return SnmpQuery::walk('AI-AP-MIB::aiRadioTransmitPower')
+            ->mapTable(function ($data, $aiRadioAPMACAddress, $aiRadioIndex) use ($sn) {
+                $mac = Mac::parse($aiRadioAPMACAddress);
+
+                return new WirelessSensor(
+                    'power',
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.14823.2.3.3.1.2.2.1.5.' . $mac->oid() . '.' . $aiRadioIndex,
+                    'aruba-instant',
+                    $mac->hex() . ".$aiRadioIndex",
+                    sprintf('%s Radio %s: Tx Power', $sn[$aiRadioAPMACAddress]['AI-AP-MIB::aiAPSerialNum'], $aiRadioIndex),
+                    $data['AI-AP-MIB::aiRadioTransmitPower'],
+                );
+            })->all();
     }
 
     /**
@@ -214,54 +244,24 @@ class ArubaInstant extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessUtilization()
+    public function discoverWirelessUtilization(): array
     {
-        // instant
-        return $this->discoverInstantRadio('utilization', 'aiRadioUtilization64');
-    }
+        $sn = SnmpQuery::cache()->walk('AI-AP-MIB::aiAPSerialNum')->table(1);
 
-    /**
-     * Aruba Instant Radio Discovery
-     *
-     * @return array Sensors
-     */
-    private function discoverInstantRadio($type, $mib, $desc = '%s Radio %s')
-    {
-        $ai_mib = 'AI-AP-MIB';
-        $ai_sg_data = array_merge_recursive(
-            $this->getCacheTable('aiAPSerialNum', $ai_mib),
-            $this->getCacheTable('aiRadioChannel', $ai_mib),
-            $this->getCacheTable('aiRadioNoiseFloor', $ai_mib),
-            $this->getCacheTable('aiRadioTransmitPower', $ai_mib),
-            $this->getCacheTable('aiRadioUtilization64', $ai_mib)
-        );
+        return SnmpQuery::walk('AI-AP-MIB::aiRadioUtilization64')
+            ->mapTable(function ($data, $aiRadioAPMACAddress, $aiRadioIndex) use ($sn) {
+                $mac = Mac::parse($aiRadioAPMACAddress);
 
-        $sensors = [];
-
-        foreach ($ai_sg_data as $ai_ap => $ai_ap_oid) {
-            if (isset($ai_ap_oid[$mib])) {
-                foreach ($ai_ap_oid[$mib] as $ai_ap_radio => $value) {
-                    $multiplier = 1;
-                    if ($type == 'frequency') {
-                        $value = WirelessSensor::channelToFrequency($this->decodeChannel($value));
-                    }
-
-                    if ($type == 'noise-floor') {
-                        $multiplier = -1;
-                        $value = $value * $multiplier;
-                    }
-
-                    $combined_oid = sprintf('%s::%s.%s.%s', $ai_mib, $mib, Mac::parse($ai_ap)->oid(), $ai_ap_radio);
-                    $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On');
-                    $description = sprintf($desc, $ai_sg_data[$ai_ap]['aiAPSerialNum'], $ai_ap_radio);
-                    $index = sprintf('%s.%s', Mac::parse($ai_ap)->hex(), $ai_ap_radio);
-
-                    $sensors[] = new WirelessSensor($type, $this->getDeviceId(), $oid, 'aruba-instant', $index, $description, $value, $multiplier);
-                } // end foreach
-            } // end if
-        } // end foreach
-
-        return $sensors;
+                return new WirelessSensor(
+                    'utilization',
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.14823.2.3.3.1.2.2.1.8.' . $mac->oid() . '.' . $aiRadioIndex,
+                    'aruba-instant',
+                    $mac->hex() . ".$aiRadioIndex",
+                    sprintf('%s Radio %s', $sn[$aiRadioAPMACAddress]['AI-AP-MIB::aiAPSerialNum'], $aiRadioIndex),
+                    $data['AI-AP-MIB::aiRadioUtilization64'],
+                );
+            })->all();
     }
 
     protected function decodeChannel($channel): int
@@ -295,34 +295,20 @@ class ArubaInstant extends OS implements
     {
         $data = [];
         if (! empty($sensors)) {
-            $device = $this->getDeviceArray();
-
-            if (intval(explode('.', $device['version'])[0]) >= 8 && intval(explode('.', $device['version'])[1]) >= 4) {
+            if (version_compare($this->getDevice()->version, '8.4.0.0', '>=')) {
                 // version is at least 8.4.0.0
-                $oids = [];
+                $oids = Arr::pluck($sensors, 'sensor_oids.0', 'sensor_id');
 
-                foreach ($sensors as $sensor) {
-                    $oids[$sensor['sensor_id']] = current($sensor['sensor_oids']);
-                }
-
-                $snmp_data = snmp_get_multi_oid($this->getDeviceArray(), $oids);
+                $snmp_data = SnmpQuery::numeric()->get($oids)->values();
 
                 foreach ($oids as $id => $oid) {
                     $data[$id] = $snmp_data[$oid] ?? null;
                 }
             } else {
                 // version is lower than 8.4.0.0
-                if (! empty($sensors) && count($sensors) == 1) {
-                    $ai_mib = 'AI-AP-MIB';
-                    $client_data = $this->getCacheTable('aiClientMACAddress', $ai_mib);
-
-                    if (empty($client_data)) {
-                        $total_clients = 0;
-                    } else {
-                        $total_clients = count($client_data);
-                    }
-
-                    $data[$sensors[0]['sensor_id']] = $total_clients;
+                if (count($sensors) == 1) {
+                    $client_data = SnmpQuery::walk('AI-AP-MIB::aiClientMACAddress')->values();
+                    $data[$sensors[0]['sensor_id']] = count($client_data);
                 }
             }
         }
@@ -341,18 +327,50 @@ class ArubaInstant extends OS implements
     {
         $data = [];
         if (! empty($sensors) && count($sensors) == 1) {
-            $ai_mib = 'AI-AP-MIB';
-            $ap_data = $this->getCacheTable('aiAPSerialNum', $ai_mib);
-
-            $total_aps = 0;
-
-            if (! empty($ap_data)) {
-                $total_aps = count($ap_data);
-            }
-
-            $data[$sensors[0]['sensor_id']] = $total_aps;
+            $ap_data = SnmpQuery::walk('AI-AP-MIB::aiAPSerialNum')->values();
+            $data[$sensors[0]['sensor_id']] = count($ap_data);
         }
 
         return $data;
+    }
+
+    public function discoverEntityPhysical(): Collection
+    {
+        $inventory = new Collection;
+
+        $ai_ig_data = SnmpQuery::walk('AI-AP-MIB::aiInfoGroup')->table(1);
+        $master_ip = $ai_ig_data[0]['AI-AP-MIB::aiMasterIPAddress'] ?? null;
+        if ($master_ip) {
+            $inventory->push(new EntPhysical([
+                'entPhysicalIndex' => 1,
+                'entPhysicalDescr' => $ai_ig_data[0]['AI-AP-MIB::aiVirtualControllerIPAddress'],
+                'entPhysicalClass' => 'chassis',
+                'entPhysicalName' => $ai_ig_data[0]['AI-AP-MIB::aiVirtualControllerName'],
+                'entPhysicalModelName' => 'Instant Virtual Controller Cluster',
+                'entPhysicalSerialNum' => $ai_ig_data[0]['AI-AP-MIB::aiVirtualControllerKey'],
+                'entPhysicalMfgName' => 'Aruba',
+            ]));
+        }
+
+        $index = 2;
+        $ap_data = SnmpQuery::cache()->walk('AI-AP-MIB::aiAccessPointTable')->table(1);
+        foreach ($ap_data as $mac => $entry) {
+            $type = $master_ip == $entry['AI-AP-MIB::aiAPIPAddress'] ? 'Master' : 'Member';
+            $model = $entry['AI-AP-MIB::aiAPModel'] ?? null;
+            $inventory->push(new EntPhysical([
+                'entPhysicalIndex' => $index++,
+                'entPhysicalDescr' => $entry['AI-AP-MIB::aiAPMACAddress'],
+                'entPhysicalName' => sprintf('%s %s Cluster %s', $entry['AI-AP-MIB::aiAPName'], $entry['AI-AP-MIB::aiAPIPAddress'], $type),
+                'entPhysicalClass' => 'other',
+                'entPhysicalContainedIn' => 1,
+                'entPhysicalSerialNum' => $entry['AI-AP-MIB::aiAPSerialNum'],
+                'entPhysicalModelName' => explode('::', $model, 2)[1] ?? $model,
+                'entPhysicalMfgName' => 'Aruba',
+                'entPhysicalVendorType' => 'accessPoint',
+                'entPhysicalSoftwareRev' => $this->getDevice()->version,
+            ]));
+        }
+
+        return $inventory;
     }
 }

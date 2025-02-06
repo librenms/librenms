@@ -32,5 +32,5 @@ foreach ($oids as $volt_id => $data) {
     $divisor = 10;
     $current = $data['ats2InputVoltage'] / $divisor;
 
-    discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(null, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }

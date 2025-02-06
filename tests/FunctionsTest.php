@@ -28,7 +28,7 @@ namespace LibreNMS\Tests;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Enum\IntegerType;
 use LibreNMS\Util\Number;
-use LibreNMS\Util\Time;
+use LibreNMS\Util\StringHelpers;
 
 class FunctionsTest extends TestCase
 {
@@ -45,10 +45,10 @@ class FunctionsTest extends TestCase
 
     public function testIsHexString(): void
     {
-        $this->assertTrue(isHexString('af 28 02'));
-        $this->assertTrue(isHexString('aF 28 02 CE'));
-        $this->assertFalse(isHexString('a5 fj 53'));
-        $this->assertFalse(isHexString('a5fe53'));
+        $this->assertTrue(StringHelpers::isHex('af 28 02'));
+        $this->assertTrue(StringHelpers::isHex('aF 28 02 CE'));
+        $this->assertFalse(StringHelpers::isHex('a5 fj 53'));
+        $this->assertFalse(StringHelpers::isHex('a5fe53'));
     }
 
     public function testDynamicDiscoveryGetValue(): void
@@ -95,25 +95,6 @@ class FunctionsTest extends TestCase
         $this->assertSame(10, YamlDiscovery::getValueFromData('oneoff', 3, $data, $pre_cache));
         $this->assertSame('Pickle', YamlDiscovery::getValueFromData('singletable', 11, $data, $pre_cache));
         $this->assertSame('BBQ', YamlDiscovery::getValueFromData('doubletable', 13, $data, $pre_cache));
-    }
-
-    public function testParseAtTime(): void
-    {
-        $this->assertEquals(time(), Time::parseAt('now'), 'now did not match');
-        $this->assertEquals(time() + 180, Time::parseAt('+3m'), '+3m did not match');
-        $this->assertEquals(time() + 7200, Time::parseAt('+2h'), '+2h did not match');
-        $this->assertEquals(time() + 172800, Time::parseAt('+2d'), '+2d did not match');
-        $this->assertEquals(time() + 63115200, Time::parseAt('+2y'), '+2y did not match');
-        $this->assertEquals(time() - 180, Time::parseAt('-3m'), '-3m did not match');
-        $this->assertEquals(time() - 7200, Time::parseAt('-2h'), '-2h did not match');
-        $this->assertEquals(time() - 172800, Time::parseAt('-2d'), '-2d did not match');
-        $this->assertEquals(time() - 63115200, Time::parseAt('-2y'), '-2y did not match');
-        $this->assertEquals(429929439, Time::parseAt('429929439'));
-        $this->assertEquals(212334234, Time::parseAt(212334234));
-        $this->assertEquals(time() - 43, Time::parseAt('-43'), '-43 did not match');
-        $this->assertEquals(0, Time::parseAt('invalid'));
-        $this->assertEquals(606614400, Time::parseAt('March 23 1989 UTC'));
-        $this->assertEquals(time() + 86400, Time::parseAt('+1 day'));
     }
 
     public function testNumberCast()

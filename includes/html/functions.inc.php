@@ -11,44 +11,13 @@
  */
 
 use App\Facades\DeviceCache;
+use App\Facades\PortCache;
+use App\Models\Port;
 use LibreNMS\Config;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
-
-/**
- * Compare $t with the value of $vars[$v], if that exists
- *
- * @param  string  $v  Name of the var to test
- * @param  string  $t  Value to compare $vars[$v] to
- * @return bool true, if values are the same, false if $vars[$v]
- *              is unset or values differ
- */
-function var_eq($v, $t)
-{
-    global $vars;
-    if (isset($vars[$v]) && $vars[$v] == $t) {
-        return true;
-    }
-
-    return false;
-}
-
-/**
- * Get the value of $vars[$v], if it exists
- *
- * @param  string  $v  Name of the var to get
- * @return string|bool The value of $vars[$v] if it exists, false if it does not exist
- */
-function var_get($v)
-{
-    global $vars;
-    if (isset($vars[$v])) {
-        return $vars[$v];
-    }
-
-    return false;
-}
+use LibreNMS\Util\Url;
 
 function toner2colour($descr, $percent)
 {
@@ -84,7 +53,7 @@ function toner2colour($descr, $percent)
 
 function generate_link($text, $vars, $new_vars = [])
 {
-    return '<a href="' . \LibreNMS\Util\Url::generate($vars, $new_vars) . '">' . $text . '</a>';
+    return '<a href="' . Url::generate($vars, $new_vars) . '">' . $text . '</a>';
 }//end generate_link()
 
 function escape_quotes($text)
@@ -94,10 +63,10 @@ function escape_quotes($text)
 
 function generate_overlib_content($graph_array, $text)
 {
-    $overlib_content = '<div class=overlib><span class=overlib-text>' . $text . '</span><br />';
+    $overlib_content = '<div class=overlib><span class=overlib-text>' . htmlspecialchars($text) . '</span><br />';
     foreach (['day', 'week', 'month', 'year'] as $period) {
         $graph_array['from'] = Config::get("time.$period");
-        $overlib_content .= escape_quotes(\LibreNMS\Util\Url::graphTag($graph_array));
+        $overlib_content .= escape_quotes(Url::graphTag($graph_array));
     }
 
     $overlib_content .= '</div>';
@@ -109,7 +78,7 @@ function generate_device_link($device, $text = null, $vars = [], $start = 0, $en
 {
     $deviceModel = DeviceCache::get((int) $device['device_id']);
 
-    return \LibreNMS\Util\Url::deviceLink($deviceModel, $text, $vars, $start, $end, $escape_text, $overlib);
+    return Url::deviceLink($deviceModel, $text, $vars, $start, $end, $escape_text, $overlib);
 }
 
 function bill_permitted($bill_id)
@@ -124,7 +93,7 @@ function bill_permitted($bill_id)
 function port_permitted($port_id, $device_id = null)
 {
     if (! is_numeric($device_id)) {
-        $device_id = get_device_id_by_port_id($port_id);
+        $device_id = PortCache::get((int) $port_id)?->device_id;
     }
 
     if (device_permitted($device_id)) {
@@ -259,49 +228,6 @@ function print_percentage_bar($width, $height, $percent, $left_text, $left_colou
     ]);
 }
 
-function generate_entity_link($type, $entity, $text = null, $graph_type = null)
-{
-    global $entity_cache;
-
-    if (is_numeric($entity)) {
-        $entity = get_entity_by_id_cache($type, $entity);
-    }
-
-    switch ($type) {
-        case 'port':
-            $link = generate_port_link($entity, $text, $graph_type);
-            break;
-
-        case 'storage':
-            if (empty($text)) {
-                $text = $entity['storage_descr'];
-            }
-
-            $link = generate_link($text, ['page' => 'device', 'device' => $entity['device_id'], 'tab' => 'health', 'metric' => 'storage']);
-            break;
-
-        default:
-            $link = $entity[$type . '_id'];
-    }
-
-    return $link;
-}//end generate_entity_link()
-
-/**
- * Extract type and subtype from a complex graph type, also makes sure variables are file name safe.
- *
- * @param  string  $type
- * @return array [type, subtype]
- */
-function extract_graph_type($type): array
-{
-    preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $type, $graphtype);
-    $type = basename($graphtype['type']);
-    $subtype = basename($graphtype['subtype']);
-
-    return [$type, $subtype];
-}
-
 function generate_port_link($port, $text = null, $type = null, $overlib = 1, $single_graph = 0)
 {
     $graph_array = [];
@@ -339,14 +265,14 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
     $graph_array['to'] = Config::get('time.now');
     $graph_array['from'] = Config::get('time.day');
     $graph_array['id'] = $port['port_id'];
-    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
+    $content .= Url::graphTag($graph_array);
     if ($single_graph == 0) {
         $graph_array['from'] = Config::get('time.week');
-        $content .= \LibreNMS\Util\Url::graphTag($graph_array);
+        $content .= Url::graphTag($graph_array);
         $graph_array['from'] = Config::get('time.month');
-        $content .= \LibreNMS\Util\Url::graphTag($graph_array);
+        $content .= Url::graphTag($graph_array);
         $graph_array['from'] = Config::get('time.year');
-        $content .= \LibreNMS\Util\Url::graphTag($graph_array);
+        $content .= Url::graphTag($graph_array);
     }
 
     $content .= '</div>';
@@ -356,7 +282,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
     if ($overlib == 0) {
         return $content;
     } elseif (port_permitted($port['port_id'], $port['device_id'])) {
-        return \LibreNMS\Util\Url::overlibLink($url, $text, $content, $class);
+        return Url::overlibLink($url, $text, $content, $class);
     } else {
         return Rewrite::normalizeIfName($text);
     }
@@ -390,27 +316,27 @@ function generate_sensor_link($args, $text = null, $type = null)
         'from' => Config::get('time.day'),
         'id' => $args['sensor_id'],
     ];
-    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
+    $content .= Url::graphTag($graph_array);
 
     $graph_array['from'] = Config::get('time.week');
-    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
+    $content .= Url::graphTag($graph_array);
 
     $graph_array['from'] = Config::get('time.month');
-    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
+    $content .= Url::graphTag($graph_array);
 
     $graph_array['from'] = Config::get('time.year');
-    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
+    $content .= Url::graphTag($graph_array);
 
     $content .= '</div>';
 
-    $url = \LibreNMS\Util\Url::generate(['page' => 'graphs', 'id' => $args['sensor_id'], 'type' => $args['graph_type'], 'from' => \LibreNMS\Config::get('time.day')], []);
+    $url = Url::generate(['page' => 'graphs', 'id' => $args['sensor_id'], 'type' => $args['graph_type'], 'from' => \LibreNMS\Config::get('time.day')], []);
 
-    return \LibreNMS\Util\Url::overlibLink($url, $text, $content);
+    return Url::overlibLink($url, $text, $content);
 }//end generate_sensor_link()
 
 function generate_port_url($port, $vars = [])
 {
-    return \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']], $vars);
+    return Url::generate(['page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']], $vars);
 }//end generate_port_url()
 
 function generate_sap_url($sap, $vars = [])
@@ -420,7 +346,7 @@ function generate_sap_url($sap, $vars = [])
         $sap['sapEncapValue'] = '4095';
     }
 
-    return \LibreNMS\Util\Url::graphPopup(['device' => $sap['device_id'], 'page' => 'graphs', 'type' => 'device_sap', 'tab' => 'routing', 'proto' => 'mpls', 'view' => 'saps', 'traffic_id' => $sap['svc_oid'] . '.' . $sap['sapPortId'] . '.' . $sap['sapEncapValue']], $vars);
+    return Url::graphPopup(['device' => $sap['device_id'], 'page' => 'graphs', 'type' => 'device_sap', 'tab' => 'routing', 'proto' => 'mpls', 'view' => 'saps', 'traffic_id' => $sap['svc_oid'] . '.' . $sap['sapPortId'] . '.' . $sap['sapEncapValue']], $vars);
 }//end generate_sap_url()
 
 function generate_port_image($args)
@@ -464,37 +390,6 @@ function print_optionbar_end()
         </div>
         ';
 }//end print_optionbar_end()
-
-function devclass($device)
-{
-    if (isset($device['status']) && $device['status'] == '0') {
-        $class = 'list-device-down';
-    } else {
-        $class = 'list-device';
-    }
-
-    if (isset($device['disable_notify']) && $device['disable_notify'] == '1') {
-        $class = 'list-device-ignored';
-        if (isset($device['status']) && $device['status'] == '1') {
-            $class = 'list-device-ignored-up';
-        }
-    }
-
-    if (isset($device['disabled']) && $device['disabled'] == '1') {
-        $class = 'list-device-disabled';
-    }
-
-    return $class;
-}//end devclass()
-
-function getlocations()
-{
-    if (Auth::user()->hasGlobalRead()) {
-        return dbFetchRows('SELECT id, location FROM locations ORDER BY location');
-    }
-
-    return dbFetchRows('SELECT id, L.location FROM devices AS D, locations AS L, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? AND D.location_id = L.id ORDER BY location', [Auth::id()]);
-}
 
 /**
  * Get the recursive file size and count for a directory
@@ -554,18 +449,18 @@ function generate_ap_link($args, $text = null, $type = null)
     $graph_array['to'] = Config::get('time.now');
     $graph_array['from'] = Config::get('time.day');
     $graph_array['id'] = $args['accesspoint_id'];
-    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
+    $content .= Url::graphTag($graph_array);
     $graph_array['from'] = Config::get('time.week');
-    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
+    $content .= Url::graphTag($graph_array);
     $graph_array['from'] = Config::get('time.month');
-    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
+    $content .= Url::graphTag($graph_array);
     $graph_array['from'] = Config::get('time.year');
-    $content .= \LibreNMS\Util\Url::graphTag($graph_array);
+    $content .= Url::graphTag($graph_array);
     $content .= '</div>';
 
     $url = generate_ap_url($args);
     if (port_permitted($args['interface_id'], $args['device_id'])) {
-        return \LibreNMS\Util\Url::overlibLink($url, $text, $content);
+        return Url::overlibLink($url, $text, $content);
     } else {
         return Rewrite::normalizeIfName($text);
     }
@@ -573,35 +468,8 @@ function generate_ap_link($args, $text = null, $type = null)
 
 function generate_ap_url($ap, $vars = [])
 {
-    return \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $ap['device_id'], 'tab' => 'accesspoints', 'ap' => $ap['accesspoint_id']], $vars);
+    return Url::generate(['page' => 'device', 'device' => $ap['device_id'], 'tab' => 'accesspoints', 'ap' => $ap['accesspoint_id']], $vars);
 }//end generate_ap_url()
-
-// Find all the files in the given directory that match the pattern
-
-function get_matching_files($dir, $match = '/\.php$/')
-{
-    $list = [];
-    if ($handle = opendir($dir)) {
-        while (false !== ($file = readdir($handle))) {
-            if ($file != '.' && $file != '..' && preg_match($match, $file) === 1) {
-                $list[] = $file;
-            }
-        }
-
-        closedir($handle);
-    }
-
-    return $list;
-}//end get_matching_files()
-
-// Include all the files in the given directory that match the pattern
-
-function include_matching_files($dir, $match = '/\.php$/')
-{
-    foreach (get_matching_files($dir, $match) as $file) {
-        include_once $file;
-    }
-}//end include_matching_files()
 
 function generate_pagination($count, $limit, $page, $links = 2)
 {
@@ -682,143 +550,192 @@ function alert_details($details)
 
     $max_row_length = 0;
     $all_fault_detail = '';
-    foreach ($details['rule'] ?? [] as $o => $tmp_alerts) {
-        $fault_detail = '';
-        $fallback = true;
-        $fault_detail .= '#' . ($o + 1) . ':&nbsp;';
-        if (isset($tmp_alerts['bill_id'])) {
-            $fault_detail .= '<a href="' . \LibreNMS\Util\Url::generate(['page' => 'bill', 'bill_id' => $tmp_alerts['bill_id']], []) . '">' . $tmp_alerts['bill_name'] . '</a>;&nbsp;';
-            $fallback = false;
+
+    // Check if we have a diff (alert status changed, worse and better)
+    if (isset($details['diff'])) {
+        // Add a "title" for the modifications
+        $all_fault_detail .= '<b>Modifications:</b><br>';
+
+        // Check if we have added
+        if (isset($details['diff']['added'])) {
+            foreach (array_values($details['diff']['added'] ?? []) as $oa => $tmp_alerts_added) {
+                $fault_detail = format_alert_details($oa, $tmp_alerts_added, 'Added');
+                $max_row_length = strlen(strip_tags($fault_detail)) > $max_row_length ? strlen(strip_tags($fault_detail)) : $max_row_length;
+                $all_fault_detail .= $fault_detail;
+            }//end foreach
         }
 
-        if (isset($tmp_alerts['port_id'])) {
-            if ($tmp_alerts['isisISAdjState']) {
-                $fault_detail .= 'Adjacent ' . $tmp_alerts['isisISAdjIPAddrAddress'];
-                $port = \App\Models\Port::find($tmp_alerts['port_id']);
-                $fault_detail .= ', Interface ' . \LibreNMS\Util\Url::portLink($port);
-            } else {
-                $tmp_alerts = cleanPort($tmp_alerts);
-                $fault_detail .= generate_port_link($tmp_alerts) . ';&nbsp;';
-            }
-            $fallback = false;
+        // Check if we have resolved
+        if (isset($details['diff']['resolved'])) {
+            foreach (array_values($details['diff']['resolved'] ?? []) as $or => $tmp_alerts_resolved) {
+                $fault_detail = format_alert_details($or, $tmp_alerts_resolved, 'Resolved');
+                $max_row_length = strlen(strip_tags($fault_detail)) > $max_row_length ? strlen(strip_tags($fault_detail)) : $max_row_length;
+                $all_fault_detail .= $fault_detail;
+            }//end foreach
         }
 
-        if (isset($tmp_alerts['accesspoint_id'])) {
-            $fault_detail .= generate_ap_link($tmp_alerts, $tmp_alerts['name']) . ';&nbsp;';
-            $fallback = false;
-        }
+        // Add a "title" for the complete list
+        $all_fault_detail .= '<br><b>All current items:</b><br>';
+    }
 
-        if (isset($tmp_alerts['sensor_id'])) {
-            if ($tmp_alerts['sensor_class'] == 'state') {
-                // Give more details for a state (textual form)
-                $details = 'State: ' . $tmp_alerts['state_descr'] . ' (numerical ' . $tmp_alerts['sensor_current'] . ')<br>  ';
-            } else {
-                // Other sensors
-                $details = 'Value: ' . $tmp_alerts['sensor_current'] . ' (' . $tmp_alerts['sensor_class'] . ')<br>  ';
-            }
-            $details_a = [];
-
-            if ($tmp_alerts['sensor_limit_low']) {
-                $details_a[] = 'low: ' . $tmp_alerts['sensor_limit_low'];
-            }
-            if ($tmp_alerts['sensor_limit_low_warn']) {
-                $details_a[] = 'low_warn: ' . $tmp_alerts['sensor_limit_low_warn'];
-            }
-            if ($tmp_alerts['sensor_limit_warn']) {
-                $details_a[] = 'high_warn: ' . $tmp_alerts['sensor_limit_warn'];
-            }
-            if ($tmp_alerts['sensor_limit']) {
-                $details_a[] = 'high: ' . $tmp_alerts['sensor_limit'];
-            }
-            $details .= implode(', ', $details_a);
-
-            $fault_detail .= generate_sensor_link($tmp_alerts, $tmp_alerts['name']) . ';&nbsp; <br>' . $details;
-            $fallback = false;
-        }
-
-        if (isset($tmp_alerts['service_id'])) {
-            $fault_detail .= "Service: <a href='" .
-                \LibreNMS\Util\Url::generate([
-                    'page' => 'device',
-                    'device' => $tmp_alerts['device_id'],
-                    'tab' => 'services',
-                ]) .
-                "'>" . $tmp_alerts['service_name'] . '</a>';
-            $fault_detail .= ',<br>Type: ' . $tmp_alerts['service_type'];
-            $fault_detail .= ',<br>Param: ' . $tmp_alerts['service_param'];
-            $fault_detail .= ',<br>Msg: ' . $tmp_alerts['service_message'];
-            $fallback = false;
-        }
-
-        if (isset($tmp_alerts['bgpPeer_id'])) {
-            // If we have a bgpPeer_id, we format the data accordingly
-            $fault_detail .= "BGP peer <a href='" .
-                \LibreNMS\Util\Url::generate([
-                    'page' => 'device',
-                    'device' => $tmp_alerts['device_id'],
-                    'tab' => 'routing',
-                    'proto' => 'bgp',
-                ]) .
-                "'>" . $tmp_alerts['bgpPeerIdentifier'] . '</a>';
-            $fault_detail .= ', Desc ' . $tmp_alerts['bgpPeerDescr'] ?? '';
-            $fault_detail .= ', AS' . $tmp_alerts['bgpPeerRemoteAs'];
-            $fault_detail .= ', State ' . $tmp_alerts['bgpPeerState'];
-            $fallback = false;
-        }
-
-        if ($tmp_alerts['type'] && isset($tmp_alerts['label'])) {
-            if ($tmp_alerts['error'] == '') {
-                $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ';&nbsp;';
-            } else {
-                $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ' - ' . $tmp_alerts['error'] . ';&nbsp;';
-            }
-            $fallback = false;
-        }
-
-        if (in_array('app_id', array_keys($tmp_alerts))) {
-            $fault_detail .= "<a href='" .
-                \LibreNMS\Util\Url::generate([
-                    'page' => 'device',
-                    'device' => $tmp_alerts['device_id'],
-                    'tab' => 'apps',
-                    'app' => $tmp_alerts['app_type'],
-                ]) . "'>";
-            $fault_detail .= $tmp_alerts['app_type'];
-            $fault_detail .= '</a>';
-
-            if ($tmp_alerts['app_status']) {
-                $fault_detail .= ' => ' . $tmp_alerts['app_status'];
-            }
-            if ($tmp_alerts['metric']) {
-                $fault_detail .= ' : ' . $tmp_alerts['metric'] . ' => ' . $tmp_alerts['value'];
-            }
-            $fallback = false;
-        }
-
-        if ($fallback === true) {
-            $fault_detail_data = [];
-            foreach ($tmp_alerts as $k => $v) {
-                if (in_array($k, ['device_id', 'sysObjectID', 'sysDescr', 'location_id'])) {
-                    continue;
-                }
-                if (! empty($v) && str_i_contains($k, ['id', 'desc', 'msg', 'last'])) {
-                    $fault_detail_data[] = "$k => '$v'";
-                }
-            }
-            $fault_detail .= count($fault_detail_data) ? implode('<br>&nbsp;&nbsp;&nbsp', $fault_detail_data) : '';
-
-            $fault_detail = rtrim($fault_detail, ', ');
-        }
-
-        $fault_detail .= '<br>';
-
+    foreach ($details['rule'] ?? [] as $o => $tmp_alerts_rule) {
+        $fault_detail = format_alert_details($o, $tmp_alerts_rule);
         $max_row_length = strlen(strip_tags($fault_detail)) > $max_row_length ? strlen(strip_tags($fault_detail)) : $max_row_length;
-
         $all_fault_detail .= $fault_detail;
     }//end foreach
 
     return [$all_fault_detail, $max_row_length];
 }//end alert_details()
+
+function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
+{
+    $fault_detail = '';
+    $fallback = true;
+    $fault_detail .= $type_info ? $type_info . '&nbsp;' : '';
+    $fault_detail .= '#' . ($alert_idx + 1) . ':&nbsp;';
+    if (isset($tmp_alerts['bill_id'])) {
+        $fault_detail .= '<a href="' . Url::generate(['page' => 'bill', 'bill_id' => $tmp_alerts['bill_id']], []) . '">' . $tmp_alerts['bill_name'] . '</a>;&nbsp;';
+        $fallback = false;
+    }
+
+    if (isset($tmp_alerts['port_id'])) {
+        if ($tmp_alerts['isisISAdjState']) {
+            $fault_detail .= 'Adjacent ' . $tmp_alerts['isisISAdjIPAddrAddress'];
+            $port = Port::find($tmp_alerts['port_id']);
+            $fault_detail .= ', Interface ' . Url::portLink($port);
+        } else {
+            $tmp_alerts = cleanPort($tmp_alerts);
+            $fault_detail .= generate_port_link($tmp_alerts) . ';&nbsp;';
+        }
+        $fallback = false;
+    }
+
+    if (isset($tmp_alerts['accesspoint_id'])) {
+        $fault_detail .= generate_ap_link($tmp_alerts, $tmp_alerts['name']) . ';&nbsp;';
+        $fallback = false;
+    }
+
+    if (isset($tmp_alerts['sensor_id'])) {
+        if ($tmp_alerts['sensor_class'] == 'state') {
+            // Give more details for a state (textual form)
+            $details = 'State: ' . $tmp_alerts['state_descr'] . ' (numerical ' . $tmp_alerts['sensor_current'] . ')<br>  ';
+        } else {
+            // Other sensors
+            $details = 'Value: ' . $tmp_alerts['sensor_current'] . ' (' . $tmp_alerts['sensor_class'] . ')<br>  ';
+        }
+        $details_a = [];
+
+        if ($tmp_alerts['sensor_limit_low']) {
+            $details_a[] = 'low: ' . $tmp_alerts['sensor_limit_low'];
+        }
+        if ($tmp_alerts['sensor_limit_low_warn']) {
+            $details_a[] = 'low_warn: ' . $tmp_alerts['sensor_limit_low_warn'];
+        }
+        if ($tmp_alerts['sensor_limit_warn']) {
+            $details_a[] = 'high_warn: ' . $tmp_alerts['sensor_limit_warn'];
+        }
+        if ($tmp_alerts['sensor_limit']) {
+            $details_a[] = 'high: ' . $tmp_alerts['sensor_limit'];
+        }
+        $details .= implode(', ', $details_a);
+
+        $fault_detail .= generate_sensor_link($tmp_alerts, $tmp_alerts['name']) . ';&nbsp; <br>' . $details;
+        $fallback = false;
+    }
+
+    if (isset($tmp_alerts['service_id'])) {
+        $fault_detail .= "Service: <a href='" .
+            Url::generate([
+                'page' => 'device',
+                'device' => $tmp_alerts['device_id'],
+                'tab' => 'services',
+                'view' => 'detail',
+            ]) .
+            "'>" . ($tmp_alerts['service_name'] ?? '') . ' (' . $tmp_alerts['service_type'] . ')' . '</a>';
+        $fault_detail .= 'Service Host: ' . ($tmp_alerts['service_ip'] != '' ? $tmp_alerts['service_ip'] : format_hostname(DeviceCache::get($tmp_alerts['device_id']))) . ',<br>';
+        $fault_detail .= ($tmp_alerts['service_desc'] != '') ? ('Description: ' . $tmp_alerts['service_desc'] . ',<br>') : '';
+        $fault_detail .= ($tmp_alerts['service_param'] != '') ? ('Param: ' . $tmp_alerts['service_param'] . ',<br>') : '';
+        $fault_detail .= 'Msg: ' . $tmp_alerts['service_message'];
+        $fallback = false;
+    }
+
+    if (isset($tmp_alerts['bgpPeer_id'])) {
+        // If we have a bgpPeer_id, we format the data accordingly
+        $fault_detail .= "BGP peer <a href='" .
+            Url::generate([
+                'page' => 'device',
+                'device' => $tmp_alerts['device_id'],
+                'tab' => 'routing',
+                'proto' => 'bgp',
+            ]) .
+            "'>" . $tmp_alerts['bgpPeerIdentifier'] . '</a>';
+        $fault_detail .= ', Desc ' . $tmp_alerts['bgpPeerDescr'] ?? '';
+        $fault_detail .= ', AS' . $tmp_alerts['bgpPeerRemoteAs'];
+        $fault_detail .= ', State ' . $tmp_alerts['bgpPeerState'];
+        $fallback = false;
+    }
+
+    if (isset($tmp_alerts['mempool_id'])) {
+        // If we have a mempool_id, we format the data accordingly
+        $fault_detail .= "MemoryPool <a href='" .
+            Url::generate([
+                'page' => 'graphs',
+                'id' => $tmp_alerts['mempool_id'],
+                'type' => 'mempool_usage',
+            ]) .
+            "'>" . ($tmp_alerts['mempool_descr'] ?? 'link') . '</a>';
+        $fault_detail .= '<br> &nbsp; &nbsp; &nbsp; Usage ' . $tmp_alerts['mempool_perc'] . '%, &nbsp; Free ' . Number::formatSi($tmp_alerts['mempool_free']) . ',&nbsp; Size ' . Number::formatSi($tmp_alerts['mempool_total']);
+        $fallback = false;
+    }
+
+    if ($tmp_alerts['type'] && isset($tmp_alerts['label'])) {
+        if ($tmp_alerts['error'] == '') {
+            $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ';&nbsp;';
+        } else {
+            $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ' - ' . $tmp_alerts['error'] . ';&nbsp;';
+        }
+        $fallback = false;
+    }
+
+    if (in_array('app_id', array_keys($tmp_alerts))) {
+        $fault_detail .= "<a href='" .
+            Url::generate([
+                'page' => 'device',
+                'device' => $tmp_alerts['device_id'],
+                'tab' => 'apps',
+                'app' => $tmp_alerts['app_type'],
+            ]) . "'>";
+        $fault_detail .= $tmp_alerts['app_type'];
+        $fault_detail .= '</a>';
+
+        if ($tmp_alerts['app_status']) {
+            $fault_detail .= ' => ' . $tmp_alerts['app_status'];
+        }
+        if ($tmp_alerts['metric']) {
+            $fault_detail .= ' : ' . $tmp_alerts['metric'] . ' => ' . $tmp_alerts['value'];
+        }
+        $fallback = false;
+    }
+
+    if ($fallback === true) {
+        $fault_detail_data = [];
+        foreach ($tmp_alerts as $k => $v) {
+            if (in_array($k, ['device_id', 'sysObjectID', 'sysDescr', 'location_id'])) {
+                continue;
+            }
+            if (! empty($v) && Str::contains($k, ['id', 'desc', 'msg', 'last'], ignoreCase: true)) {
+                $fault_detail_data[] = "$k => '$v'";
+            }
+        }
+        $fault_detail .= count($fault_detail_data) ? implode('<br>&nbsp;&nbsp;&nbsp', $fault_detail_data) : '';
+
+        $fault_detail = rtrim($fault_detail, ', ');
+    }
+
+    $fault_detail .= '<br>';
+
+    return $fault_detail;
+}
 
 function dynamic_override_config($type, $name, $device)
 {
@@ -829,9 +746,9 @@ function dynamic_override_config($type, $name, $device)
         $checked = '';
     }
     if ($type == 'checkbox') {
-        return '<input type="checkbox" id="override_config" name="override_config" data-attrib="' . $name . '" data-device_id="' . $device['device_id'] . '" data-size="small" ' . $checked . '>';
+        return '<input type="checkbox" id="override_config" name="override_config" data-attrib="' . htmlentities($name) . '" data-device_id="' . $device['device_id'] . '" data-size="small" ' . $checked . '>';
     } elseif ($type == 'text') {
-        return '<input type="text" id="override_config_text" name="override_config_text" data-attrib="' . $name . '" data-device_id="' . $device['device_id'] . '" value="' . $attrib_val . '">';
+        return '<input type="text" id="override_config_text" name="override_config_text" data-attrib="' . htmlentities($name) . '" data-device_id="' . $device['device_id'] . '" value="' . htmlentities($attrib_val) . '">';
     }
 }//end dynamic_override_config()
 
@@ -953,21 +870,6 @@ function search_oxidized_config($search_in_conf_textbox)
 }
 
 /**
- * @param  $data
- * @return bool|mixed
- */
-function array_to_htmljson($data)
-{
-    if (is_array($data)) {
-        $data = htmlentities(json_encode($data));
-
-        return str_replace(',', ',<br />', $data);
-    } else {
-        return false;
-    }
-}
-
-/**
  * @param  int  $eventlog_severity
  * @return string $eventlog_severity_icon
  */
@@ -1005,13 +907,25 @@ function get_oxidized_nodes_list()
             //user cannot see this device, so let's skip it.
             continue;
         }
+        try {
+            // Convert UTC time string to local timezone set
+            $utc_time = $object['time'];
+            $utc_date = new DateTime($utc_time, new DateTimeZone('UTC'));
+            $local_timezone = new DateTimeZone(date_default_timezone_get());
+            $local_date = $utc_date->setTimezone($local_timezone);
 
+            // Generate local time string
+            $formatted_local_time = $local_date->format('Y-m-d H:i:s T');
+        } catch (Exception $e) {
+            // Just display the current value of $object['time'];
+            $formatted_local_time = $object['time'];
+        }
         echo '<tr>
         <td>' . $device['device_id'] . '</td>
         <td>' . $object['name'] . '</td>
         <td>' . $device['sysName'] . '</td>
         <td>' . $object['status'] . '</td>
-        <td>' . $object['time'] . '</td>
+        <td>' . $formatted_local_time . '</td>
         <td>' . $object['model'] . '</td>
         <td>' . $object['group'] . '</td>
         <td></td>
@@ -1032,27 +946,6 @@ function generate_stacked_graphs($force_stack = false, $transparency = '88')
     } else {
         return ['transparency' => '', 'stacked' => '-1'];
     }
-}
-
-/**
- * Returns the sysname of a device with a html line break prepended.
- * if the device has an empty sysname it will return device's hostname instead
- * And finally if the device has no hostname it will return an empty string
- *
- * @param array device
- * @return string
- */
-function get_device_name($device)
-{
-    $ret_str = '';
-
-    if (format_hostname($device) !== $device['sysName']) {
-        $ret_str = $device['sysName'];
-    } elseif ($device['hostname'] !== $device['ip']) {
-        $ret_str = $device['hostname'];
-    }
-
-    return $ret_str;
 }
 
 /**
@@ -1097,16 +990,16 @@ function get_sensor_label_color($sensor, $type = 'sensors')
     if (is_null($sensor)) {
         return 'label-unknown';
     }
-    if (! is_null($sensor['sensor_limit_warn']) && $sensor['sensor_current'] > $sensor['sensor_limit_warn']) {
+    if (! is_null($sensor['sensor_limit_warn']) && $sensor['sensor_current'] >= $sensor['sensor_limit_warn']) {
         $label_style = 'label-warning';
     }
-    if (! is_null($sensor['sensor_limit_low_warn']) && $sensor['sensor_current'] < $sensor['sensor_limit_low_warn']) {
+    if (! is_null($sensor['sensor_limit_low_warn']) && $sensor['sensor_current'] <= $sensor['sensor_limit_low_warn']) {
         $label_style = 'label-warning';
     }
-    if (! is_null($sensor['sensor_limit']) && $sensor['sensor_current'] > $sensor['sensor_limit']) {
+    if (! is_null($sensor['sensor_limit']) && $sensor['sensor_current'] >= $sensor['sensor_limit']) {
         $label_style = 'label-danger';
     }
-    if (! is_null($sensor['sensor_limit_low']) && $sensor['sensor_current'] < $sensor['sensor_limit_low']) {
+    if (! is_null($sensor['sensor_limit_low']) && $sensor['sensor_current'] <= $sensor['sensor_limit_low']) {
         $label_style = 'label-danger';
     }
     $unit = __("$type.{$sensor['sensor_class']}.unit");

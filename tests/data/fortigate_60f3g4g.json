@@ -4814,7 +4814,7 @@
                     "bgpPeerLastErrorCode": 4,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
-                    "bgpPeerIface": null,
+                    "bgpPeerIface": 18,
                     "bgpLocalAddr": "192.168.1.22",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -5082,5 +5082,103 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 1,
+                    "low_ifIndex": 20,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 3,
+                    "low_ifIndex": 18,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 8,
+                    "low_ifIndex": 22,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 22,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 2,
+                    "ifStackStatus": "notInService"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 7,
+                    "ifStackStatus": "notInService"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 12,
+                    "ifStackStatus": "notInService"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 14,
+                    "ifStackStatus": "notInService"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 15,
+                    "ifStackStatus": "notInService"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 17,
+                    "ifStackStatus": "notInService"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 21,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 11,
+                    "low_ifIndex": 22,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 13,
+                    "low_ifIndex": 22,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 16,
+                    "low_ifIndex": 10,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 21,
+                    "low_ifIndex": 22,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "forti-60f-3g4g",
+                    "remote_port": "port12 (e8123456789a)",
+                    "remote_platform": null,
+                    "remote_version": "FortiSwitchRugged-112D-POE v6.4.5,build0461,201215 (GA)",
+                    "ifAlias": "TEMP LINK TO FORTI SWITCH",
+                    "ifDescr": "wan2",
+                    "ifName": "wan2"
+                }
+            ]
+        }
     }
 }

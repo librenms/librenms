@@ -25,20 +25,29 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\Device;
+use App\Models\Transceiver;
+use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
-class Exa extends OS implements OSDiscovery
+class Exa extends OS implements OSDiscovery, TransceiverDiscovery
 {
     public function discoverOS(Device $device): void
     {
-        $info = snmp_getnext_multi($this->getDeviceArray(), ['e7CardSoftwareVersion', 'e7CardSerialNumber'], '-OQUs', 'E7-Calix-MIB');
-        $device->version = $info['e7CardSoftwareVersion'] ?? null;
-        $device->serial = $info['e7CardSerialNumber'] ?? null;
+        $response = SnmpQuery::next([
+            'E7-Calix-MIB::e7CardSoftwareVersion',
+            'E7-Calix-MIB::e7CardSerialNumber',
+        ]);
+
+        $device->version = $response->value('E7-Calix-MIB::e7CardSoftwareVersion') ?: null;
+        $device->serial = $response->value('E7-Calix-MIB::e7CardSerialNumber') ?: null;
         $device->hardware = 'Calix ' . $device->sysDescr;
 
-        $cards = explode("\n", snmp_walk($this->getDeviceArray(), 'e7CardProvType', '-OQv', 'E7-Calix-MIB'));
+        $cards = SnmpQuery::enumStrings()->walk('E7-Calix-MIB::e7CardProvType')->values();
         $card_count = [];
         foreach ($cards as $card) {
             $card_count[$card] = ($card_count[$card] ?? 0) + 1;
@@ -46,5 +55,33 @@ class Exa extends OS implements OSDiscovery
         $device->features = implode(', ', array_map(function ($card) use ($card_count) {
             return ($card_count[$card] > 1 ? $card_count[$card] . 'x ' : '') . $card;
         }, array_keys($card_count)));
+    }
+
+    public function discoverTransceivers(): Collection
+    {
+        return \SnmpQuery::cache()->walk('E7-Calix-MIB::e7OltPonPortTable')->mapTable(function ($data, $shelf, $card, $port) {
+            if ($data['E7-Calix-MIB::e7OltPonPortStatus'] == 0) {
+                return null;
+            }
+
+            $ifIndex = self::getIfIndex($shelf, $card, $port, 'gpon');
+
+            return new Transceiver([
+                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
+                'index' => "$shelf.$card.$port",
+                'entity_physical_index' => $ifIndex,
+            ]);
+        })->filter();
+    }
+
+    public static function getIfIndex(int $chassis, int $slot, int $id, string $type): int
+    {
+        // doesn't work for stacked chassis, I don't have enough info to figure out how it works
+        $offset = match ($type) {
+            'gpon' => 20000,
+            default => 0,
+        };
+
+        return $offset + (10000 * $chassis) + ($slot * 100) + $id;
     }
 }

@@ -38,7 +38,7 @@ if (isset($_POST['editing'])) {
             $device->features = null;
             $device->hardware = $_POST['hardware'];
             $device->icon = null;
-            $device->os = $_POST['os'] ? $_POST['os_id'] : 'ping';
+            $device->os = $_POST['os'] ? strip_tags($_POST['os_id']) : 'ping';
             $device->snmp_disable = 1;
             $device->sysName = $_POST['sysName'] ?: null;
             $device->version = null;
@@ -211,7 +211,7 @@ echo "
     <label for='os' class='col-sm-2 control-label'>OS (optional)</label>
     <div class='col-sm-4'>
     <input id='os' class='form-control' name='os' value='" . htmlspecialchars(Config::get("os.{$device->os}.text")) . "'/>
-    <input type='hidden' id='os_id' class='form-control' name='os_id' value='" . $device->os . "'/>
+    <input type='hidden' id='os_id' class='form-control' name='os_id' value='" . htmlspecialchars($device->os) . "'/>
     </div>
     </div>
     </div>

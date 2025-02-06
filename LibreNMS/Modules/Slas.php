@@ -102,19 +102,24 @@ class Slas implements Module
         }
     }
 
+    public function dataExists(Device $device): bool
+    {
+        return $device->slas()->exists();
+    }
+
     /**
      * Remove all DB data for this module.
      * This will be run when the module is disabled.
      */
-    public function cleanup(Device $device): void
+    public function cleanup(Device $device): int
     {
-        $device->slas()->delete();
+        return $device->slas()->delete();
     }
 
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
         return [
             'slas' => $device->slas()->orderBy('sla_nr')

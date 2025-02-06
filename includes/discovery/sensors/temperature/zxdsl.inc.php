@@ -15,7 +15,7 @@ $value = str_replace('"', '', $value);
 
 if (is_numeric($value)) {
     discover_sensor(
-        $valid['sensor'],
+        null,
         'temperature',
         $device,
         $valueoid,

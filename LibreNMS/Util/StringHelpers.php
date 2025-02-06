@@ -27,22 +27,6 @@ namespace LibreNMS\Util;
 
 class StringHelpers
 {
-    /**
-     * Shorten text over 50 chars, if shortened, add ellipsis
-     *
-     * @param  string  $string
-     * @param  int  $max
-     * @return string
-     */
-    public static function shortenText($string, $max = 30)
-    {
-        if (strlen($string) > 50) {
-            return substr($string, 0, $max) . '...';
-        }
-
-        return $string;
-    }
-
     public static function niceCase($string)
     {
         $replacements = [
@@ -57,6 +41,7 @@ class StringHelpers
             'freeradius' => 'FreeRADIUS',
             'gpsd' => 'GPSD',
             'hv-monitor' => 'HV Monitor',
+            'http_access_log_combined' => 'HTTP Access Log Combined',
             'mojo_cape_submit' => 'Mojo CAPE Submit',
             'mailcow-postfix' => 'mailcow-dockerized postfix',
             'mysql' => 'MySQL',
@@ -69,6 +54,7 @@ class StringHelpers
             'ntp-server' => 'NTP Server',
             'opengridscheduler' => 'Open Grid Scheduler',
             'opensearch' => 'Elasticsearch\Opensearch',
+            'oslv_monitor' => 'OS Level Virtualization',
             'os-updates' => 'OS Updates',
             'php-fpm' => 'PHP-FPM',
             'pi-hole' => 'Pi-hole',
@@ -173,5 +159,42 @@ class StringHelpers
         }
 
         return implode($seperator, $hex);
+    }
+
+    public static function hexToAscii(string $hex, string $seperator = ''): string
+    {
+        if ($seperator) {
+            $escaped_seperator = preg_quote($seperator);
+            $no_nulls = preg_replace("/(00$escaped_seperator(00)?|{$escaped_seperator}00)/", '', $hex);
+            $hex = str_replace($seperator, '', $no_nulls);
+        }
+
+        $string = '';
+
+        for ($i = 0; $i < strlen($hex) - 1; $i += 2) {
+            $string .= chr(hexdec(substr($hex, $i, 2)));
+        }
+
+        return $string;
+    }
+
+    public static function trimHexGarbage(string $string): string
+    {
+        $regex = '/((\.{2,}.{1,2})?\.+)?([0-9a-f]{2} )*([0-9a-f]{2})?$/';
+
+        return preg_replace($regex, '', str_replace("\n", '', $string));
+    }
+
+    /**
+     * If string has a number at the start (excluding whitespace) that can be extraced by Number::cast()
+     */
+    public static function hasNumber(string $string): bool
+    {
+        return (bool) preg_match('/^\s*-?\d+(\.\d+)?/', $string);
+    }
+
+    public static function isHex(string $string): bool
+    {
+        return (bool) preg_match('/^[a-f0-9][a-f0-9]( [a-f0-9][a-f0-9])*$/is', trim($string));
     }
 }

@@ -19,10 +19,6 @@ bgp-peers:
         - { left: bgpPeers.vrf_id, right: vrfs.vrf_id, select: [vrfs.bgpLocalAs as vrfLocalAs] }
     bgpPeers_cbgp:
         excluded_fields: [device_id]
-entity-physical:
-    entPhysical:
-        excluded_fields: [device_id, entPhysical_id]
-        order_by: entPhysicalIndex
 fdb-table:
     ports_fdb:
         excluded_fields: [device_id, ports_fdb_id, port_id, vlan_id, created_at, updated_at]
@@ -85,9 +81,6 @@ vrf:
         excluded_fields: [vrf_id, device_id]
         joins:
             - { custom: "LEFT JOIN (SELECT ifVrf, GROUP_CONCAT(ifIndex ORDER BY ifIndex ASC SEPARATOR ',') as ifIndices FROM ports GROUP BY ifVrf) p ON p.ifVrf = vrfs.vrf_id", select: ["p.ifIndices"] }
-wireless:
-    wireless_sensors:
-        excluded_fields: [device_id, sensor_id, access_point_id, lastupdate]
 cisco-mac-accounting:
     mac_accounting:
         excluded_fields: [ma_id, port_id, poll_time, poll_prev, poll_period, cipMacHCSwitchedBytes_input_rate, cipMacHCSwitchedBytes_output_rate, cipMacHCSwitchedPkts_input_rate, cipMacHCSwitchedPkts_output_rate]
@@ -97,7 +90,7 @@ cisco-mac-accounting:
         order_by: ports.ifIndex, mac
 discovery-protocols:
     links:
-        joins: 
+        joins:
             - { left: links.local_port_id, right: ports.port_id, select: [ports.ifAlias, ports.ifDescr, ports.ifName] }
         custom_where: WHERE links.local_device_id=?
         excluded_fields: [local_device_id, local_port_id, remote_port_id, remote_device_id, id]

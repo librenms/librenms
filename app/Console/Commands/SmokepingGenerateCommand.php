@@ -374,7 +374,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      */
     private function balanceProbes($transport, $probeCount)
     {
-        if ($transport === 'udp') {
+        if ($transport === 'udp' || $transport === 'tcp') {
             if ($probeCount === $this->ip4count) {
                 $this->ip4count = 0;
             }

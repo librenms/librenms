@@ -27,8 +27,8 @@ namespace App\Http\Controllers\Table;
 
 use App\Models\DeviceOutage;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Blade;
 use LibreNMS\Config;
-use LibreNMS\Util\Url;
 
 class OutagesController extends TableController
 {
@@ -84,7 +84,7 @@ class OutagesController extends TableController
             'status' => $this->statusLabel($outage),
             'going_down' => $start,
             'up_again' => $end,
-            'device_id' => $outage->device ? Url::deviceLink($outage->device, $outage->device->shortDisplayName()) : null,
+            'device_id' => Blade::render('<x-device-link :device="$device"/>', ['device' => $outage->device]),
             'duration' => $this->formatTime($duration),
         ];
     }

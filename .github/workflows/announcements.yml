@@ -1,0 +1,46 @@
+name: Notify Discord on PR Merge with Specific Tag
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  notify-discord:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check Out Repository
+        uses: actions/checkout@v3
+
+      - name: Check for Specific Label
+        id: check_label
+        run: |
+          LABEL_FOUND=false
+          for label in "${{ github.event.pull_request.labels[*].name }}"; do
+            if [[ "$label" == "Breaking-Change" ]]; then
+              LABEL_FOUND=true
+              break
+            fi
+          done
+
+          if [[ "$LABEL_FOUND" != "true" ]]; then
+            echo "PR does not contain the specific label. Skipping."
+            exit 0
+          fi
+
+
+      - name: Send Notification to Discord
+        env:
+          DISCORD_WEBHOOK_URL: "${{ secrets.DISCORD_WEBHOOK_URL_ANNOUNCEMENT }}"
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_MESSAGE="${{ github.event.pull_request.body }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+
+          curl -X POST -H "Content-Type: application/json" \
+          -d "{
+            \"content\": \":rotating_light: A breaking change pull request has been merged! :rotating_light: \n\n**Title**: $PR_TITLE\n[View PR]($PR_URL)\n\n$PR_MESSAGE\"
+          }" \
+          $DISCORD_WEBHOOK_URL

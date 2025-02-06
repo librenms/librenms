@@ -1,10 +1,9 @@
 import logging
 import os
+import pymysql  # pylint: disable=import-error
 import sys
 import threading
 import time
-
-import pymysql  # pylint: disable=import-error
 
 import LibreNMS
 from LibreNMS.config import DBConfig
@@ -138,39 +137,63 @@ class ServiceConfig(DBConfig):
         self.log_level = config.get("poller_service_loglevel", ServiceConfig.log_level)
 
         # new options
-        self.poller.enabled = config.get("service_poller_enabled", True)  # unused
+        self.poller.enabled = (
+            config.get("service_poller_enabled", True)
+            if config.get("schedule_type").get("poller", "legacy") == "legacy"
+            else config.get("schedule_type").get("poller", "legacy") == "dispatcher"
+        )
         self.poller.workers = config.get(
             "service_poller_workers", ServiceConfig.poller.workers
         )
         self.poller.frequency = config.get(
             "service_poller_frequency", ServiceConfig.poller.frequency
         )
-        self.discovery.enabled = config.get("service_discovery_enabled", True)  # unused
+        self.discovery.enabled = (
+            config.get("service_discovery_enabled", True)
+            if config.get("schedule_type").get("discovery", "legacy") == "legacy"
+            else config.get("schedule_type").get("discovery", "legacy") == "dispatcher"
+        )
         self.discovery.workers = config.get(
             "service_discovery_workers", ServiceConfig.discovery.workers
         )
         self.discovery.frequency = config.get(
             "service_discovery_frequency", ServiceConfig.discovery.frequency
         )
-        self.services.enabled = config.get("service_services_enabled", True)
+        self.services.enabled = (
+            config.get("service_services_enabled", True)
+            if config.get("schedule_type").get("services", "legacy") == "legacy"
+            else config.get("schedule_type").get("services", "legacy") == "dispatcher"
+        )
         self.services.workers = config.get(
             "service_services_workers", ServiceConfig.services.workers
         )
         self.services.frequency = config.get(
             "service_services_frequency", ServiceConfig.services.frequency
         )
-        self.billing.enabled = config.get("service_billing_enabled", True)
+        self.billing.enabled = (
+            config.get("service_billing_enabled", True)
+            if config.get("schedule_type").get("billing", "legacy") == "legacy"
+            else config.get("schedule_type").get("billing", "legacy") == "dispatcher"
+        )
         self.billing.frequency = config.get(
             "service_billing_frequency", ServiceConfig.billing.frequency
         )
         self.billing.calculate = config.get(
             "service_billing_calculate_frequency", ServiceConfig.billing.calculate
         )
-        self.alerting.enabled = config.get("service_alerting_enabled", True)
+        self.alerting.enabled = (
+            config.get("service_alerting_enabled", True)
+            if config.get("schedule_type").get("alerting", "legacy") == "legacy"
+            else config.get("schedule_type").get("alerting", "legacy") == "dispatcher"
+        )
         self.alerting.frequency = config.get(
             "service_alerting_frequency", ServiceConfig.alerting.frequency
         )
-        self.ping.enabled = config.get("service_ping_enabled", False)
+        self.ping.enabled = (
+            config.get("service_ping_enabled", False)
+            if config.get("schedule_type").get("ping", "legacy") == "legacy"
+            else config.get("schedule_type").get("ping", "legacy") == "dispatcher"
+        )
         self.ping.frequency = config.get("ping_rrd_step", ServiceConfig.ping.frequency)
         self.down_retry = config.get(
             "service_poller_down_retry", ServiceConfig.down_retry

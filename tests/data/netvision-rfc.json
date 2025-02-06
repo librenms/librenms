@@ -8,12 +8,12 @@
                     "sysDescr": "Linux localhost.localdomain 2.6.37.6-lsp-3.2.5_stm24_0012-spear3xx #105 Mon Dec 24 14:49:28 CST 2018 armv5tejl",
                     "sysContact": "<private>",
                     "version": "7.20",
-                    "hardware": null,
+                    "hardware": "MODULYS GP 2.0",
                     "features": null,
                     "location": "<private>",
                     "os": "netvision-rfc",
                     "type": "power",
-                    "serial": null,
+                    "serial": "PD04405001",
                     "icon": "netvision.png"
                 }
             ]
@@ -863,7 +863,7 @@
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 100,
-                    "sensor_limit": 101,
+                    "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 15,
                     "sensor_limit_low_warn": 50,

@@ -25,9 +25,12 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\ImageFormat;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\FileExistsException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Proc;
@@ -44,28 +47,24 @@ class Rrd extends BaseDatastore
     private $sync_process;
     /** @var Proc */
     private $async_process;
+    /** @var string */
     private $rrd_dir;
+    /** @var string */
     private $version;
+    /** @var string */
     private $rrdcached;
+    /** @var string */
     private $rra;
+    /** @var int */
     private $step;
+    /** @var string */
+    private $rrdtool_executable;
 
     public function __construct()
     {
         parent::__construct();
-        $this->rrdcached = Config::get('rrdcached', false);
-
+        $this->loadConfig();
         $this->init();
-        $this->rrd_dir = Config::get('rrd_dir', Config::get('install_dir') . '/rrd');
-        $this->step = Config::get('rrd.step', 300);
-        $this->rra = Config::get(
-            'rrd_rra',
-            'RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440 ' .
-            ' RRA:MIN:0.5:1:2016 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:1440     RRA:MIN:0.5:288:1440 ' .
-            ' RRA:MAX:0.5:1:2016 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:1440     RRA:MAX:0.5:288:1440 ' .
-            ' RRA:LAST:0.5:1:2016 '
-        );
-        $this->version = Config::get('rrdtool_version', '1.4');
     }
 
     public function getName()
@@ -78,15 +77,31 @@ class Rrd extends BaseDatastore
         return Config::get('rrd.enable', true);
     }
 
+    protected function loadConfig(): void
+    {
+        $this->rrdcached = Config::get('rrdcached', false);
+        $this->rrd_dir = Config::get('rrd_dir', Config::get('install_dir') . '/rrd');
+        $this->step = Config::get('rrd.step', 300);
+        $this->rra = Config::get(
+            'rrd_rra',
+            'RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440 ' .
+            ' RRA:MIN:0.5:1:2016 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:1440     RRA:MIN:0.5:288:1440 ' .
+            ' RRA:MAX:0.5:1:2016 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:1440     RRA:MAX:0.5:288:1440 ' .
+            ' RRA:LAST:0.5:1:2016 '
+        );
+        $this->version = Config::get('rrdtool_version', '1.4');
+        $this->rrdtool_executable = Config::get('rrdtool', 'rrdtool');
+    }
+
     /**
      * Opens up a pipe to RRDTool using handles provided
      *
      * @param  bool  $dual_process  start an additional process that's output should be read after every command
      * @return bool the process(s) have been successfully started
      */
-    public function init($dual_process = true)
+    public function init($dual_process = true): bool
     {
-        $command = Config::get('rrdtool', 'rrdtool') . ' -';
+        $command = $this->rrdtool_executable . ' -';
 
         $descriptor_spec = [
             0 => ['pipe', 'r'], // stdin  is a pipe that the child will read from
@@ -94,18 +109,24 @@ class Rrd extends BaseDatastore
             2 => ['pipe', 'w'], // stderr is a pipe that the child will write to
         ];
 
-        $cwd = Config::get('rrd_dir');
+        $cwd = $this->rrd_dir;
 
-        if (! $this->isSyncRunning()) {
-            $this->sync_process = new Proc($command, $descriptor_spec, $cwd);
+        try {
+            if (! $this->isSyncRunning()) {
+                $this->sync_process = new Proc($command, $descriptor_spec, $cwd);
+            }
+
+            if ($dual_process && ! $this->isAsyncRunning()) {
+                $this->async_process = new Proc($command, $descriptor_spec, $cwd);
+                $this->async_process->setSynchronous(false);
+            }
+
+            return $this->isSyncRunning() && ($dual_process ? $this->isAsyncRunning() : true);
+        } catch (\Exception $e) {
+            Log::error('Failed to start RRD datastore: ' . $e->getMessage());
+
+            return false;
         }
-
-        if ($dual_process && ! $this->isAsyncRunning()) {
-            $this->async_process = new Proc($command, $descriptor_spec, $cwd);
-            $this->async_process->setSynchronous(false);
-        }
-
-        return $this->isSyncRunning() && ($dual_process ? $this->isAsyncRunning() : true);
     }
 
     public function isSyncRunning()
@@ -323,11 +344,11 @@ class Rrd extends BaseDatastore
         $newrrd = self::name($device['hostname'], $newname);
         if (is_file($oldrrd) && ! is_file($newrrd)) {
             if (rename($oldrrd, $newrrd)) {
-                log_event("Renamed $oldrrd to $newrrd", $device, 'poller', 1);
+                Eventlog::log("Renamed $oldrrd to $newrrd", $device['device_id'], 'poller', Severity::Ok);
 
                 return true;
             } else {
-                log_event("Failed to rename $oldrrd to $newrrd", $device, 'poller', 5);
+                Eventlog::log("Failed to rename $oldrrd to $newrrd", $device['device_id'], 'poller', Severity::Error);
 
                 return false;
             }
@@ -360,9 +381,9 @@ class Rrd extends BaseDatastore
      */
     public function dirFromHost($host)
     {
-        $host = str_replace(':', '_', trim($host, '[]'));
+        $host = self::safeName(trim($host, '[]'));
 
-        return implode('/', [$this->rrd_dir, $host]);
+        return Str::finish($this->rrd_dir, '/') . $host;
     }
 
     /**
@@ -438,7 +459,7 @@ class Rrd extends BaseDatastore
      *
      * @throws FileExistsException if rrdtool <1.4.3 and the rrd file exists locally
      */
-    public function buildCommand($command, $filename, $options)
+    public function buildCommand($command, $filename, $options): string
     {
         if ($command == 'create') {
             // <1.4.3 doesn't support -O, so make sure the file doesn't exist
@@ -579,7 +600,7 @@ class Rrd extends BaseDatastore
      */
     public function graph(string $options, array $env = null): string
     {
-        $process = new Process([Config::get('rrdtool', 'rrdtool'), '-'], $this->rrd_dir, $env);
+        $process = new Process([$this->rrdtool_executable, '-'], $this->rrd_dir, $env);
         $process->setTimeout(300);
         $process->setIdleTimeout(300);
 
@@ -655,7 +676,7 @@ class Rrd extends BaseDatastore
      */
     public static function fixedSafeDescr($descr, $length)
     {
-        $result = Rewrite::shortenIfType($descr);
+        $result = Rewrite::shortenIfName($descr);
         $result = str_replace("'", '', $result);            // remove quotes
 
         if (is_numeric($length)) {
