@@ -48,7 +48,7 @@ class Glpi extends Transport
             ->get($this->config['api-url'] . '/initSession', $data);
 
         if (! $res->successful()) {
-            throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), 
+            throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(),
                 $alert_data['msg'], $data);
         }
 
@@ -213,7 +213,7 @@ class Glpi extends Transport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), 
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(),
             $alert_data['msg'], $data);
     }
 
