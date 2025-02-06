@@ -120,7 +120,7 @@ class Glpi extends Transport
             $entityName = $res->json()['data'][0]['80'] ?? null;
             $entityID = null;
             if ($entityName != null) {
-                $entitySearchURL = $this->config['api-url'].
+                $entitySearchURL = $this->config['api-url'] .
                     '/search/Entity?' .
                     'forcedisplay[0]=2&' .
                     'criteria[0][field]=1&' .
@@ -174,7 +174,6 @@ class Glpi extends Transport
                     ->withHeaders($headers)
                     ->post($this->config['api-url'] . '/Item_Ticket', $data);
             }
-
         } else {
             // Update the status if resolved
             $ticketID = $res->json()['data'][0]['2'];
