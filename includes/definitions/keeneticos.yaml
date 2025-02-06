@@ -7,5 +7,5 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
     -
-        sysDescr:
-            - 'Keenetic'
+        sysDescr_regex:
+            - '/^Keenetic/'
