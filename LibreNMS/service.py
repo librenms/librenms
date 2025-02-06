@@ -373,6 +373,7 @@ class ServiceConfig(DBConfig):
         logger.error("Could not parse group string, defaulting to 0")
         return [0]
 
+
 class Service:
     config = ServiceConfig()
     _fp = False
@@ -414,7 +415,7 @@ class Service:
             )
         else:
             logger.info("Watchdog is disabled.")
-        with open(self.config.health_file, 'a') as f:
+        with open(self.config.health_file, "a") as f:
             utime(self.config.health_file)
         self.systemd_watchdog_timer = LibreNMS.RecurringTimer(
             10, self.systemd_watchdog, "systemd-watchdog"
