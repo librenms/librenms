@@ -8,12 +8,12 @@
                     "sysDescr": "Keenetic Hero 4G+ (KeeneticOS 4.02.C.1.0-1): KN-2311",
                     "sysContact": "<private contact>",
                     "version": "4.02.C.1.0-1",
-                    "hardware": "KN-2311",
+                    "hardware": null,
                     "features": null,
                     "location": "<private location>",
                     "os": "keeneticos",
                     "type": "network",
-                    "serial": "S2252TA123456",
+                    "serial": null,
                     "icon": "keeneticos.svg"
                 }
             ]
@@ -6050,25 +6050,6 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Keenetic",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 19,
-                    "entPhysicalDescr": null,
-                    "entPhysicalClass": null,
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": null,
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": null,
-                    "entPhysicalModelName": null,
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": null,
-                    "entPhysicalContainedIn": 0,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": null,
                     "ifIndex": null
                 }
             ]
