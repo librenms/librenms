@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Actions\Device\CheckDeviceAvailability;
 use App\Events\DevicePolled;
 use App\Events\PollingDevice;
+use App\Exceptions\PollingFailedException;
 use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
@@ -116,7 +117,7 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
         }
 
         if (! $this->device->status) {
-            throw new \Exception('Failed to poll device');
+            throw new PollingFailedException($this->device);
         }
 
         DevicePolled::dispatch($this->device);

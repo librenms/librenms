@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
 use App\Events\DevicePolled;
+use App\Exceptions\PollingFailedException;
 use App\Facades\LibrenmsConfig;
 use App\Jobs\DispatchPollingWork;
 use App\Jobs\PollDevice;
@@ -75,9 +76,13 @@ class DevicePoll extends LnmsCommand
             });
 
             foreach (Device::whereDeviceSpec($this->argument('device spec'))->pluck('device_id') as $device_id) {
-                $this->current_device_id = $device_id;
-                $result->markAttempted();
-                PollDevice::dispatchSync($device_id, $module_overrides);
+                try {
+                    $this->current_device_id = $device_id;
+                    $result->markAttempted();
+                    PollDevice::dispatchSync($device_id, $module_overrides);
+                } catch(PollingFailedException $e) {
+                    Log::info($e->getMessage());
+                }
             }
 
             if ($result->hasAnyCompleted()) {
