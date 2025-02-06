@@ -35,33 +35,33 @@ class Glpi extends Transport
     {
         // Connect to the API with app/user tokens
         $headers = [
-            "Content-Type" => "application/json",
-            "App-Token" => $this->config["app-token"]
+            'Content-Type' => 'application/json',
+            'App-Token' => $this->config['app-token'],
         ];
 
         $data = [
-            "user_token" => $this->config["user-token"]
+            'user_token' => $this->config['user-token'],
         ];
 
         $res = Http::client()
             ->withHeaders($headers)
-            ->get($this->config["api-url"] . "/initSession", $data);
+            ->get($this->config['api-url'] . '/initSession', $data);
 
-        if (!$res->successful()) {
+        if (! $res->successful()) {
             throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), 
-                                                      $alert_data['msg'], $data);
+                $alert_data['msg'], $data);
         }
 
-        $headers["Session-Token"] = json_decode($res->body(), true)["session_token"];
+        $headers['Session-Token'] = json_decode($res->body(), true)['session_token'];
 
         // Change the active profile to the admin one
         $profile = null;
         $profiles = Http::client()
             ->withHeaders($headers)
-            ->get($this->config["api-url"] . "/getMyProfiles");
+            ->get($this->config['api-url'] . '/getMyProfiles');
         
         foreach ($profiles['myprofiles'] as $profile) {
-            if (str_contains($profile['name'], "super-admin")) {
+            if (str_contains($profile['name'], 'super-admin')) {
                 $profile = $profile['id'];
                 break;
             }
@@ -69,141 +69,141 @@ class Glpi extends Transport
 
         if ($profile != null) {
             $data = [
-                'profiles_id' => $profile
+                'profiles_id' => $profile,
             ];
 
             $res = Http::client()
                 ->withHeaders($headers)
-                ->post($this->config["api-url"] . "/changeActiveProfile/", $data);
+                ->post($this->config['api-url'] . '/changeActiveProfile/', $data);
 
             $res = Http::client()
                 ->withHeaders($headers)
-                ->post($this->config["api-url"] . "/changeActiveEntities/");
+                ->post($this->config['api-url'] . '/changeActiveEntities/');
         }
 
         // Retrieve the ticket for the alert (by title)
-        $ticketURL = $this->config["api-url"] . "/Ticket";
-        $searchURL = $this->config["api-url"].
-            "/search/Ticket?".
-            "forcedisplay[0]=2&".
-            "criteria[0][field]=1&".
-            "criteria[0][searchtype]=contains&".
-            "criteria[0][value]=^[LibreNMS: " . $alert_data['sysName'] . "] " . $alert_data["name"] . "$&".
-            "criteria[1][link]=AND&".
-            "criteria[1][field]=12&".
-            "criteria[1][searchtype]=equals&".
-            "criteria[1][value]=notclosed";
+        $ticketURL = $this->config['api-url'] . '/Ticket';
+        $searchURL = $this->config['api-url'] .
+            '/search/Ticket?'.
+            'forcedisplay[0]=2&'.
+            'criteria[0][field]=1&'.
+            'criteria[0][searchtype]=contains&'.
+            'criteria[0][value]=^[LibreNMS: ' . $alert_data['sysName'] . '] ' . $alert_data['name'] . '$&'.
+            'criteria[1][link]=AND&'.
+            'criteria[1][field]=12&'.
+            'criteria[1][searchtype]=equals&'.
+            'criteria[1][value]=notclosed';
 
         $res = Http::client()
             ->withHeaders($headers)
             ->get($searchURL);
 
-        if (!array_key_exists("data", $res->json())) {
+        if (! array_key_exists('data', $res->json())) {
             // No ticket for the alert found, create a new one
 
             // Retrieve the device in GLPI
-            $deviceSearchURL = $this->config["api-url"].
-                "/search/Computer?".
-                "forcedisplay[0]=2&".
-                "forcedisplay[1]=80&".
-                "criteria[0][field]=1&".
-                "criteria[0][searchtype]=contains&".
-                "criteria[0][value]=^" . $alert_data["sysName"] . "$";
-            
+            $deviceSearchURL = $this->config['api-url'] .
+                '/search/Computer?'.
+                'forcedisplay[0]=2&'.
+                'forcedisplay[1]=80&'.
+                'criteria[0][field]=1&'.
+                'criteria[0][searchtype]=contains&'.
+                'criteria[0][value]=^' . $alert_data['sysName'] . '$';
+
             $res = Http::client()
                 ->withHeaders($headers)
                 ->get($deviceSearchURL);
 
-            $deviceID = $res->json()["data"][0]["2"] ?? null;
-            
+            $deviceID = $res->json()['data'][0]['2'] ?? null;
+
             // Retrieve the entity in GLPI
-            $entityName = $res->json()["data"][0]["80"] ?? null;
+            $entityName = $res->json()['data'][0]['80'] ?? null;
             $entityID = null;
             if ($entityName != null) {
-                $entitySearchURL = $this->config["api-url"].
-                    "/search/Entity?".
-                    "forcedisplay[0]=2&".
-                    "criteria[0][field]=1&".
-                    "criteria[0][searchtype]=contains&".
-                    "criteria[0][value]=^" . $entityName . "$";
+                $entitySearchURL = $this->config['api-url'].
+                    '/search/Entity?'.
+                    'forcedisplay[0]=2&'.
+                    'criteria[0][field]=1&'.
+                    'criteria[0][searchtype]=contains&'.
+                    'criteria[0][value]=^' . $entityName . '$';
 
                 $res = Http::client()
                     ->withHeaders($headers)
                     ->get($entitySearchURL);
 
-                $entityID = $res->json()["data"][0]["2"] ?? null;
+                $entityID = $res->json()['data'][0]['2'] ?? null;
             }
 
             // Retrieve the user logged in
             $res = Http::client()
                 ->withHeaders($headers)
-                ->get($this->config["api-url"] . "/getFullSession");
+                ->get($this->config['api-url'] . '/getFullSession');
 
-            $userID = $res->json()["session"]["glpiID"];
+            $userID = $res->json()['session']['glpiID'];
 
             // Create the ticket
             $data = [
-                "input" => [
-                    "name" => "[LibreNMS: " . $alert_data['sysName'] . "] " . $alert_data["name"],
-                    "content" => $alert_data["msg"],
-                    "_users_id_requester" => $userID
+                'input' => [
+                    'name' => '[LibreNMS: ' . $alert_data['sysName'] . '] ' . $alert_data['name'],
+                    'content' => $alert_data['msg'],
+                    '_users_id_requester' => $userID,
                 ]
             ];
 
             if ($entityID != null) {
-                $data["input"]["entities_id"] = $entityID;
+                $data['input']['entities_id'] = $entityID;
             }
-            
+
             $res = Http::client()
                 ->withHeaders($headers)
                 ->post($ticketURL, $data);
 
             // Associate GLPI device to the ticket
             if ($res->successful() && $deviceID != null) {
-                $ticketID = $res->json()["id"];
-                
+                $ticketID = $res->json()['id'];
+
                 $data = [
-                    "input" => [
-                        "items_id" => $deviceID,
-                        "itemtype" => "Computer",
-                        "tickets_id" => $ticketID
+                    'input' => [
+                        'items_id' => $deviceID,
+                        'itemtype' => 'Computer',
+                        'tickets_id' => $ticketID,
                     ]
                 ];
 
                 $res = Http::client()
                     ->withHeaders($headers)
-                    ->post($this->config["api-url"] . "/Item_Ticket", $data);
+                    ->post($this->config['api-url'] . '/Item_Ticket', $data);
             }
 
         } else {
             // Update the status if resolved
-            $ticketID = $res->json()["data"][0]["2"];
+            $ticketID = $res->json()['data'][0]['2'];
             $res = Http::client()
                 ->withHeaders($headers)
-                ->get($this->config["api-url"] . "/Ticket/$ticketID");
+                ->get($this->config['api-url'] . '/Ticket/$ticketID');
 
-            if ($res->json()["status"] == 5) {
+            if ($res->json()['status'] == 5) {
                 $data = [
-                    "input" => [
-                        "status" => 2
+                    'input' => [
+                        'status' => 2,
                     ]
                 ];
 
                 $res = Http::client()
                     ->withHeaders($headers)
-                    ->patch($this->config["api-url"] . "/Ticket/$ticketID", $data);
+                    ->patch($this->config['api-url'] . '/Ticket/$ticketID', $data);
             }
-            
+
             // Add followup to ticket
             $data = [
-                "input" => [
-                    "content" => $alert_data["msg"],
-                    "itemtype" => "Ticket",
-                    "items_id" => $ticketID
+                'input' => [
+                    'content' => $alert_data['msg'],
+                    'itemtype' => 'Ticket',
+                    'items_id' => $ticketID,
                 ]
             ];
 
-            $followupURL = $this->config["api-url"] . "/ITILFollowup";
+            $followupURL = $this->config['api-url'] . '/ITILFollowup';
 
             $res = Http::client()
                 ->withHeaders($headers)
@@ -215,7 +215,7 @@ class Glpi extends Transport
         }
 
         throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), 
-                                                  $alert_data['msg'], $data);
+            $alert_data['msg'], $data);
     }
 
     public static function configTemplate(): array
