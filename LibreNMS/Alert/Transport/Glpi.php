@@ -59,7 +59,7 @@ class Glpi extends Transport
         $profiles = Http::client()
             ->withHeaders($headers)
             ->get($this->config['api-url'] . '/getMyProfiles');
-        
+
         foreach ($profiles['myprofiles'] as $profile) {
             if (str_contains($profile['name'], 'super-admin')) {
                 $profile = $profile['id'];
@@ -84,14 +84,14 @@ class Glpi extends Transport
         // Retrieve the ticket for the alert (by title)
         $ticketURL = $this->config['api-url'] . '/Ticket';
         $searchURL = $this->config['api-url'] .
-            '/search/Ticket?'.
-            'forcedisplay[0]=2&'.
-            'criteria[0][field]=1&'.
-            'criteria[0][searchtype]=contains&'.
-            'criteria[0][value]=^[LibreNMS: ' . $alert_data['sysName'] . '] ' . $alert_data['name'] . '$&'.
-            'criteria[1][link]=AND&'.
-            'criteria[1][field]=12&'.
-            'criteria[1][searchtype]=equals&'.
+            '/search/Ticket?' .
+            'forcedisplay[0]=2&' .
+            'criteria[0][field]=1&' .
+            'criteria[0][searchtype]=contains&' .
+            'criteria[0][value]=^[LibreNMS: ' . $alert_data['sysName'] . '] ' . $alert_data['name'] . '$&' .
+            'criteria[1][link]=AND&' .
+            'criteria[1][field]=12&' .
+            'criteria[1][searchtype]=equals&' .
             'criteria[1][value]=notclosed';
 
         $res = Http::client()
@@ -103,11 +103,11 @@ class Glpi extends Transport
 
             // Retrieve the device in GLPI
             $deviceSearchURL = $this->config['api-url'] .
-                '/search/Computer?'.
-                'forcedisplay[0]=2&'.
-                'forcedisplay[1]=80&'.
-                'criteria[0][field]=1&'.
-                'criteria[0][searchtype]=contains&'.
+                '/search/Computer?' .
+                'forcedisplay[0]=2&' .
+                'forcedisplay[1]=80&' .
+                'criteria[0][field]=1&' .
+                'criteria[0][searchtype]=contains&' .
                 'criteria[0][value]=^' . $alert_data['sysName'] . '$';
 
             $res = Http::client()
@@ -121,10 +121,10 @@ class Glpi extends Transport
             $entityID = null;
             if ($entityName != null) {
                 $entitySearchURL = $this->config['api-url'].
-                    '/search/Entity?'.
-                    'forcedisplay[0]=2&'.
-                    'criteria[0][field]=1&'.
-                    'criteria[0][searchtype]=contains&'.
+                    '/search/Entity?' .
+                    'forcedisplay[0]=2&' .
+                    'criteria[0][field]=1&' .
+                    'criteria[0][searchtype]=contains&' .
                     'criteria[0][value]=^' . $entityName . '$';
 
                 $res = Http::client()
@@ -147,7 +147,7 @@ class Glpi extends Transport
                     'name' => '[LibreNMS: ' . $alert_data['sysName'] . '] ' . $alert_data['name'],
                     'content' => $alert_data['msg'],
                     '_users_id_requester' => $userID,
-                ]
+                ],
             ];
 
             if ($entityID != null) {
@@ -167,7 +167,7 @@ class Glpi extends Transport
                         'items_id' => $deviceID,
                         'itemtype' => 'Computer',
                         'tickets_id' => $ticketID,
-                    ]
+                    ],
                 ];
 
                 $res = Http::client()
@@ -186,7 +186,7 @@ class Glpi extends Transport
                 $data = [
                     'input' => [
                         'status' => 2,
-                    ]
+                    ],
                 ];
 
                 $res = Http::client()
@@ -200,7 +200,7 @@ class Glpi extends Transport
                     'content' => $alert_data['msg'],
                     'itemtype' => 'Ticket',
                     'items_id' => $ticketID,
-                ]
+                ],
             ];
 
             $followupURL = $this->config['api-url'] . '/ITILFollowup';
