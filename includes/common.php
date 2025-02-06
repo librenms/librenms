@@ -449,7 +449,9 @@ function get_ports_mapped($device_id, $with_statistics = false)
 function get_port_id($ports_mapped, $port, $port_association_mode)
 {
     // Get port_id according to port_association_mode used for this device
-    $port_id = null;
+    if (! in_array($port_association_mode, ['ifIndex', 'ifName', 'ifDescr', 'ifAlias'])) {
+        return null;
+    }
 
     /*
      * Information an all ports is available through $ports_mapped['ports']
@@ -460,11 +462,15 @@ function get_port_id($ports_mapped, $port, $port_association_mode)
     */
     $maps = $ports_mapped['maps'];
 
-    if (in_array($port_association_mode, ['ifIndex', 'ifName', 'ifDescr', 'ifAlias'])) {
-        $port_id = $maps[$port_association_mode][$port[$port_association_mode]] ?? null;
+    // get the port association key
+    $key = null;
+    if (isset($port[$port_association_mode])) {
+        $key = $port[$port_association_mode];
+    } elseif ($port_association_mode == 'ifName' && isset($port['ifDescr'])) {
+        $key = $port['ifDescr']; // port does not have ifName, try ifDescr otherwise ports will break
     }
 
-    return $port_id;
+    return $maps[$port_association_mode][$key] ?? null;
 }
 
 /**
@@ -479,7 +485,7 @@ function get_port_id($ports_mapped, $port, $port_association_mode)
  */
 function ResolveGlues($tables, $target, $x = 0, $hist = [], $last = [])
 {
-    if (sizeof($tables) == 1 && $x != 0) {
+    if (count($tables) == 1 && $x != 0) {
         if (dbFetchCell('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME = ?', [$tables[0], $target]) == 1) {
             return array_merge($last, [$tables[0] . '.' . $target]);
         } else {
@@ -512,7 +518,7 @@ function ResolveGlues($tables, $target, $x = 0, $hist = [], $last = [])
             }
 
             $glues = dbFetchRows('SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME LIKE "%\_id"', [$table]);
-            if (sizeof($glues) == 1 && $glues[0]['COLUMN_NAME'] != $target) {
+            if (count($glues) == 1 && $glues[0]['COLUMN_NAME'] != $target) {
                 //Search for new candidates to expand
                 $ntables = [];
                 [$tmp] = explode('_', $glues[0]['COLUMN_NAME'], 2);

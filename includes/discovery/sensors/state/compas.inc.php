@@ -45,8 +45,6 @@ if (is_numeric($batteryTestState)) {
     $descr = 'Battery Test Status';
     //Discover Sensors
     discover_sensor(null, 'state', $device, $curOID, $index, $state_name, $descr, '1', '1', null, null, null, null, $batteryTestState);
-    //Create Sensor To State Index
-    create_sensor_to_state_index($device, $state_name, $index);
 }
 $dcMode = snmp_get($device, 'es1dc1DataSystemDCMode.0', '-Ovqe', 'SITE-MONITORING-MIB');
 $curOID = '.1.3.6.1.4.1.26854.3.2.1.20.1.20.1.13.3.1.0';
@@ -66,6 +64,4 @@ if (is_numeric($dcMode)) {
     $descr = 'System DC Mode';
     //Discover Sensors
     discover_sensor(null, 'state', $device, $curOID, $index, $state_name, $descr, '1', '1', null, null, null, null, $dcMode);
-    //Create Sensor To State Index
-    create_sensor_to_state_index($device, $state_name, $index);
 }

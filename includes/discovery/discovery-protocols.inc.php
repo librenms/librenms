@@ -332,6 +332,8 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
         foreach ($lldp_if_array as $entry_key => $lldp_instance) {
             if ($device['os'] == 'aos7') {
                 $ifName = $lldp_local[$entry_key]['lldpLocPortDesc'];
+            } elseif ($device['os'] == 'routeros') {
+                $ifIndex = $entry_key;
             } elseif (is_numeric($dot1d_array[$entry_key]['dot1dBasePortIfIndex'])) {
                 $ifIndex = $dot1d_array[$entry_key]['dot1dBasePortIfIndex'];
             } else {
@@ -401,7 +403,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
 
                 if ($remote_device['os'] == 'xos') {
                     $slot_port = explode(':', $remote_port_name);
-                    if (sizeof($slot_port) == 2) {
+                    if (count($slot_port) == 2) {
                         $n_slot = (int) $slot_port[0];
                         $n_port = (int) $slot_port[1];
                     } else {
