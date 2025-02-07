@@ -115,7 +115,7 @@ modules:
                     index: 'sfpTxPower.{{ $index }}'
                     divisor: 1000000
                     group: transceiver
-                    entPhysicalIndex: $index
+                    entPhysicalIndex: '{{ $index }}'
                     skip_values:
                         -
                             oid: SIAE-SFP-MIB::sfpDiagnosticValid
@@ -133,7 +133,7 @@ modules:
                     index: 'sfpRxPower.{{ $index }}'
                     divisor: 1000000
                     group: transceiver
-                    entPhysicalIndex: $index
+                    entPhysicalIndex: '{{ $index }}'
                     skip_values:
                         -
                             oid: SIAE-SFP-MIB::sfpDiagnosticValid
