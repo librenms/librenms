@@ -148,8 +148,8 @@ $pagetitle[] = 'Add host';
           <div class="col-sm-3">
             <select name="snmpver" id="snmpver" class="form-control input-sm" onChange="changeForm();">
               <option value="v1">v1</option>
-              <option value="v2c" selected>v2c</option>
-              <option value="v3">v3</option>
+              <option value="v2c" <?php echo (Config::get('snmp.version')[0] == 'v2c' ? 'selected' : '') ?> >v2c</option>
+              <option value="v3" <?php echo (Config::get('snmp.version')[0] == 'v3' ? 'selected' : '') ?> >v3</option>
             </select>
           </div>
           <div class="col-sm-3">
@@ -365,6 +365,8 @@ if (Config::get('distributed_poller') === true) {
 
     $("[name='snmp']").bootstrapSwitch('offColor','danger');
     $("[name='force_add']").bootstrapSwitch();
+
+    $(document).ready(function loadPage() { changeForm(); });
 <?php
 if (! $snmp_enabled) {
     echo '  $("[name=\'snmp\']").trigger(\'click\');';
