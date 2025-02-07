@@ -43,6 +43,27 @@ html, body, #fullscreen-map {
    padding-bottom: 0;
    margin-bottom: 0;
 }
+
+#fullscreen-map {
+   z-index: 1;
+}
+
+.leaflet-map-pane {
+   z-index: 2;
+}
+
+.leaflet-google-layer {
+   z-index: 1;
+}
+
+.leaflet-overlay-pane {
+   z-index: 3;
+}
+
+.navbar {
+   z-index: 1000 !important;
+   position: relative;
+}
 </style>
 @endsection
 
@@ -267,7 +288,7 @@ html, body, #fullscreen-map {
 
     
     $(document).ready(function(){
-            device_map.scrollWheelZoom.enable();
+        device_map.scrollWheelZoom.enable();
 
         // initial load
         refreshMap();
