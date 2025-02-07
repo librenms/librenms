@@ -230,6 +230,8 @@ class SmOs extends OS implements
     public function discoverWirelessSnr()
     {
         $radioStatusTable = SnmpQuery::hideMib()->walk('SIAE-RADIO-SYSTEM-MIB::radioStatusTable')->table(1);
+        $sensors = [];
+
         foreach ($radioStatusTable as $index => $entry) {
             $oid = '.1.3.6.1.4.1.3373.1103.80.12.1.28.';
             $sensors[] = new WirelessSensor(
