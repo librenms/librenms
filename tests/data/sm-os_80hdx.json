@@ -3871,5 +3871,49 @@
                 }
             ]
         }
+    },
+    "transceivers": {
+        "discovery": {
+            "transceivers": [
+                {
+                    "index": "1",
+                    "entity_physical_index": 1,
+                    "type": null,
+                    "vendor": "Cambium Networks",
+                    "oui": null,
+                    "model": "SFP-10G-LR",
+                    "revision": null,
+                    "serial": "S2202220799",
+                    "date": "2022-03-23",
+                    "ddm": 1,
+                    "encoding": null,
+                    "cable": null,
+                    "distance": 10000,
+                    "wavelength": 1310,
+                    "connector": null,
+                    "channels": 1,
+                    "ifIndex": 1
+                },
+                {
+                    "index": "2",
+                    "entity_physical_index": 2,
+                    "type": null,
+                    "vendor": "",
+                    "oui": null,
+                    "model": "",
+                    "revision": null,
+                    "serial": "",
+                    "date": null,
+                    "ddm": 1,
+                    "encoding": null,
+                    "cable": null,
+                    "distance": null,
+                    "wavelength": 0,
+                    "connector": null,
+                    "channels": 1,
+                    "ifIndex": 2
+                }
+            ]
+        }
     }
 }

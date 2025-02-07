@@ -2,6 +2,9 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Transceiver;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessMseDiscovery;
@@ -9,10 +12,12 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
 use SnmpQuery;
 
 class SmOs extends OS implements
+    TransceiverDiscovery,
     WirelessRateDiscovery,
     WirelessRssiDiscovery,
     WirelessPowerDiscovery,
@@ -248,6 +253,38 @@ class SmOs extends OS implements
         }
 
         return $sensors;
+    }
+
+    public function discoverTransceivers(): Collection
+    {
+        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
+
+        return SnmpQuery::cache()->walk('SIAE-SFP-MIB::sfpSerialIdTable')->mapTable(function ($data, $ifIndex) use ($ifIndexToPortId) {
+            $distance = null;
+            if ($data['SIAE-SFP-MIB::sfpLinkLength9u'] > 0) {
+                $distance = $data['SIAE-SFP-MIB::sfpLinkLength9u'];
+            } elseif ($data['SIAE-SFP-MIB::sfpLinkLength50u'] > 0) {
+                $distance = $data['SIAE-SFP-MIB::sfpLinkLength50u'];
+            } elseif ($data['SIAE-SFP-MIB::sfpLinkLength62p5u'] > 0) {
+                $distance = $data['SIAE-SFP-MIB::sfpLinkLength62p5u'];
+            } elseif ($data['SIAE-SFP-MIB::sfpLinkLengthCopper'] > 0) {
+                $distance = $data['SIAE-SFP-MIB::sfpLinkLengthCopper'];
+            }
+
+            return new Transceiver([
+                'port_id' => $ifIndexToPortId->get($ifIndex, 0),
+                'index' => $ifIndex,
+                'entity_physical_index' => $ifIndex,
+                'type' => null,
+                'vendor' => $data['SIAE-SFP-MIB::sfpVendorName'] ?? null,
+                'date' => !empty($data['SIAE-SFP-MIB::sfpVendorDateCode']) ? Carbon::createFromFormat('ymd', $data['SIAE-SFP-MIB::sfpVendorDateCode'])->toDateString() : null,
+                'model' => $data['SIAE-SFP-MIB::sfpVendorPartNumber'] ?? null,
+                'serial' => $data['SIAE-SFP-MIB::sfpVendorSN'] ?? null,
+                'ddm' => empty($data['SIAE-SFP-MIB::sfpDiagMonitorCode']) ? 0 : 1,
+                'distance' => $distance,
+                'wavelength' => $data['SIAE-SFP-MIB::sfpWavelength'] ?? null,
+            ]);
+        });
     }
 
     public function getRadioLabel($index)
