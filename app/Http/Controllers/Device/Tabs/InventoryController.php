@@ -26,14 +26,28 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Facades\DeviceCache;
+use App\Models\Port;
 use App\Models\Device;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class InventoryController implements DeviceTab
 {
     private $type = null;
+    private bool $detail = false;
+    private array $settings = [];
+    private array $defaults = [
+        'perPage' => "all",
+        'sort' => 'ifIndex',
+        'order' => 'asc',
+        'disabled' => true,
+        'ignored' => true,
+        'admin' => 'any',
+        'status' => 'any',
+    ];
 
     public function __construct()
     {
@@ -70,8 +84,65 @@ class InventoryController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
+		/*
         return [
             'tab' => $this->type, // inject to load correct legacy file
         ];
+		*/
+        $this->loadSettings($request);
+		$data = $this->portData($device, $request);
+        return array_merge([
+            'tab' => $this->type, // inject to load correct legacy file
+        ], $data);
+    }
+
+    private function loadSettings(Request $request): void
+    {
+
+        $this->settings = $this->defaults;
+
+    }
+
+    private function getFilteredPortsQuery(Device $device, array $relationships = []): Builder
+    {
+        $orderBy = match ($this->settings['sort']) {
+            'traffic' => \DB::raw('ports.ifInOctets_rate + ports.ifOutOctets_rate'),
+            'speed' => 'ifSpeed',
+            'media' => 'ifType',
+            'mac' => 'ifPhysAddress',
+            'port' => 'ifName',
+            default => 'ifIndex',
+        };
+
+        return Port::where('device_id', $device->device_id)
+            ->isNotDeleted()
+            ->hasAccess(Auth::user())->with($relationships)
+            ->orderBy($orderBy, $this->settings['order']);
+    }
+
+    private function portData(Device $device, Request $request): array
+    {
+        $relationships = ['groups', 'ipv4', 'ipv6', 'vlans', 'adsl', 'vdsl'];
+        if ($this->detail) {
+            $relationships[] = 'transceivers';
+            $relationships['stackParent'] = fn ($q) => $q->select('port_id');
+            $relationships['stackChildren'] = fn ($q) => $q->select('port_id');
+        }
+
+        /** @var Collection<Port>|LengthAwarePaginator<Port> $ports */
+        $ports = $this->getFilteredPortsQuery($device, $relationships)
+            ->paginate(fn ($total) => $this->settings['perPage'] == 'all' ? $total : (int) $this->settings['perPage']) // @phpstan-ignore-line missing closure type
+            ->appends('perPage', $this->settings['perPage']);
+
+        $data = [
+            'ports' => $ports,
+            'graphs' => [
+                'bits' => [['type' => 'port_bits', 'title' => trans('Traffic'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
+                'upkts' => [['type' => 'port_upkts', 'title' => trans('Packets (Unicast)'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
+                'errors' => [['type' => 'port_errors', 'title' => trans('Errors'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
+            ],
+        ];
+
+        return $data;
     }
 }
