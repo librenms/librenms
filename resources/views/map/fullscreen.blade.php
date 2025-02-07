@@ -265,14 +265,9 @@ html, body, #fullscreen-map {
 @endif
     }
 
-    device_map.scrollWheelZoom.disable();
+    
     $(document).ready(function(){
-        $("#fullscreen-map").on("click", function(event) {
             device_map.scrollWheelZoom.enable();
-        });
-        $("#fullscreen-map").on("mouseleave", function(event) {
-            device_map.scrollWheelZoom.disable();
-        });
 
         // initial load
         refreshMap();
