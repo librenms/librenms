@@ -85,7 +85,6 @@ $link_array = [
 
 $menu_options['graphs'] = 'Graphs';
 $menu_options['realtime'] = 'Real time';
-$menu_options['portui'] = 'Physical';
 
 if ($port->macs()->exists()) {
     $menu_options['arp'] = 'ARP Table';
