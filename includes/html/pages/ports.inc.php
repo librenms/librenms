@@ -26,7 +26,7 @@ if (! isset($vars['format'])) {
 
 $displayLists = '<span style="font-weight: bold;">Ports lists</span> &#187; ';
 
-$menu_options = ['basic' => 'Basic', 'detail' => 'Detail',  'portui' => 'Physical', ];
+$menu_options = ['basic' => 'Basic', 'detail' => 'Detail'];
 
 $sep = '';
 foreach ($menu_options as $option => $text) {

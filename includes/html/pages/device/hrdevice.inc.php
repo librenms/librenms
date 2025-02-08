@@ -71,3 +71,5 @@ foreach (dbFetchRows('SELECT * FROM `hrDevice` WHERE `device_id` = ? ORDER BY `h
 echo '</table>';
 
 $pagetitle[] = 'Inventory';
+
+include('physicalports.inc.php');
