@@ -8,46 +8,49 @@
 OG-PRODUCTS-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-	ogProducts, ogModules
-		FROM OG-SMI-MIB
-	MODULE-IDENTITY
-		FROM SNMPv2-SMI;
+        ogProducts, ogModules
+                FROM OG-SMI-MIB
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI;
 
 ogProductsMib MODULE-IDENTITY
-	LAST-UPDATED "202005200000Z"
-	ORGANIZATION "Opengear Inc."
-	CONTACT-INFO
-		"Opengear Inc.
-		 630 West 9560 South,
-		 Sandy, UT 84070
-		 support@opengear.com"
-	DESCRIPTION
-		"Opengear Product MIB"
-	REVISION "202005200000Z"
-	DESCRIPTION
-		"Add Operations Manager to the MIB."
-	REVISION "201806150000Z"
-	DESCRIPTION
-		"Add Lighthouse 5 target to the MIB."
-	REVISION "201606270000Z"
-	DESCRIPTION
-		"Add CM7196 target to the MIB."
-	REVISION "201602100000Z"
-	DESCRIPTION
-		"Add CM71xx target to the MIB."
-	REVISION "201506020000Z"
-	DESCRIPTION
-		"Add ACM700x target to the MIB."
-	REVISION "201308110000Z"
-	DESCRIPTION
-		"Renamed from OPENGEAR-PRODUCTS-MIB to OG-PRODUCTS-MIB to
-		fix naming discrepancy."
-	REVISION "201108150123Z"
-	DESCRIPTION
-		"Add ACM550x target to the MIB."
-	REVISION "201004151127Z"
-	DESCRIPTION
-		"Initial version."
+        LAST-UPDATED "202301180000Z"
+        ORGANIZATION "Opengear Inc."
+        CONTACT-INFO
+                "Opengear Inc.
+                 630 West 9560 South,
+                 Sandy, UT 84070
+                 support@opengear.com"
+        DESCRIPTION
+                "Opengear Product MIB"
+        REVISION "202301180000Z"
+        DESCRIPTION
+                "Add OM12xx, OM22xx and CM81xx targets to the MIB."
+        REVISION "202005200000Z"
+        DESCRIPTION
+                "Add Operations Manager to the MIB."
+        REVISION "201806150000Z"
+        DESCRIPTION
+                "Add Lighthouse 5 target to the MIB."
+        REVISION "201606270000Z"
+        DESCRIPTION
+                "Add CM7196 target to the MIB."
+        REVISION "201602100000Z"
+        DESCRIPTION
+                "Add CM71xx target to the MIB."
+        REVISION "201506020000Z"
+        DESCRIPTION
+                "Add ACM700x target to the MIB."
+        REVISION "201308110000Z"
+        DESCRIPTION
+                "Renamed from OPENGEAR-PRODUCTS-MIB to OG-PRODUCTS-MIB to
+                fix naming discrepancy."
+        REVISION "201108150123Z"
+        DESCRIPTION
+                "Add ACM550x target to the MIB."
+        REVISION "201004151127Z"
+        DESCRIPTION
+                "Initial version."
       ::= { ogModules 2 }
 
 ogCM4001 OBJECT IDENTIFIER ::= { ogProducts 1 }
@@ -75,5 +78,9 @@ ogACM550x OBJECT IDENTIFIER ::= { ogProducts 81 }
 ogACM700x OBJECT IDENTIFIER ::= { ogProducts 90 }
 ogACM70045 OBJECT IDENTIFIER ::= { ogProducts 91 }
 ogOperationsManager OBJECT IDENTIFIER ::= { ogProducts 101 }
+ogOM12xx OBJECT IDENTIFIER ::= { ogProducts 110 }
+ogOM22xx OBJECT IDENTIFIER ::= { ogProducts 120 }
+ogCM81xx OBJECT IDENTIFIER ::= { ogProducts 130 }
+ogEM80xx OBJECT IDENTIFIER ::= { ogProducts 140 }
 
 END
