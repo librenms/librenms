@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Eloquent\Builder;
-echo "<pre>";
+echo "<pre>\n";
 
 // Set default column height to something sensible
 $columnHeight = 2;
@@ -33,6 +33,8 @@ if(file_exists($filePath)) {
 
 if(!isset($transformedPorts)) {
 	if (empty($transformedPorts)) {
+		if(!empty($entPhysical))
+			echo "<!-- Found entPhysical information -->\n";
 		echo "<!-- No hints found for '{$brand}' model '{$hardware}', auto generating -->\n";
 		$transformedPorts = transformPortsAuto($data['ports'], 2, $entPhysical);
 	}
@@ -67,7 +69,7 @@ function loopEntPhysical($device, $ent, $level)
 		}
 		if(($ent['entPhysicalSerialNum']) && ($ent['entPhysicalClass'] == "chassis")) {
 			//echo " <br /><span style='color: #000099;'>Serial No. " . $ent['entPhysicalSerialNum'] . '</span> ';
-			$entphysical['switches'][$i] = $ent['entPhysicalSerialNum'];
+			$entphysical['switches'][$i+1] = $ent['entPhysicalSerialNum'];
 		}
 		
 		$count = dbFetchCell("SELECT COUNT(*) FROM `entPhysical` WHERE device_id = '" . $device['device_id'] . "' AND entPhysicalContainedIn = '" . $ent['entPhysicalIndex'] . "'");
@@ -76,9 +78,10 @@ function loopEntPhysical($device, $ent, $level)
 		}
 		$i++;
     }//end foreach
-	//echo print_r($entphysical, true);
 	return $entphysical;
 }//end loopEntPhysical()
+
+//echo print_r($entPhysical, true);
 
 echo "</pre>";
 
@@ -111,15 +114,7 @@ echo <<<CSS
         width: 100%;
     }
 
-    .port-cell {
-        border: 4px solid;
-        text-align: center;
-        padding: 10px;
-		width: 45px;
-    }
-	
-	
-	.port-cell-cu {
+    .port-cell-cu {
 		position: relative;
         text-align: center;
         border: 4px solid;
@@ -129,57 +124,37 @@ echo <<<CSS
 		box-shadow: inset 0 0 5px #111, 0 5px 10px rgba(0, 0, 0, 0.5);
 		justify-content: center;
 		align-items: center;
-	}
-
-	.port-cell-sfp {
-		position: relative;
-        text-align: center;
-        border: 4px solid;
-		height: 35px;
-		width: 45px;
-		background: #333;
-		box-shadow: inset 0 0 5px #111, 0 5px 10px rgba(0, 0, 0, 0.5);
-		justify-content: center;
-		align-items: center;
-	}
-
-	.port-cell-qsfp {
-		position: relative;
-        text-align: center;
-        border: 4px solid;
-		height: 35px;
-		width: 90px;
-		background: #333;
-		box-shadow: inset 0 0 5px #111, 0 5px 10px rgba(0, 0, 0, 0.5);
-		justify-content: center;
-		align-items: center;
-	}
-
-	.notch {
-		position: absolute;
-		top: -10px;
-		left: 50%;
-		width: 40px;
-		height: 15px;
-		background: #333;
-		transform: translateX(-50%);
-		border-radius: 3px;
-	}
-
+        margin: 4px; /* Added margin to prevent overlapping */
+        position: relative; /* For tooltip positioning */
+     }
 
     .port-cell-sfp {
-        border: 4px solid;
+		position: relative;
         text-align: center;
-        padding: 10px;
+        border: 4px solid;
+		height: 35px;
 		width: 45px;
-    }
+		background: #333;
+		box-shadow: inset 0 0 5px #111, 0 5px 10px rgba(0, 0, 0, 0.5);
+		justify-content: center;
+		align-items: center;
+        margin: 4px; /* Added margin to prevent overlapping */
+        position: relative; /* For tooltip positioning */
+     }
 
     .port-cell-qsfp {
-        border: 4px solid;
-        text-align: center;
-        padding: 10px;
-		width: 90px;
-    }
+		position: relative;
+		text-align: center;
+		border: 4px solid;
+		height: 35px;
+		width: 80px;
+		background: #333;
+		box-shadow: inset 0 0 5px #111, 0 5px 10px rgba(0, 0, 0, 0.5);
+		justify-content: center;
+		align-items: center;
+        margin: 4px; /* Added margin to prevent overlapping */
+        position: relative; /* For tooltip positioning */
+     }
 
     .border-up {
         border-color: MediumSeaGreen;
@@ -213,11 +188,12 @@ echo <<<CSS
         border: 2px solid transparent;
         background-color: transparent;
     }
-	
+
     /* Tooltip container */
     .port-cell .tooltip {
         display: none;
         position: absolute;
+        bottom: 110%; /* Position tooltip above the port */
         top: 100%;
         left: 50%;
         transform: translateX(-50%);
@@ -297,7 +273,6 @@ function generateTransformPorts($json, $side = 'front')
 	return $result;
 }
 
-
 // Find line in hints file with /prefix/: and return line without prefix
 // This should return a json object
 function fastFindLine($filePath, $prefix)
@@ -338,13 +313,13 @@ function findSwitchesRange($indexports)
 				$switches[$switchmatch[0]] = true;
 				break;
 			default:
-				continue;
+				continue 2;
 		}
-		// echo "found highest switch port $ifName";		
+		// echo "found highest switch port $ifName";
 	}
 	if(empty($switches))
 		$switches[1] = true;
-	
+
 	return $switches;
 }
 
@@ -358,18 +333,26 @@ function findEntPhysicalPortType($entPhysical, $ifDescr) {
 	// 	
 	$str = "$ifDescr Container";
 	if(isset($entPhysical[$str])) {
-		if(preg_match("/(baset)/i", $entPhysical[$str]['entPhysicalVendorType']))
+		if(preg_match("/(BaseT|WiredSwitch[0-9]Gb)/i", $entPhysical[$str]['entPhysicalVendorType']))
 			$result[] = "cu";
-		if(preg_match("/(sfp)/i", $entPhysical[$str]['entPhysicalVendorType']))
+		elseif(preg_match("/(qsfp|WiredSwitch[4][0]Gb)/i", $entPhysical[$ifDescr]['entPhysicalVendorType']))
+			$result[] = "qsfp";
+		elseif(preg_match("/(sfp|WiredSwitch[125][0]Gb)/i", $entPhysical[$str]['entPhysicalVendorType']))
 			$result[] = "sfp";
+		else
+			echo "Could not determine phy type '{$entPhysical[$str]['entPhysicalVendorType']}' ";
 	}
 	if (isset($entPhysical[$ifDescr])) {
-		if(preg_match("/(baset)/i", $entPhysical[$ifDescr]['entPhysicalVendorType']))
+		if(preg_match("/(BaseT|WiredSwitch[0-9]Gb)/i", $entPhysical[$ifDescr]['entPhysicalVendorType']))
 			$result[] = "cu";
-		if(preg_match("/(sfp)/i", $entPhysical[$ifDescr]['entPhysicalVendorType']))
+		elseif(preg_match("/(qsfp|WiredSwitch[4][0]Gb)/i", $entPhysical[$ifDescr]['entPhysicalVendorType']))
+			$result[] = "qsfp";
+		elseif(preg_match("/(sfp|WiredSwitch[125][0]Gb)/i", $entPhysical[$ifDescr]['entPhysicalVendorType']))
 			$result[] = "sfp";
-		if(preg_match("/(basesx)/i", $entPhysical[$ifDescr]['entPhysicalVendorType']))
-			$result[] = "mm";
+		elseif(preg_match("/(basesx)/i", $entPhysical[$ifDescr]['entPhysicalVendorType']))
+			$result[] = "mmsr";
+		else
+			echo "Could not determine phy type {$entPhysical[$ifDescr]['entPhysicalVendorType']} ";
 	}	
 	return $result;
 }
@@ -384,9 +367,10 @@ function transformPortsAuto($ports, $rowHeight = 2, $entPhysical): array
 	$i = 0;
 	$col = 0;
 	$block = 0;
+
     foreach ($ports->items() as $port_id => $port) {
         // Extract ifName and split into components
-		foreach(array("ifType", "ifName", "ifDescr", "ifOperStatus", "ifAdminStatus", "ifVlan") as $field)
+		foreach(array("ifType", "ifName", "ifDescr", "ifOperStatus", "ifAdminStatus", "ifVlan", "ifTrunk") as $field)
 			$$field = $port[$field] ?? null;
 			
         if ($ifName) {
@@ -500,10 +484,10 @@ function generateVisualTableWithAttributes($switches = array(1 => true), array $
     foreach ($switches as $switch => $id) {
         // Create a container for the switch
         $html .= '<div class="switch-container">';
-		/* These don't match up yet
+		// These don't neccesarily match up yet
 		if(isset($entPhysical['switches'][$switch]))
-			$html .= "Switch: $switch: {$entPhysical['switches'][$switch]}</br>";
-		*/
+			$html .= "Switch: $switch: {$entPhysical['switches'][$switch]}</br>\n";
+		
 
 		foreach ($transform as $module => $blocks) {
 			// Create a container for the module, but only if there is more then 1.
@@ -544,9 +528,12 @@ function generateVisualTableWithAttributes($switches = array(1 => true), array $
 								}
 								// Lookup port by port_id from transform array
 								$attr = $indexports[$portName];
+								$ifDescr = $attr->ifDescr ?? 'down';
 								$adminStatus = $attr->ifAdminStatus ?? 'down';
 								$operStatus = $attr->ifOperStatus ?? 'down';
 								$vlan = $attr->ifVlan ?? 'Unknown';
+								if($vlan == "Unknown")
+									$vlan = $attr->ifTrunk ?? 'Unknown';
 
 								// Determine the CSS classes based on statuses
 								$borderClass = match ($adminStatus) {
@@ -559,7 +546,8 @@ function generateVisualTableWithAttributes($switches = array(1 => true), array $
 
 							    // Port-Cell type
 							    $types = findEntPhysicalPortType($entPhysical, $ifDescr);
-								switch($type[0]) {
+								//$html .= "{$ifDescr}, ". print_r($types, true);
+								switch($types[0]) {
 								   case "qsfp":
 										$portcell = "port-cell-qsfp";
 										break;
@@ -572,9 +560,14 @@ function generateVisualTableWithAttributes($switches = array(1 => true), array $
 								}
 
 								// Needs STP Port Blocking status color 
-								
-							    // Add the port cell with custom tooltip						   
+							    // Add the port cell with custom tooltip
 								// add tooltip helper here, doesn't work yet.
+			                    $tooltipContent = <<<TOOLTIP
+        <div>Port: $portName</div>
+        <div>Admin Status: $adminStatus</div>
+        <div>Oper Status: $operStatus</div>
+        <div>VLAN: $vlan</div>
+TOOLTIP;
 								$html .= "<td class='{$portcell} $borderClass $bgClass' >
 							<div class='port-name'>{$portparts[0]}</div>
 											<div class='tooltip'>{$tooltipContent}</div>
