@@ -175,23 +175,12 @@ class Glpi extends Transport
                     ->post($this->config['api-url'] . '/Item_Ticket', $data);
             }
         } else {
-            // Update the status if resolved
             $ticketID = $res->json()['data'][0]['2'];
-            $res = Http::client()
+
+            // Update the status if resolved
+            $ticketData = Http::client()
                 ->withHeaders($headers)
-                ->get($this->config['api-url'] . '/Ticket/$ticketID');
-
-            if ($res->json()['status'] == 5) {
-                $data = [
-                    'input' => [
-                        'status' => 2,
-                    ],
-                ];
-
-                $res = Http::client()
-                    ->withHeaders($headers)
-                    ->patch($this->config['api-url'] . '/Ticket/$ticketID', $data);
-            }
+                ->get($this->config['api-url'] . '/Ticket/' . $ticketID);
 
             // Add followup to ticket
             $data = [
@@ -207,6 +196,23 @@ class Glpi extends Transport
             $res = Http::client()
                 ->withHeaders($headers)
                 ->post($followupURL, $data);
+
+            if ($ticketData->json()['status'] == 5) {
+                // Reopen the ticket if it was resolved or close it if the device recovered
+                $data = [
+                    'input' => [
+                        'status' => 2,
+                    ],
+                ];
+
+                if ($alert_data['state'] == 0) {
+                    $data['input']['status'] = 6;
+                }
+
+                $res = Http::client()
+                    ->withHeaders($headers)
+                    ->patch($this->config['api-url'] . '/Ticket/' . $ticketID, $data);
+            }
         }
 
         if ($res->successful()) {
