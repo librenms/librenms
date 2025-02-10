@@ -25,7 +25,7 @@ if (! \LibreNMS\Config::get('enable_proxmox')) {
         'proxmox_traffic' => 'Traffic',
     ];
 
-    foreach (proxmox_node_vms($device["device_id"]) as $nvm) {
+    foreach (proxmox_node_vms($device['device_id']) as $nvm) {
         $vm = proxmox_vm_info($nvm['vmid'], $nvm['cluster']);
 
         foreach ($vm['ports'] as $port) {
