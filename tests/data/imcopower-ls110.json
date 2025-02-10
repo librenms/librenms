@@ -358,7 +358,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.33283.1.30.5.1.3.0",
                     "sensor_index": "sdsTempSensValue.0",
                     "sensor_type": "imcopower-ls110",
-                    "sensor_descr": "Temperature",
+                    "sensor_descr": "Battery Temperature",
                     "group": null,
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
