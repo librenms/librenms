@@ -1,6 +1,6 @@
 <?php
 
-$vm = proxmox_vm_info(Request::get('vmid'), Request::get('instance'));
+$vm = proxmox_vm_info($vars['vmid'], $vars['instance']);
 
 $graphs = [
     'proxmox_traffic' => 'Traffic',
