@@ -2008,6 +2008,10 @@
             "default": false,
             "type": "boolean"
         },
+        "enable_syslog_hooks": {
+            "default": false,
+            "type": "boolean"
+        },
         "enable_vrf_lite_cisco": {
             "default": true,
             "type": "boolean"
