@@ -176,7 +176,7 @@ class Glpi extends Transport
             }
         } else {
             $ticketID = $res->json()['data'][0]['2'];
-            
+
             // Update the status if resolved
             $ticketData = Http::client()
                 ->withHeaders($headers)
