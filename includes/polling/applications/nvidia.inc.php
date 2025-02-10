@@ -71,7 +71,7 @@ foreach ($gpuArray as $index => $gpu) {
     $metrics[$index] = $fields;
 
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 }
 $sm_average = ($sm_total ? ($sm_total / count($gpuArray)) : 0);
 

@@ -77,5 +77,5 @@ $tags = [
     'rrd_name' => ['app', $name, $app->app_id],
     'rrd_def' => $rrd_def,
 ];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 update_application($app, 'OK', $fields);

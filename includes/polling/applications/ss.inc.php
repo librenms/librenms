@@ -40,7 +40,7 @@ if (! function_exists('ss_data_update_helper')) {
             'rrd_def' => $rrd_def,
             'rrd_name' => $rrd_name,
         ];
-        data_update($device, $polling_type, $tags, $fields);
+        app('Datastore')->put($device, $polling_type, $tags, $fields);
 
         return $metrics;
     }

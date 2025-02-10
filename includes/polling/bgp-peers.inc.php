@@ -524,7 +524,7 @@ if (! empty($peers)) {
             'rrd_name' => $peer_rrd_name,
             'rrd_def' => $peer_rrd_def,
         ];
-        data_update($device, 'bgp', $tags, $fields);
+        app('Datastore')->put($device, 'bgp', $tags, $fields);
 
         // --- Update Database data ---
         $peer['update'] = array_diff_assoc($peer_data, $peer);
@@ -813,7 +813,7 @@ if (! empty($peers)) {
                     'rrd_name' => $cbgp_rrd_name,
                     'rrd_def' => $cbgp_rrd_def,
                 ];
-                data_update($device, 'cbgp', $tags, $fields);
+                app('Datastore')->put($device, 'cbgp', $tags, $fields);
             } //end foreach
         } //end if
         echo "\n";

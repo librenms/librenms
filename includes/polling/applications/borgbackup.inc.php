@@ -77,7 +77,7 @@ foreach ($total_vars as $to_total) {
         'data' => $data['totals'][$to_total],
     ];
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
     $metrics[$to_total] = $data['totals'][$to_total];
 }
 
@@ -130,7 +130,7 @@ if (strcmp($data['mode'], 'multi') == 0) {
             'data' => $errored,
         ];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
 
         // process each variable for the repo
         foreach ($repo_vars as $repo_var_key) {
@@ -139,7 +139,7 @@ if (strcmp($data['mode'], 'multi') == 0) {
                 'data' => $data['repos'][$repo][$repo_var_key],
             ];
             $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-            data_update($device, 'app', $tags, $fields);
+            app('Datastore')->put($device, 'app', $tags, $fields);
         }
 
         // add the current repo to the list of repos

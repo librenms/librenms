@@ -78,7 +78,7 @@ $fields = [
 $metrics[$name . '_' . $category] = $fields;
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 if ($version >= 2) {
     $category = 'pools';
@@ -105,7 +105,7 @@ if ($version >= 2) {
 
         $metrics[$dhcp_pool_name . '_' . $category] = $fields;
         $tags = ['name' => $dhcp_pool_name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
     }
 
     $category = 'networks';
@@ -132,7 +132,7 @@ if ($version >= 2) {
 
         $metrics[$dhcp_network_name . '_' . $category] = $fields;
         $tags = ['name' => $dhcp_network_name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
     }
 }
 

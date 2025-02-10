@@ -97,7 +97,7 @@ if (! empty($agent_data['munin'])) {
                     'rrd_def' => RrdDefinition::make()->addDataset('val', $data['type']),
                     'rrd_name' => $base_rrd_name . '_' . $name,
                 ];
-                data_update($device, 'munin-plugins', $tags, $fields);
+                app('Datastore')->put($device, 'munin-plugins', $tags, $fields);
 
                 if (empty($ds_list[$ds_uniq])) {
                     $insert = [

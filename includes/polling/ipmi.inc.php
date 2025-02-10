@@ -77,7 +77,7 @@ if (is_array($ipmi_rows)) {
                 'rrd_name' => $rrd_name,
                 'rrd_def' => $rrd_def,
             ];
-            data_update($device, 'ipmi', $tags, $fields);
+            app('Datastore')->put($device, 'ipmi', $tags, $fields);
 
             // FIXME warnings in event & mail not done here yet!
             dbUpdate(

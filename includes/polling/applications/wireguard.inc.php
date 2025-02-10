@@ -121,7 +121,7 @@ foreach ($interface_client_map as $interface => $client_list) {
                 $client,
             ],
         ];
-        data_update($device, $polling_type, $tags_intfclient, $fields_intfclient);
+        app('Datastore')->put($device, $polling_type, $tags_intfclient, $fields_intfclient);
     }
 
     // create interface fields
@@ -139,7 +139,7 @@ foreach ($interface_client_map as $interface => $client_list) {
         'rrd_def' => $rrd_def_intf,
         'rrd_name' => [$polling_type, $name, $app->app_id, $interface],
     ];
-    data_update($device, $polling_type, $tags_intf, $fields_intf);
+    app('Datastore')->put($device, $polling_type, $tags_intf, $fields_intf);
 }
 
 // create total fields
@@ -157,7 +157,7 @@ $tags_all = [
     'rrd_def' => $rrd_def_total,
     'rrd_name' => [$polling_type, $name, $app->app_id],
 ];
-data_update($device, $polling_type, $tags_all, $fields_all);
+app('Datastore')->put($device, $polling_type, $tags_all, $fields_all);
 
 // variable tracks whether we updated mappings so it only happens once
 $mappings_updated = false;

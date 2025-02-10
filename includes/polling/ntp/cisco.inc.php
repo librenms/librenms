@@ -73,7 +73,7 @@ if (is_array($components) && count($components) > 0) {
         $rrd['dispersion'] = hexdec(substr($hexdisp, 0, 5)) + hexdec(substr($hexdisp, -5)) / 65536;
 
         $tags = compact('ntp', 'rrd_name', 'rrd_def', 'peer');
-        data_update($device, 'ntp', $tags, $rrd);
+        app('Datastore')->put($device, 'ntp', $tags, $rrd);
 
         // Let's print some debugging info.
         d_echo("\n\nComponent: " . $key . "\n");
