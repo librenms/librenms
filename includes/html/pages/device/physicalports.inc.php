@@ -1,13 +1,12 @@
 <?php
 
-use Illuminate\Database\Eloquent\Builder;
 // echo "<pre>\n";
 
 // Set default column height to something sensible
 $columnHeight = 2;
 // Find hardware, model name or systemname for hints
 //echo print_r($device, true);
-$hardware  = $device['hardware'] ?? null;
+$hardware = $device['hardware'] ?? null;
 // Lookup entPhysical storage for more hardware hints
 $level = 0;
 $entPhysical = loopEntPhysical($device, 0, 0);
@@ -17,69 +16,71 @@ $entPhysical = loopEntPhysical($device, 0, 0);
 $brand = substr(basename($device['icon'] ?? null), 0, -4);
 $filePath = "resources/views/device/hints/{$brand}.hints";
 // echo getcwd();
-if(file_exists($filePath)) {
-	$line = fastFindLine($filePath, $hardware);
-	if(!empty($line)) {
-		echo "<!-- Found hardware '{$hardware}' in '{$brand}' hints  -->\n";
-		// echo print_r(substr($line, strlen("{$hardware}:")), true);
+if (file_exists($filePath)) {
+    $line = fastFindLine($filePath, $hardware);
+    if (! empty($line)) {
+        echo "<!-- Found hardware '{$hardware}' in '{$brand}' hints  -->\n";
+        // echo print_r(substr($line, strlen("{$hardware}:")), true);
 
-		// if json does not decode, the return is false and we catch later
-		$transformedPorts = generateTransformPorts(json_decode(substr(trim($line), strlen($hardware)+1), true));
-		if (!isset($transformedPorts)) {
-			echo "<!--  Failed to decode json string, is it valid? -->\n";
-		}
-	}
+        // if json does not decode, the return is false and we catch later
+        $transformedPorts = generateTransformPorts(json_decode(substr(trim($line), strlen($hardware) + 1), true));
+        if (! isset($transformedPorts)) {
+            echo "<!--  Failed to decode json string, is it valid? -->\n";
+        }
+    }
 }
 
-if(!isset($transformedPorts)) {
-	if (empty($transformedPorts)) {
-		if(!empty($entPhysical))
-			echo "<!-- Found entPhysical information -->\n";
-		echo "<!-- No hints found for '{$brand}' model '{$hardware}', auto generating -->\n";
-		$transformedPorts = transformPortsAuto($data['ports'], 2, $entPhysical);
-	}
+if (! isset($transformedPorts)) {
+    if (empty($transformedPorts)) {
+        if (! empty($entPhysical)) {
+            echo "<!-- Found entPhysical information -->\n";
+        }
+        echo "<!-- No hints found for '{$brand}' model '{$hardware}', auto generating -->\n";
+        $transformedPorts = transformPortsAuto($data['ports'], 2, $entPhysical);
+    }
 }
 
-if(isset($data['ports'])) {
-	$indexports = transformPortsIndexedByIfName($data['ports']);
-	$switches = findSwitchesRange($indexports);
-	echo "<!-- Used hint </br>'". trim(substr($line, strlen($hardware)+1)) ."'</br>produced </br>". json_encode($transformedPorts) ." -->\n";
-	echo "<!-- Found switches: ". print_r($switches, true) ." -->\n";
+if (isset($data['ports'])) {
+    $indexports = transformPortsIndexedByIfName($data['ports']);
+    $switches = findSwitchesRange($indexports);
+    echo "<!-- Used hint </br>'" . trim(substr($line, strlen($hardware) + 1)) . "'</br>produced </br>" . json_encode($transformedPorts) . " -->\n";
+    echo '<!-- Found switches: ' . print_r($switches, true) . " -->\n";
 }
 
 function loopEntPhysical($device, $ent, $level)
 {
-	// This recurses, make sure to get entire result
-	global $entphysical;
-	// Needs rewrite into eloquent
+    // This recurses, make sure to get entire result
+    global $entphysical;
+    // Needs rewrite into eloquent
     //$ents = dbFetchRows('SELECT * FROM `entPhysical` WHERE device_id = ? AND entPhysicalContainedIn = ? ORDER BY entPhysicalContainedIn,entPhysicalIndex', [$device['device_id'], $ent]);
     $ents = DeviceCache::getPrimary()->entityPhysical()->where('entPhysicalContainedIn', $ent)->orderBy('entPhysicalContainedIn')->orderBy('entPhysicalIndex')->get()->toArray();
-	$i = 0;
+    $i = 0;
     foreach ($ents as $ent) {
-		if ($ent['entPhysicalClass'] == 'port') {
-			$entphysical[$ent['entPhysicalName']] = $ent;
-			// echo print_r($ent, true);
-		} elseif ($ent['entPhysicalClass'] == 'container') {
-			$entphysical[$ent['entPhysicalName']] = $ent;
-		}
-		if(($ent['entPhysicalSerialNum']) && ($ent['entPhysicalClass'] == "chassis")) {
-			//echo " <br /><span style='color: #000099;'>Serial No. " . $ent['entPhysicalSerialNum'] . '</span> ';
-			$entphysical['switches'][$i+1] = $ent['entPhysicalSerialNum'];
-		}
-		
-		$count = DeviceCache::getPrimary()->entityPhysical()->where('entPhysicalContainedIn', $ent['entPhysicalIndex'])->count();
-		if (floatval($count) > 0) {
-			loopEntPhysical($device, $ent['entPhysicalIndex'], $level + 1);
-		}
-		$i++;
+        if ($ent['entPhysicalClass'] == 'port') {
+            $entphysical[$ent['entPhysicalName']] = $ent;
+        // echo print_r($ent, true);
+        } elseif ($ent['entPhysicalClass'] == 'container') {
+            $entphysical[$ent['entPhysicalName']] = $ent;
+        }
+        if ($ent['entPhysicalSerialNum'] && ($ent['entPhysicalClass'] == 'chassis')) {
+            //echo " <br /><span style='color: #000099;'>Serial No. " . $ent['entPhysicalSerialNum'] . '</span> ';
+            $entphysical['switches'][$i + 1] = $ent['entPhysicalSerialNum'];
+        }
+
+        $count = DeviceCache::getPrimary()->entityPhysical()->where('entPhysicalContainedIn', $ent['entPhysicalIndex'])->count();
+        if (floatval($count) > 0) {
+            loopEntPhysical($device, $ent['entPhysicalIndex'], $level + 1);
+        }
+        $i++;
     }//end foreach
-	return $entphysical;
+
+    return $entphysical;
 }//end loopEntPhysical()
 
 // echo "</pre>";
 
 // Add CSS for physical port layout
-echo <<<CSS
+echo <<<'CSS'
 <style>
     .switch-container {
         border: 2px solid black;
@@ -209,61 +210,62 @@ CSS;
 // Example usage with your updated array:
 echo generateVisualTableWithAttributes($switches, $transformedPorts, $indexports, $entPhysical);
 
-
 // Functions below
 
 // Generate switch layout from hints file
 
 function generateTransformPorts($json, $side = 'front')
 {
-	if(!is_array($json))
-		return false;
+    if (! is_array($json)) {
+        return false;
+    }
 
-	$result = array();
-	// Example asr920 string here, yes, it's long.
-//  {"front":[{"height":"1","inverse":"0","block":"0","count":"1","type":"ac","start":"ac1"},{"height":"1","inverse":"0","block":"1","count":"1","type":"ac","start":"ac2"},{"height":"1","inverse":"0","block":"2","count":"1","type":"cu","start":"Gi0"},{"height":"2","inverse":"1","block":"3","count":"4","type":"sfp","start":"Gi0\/0\/0"},{"height":"2","inverse":"1","block":"4","count":"8","type":"sfp","start":"Gi0\/0\/4"},{"height":"2","inverse":"1","block":"4","count":"8","type":"cu","start":"Gi0\/0\/4"},{"height":"2","inverse":"1","block":"5","count":"2","type":"sfp","start":"Te0\/0\/12"}],"rear":[[]]}
+    $result = [];
+    // Example asr920 string here, yes, it's long.
+    //  {"front":[{"height":"1","inverse":"0","block":"0","count":"1","type":"ac","start":"ac1"},{"height":"1","inverse":"0","block":"1","count":"1","type":"ac","start":"ac2"},{"height":"1","inverse":"0","block":"2","count":"1","type":"cu","start":"Gi0"},{"height":"2","inverse":"1","block":"3","count":"4","type":"sfp","start":"Gi0\/0\/0"},{"height":"2","inverse":"1","block":"4","count":"8","type":"sfp","start":"Gi0\/0\/4"},{"height":"2","inverse":"1","block":"4","count":"8","type":"cu","start":"Gi0\/0\/4"},{"height":"2","inverse":"1","block":"5","count":"2","type":"sfp","start":"Te0\/0\/12"}],"rear":[[]]}
 
-	// we assume it is just module 0 for now, and each module will fire this
-	// During output we overwrite switchno and moduleno using the actual port info
-	$module = 0;
-	if(isset($json['front'])) {
-		//echo print_r($json['front'], true);
-		foreach($json['front'] as $item) {
-			$i = 0;
-			$column = 1;
-			// echo print_r($item, true);
-			
-			while($i < floatval($item['count'])) {
-				$column = floor($i / $item['height']);
-				// $portmap[$module][$block][$column][][$ifName] = $phy;
-				// Explode and implode to increase if number
-				$parts = array_reverse(explode("/",$item['start']));
-				$ifName = $item['start'];
-				// Check for multi module switch/module/port
-				if(count($parts) > 1) {
-					if(is_numeric($parts[0])) {
-						$parts[0] = $parts[0] + $i;
-					}
-					$ifName = implode("/", array_reverse($parts));
-				} else {
-					// Just a plain string, test for number?
-					preg_match("/([a-z-_ ]+)([0-9]+)/i", $parts[0], $matches);
-					if(isset($matches[2]))
-						$ifName = "{$matches[1]}". floatval($matches[2] + $i);
-				}
-				$result[$module][$item['block']][$column][][$ifName] = $item['type'];
-				$i++;
-			}
-			
-		}
-	}
-	
-	if(isset($json['rear'])) {
-		if(empty($json['rear']))
-			return array();
-		
-	}
-	return $result;
+    // we assume it is just module 0 for now, and each module will fire this
+    // During output we overwrite switchno and moduleno using the actual port info
+    $module = 0;
+    if (isset($json['front'])) {
+        //echo print_r($json['front'], true);
+        foreach ($json['front'] as $item) {
+            $i = 0;
+            $column = 1;
+            // echo print_r($item, true);
+
+            while ($i < floatval($item['count'])) {
+                $column = floor($i / $item['height']);
+                // $portmap[$module][$block][$column][][$ifName] = $phy;
+                // Explode and implode to increase if number
+                $parts = array_reverse(explode('/', $item['start']));
+                $ifName = $item['start'];
+                // Check for multi module switch/module/port
+                if (count($parts) > 1) {
+                    if (is_numeric($parts[0])) {
+                        $parts[0] = $parts[0] + $i;
+                    }
+                    $ifName = implode('/', array_reverse($parts));
+                } else {
+                    // Just a plain string, test for number?
+                    preg_match('/([a-z-_ ]+)([0-9]+)/i', $parts[0], $matches);
+                    if (isset($matches[2])) {
+                        $ifName = "{$matches[1]}" . floatval($matches[2] + $i);
+                    }
+                }
+                $result[$module][$item['block']][$column][][$ifName] = $item['type'];
+                $i++;
+            }
+        }
+    }
+
+    if (isset($json['rear'])) {
+        if (empty($json['rear'])) {
+            return [];
+        }
+    }
+
+    return $result;
 }
 
 // Find line in hints file with /prefix/: and return line without prefix
@@ -271,13 +273,14 @@ function generateTransformPorts($json, $side = 'front')
 function fastFindLine($filePath, $prefix)
 {
     $file = new SplFileObject($filePath);
-	$prefix .= ":";
-    while (!$file->eof()) {
+    $prefix .= ':';
+    while (! $file->eof()) {
         $line = $file->fgets();
         if (strncmp($line, $prefix, strlen($prefix)) === 0) {
             return $line;
         }
     }
+
     return null;
 }
 
@@ -286,67 +289,73 @@ function transformPortsIndexedByIfName($ports)
 {
     $result = [];
     foreach ($ports->items() as $port_id => $port) {
-		$ifName = $port->ifName;
-		$result[$ifName] = $port;
-	}
-	return $result;
+        $ifName = $port->ifName;
+        $result[$ifName] = $port;
+    }
+
+    return $result;
 }
 
 // Ports indexed by ifName, find switch range
 function findSwitchesRange($indexports)
 {
-	// Only works on ports deliminated with /, alternative preg_split()
-	// Cisco, Aruba, Juniper
-	$switches = array();
-	foreach($indexports as $ifName => $port) {
-		$parts = explode('/', $ifName);
-		switch(count($parts)) {
-			case 3:
-				preg_match("/([0-9]+)/", $parts[0], $switchmatch);
-				$switches[$switchmatch[0]] = true;
-				break;
-			default:
-				continue 2;
-		}
-		// echo "found highest switch port $ifName";
-	}
-	if(empty($switches))
-		$switches[1] = true;
+    // Only works on ports deliminated with /, alternative preg_split()
+    // Cisco, Aruba, Juniper
+    $switches = [];
+    foreach ($indexports as $ifName => $port) {
+        $parts = explode('/', $ifName);
+        switch(count($parts)) {
+            case 3:
+                preg_match('/([0-9]+)/', $parts[0], $switchmatch);
+                $switches[$switchmatch[0]] = true;
+                break;
+            default:
+                continue 2;
+        }
+        // echo "found highest switch port $ifName";
+    }
+    if (empty($switches)) {
+        $switches[1] = true;
+    }
 
-	return $switches;
+    return $switches;
 }
 
 // Return one or more interfaces from $entPhysical array
-function findEntPhysicalPortType($entPhysical, $ifDescr) {
-	$result = array();
-	// Cisco SFP is in different ifDescr
-	// GigabitEthernet3/0/51 Container
-	// entPhysicalVendorType cevContainerSFP cevPortGigBaseSX cevPortBaseTEther
-	// Aruba in WiredSwitch 1,25, 50 Gb
-	$str = "$ifDescr Container";
-	if(isset($entPhysical[$str])) {
-		if(preg_match("/(BaseT|WiredSwitch[0-9]Gb)/i", $entPhysical[$str]['entPhysicalVendorType']))
-			$result[] = "cu";
-		elseif(preg_match("/(qsfp|WiredSwitch[4][0]Gb)/i", $entPhysical[$ifDescr]['entPhysicalVendorType']))
-			$result[] = "qsfp";
-		elseif(preg_match("/(sfp|WiredSwitch[125][0]Gb)/i", $entPhysical[$str]['entPhysicalVendorType']))
-			$result[] = "sfp";
-		else
-			echo "Could not determine phy type '{$entPhysical[$str]['entPhysicalVendorType']}' ";
-	}
-	if (isset($entPhysical[$ifDescr])) {
-		if(preg_match("/(BaseT|WiredSwitch[0-9]Gb)/i", $entPhysical[$ifDescr]['entPhysicalVendorType']))
-			$result[] = "cu";
-		elseif(preg_match("/(qsfp|WiredSwitch[4][0]Gb)/i", $entPhysical[$ifDescr]['entPhysicalVendorType']))
-			$result[] = "qsfp";
-		elseif(preg_match("/(sfp|WiredSwitch[125][0]Gb)/i", $entPhysical[$ifDescr]['entPhysicalVendorType']))
-			$result[] = "sfp";
-		elseif(preg_match("/(basesx)/i", $entPhysical[$ifDescr]['entPhysicalVendorType']))
-			$result[] = "mmsr";
-		else
-			echo "Could not determine phy type {$entPhysical[$ifDescr]['entPhysicalVendorType']} ";
-	}	
-	return $result;
+function findEntPhysicalPortType($entPhysical, $ifDescr)
+{
+    $result = [];
+    // Cisco SFP is in different ifDescr
+    // GigabitEthernet3/0/51 Container
+    // entPhysicalVendorType cevContainerSFP cevPortGigBaseSX cevPortBaseTEther
+    // Aruba in WiredSwitch 1,25, 50 Gb
+    $str = "$ifDescr Container";
+    if (isset($entPhysical[$str])) {
+        if (preg_match('/(BaseT|WiredSwitch[0-9]Gb)/i', $entPhysical[$str]['entPhysicalVendorType'])) {
+            $result[] = 'cu';
+        } elseif (preg_match('/(qsfp|WiredSwitch[4][0]Gb)/i', $entPhysical[$ifDescr]['entPhysicalVendorType'])) {
+            $result[] = 'qsfp';
+        } elseif (preg_match('/(sfp|WiredSwitch[125][0]Gb)/i', $entPhysical[$str]['entPhysicalVendorType'])) {
+            $result[] = 'sfp';
+        } else {
+            echo "Could not determine phy type '{$entPhysical[$str]['entPhysicalVendorType']}' ";
+        }
+    }
+    if (isset($entPhysical[$ifDescr])) {
+        if (preg_match('/(BaseT|WiredSwitch[0-9]Gb)/i', $entPhysical[$ifDescr]['entPhysicalVendorType'])) {
+            $result[] = 'cu';
+        } elseif (preg_match('/(qsfp|WiredSwitch[4][0]Gb)/i', $entPhysical[$ifDescr]['entPhysicalVendorType'])) {
+            $result[] = 'qsfp';
+        } elseif (preg_match('/(sfp|WiredSwitch[125][0]Gb)/i', $entPhysical[$ifDescr]['entPhysicalVendorType'])) {
+            $result[] = 'sfp';
+        } elseif (preg_match('/(basesx)/i', $entPhysical[$ifDescr]['entPhysicalVendorType'])) {
+            $result[] = 'mmsr';
+        } else {
+            echo "Could not determine phy type {$entPhysical[$ifDescr]['entPhysicalVendorType']} ";
+        }
+    }
+
+    return $result;
 }
 
 // Walk the ports array and by magic create switches, modules, blocks and columns in something that resembles an array. Physical location might well be wrong.
@@ -356,94 +365,105 @@ function findEntPhysicalPortType($entPhysical, $ifDescr) {
 function transformPortsAuto($ports, $rowHeight = 2, $entPhysical): array
 {
     $result = [];
-	$i = 0;
-	$col = 0;
-	$block = 0;
+    $i = 0;
+    $col = 0;
+    $block = 0;
 
     foreach ($ports->items() as $port_id => $port) {
         // Extract ifName and split into components
-		foreach(array("ifType", "ifName", "ifDescr", "ifOperStatus", "ifAdminStatus", "ifVlan", "ifTrunk") as $field)
-			$$field = $port[$field] ?? null;
-			
+        foreach (['ifType', 'ifName', 'ifDescr', 'ifOperStatus', 'ifAdminStatus', 'ifVlan', 'ifTrunk'] as $field) {
+            $$field = $port[$field] ?? null;
+        }
+
         if ($ifName) {
-			// only physical ports, ignore wifi, subinterfaces, loopback
-			if(preg_match("/(lo|br|wifi|[.][0-9]+|ovpn|tun|tap|sit|enc)/i", $ifName))
-				continue;
-			if($ifType != "ethernetCsmacd")
-				continue;
-			
-			// Checl for Container first, might hold transceiver, Cisco uses ifDescr to match
-			$types = findEntPhysicalPortType($entPhysical, $ifDescr);
-			// just compare on 1st entry. 
-			// Check if type has changed, if so, increment block
-			if((isset($prevtype) && ($prevtype != $types[0])))
-				$block = $block + 1;
+            // only physical ports, ignore wifi, subinterfaces, loopback
+            if (preg_match('/(lo|br|wifi|[.][0-9]+|ovpn|tun|tap|sit|enc)/i', $ifName)) {
+                continue;
+            }
+            if ($ifType != 'ethernetCsmacd') {
+                continue;
+            }
 
-			// See if we have a prefix like GigabitEthernet
-			preg_match("/^([a-z-_ ]+)/i", $ifName, $prefix);
+            // Checl for Container first, might hold transceiver, Cisco uses ifDescr to match
+            $types = findEntPhysicalPortType($entPhysical, $ifDescr);
+            // just compare on 1st entry.
+            // Check if type has changed, if so, increment block
+            if (isset($prevtype) && ($prevtype != $types[0])) {
+                $block = $block + 1;
+            }
 
-			// Check if ascii prefix has changed, if so, increment module
-			if((isset($prevprefix) && ($prevprefix != $prefix[0])))
-				$block = $block + 1;
+            // See if we have a prefix like GigabitEthernet
+            preg_match('/^([a-z-_ ]+)/i', $ifName, $prefix);
 
-			// figure out the layout, count parts, split accordingly
+            // Check if ascii prefix has changed, if so, increment module
+            if (isset($prevprefix) && ($prevprefix != $prefix[0])) {
+                $block = $block + 1;
+            }
+
+            // figure out the layout, count parts, split accordingly
             $parts = explode('/', $ifName);
-			$partscount = count($parts);
-			
-			if((isset($prevpartscount) && ($prevpartscount != $partscount)))
-				$block = $block + 1;
-			
-			// reset block count on new module, switch
-			if((isset($prevmodule)) && ($prevmodule != $module))
-				$block = 0;
-			if((isset($prevswitch)) && ($prevswitch != $switch)) {
-				$block = 0;
-				// if the switchcount exceeds one, assume VSF stack and use that layout.
-				return $result;
-			}
-			
-			switch(count($parts)) {
-					case 3:
-						preg_match("/([0-9]+)/", $parts[0], $switchmatch);
-						$switch = $switchmatch[0];
-						$module = floatval($parts[1]) ?? null;
-						$portNumber = $parts[2] ?? '1';
-						$Height = $rowHeight;
-						break;
-					case 2:
-						$switch = 1;
-						$module = floatval($parts[0]);
-						$portNumber = $parts[1] ?? '1';
-						$Height = $rowHeight;
-						break;
-					default:
-						/// Just the 1 item?
-						$switch = 1;
-						$module = 0;
-						$portNumber = $parts[0] ?? '1';
-						$Height = 1;
-						break;
-			}
-			
-			// Couldn't determine if this was a cu, sfp, qsfp on Aruba
-			// if($portNumber == 52)
-			//  echo print_r($port, true);
+            $partscount = count($parts);
 
-			$col = floor($i / $Height);
+            if (isset($prevpartscount) && ($prevpartscount != $partscount)) {
+                $block = $block + 1;
+            }
+
+            // reset block count on new module, switch
+            if ((isset($prevmodule)) && ($prevmodule != $module)) {
+                $block = 0;
+            }
+            if ((isset($prevswitch)) && ($prevswitch != $switch)) {
+                $block = 0;
+
+                // if the switchcount exceeds one, assume VSF stack and use that layout.
+                return $result;
+            }
+
+            switch(count($parts)) {
+                case 3:
+                    preg_match('/([0-9]+)/', $parts[0], $switchmatch);
+                    $switch = $switchmatch[0];
+                    $module = floatval($parts[1]) ?? null;
+                    $portNumber = $parts[2] ?? '1';
+                    $Height = $rowHeight;
+                    break;
+                case 2:
+                    $switch = 1;
+                    $module = floatval($parts[0]);
+                    $portNumber = $parts[1] ?? '1';
+                    $Height = $rowHeight;
+                    break;
+                default:
+                    /// Just the 1 item?
+                    $switch = 1;
+                    $module = 0;
+                    $portNumber = $parts[0] ?? '1';
+                    $Height = 1;
+                    break;
+            }
+
+            // Couldn't determine if this was a cu, sfp, qsfp on Aruba
+            // if($portNumber == 52)
+            //  echo print_r($port, true);
+
+            $col = floor($i / $Height);
             // Build the multi-dimensional array
-			$result[$module][$block][$col][][$ifName] = "cu";
-			
-			$prevmodule = $module;
-			$prevswitch = $switch;
-			if(isset($prefix[0]))
-				$prevprefix = $prefix[0];
+            $result[$module][$block][$col][][$ifName] = 'cu';
 
-			if(isset($partscount))
-				$prevpartscount = $partscount;
+            $prevmodule = $module;
+            $prevswitch = $switch;
+            if (isset($prefix[0])) {
+                $prevprefix = $prefix[0];
+            }
 
-			if(isset($types[0]))
-				$prevtype = $types[0];
-			$i++;
+            if (isset($partscount)) {
+                $prevpartscount = $partscount;
+            }
+
+            if (isset($types[0])) {
+                $prevtype = $types[0];
+            }
+            $i++;
         }
     }
 
@@ -453,136 +473,139 @@ function transformPortsAuto($ports, $rowHeight = 2, $entPhysical): array
 // Check if the ports are relevant to this particular switch, false or true
 function filterPortsforSwitch($columns, $switch)
 {
-	foreach ($columns as $col => $ports) {
-		foreach($ports as $rows) {
-			foreach($rows as $portName => $port) {
-				$portparts = explode("/", strval($portName));
-				if(count($portparts) == 3){
-					if(!preg_match("/($switch)\/([0-9+])\/([0-9]+)/i", $portName)) {
-						//$html .= "$portName is from switch $switch ";
-						return false;
-					}
-						
-				}
-			}
-		}
-	}
-	return true;
+    foreach ($columns as $col => $ports) {
+        foreach ($ports as $rows) {
+            foreach ($rows as $portName => $port) {
+                $portparts = explode('/', strval($portName));
+                if (count($portparts) == 3) {
+                    if (! preg_match("/($switch)\/([0-9+])\/([0-9]+)/i", $portName)) {
+                        //$html .= "$portName is from switch $switch ";
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+
+    return true;
 }
 
-function generateVisualTableWithAttributes($switches = array(1 => true), array $transform, $indexports, $entPhysical): string
+function generateVisualTableWithAttributes($switches = [1 => true], array $transform, $indexports, $entPhysical): string
 {
     $html = '<div class="visual-table">';
     foreach ($switches as $switch => $id) {
         // Create a container for the switch
         $html .= '<div class="switch-container">';
-		// These don't neccesarily match up yet
-		if(isset($entPhysical['switches'][$switch]))
-			$html .= "Switch: $switch: {$entPhysical['switches'][$switch]}</br>\n";
-		
+        // These don't neccesarily match up yet
+        if (isset($entPhysical['switches'][$switch])) {
+            $html .= "Switch: $switch: {$entPhysical['switches'][$switch]}</br>\n";
+        }
 
-		foreach ($transform as $module => $blocks) {
-			// Create a container for the module, but only if there is more then 1.
-			if(count($transform) > 1) {
-				$html .= '<div class="module-container">';
-				//$html .= "Module: $module</br>";
-			}
+        foreach ($transform as $module => $blocks) {
+            // Create a container for the module, but only if there is more then 1.
+            if (count($transform) > 1) {
+                $html .= '<div class="module-container">';
+                //$html .= "Module: $module</br>";
+            }
 
-			foreach ($blocks as $block => $columns) {
-				// Filter out ports from stack members
-				if(filterPortsforSwitch($columns, $switch) === false)
-					continue;
+            foreach ($blocks as $block => $columns) {
+                // Filter out ports from stack members
+                if (filterPortsforSwitch($columns, $switch) === false) {
+                    continue;
+                }
 
-				// Create a container for the block, but only if there is more then 1.
-				if(count($blocks) > 1) {
-					$html .= '<div class="block-container">';
-					// $html .= "Block: $block</br>";
-				}
-				$html .= '<table class="port-table">';
-				// Get the maximum rows across columns
-				$rowCount = max(array_map('count', $columns));
-				for ($row = 0; $row < $rowCount; $row++) {
-					$html .= '<tr>';
-					foreach ($columns as $col => $ports) {
-						$portData = $ports[$row] ?? null; // Retrieve port data if it exists						
-						if ($portData) {
-							
-							foreach ($portData as $portName => $phy) {
-								// Get last part for just number
-								$portparts = array_reverse(explode("/", strval($portName)));
-								// We only want the specific switch if the port has this info
-								switch(count($portparts)) {
-										case 3:
-											preg_match("/([0-9]+)/", $portparts[2], $switchmatch);
-											if($switchmatch[0 ]!= $switch)
-												continue 3;
-											break;
-								}
-								// Lookup port by port_id from transform array
-								$attr = $indexports[$portName];
-								$ifDescr = $attr->ifDescr ?? 'down';
-								$adminStatus = $attr->ifAdminStatus ?? 'down';
-								$operStatus = $attr->ifOperStatus ?? 'down';
-								$vlan = $attr->ifVlan ?? 'Unknown';
-								if($vlan == "Unknown")
-									$vlan = $attr->ifTrunk ?? 'Unknown';
+                // Create a container for the block, but only if there is more then 1.
+                if (count($blocks) > 1) {
+                    $html .= '<div class="block-container">';
+                    // $html .= "Block: $block</br>";
+                }
+                $html .= '<table class="port-table">';
+                // Get the maximum rows across columns
+                $rowCount = max(array_map('count', $columns));
+                for ($row = 0; $row < $rowCount; $row++) {
+                    $html .= '<tr>';
+                    foreach ($columns as $col => $ports) {
+                        $portData = $ports[$row] ?? null; // Retrieve port data if it exists
+                        if ($portData) {
+                            foreach ($portData as $portName => $phy) {
+                                // Get last part for just number
+                                $portparts = array_reverse(explode('/', strval($portName)));
+                                // We only want the specific switch if the port has this info
+                                switch(count($portparts)) {
+                                    case 3:
+                                        preg_match('/([0-9]+)/', $portparts[2], $switchmatch);
+                                        if ($switchmatch[0] != $switch) {
+                                            continue 3;
+                                        }
+                                        break;
+                                }
+                                // Lookup port by port_id from transform array
+                                $attr = $indexports[$portName];
+                                $ifDescr = $attr->ifDescr ?? 'down';
+                                $adminStatus = $attr->ifAdminStatus ?? 'down';
+                                $operStatus = $attr->ifOperStatus ?? 'down';
+                                $vlan = $attr->ifVlan ?? 'Unknown';
+                                if ($vlan == 'Unknown') {
+                                    $vlan = $attr->ifTrunk ?? 'Unknown';
+                                }
 
-								// Determine the CSS classes based on statuses
-								$borderClass = match ($adminStatus) {
-									'up' => 'border-up',
-									'disabled' => 'border-disabled',
-									default => 'border-down',
-								};
+                                // Determine the CSS classes based on statuses
+                                $borderClass = match ($adminStatus) {
+                                    'up' => 'border-up',
+                                    'disabled' => 'border-disabled',
+                                    default => 'border-down',
+                                };
 
-								$bgClass = ($operStatus === 'up') ? 'bg-up' : 'bg-down';
+                                $bgClass = ($operStatus === 'up') ? 'bg-up' : 'bg-down';
 
-							    // Port-Cell type
-							    $types = findEntPhysicalPortType($entPhysical, $ifDescr);
-								//$html .= "{$ifDescr}, ". print_r($types, true);
-								switch($types[0]) {
-								   case "qsfp":
-										$portcell = "port-cell-qsfp";
-										break;
-								   case "sfp":
-										$portcell = "port-cell-sfp";
-										break;
-								   default:
-										$portcell = "port-cell-cu";
-										break;
-								}
+                                // Port-Cell type
+                                $types = findEntPhysicalPortType($entPhysical, $ifDescr);
+                                //$html .= "{$ifDescr}, ". print_r($types, true);
+                                switch($types[0]) {
+                                    case 'qsfp':
+                                        $portcell = 'port-cell-qsfp';
+                                        break;
+                                    case 'sfp':
+                                        $portcell = 'port-cell-sfp';
+                                        break;
+                                    default:
+                                        $portcell = 'port-cell-cu';
+                                        break;
+                                }
 
-								// Needs STP Port Blocking status color 
-							    // Add the port cell with custom tooltip
-								// add tooltip helper here, doesn't work yet.
-			                    $tooltipContent = <<<TOOLTIP
+                                // Needs STP Port Blocking status color
+                                // Add the port cell with custom tooltip
+                                // add tooltip helper here, doesn't work yet.
+                                $tooltipContent = <<<TOOLTIP
         <div>Port: $portName</div>
         <div>Admin Status: $adminStatus</div>
         <div>Oper Status: $operStatus</div>
         <div>VLAN: $vlan</div>
 TOOLTIP;
-								$html .= "<td class='{$portcell} $borderClass $bgClass' >
+                                $html .= "<td class='{$portcell} $borderClass $bgClass' >
 							<div class='port-name'>{$portparts[0]}</div>
 											<div class='tooltip'>{$tooltipContent}</div>
 										  </td>";
-							}
-						} else {
-							// Empty cell
-							$html .= "<td class='port-cell empty-cell'></td>";
-						}
-					}
-					$html .= '</tr>';
-				}
-				$html .= '</table>';
-				if(count($blocks) > 1) {
-					$html .= '</div>'; // End block container
-				}
-			}
-			$html .= '</table>';
-			if(count($transform) > 1)
-				$html .= '</div>'; // End module container
-		}
+                            }
+                        } else {
+                            // Empty cell
+                            $html .= "<td class='port-cell empty-cell'></td>";
+                        }
+                    }
+                    $html .= '</tr>';
+                }
+                $html .= '</table>';
+                if (count($blocks) > 1) {
+                    $html .= '</div>'; // End block container
+                }
+            }
+            $html .= '</table>';
+            if (count($transform) > 1) {
+                $html .= '</div>';
+            } // End module container
+        }
         $html .= '</div>'; // End switch container
-	}
+    }
     $html .= '</div>';
 
     return $html;

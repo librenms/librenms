@@ -72,4 +72,4 @@ echo '</table>';
 
 $pagetitle[] = 'Inventory';
 
-include('physicalports.inc.php');
+include 'physicalports.inc.php';

@@ -26,8 +26,8 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Facades\DeviceCache;
-use App\Models\Port;
 use App\Models\Device;
+use App\Models\Port;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -42,7 +42,7 @@ class InventoryController implements DeviceTab
     private bool $detail = false;
     private array $settings = [];
     private array $defaults = [
-        'perPage' => "all",
+        'perPage' => 'all',
         'sort' => 'ifIndex',
         'order' => 'asc',
         'disabled' => true,
@@ -86,13 +86,14 @@ class InventoryController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-		/*
+        /*
         return [
             'tab' => $this->type, // inject to load correct legacy file
         ];
-		*/
+        */
         $this->loadSettings($request);
-		$data = $this->portData($device, $request);
+        $data = $this->portData($device, $request);
+
         return array_merge([
             'tab' => $this->type, // inject to load correct legacy file
         ], $data);
@@ -100,9 +101,7 @@ class InventoryController implements DeviceTab
 
     private function loadSettings(Request $request): void
     {
-
         $this->settings = $this->defaults;
-
     }
 
     private function getFilteredPortsQuery(Device $device, array $relationships = []): Builder
