@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Eloquent\Builder;
-echo "<pre>\n";
+// echo "<pre>\n";
 
 // Set default column height to something sensible
 $columnHeight = 2;
@@ -10,8 +10,8 @@ $columnHeight = 2;
 $hardware  = $device['hardware'] ?? null;
 // Lookup entPhysical storage for more hardware hints
 $level = 0;
-$entPhysical = loopEntPhysical($device, $ent['entPhysicalIndex'], $level);
-// echo print_r($enPhysical, true);
+$entPhysical = loopEntPhysical($device, 0, 0);
+// echo print_r($entPhysical, true);
 
 // Deduce hints file from icon name
 $brand = substr(basename($device['icon'] ?? null), 0, -4);
@@ -52,15 +52,10 @@ function loopEntPhysical($device, $ent, $level)
 	// This recurses, make sure to get entire result
 	global $entphysical;
 	// Needs rewrite into eloquent
-    $ents = dbFetchRows('SELECT * FROM `entPhysical` WHERE device_id = ? AND entPhysicalContainedIn = ? ORDER BY entPhysicalContainedIn,entPhysicalIndex', [$device['device_id'], $ent]);
+    //$ents = dbFetchRows('SELECT * FROM `entPhysical` WHERE device_id = ? AND entPhysicalContainedIn = ? ORDER BY entPhysicalContainedIn,entPhysicalIndex', [$device['device_id'], $ent]);
+    $ents = DeviceCache::getPrimary()->entityPhysical()->where('entPhysicalContainedIn', $ent)->orderBy('entPhysicalContainedIn')->orderBy('entPhysicalIndex')->get()->toArray();
 	$i = 0;
-    foreach ($ents as $id => $ent) {
-		//Let's find if we have any sensors attached to the current entity;
-		//We hit this code for every type of entity because not all vendors have 1 'sensor' entity per sensor
-		$sensors = DeviceCache::getPrimary()->sensors()->where(function (Builder $query) use ($ent) {
-			return $query->where('entPhysicalIndex', $ent['entPhysicalIndex'])
-				->orWhere('sensor_index', $ent['entPhysicalIndex']);
-		})->get();
+    foreach ($ents as $ent) {
 		if ($ent['entPhysicalClass'] == 'port') {
 			$entphysical[$ent['entPhysicalName']] = $ent;
 			// echo print_r($ent, true);
@@ -72,18 +67,16 @@ function loopEntPhysical($device, $ent, $level)
 			$entphysical['switches'][$i+1] = $ent['entPhysicalSerialNum'];
 		}
 		
-		$count = dbFetchCell("SELECT COUNT(*) FROM `entPhysical` WHERE device_id = '" . $device['device_id'] . "' AND entPhysicalContainedIn = '" . $ent['entPhysicalIndex'] . "'");
-		if ($count) {
-			loopEntPhysical($device, $ent['entPhysicalIndex'], $level + 1, 'liClosed');
+		$count = DeviceCache::getPrimary()->entityPhysical()->where('entPhysicalContainedIn', $ent['entPhysicalIndex'])->count();
+		if (floatval($count) > 0) {
+			loopEntPhysical($device, $ent['entPhysicalIndex'], $level + 1);
 		}
 		$i++;
     }//end foreach
 	return $entphysical;
 }//end loopEntPhysical()
 
-//echo print_r($entPhysical, true);
-
-echo "</pre>";
+// echo "</pre>";
 
 // Add CSS for physical port layout
 echo <<<CSS
@@ -326,11 +319,10 @@ function findSwitchesRange($indexports)
 // Return one or more interfaces from $entPhysical array
 function findEntPhysicalPortType($entPhysical, $ifDescr) {
 	$result = array();
-	//echo "Search interface $ifDescr ";
-	// echo print_r($entPhysical, true);
+	// Cisco SFP is in different ifDescr
 	// GigabitEthernet3/0/51 Container
 	// entPhysicalVendorType cevContainerSFP cevPortGigBaseSX cevPortBaseTEther
-	// 	
+	// Aruba in WiredSwitch 1,25, 50 Gb
 	$str = "$ifDescr Container";
 	if(isset($entPhysical[$str])) {
 		if(preg_match("/(BaseT|WiredSwitch[0-9]Gb)/i", $entPhysical[$str]['entPhysicalVendorType']))
