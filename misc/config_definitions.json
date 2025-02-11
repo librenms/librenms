@@ -4731,6 +4731,11 @@
                     "edge": "#ff777788",
                     "node": "#ffdddd"
                 },
+                "wn": {
+                    "border": "#ff6644",
+                    "edge": "#ff7755",
+                    "node": "#ffeecc"
+                },
                 "highlight": {
                     "border": "#ee4000",
                     "borderWidth": 3
@@ -6365,8 +6370,8 @@
         },
         "uptime_warning": {
             "group": "webui",
-            "section": "dashboard",
-            "order": 2,
+            "section": "device",
+            "order": 7,
             "default": 86400,
             "type": "integer",
             "validate": {
