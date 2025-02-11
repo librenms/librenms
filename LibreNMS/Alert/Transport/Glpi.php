@@ -41,6 +41,7 @@ class Glpi extends Transport
 
         $data = [
             'user_token' => $this->config['user-token'],
+            'get_full_session' => true,
         ];
 
         $res = Http::client()
@@ -52,33 +53,19 @@ class Glpi extends Transport
                 $alert_data['msg'], $data);
         }
 
-        $headers['Session-Token'] = json_decode($res->body(), true)['session_token'];
+        $headers['Session-Token'] = $res->json()['session_token'];
+        $userID = $res->json()['session']['glpiID'];
+        $profileID = $res->json()['session']['glpiactiveprofile']['id'];
 
-        // Change the active profile to the admin one
-        $profile = null;
-        $profiles = Http::client()
-            ->withHeaders($headers)
-            ->get($this->config['api-url'] . '/getMyProfiles');
-
-        foreach ($profiles['myprofiles'] as $profile) {
-            if (str_contains($profile['name'], 'super-admin')) {
-                $profile = $profile['id'];
-                break;
-            }
-        }
-
-        if ($profile != null) {
+        // Change the active profile to super-admin (always 4 in GLPI)
+        if ($profileID != 4) {
             $data = [
-                'profiles_id' => $profile,
+                'profiles_id' => 4,
             ];
 
             $res = Http::client()
                 ->withHeaders($headers)
                 ->post($this->config['api-url'] . '/changeActiveProfile/', $data);
-
-            $res = Http::client()
-                ->withHeaders($headers)
-                ->post($this->config['api-url'] . '/changeActiveEntities/');
         }
 
         // Retrieve the ticket for the alert (by title)
@@ -86,6 +73,7 @@ class Glpi extends Transport
         $searchURL = $this->config['api-url'] .
             '/search/Ticket?' .
             'forcedisplay[0]=2&' .
+            'forcedisplay[1]=12&' .
             'criteria[0][field]=1&' .
             'criteria[0][searchtype]=contains&' .
             'criteria[0][value]=^[LibreNMS: ' . $alert_data['sysName'] . '] ' . $alert_data['name'] . '$&' .
@@ -103,7 +91,7 @@ class Glpi extends Transport
 
             // Retrieve the device in GLPI
             $deviceSearchURL = $this->config['api-url'] .
-                '/search/Computer?' .
+                '/search/AllAssets?' .
                 'forcedisplay[0]=2&' .
                 'forcedisplay[1]=80&' .
                 'criteria[0][field]=1&' .
@@ -115,31 +103,21 @@ class Glpi extends Transport
                 ->get($deviceSearchURL);
 
             $deviceID = $res->json()['data'][0]['2'] ?? null;
+            $itemtype = $res->json()['data'][0]['itemtype'] ?? null;
 
             // Retrieve the entity in GLPI
             $entityName = $res->json()['data'][0]['80'] ?? null;
             $entityID = null;
             if ($entityName != null) {
                 $entitySearchURL = $this->config['api-url'] .
-                    '/search/Entity?' .
-                    'forcedisplay[0]=2&' .
-                    'criteria[0][field]=1&' .
-                    'criteria[0][searchtype]=contains&' .
-                    'criteria[0][value]=^' . $entityName . '$';
+                    '/Entity?searchText[completename]=^' . $entityName . '$';
 
                 $res = Http::client()
                     ->withHeaders($headers)
                     ->get($entitySearchURL);
 
-                $entityID = $res->json()['data'][0]['2'] ?? null;
+                $entityID = $res->json()[0]['id'] ?? null;
             }
-
-            // Retrieve the user logged in
-            $res = Http::client()
-                ->withHeaders($headers)
-                ->get($this->config['api-url'] . '/getFullSession');
-
-            $userID = $res->json()['session']['glpiID'];
 
             // Create the ticket
             $data = [
@@ -165,7 +143,7 @@ class Glpi extends Transport
                 $data = [
                     'input' => [
                         'items_id' => $deviceID,
-                        'itemtype' => 'Computer',
+                        'itemtype' => $itemtype,
                         'tickets_id' => $ticketID,
                     ],
                 ];
@@ -176,11 +154,7 @@ class Glpi extends Transport
             }
         } else {
             $ticketID = $res->json()['data'][0]['2'];
-
-            // Update the status if resolved
-            $ticketData = Http::client()
-                ->withHeaders($headers)
-                ->get($this->config['api-url'] . '/Ticket/' . $ticketID);
+            $ticketStatus = $res->json()['data'][0]['12'];
 
             // Add followup to ticket
             $data = [
@@ -197,8 +171,8 @@ class Glpi extends Transport
                 ->withHeaders($headers)
                 ->post($followupURL, $data);
 
-            if ($ticketData->json()['status'] == 5) {
-                // Reopen the ticket if it was resolved or close it if the device recovered
+            if ($ticketStatus == 5) {
+                // Reopen the ticket if it was resolved or close it if the state is 0
                 $data = [
                     'input' => [
                         'status' => 2,
