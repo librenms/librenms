@@ -194,6 +194,8 @@ class CustomMapDataController extends Controller
 
             // set up linked device and status
             if ($node->device) {
+                $warning_time = Config::get('uptime_warning', 86400);
+
                 $nodes[$nodeid]['device_name'] = $node->device->hostname . '(' . $node->device->sysName . ')';
                 $nodes[$nodeid]['device_image'] = $node->device->icon;
                 $nodes[$nodeid]['device_info'] = Blade::render('<x-device-link-map :device="$device" />', ['device' => $node->device]);
@@ -202,6 +204,8 @@ class CustomMapDataController extends Controller
                     $this->setNodeDisabledStyle($nodes[$nodeid]);
                 } elseif (! $node->device->status) {
                     $this->setNodeDownStyle($nodes[$nodeid], $request);
+                } elseif ($node->device->uptime < $warning_time && $node->device->uptime != 0) {
+                    $this->setNodeWarningStyle($nodes[$nodeid], $request);
                 }
             }
         }
@@ -388,6 +392,16 @@ class CustomMapDataController extends Controller
     {
         $node_data_array['colour_bg_view'] = Config::get('network_map_legend.di.border');
         $node_data_array['colour_bdr_view'] = Config::get('network_map_legend.di.node');
+    }
+
+    protected function setNodeWarningStyle(array &$node_data_array, Request $request): void
+    {
+        $node_data_array['colour_bg_view'] = Config::get('network_map_legend.wn.node');
+        $node_data_array['colour_bdr_view'] = Config::get('network_map_legend.wn.border');
+        // Change the text colour as long as we have not been requested by the editor
+        if ($request->headers->get('referer') && ! str_ends_with(parse_url($request->headers->get('referer'), PHP_URL_PATH), '/edit')) {
+            $node_data_array['text_colour'] = 'darkorange';
+        }
     }
 
     protected function setNodeDownStyle(array &$node_data_array, Request $request): void
