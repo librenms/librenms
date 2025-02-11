@@ -3,10 +3,10 @@
 
 ## Syslog integration variants
 This section explain different ways to recieve and process syslog with LibreNMS.
-Except of graylog, all Syslogs variants store their logs in the LibreNMS database. You need to enable the Syslog extension in  `config.php`:
+Except of graylog, all Syslogs variants store their logs in the LibreNMS database. You need to enable the Syslog extension:
 
-```php
-$config['enable_syslog'] = 1;
+```bash
+lnms config:set enable_syslog true
 ```
 A Syslog integration gives you a centralized view of information within the LibreNMS (device view, traps, event). Further more you can trigger alerts based on syslog messages (see rule collections).
 
@@ -393,11 +393,10 @@ You will need to download and install "Datagram-Syslog Agent" for this how to
 ## External hooks
 
 Trigger external scripts based on specific syslog patterns being
-matched with syslog hooks. Add the following to your LibreNMS
-`config.php` to enable hooks:
+matched with syslog hooks. Enable syslog hook support:
 
-```ssh
-$config['enable_syslog_hooks'] = 1;
+```bash
+lnms config:set enable_syslog_hooks true
 ```
 
 The below are some example hooks to call an external script in the

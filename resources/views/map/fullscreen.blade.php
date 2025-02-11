@@ -43,6 +43,27 @@ html, body, #fullscreen-map {
    padding-bottom: 0;
    margin-bottom: 0;
 }
+
+#fullscreen-map {
+   z-index: 1;
+}
+
+.leaflet-map-pane {
+   z-index: 2;
+}
+
+.leaflet-google-layer {
+   z-index: 1;
+}
+
+.leaflet-overlay-pane {
+   z-index: 3;
+}
+
+.navbar {
+   z-index: 1000 !important;
+   position: relative;
+}
 </style>
 @endsection
 
@@ -69,7 +90,49 @@ html, body, #fullscreen-map {
     window.addEventListener('resize', checkMapSize);
     checkMapSize();
 
-    var device_map = init_map("fullscreen-map", {engine: "{{$map_provider}}", api_key: "{{$map_api_key}}", "tile_url": "{{$tile_url}}", lat: {{$init_lat}}, lng: {{$init_lng}}, zoom: {{$init_zoom}}});
+    function updateMapHash() {
+        var center = device_map.getCenter();
+        var zoom = device_map.getZoom();
+        var hash = '#' + [
+            zoom,
+            center.lat.toFixed(6),
+            center.lng.toFixed(6)
+        ].join('/');
+        window.location.hash = hash;
+    }
+
+    function readMapHash() {
+        var hash = window.location.hash;
+        if (hash) {
+            var params = hash.substring(1).split('/');
+            if (params.length === 3) {
+                return {
+                    zoom: parseFloat(params[0]),
+                    lat: parseFloat(params[1]),
+                    lng: parseFloat(params[2])
+                };
+            }
+        }
+        return null;
+    }
+
+    var device_map = init_map("fullscreen-map", {
+        engine: "{{$map_provider}}",
+        api_key: "{{$map_api_key}}",
+        "tile_url": "{{$tile_url}}",
+        lat: {{$init_lat}},
+        lng: {{$init_lng}},
+        zoom: {{$init_zoom}}
+    });
+
+    // Apply hash position if exists
+    var hashPosition = readMapHash();
+    if (hashPosition) {
+        device_map.setView([hashPosition.lat, hashPosition.lng], hashPosition.zoom);
+    }
+
+    // Add event listener for map movements
+    device_map.on('moveend', updateMapHash);
 
     var device_marker_cluster = L.markerClusterGroup({
         maxClusterRadius: {{$group_radius}},
@@ -223,14 +286,9 @@ html, body, #fullscreen-map {
 @endif
     }
 
-    device_map.scrollWheelZoom.disable();
+    
     $(document).ready(function(){
-        $("#fullscreen-map").on("click", function(event) {
-            device_map.scrollWheelZoom.enable();
-        });
-        $("#fullscreen-map").on("mouseleave", function(event) {
-            device_map.scrollWheelZoom.disable();
-        });
+        device_map.scrollWheelZoom.enable();
 
         // initial load
         refreshMap();
