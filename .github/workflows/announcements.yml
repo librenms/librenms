@@ -24,11 +24,14 @@ jobs:
 
           if [[ "$LABEL_FOUND" != "true" ]]; then
             echo "PR does not contain the specific label. Skipping."
-            exit 1
+            exit 0
+          else
+            echo "notify=true" >> "$GITHUB_ENV"
           fi
 
 
       - name: Send Notification to Discord
+        if: steps.check_label.outputs.notify == true
         env:
           DISCORD_WEBHOOK_URL: "${{ secrets.DISCORD_WEBHOOK_URL_ANNOUNCEMENT }}"
         run: |
