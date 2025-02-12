@@ -8002,6 +8002,31 @@
     },
     "ospfv3": {
         "poller": {
+            "ospfv3_ports": [
+                {
+                    "ospfv3_instance_id": 0,
+                    "ospfv3_port_id": "2",
+                    "ospfv3IfIndex": 2,
+                    "ospfv3IfInstId": 0,
+                    "ospfv3IfAreaId": "0",
+                    "ospfv3IfType": "broadcast",
+                    "ospfv3IfAdminStatus": "enabled",
+                    "ospfv3IfRtrPriority": 1,
+                    "ospfv3IfTransitDelay": 1,
+                    "ospfv3IfRetransInterval": 5,
+                    "ospfv3IfHelloInterval": 10,
+                    "ospfv3IfRtrDeadInterval": 40,
+                    "ospfv3IfPollInterval": 10,
+                    "ospfv3IfState": "backupDesignatedRouter",
+                    "ospfv3IfDesignatedRouter": "10.0.99.11",
+                    "ospfv3IfBackupDesignatedRouter": "10.150.9.254",
+                    "ospfv3IfEvents": 7,
+                    "ospfv3IfDemand": "false",
+                    "ospfv3IfMetricValue": 10,
+                    "context_name": "",
+                    "ifIndex": 2
+                }
+            ],
             "ospfv3_instances": [
                 {
                     "ospfv3_instance_id": 0,
@@ -8032,6 +8057,26 @@
                     "ospfv3AreaSummary": "sendAreaSummary",
                     "ospfv3AreaStubMetric": "1",
                     "ospfv3AreaStubMetricType": "comparableCost",
+                    "context_name": ""
+                }
+            ],
+            "ospfv3_nbrs": [
+                {
+                    "port_id": null,
+                    "ospfv3_instance_id": 0,
+                    "ospfv3_nbr_id": "2",
+                    "ospfv3NbrIfId": 1147535360,
+                    "ospfv3NbrIfIndex": 2,
+                    "ospfv3NbrIfInstId": 0,
+                    "ospfv3NbrAddressType": "ipv6",
+                    "ospfv3NbrAddress": "fe80::01d7:0101:98cf:af80",
+                    "ospfv3NbrRtrId": "10.0.99.11",
+                    "ospfv3NbrOptions": 19,
+                    "ospfv3NbrPriority": 50,
+                    "ospfv3NbrState": "full",
+                    "ospfv3NbrEvents": 6,
+                    "ospfv3NbrLsRetransQLen": 0,
+                    "ospfv3NbrHelloSuppressed": "false",
                     "context_name": ""
                 }
             ]

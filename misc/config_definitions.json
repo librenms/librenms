@@ -5371,7 +5371,7 @@
             "order": 331,
             "group": "poller",
             "section": "poller_modules",
-            "default": false,
+            "default": true,
             "type": "boolean"
         },
         "poller_modules.isis": {
