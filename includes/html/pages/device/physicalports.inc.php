@@ -47,7 +47,6 @@ if (isset($data['ports'])) {
     echo '<!-- Found switches: ' . print_r($switches, true) . " -->\n";
 }
 
-
 // echo "</pre>";
 
 // Add CSS for physical port layout
@@ -377,7 +376,7 @@ function findEntPhysicalPortType($entPhysical, $ifDescr)
         } elseif (preg_match('/(sfp|WiredSwitch[125][0]Gb)/i', $entPhysical[$str]['entPhysicalVendorType'])) {
             $result[] = 'sfp';
         } else {
-		echo "<!-- Could not determine phy type '{$entPhysical[$str]['entPhysicalVendorType']}' from {$ifDescr} -->\n";
+            echo "<!-- Could not determine phy type '{$entPhysical[$str]['entPhysicalVendorType']}' from {$ifDescr} -->\n";
         }
     }
     if (isset($entPhysical[$ifDescr])) {
@@ -422,7 +421,7 @@ function transformPortsAuto($ports, $rowHeight = 2, $entPhysical): array
             if ($ifType != 'ethernetCsmacd') {
                 continue;
             }
-			$bumpblock = false;
+            $bumpblock = false;
 
             // Checl for Container first, might hold transceiver, Cisco uses ifDescr to match
             $types = findEntPhysicalPortType($entPhysical, $ifDescr);
@@ -448,10 +447,10 @@ function transformPortsAuto($ports, $rowHeight = 2, $entPhysical): array
                 $bumpblock = true;
             }
 
-			if($bumpblock === true) {
+            if ($bumpblock === true) {
                 $block = $block + 1;
-				$i = 0;
-			}
+                $i = 0;
+            }
 
             // reset block count on new module, switch
             if ((isset($prevmodule)) && ($prevmodule != $module)) {
@@ -469,22 +468,25 @@ function transformPortsAuto($ports, $rowHeight = 2, $entPhysical): array
                     preg_match('/([0-9]+)/', $parts[0], $switchmatch);
                     $switch = $switchmatch[0];
                     $module = floatval($parts[1]) ?? 0;
-					$portNumber = $parts[2] ?? '1';
+                    $portNumber = $parts[2] ?? '1';
                     $Height = $rowHeight;
                     break;
                 case 2:
-					if(!isset($switch))
+                    if (! isset($switch)) {
                         $switch = 1;
+                    }
                     $module = floatval($parts[0]);
                     $portNumber = $parts[1] ?? '1';
                     $Height = $rowHeight;
                     break;
                 default:
                     /// Just the 1 item?
-					if(!isset($switch))
+                    if (! isset($switch)) {
                         $switch = 1;
-					if(!isset($module))
+                    }
+                    if (! isset($module)) {
                         $module = 0;
+                    }
                     $portNumber = $parts[0] ?? '1';
                     $Height = 1;
                     break;
@@ -622,7 +624,7 @@ function generateVisualTableWithAttributes($switches = [1 => true], array $trans
                                 }
 
                                 // Needs STP Port Blocking status color
-								// Needs Port speed bg for 10mbit ports 
+                                // Needs Port speed bg for 10mbit ports
                                 // Add the port cell with custom tooltip
                                 // add tooltip helper here, doesn't work yet, seems to be stuck behind a layer.
                                 $tooltipContent = <<<TOOLTIP
