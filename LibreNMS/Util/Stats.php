@@ -107,7 +107,6 @@ class Stats
             'bgppeer_status' => $this->selectTotal('bgpPeers', ['bgpPeerAdminStatus']),
             'bills' => $this->selectTotal('bills', ['bill_type']),
             'cef' => $this->selectTotal('cef_switching'),
-            'cisco_asa' => $this->selectTotal(DB::table('ciscoASA')->where('disabled', 0), ['oid']),
             'mempool' => $this->selectTotal('mempools', ['mempool_descr']),
             'dbschema' => $this->selectStatic(DB::table('migrations')->count()),
             'snmp_version' => $this->selectTotal('devices', ['snmpver']),

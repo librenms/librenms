@@ -423,18 +423,6 @@ cef_switching:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [cef_switching_id], Unique: true, Type: BTREE }
     cef_switching_device_id_entphysicalindex_afi_cef_index_unique: { Name: cef_switching_device_id_entphysicalindex_afi_cef_index_unique, Columns: [device_id, entPhysicalIndex, afi, cef_index], Unique: true, Type: BTREE }
-ciscoASA:
-  Columns:
-    - { Field: ciscoASA_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: oid, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: data, Type: bigint, 'Null': false, Extra: '' }
-    - { Field: high_alert, Type: bigint, 'Null': false, Extra: '', Default: '-1' }
-    - { Field: low_alert, Type: bigint, 'Null': false, Extra: '', Default: '0' }
-    - { Field: disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [ciscoASA_id], Unique: true, Type: BTREE }
-    ciscoasa_device_id_index: { Name: ciscoasa_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
 component:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
