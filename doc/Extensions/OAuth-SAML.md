@@ -23,7 +23,7 @@ LibreNMS version 22.3.0 or later.
 Please ensure you set `APP_URL` within your `.env` file so that callback URLs work correctly with the identify provider.
 
 !!! note
-    Once you have configured your OAuth or SAML2 provider, please ensure you check the [Post configuration settings](#post-configration-settings) section at the end.
+    Once you have configured your OAuth or SAML2 provider, please ensure you check the [Post configuration settings](#post-config) section at the end.
 
 ## GitHub and Microsoft Examples
 
@@ -104,29 +104,29 @@ Now we need some values from the OAuth provider itself, in most cases you need t
 === "GitHub"
     For our example with GitHub we go to [GitHub Developer Settings](https://github.com/settings/developers) and press "Register a new application":
 
-    ![socialite-github-1](/img/socialite-github-1.png)
+    ![socialite-github-1](../img/socialite-github-1.png)
 
     Fill out the form accordingly (with your own values):
-    ![socialite-github-2](/img/socialite-github-2.png)
+    ![socialite-github-2](../img/socialite-github-2.png)
 
 === "Microsoft"
     For our example with Microsoft we go to ["Azure Active Directory" > "App registrations"](https://aad.portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps) and press "New registration"
 
-    ![socialite-1](/img/socialite-microsoft-1.png)
+    ![socialite-1](../img/socialite-microsoft-1.png)
 
     Fill out the form accordingly using your own values):
-    ![socialite-2](/img/socialite-microsoft-2.png)
+    ![socialite-2](../img/socialite-microsoft-2.png)
 
     Copy the value of the **Application (client) ID** and **Directory (tenant) ID** and save them, you will need them in the next step.
-    ![socialite-2](/img/socialite-microsoft-3.png)
+    ![socialite-2](../img/socialite-microsoft-3.png)
 
 === "Okta"
     For our example with Okta, we go to `Applications>Create App Integration`, Select `OIDC - OpenID Connect`, then `Web Application`.
 
-    ![socialite-okta-1](/img/socialite-okta-1.png)
+    ![socialite-okta-1](../img/socialite-okta-1.png)
 
     Fill in the Name, Logo, and Assignments based on your preferred settings. Leave the `Sign-In Redirect URI` field, this is where you will edit this later:
-    ![socialite-okta-2](/img/socialite-okta-2.png)
+    ![socialite-okta-2](../img/socialite-okta-2.png)
 
     Note your Okta domain or login url. Sometimes this can be a vanity url like `login.company.com`, or sometimes just `company.okta.com`.
 
@@ -138,7 +138,7 @@ Now we need some values from the OAuth provider itself, in most cases you need t
 
     Press 'Generate a new client secret' to get a new client secret.
 
-    ![socialite-github-3](/img/socialite-github-3.png)
+    ![socialite-github-3](../img/socialite-github-3.png)
 
     Copy the **Client ID** and **Client secret**
 
@@ -153,17 +153,17 @@ Now we need some values from the OAuth provider itself, in most cases you need t
     Select the 'New client secret' button.
     Enter a value in Description and select one of the options for Expires and select 'Add'.
 
-    ![socialite-2](/img/socialite-microsoft-6.png)
+    ![socialite-2](../img/socialite-microsoft-6.png)
 
     Copy the client secret **Value** (not Secret ID!) before you leave this page. You will need it in the next step.
 
-    ![socialite-2](/img/socialite-microsoft-5.png)
+    ![socialite-2](../img/socialite-microsoft-5.png)
 
 === "Okta"
 
     This step is done for you when creating the app. All you have to do is copy down the client secret. You will need it in the next step.
 
-    ![socialite-okta-3](/img/socialite-okta-3.png)
+    ![socialite-okta-3](../img/socialite-okta-3.png)
 
 
 ### Saving configuration
@@ -298,6 +298,11 @@ Socialite can specifiy scopes that should be included with in the authentication
 For example, if Okta is configured to expose group information it is possible to use these group
 names to configure User Roles.
 
+This requires configuration in Okta.  You can set the 'Groups claim type' to 'Filter' and supply
+a regex of which groups should be returned which can be mapped below.
+
+![socialite-okta-1](../img/socialite-okta-4.png)
+
 First enable sending the 'groups' claim (along with the normal openid, profile, and email claims).
 Be aware that the scope name must match the claim name. For identity providers where the scope does
 not match (e.g. Keycloak: roles -> groups) you need to configure a custom scope.
@@ -334,19 +339,19 @@ It is up the IdP to provide the relevant details that you will need for configur
 
     Go to [https://admin.google.com/ac/apps/unified](https://admin.google.com/ac/apps/unified)
 
-    ![socialite-saml-google-1](/img/socialite-saml-google-1.png)
-    ![socialite-saml-google-2](/img/socialite-saml-google-2.png)
+    ![socialite-saml-google-1](../img/socialite-saml-google-1.png)
+    ![socialite-saml-google-2](../img/socialite-saml-google-2.png)
 
     Press "DOWNLOAD METADATA" and save the file somewhere accessible by your LibreNMS server
 
-    ![socialite-saml-google-3](/img/socialite-saml-google-3.png)
+    ![socialite-saml-google-3](../img/socialite-saml-google-3.png)
 
     ACS URL = https://*your-librenms-url*/auth/saml2/callback
     Entity ID = https://*your-librenms-url*/auth/saml2
     Name ID format = PERSISTANT
     Name ID = Basic Information > Primary email
 
-    ![socialite-saml-google-4](/img/socialite-saml-google-4.png)
+    ![socialite-saml-google-4](../img/socialite-saml-google-4.png)
 
 
     First name = http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname
@@ -354,10 +359,10 @@ It is up the IdP to provide the relevant details that you will need for configur
     Primary email = http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress
 
 
-    ![socialite-saml-google-5](/img/socialite-saml-google-5.png)
+    ![socialite-saml-google-5](../img/socialite-saml-google-5.png)
 
 
-    ![socialite-saml-google-6](/img/socialite-saml-google-6.png)
+    ![socialite-saml-google-6](../img/socialite-saml-google-6.png)
 
 
     !!! setting "settings/auth/socialite"
@@ -467,7 +472,7 @@ If you have a need to, then you can override redirect url with the following com
 === "SAML2"
     `lnms config:set auth.socialite.configs.saml2.sp_acs auth/saml2/callback`
 
-## Post configuration settings
+## <a name="post-config">Post configuration settings</a>
 
 !!! setting "settings/auth/socialite"
     From here you can configure the settings for any identity providers you have configured along with some bespoke options.

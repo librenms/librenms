@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Data\Graphing\GraphParameters;
 use LibreNMS\Enum\ImageFormat;
@@ -47,6 +48,8 @@ try {
         include Config::get('install_dir') . '/includes/html/graphs/customoid/customoid.inc.php';
     } elseif ($auth && is_file(Config::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php")) {
         include Config::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php";
+    } elseif ($auth && is_file(Config::get('install_dir') . "/includes/html/graphs/$type/generic.inc.php")) {
+        include Config::get('install_dir') . "/includes/html/graphs/$type/generic.inc.php";
     } else {
         graph_error("$type*$subtype Graph Template Missing", "$type*$subtype");
     }
@@ -70,7 +73,7 @@ try {
         echo "<div class='infobox'>";
         echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Command</p>";
         echo "<pre class='rrd-pre'>";
-        echo escapeshellcmd('rrdtool ' . Rrd::buildCommand('graph', Config::get('temp_dir') . '/' . strgen(), $rrd_options));
+        echo escapeshellcmd('rrdtool ' . Rrd::buildCommand('graph', Config::get('temp_dir') . '/' . Str::random(), $rrd_options));
         echo '</pre>';
         try {
             Rrd::graph($rrd_options, $env);
@@ -96,9 +99,9 @@ try {
 
     // output the graph
     if (\LibreNMS\Util\Debug::isEnabled()) {
-        echo '<img src="data:' . ImageFormat::forGraph()->contentType() . ';base64,' . base64_encode($image_data) . '" alt="graph" />';
+        echo '<img src="data:' . ImageFormat::forGraph($vars['graph_type'] ?? null)->contentType() . ';base64,' . base64_encode($image_data) . '" alt="graph" />';
     } else {
-        header('Content-type: ' . ImageFormat::forGraph()->contentType());
+        header('Content-type: ' . ImageFormat::forGraph($vars['graph_type'] ?? null)->contentType());
         echo (isset($vars['output']) && $vars['output'] === 'base64') ? base64_encode($image_data) : $image_data;
     }
 } catch (\LibreNMS\Exceptions\RrdGraphException $e) {

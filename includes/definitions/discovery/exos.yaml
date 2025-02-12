@@ -1,0 +1,65 @@
+mib: FCMGMT-MIB
+modules:
+    os:
+        hardware: connUnitProduct
+        serial: connUnitSn
+    sensors:
+        state:
+            data:
+                -
+                    oid: connUnitState
+                    value: connUnitState
+                    num_oid: '.1.3.6.1.3.94.1.6.1.5.{{ $index }}'
+                    descr: 'Connectivity Unit State'
+                    index: 'connUnitState.{{ $index }}'
+                    state_name: connUnitState
+                    snmp_flags: ['-OteQUsab']
+                    states:
+                        - { value: 2, generic: 0, graph: 0, descr: Online }
+                        - { value: 3, generic: 2, graph: 0, descr: Offline }
+                        - { value: 1, generic: 3, graph: 0, descr: none }
+                -
+                    oid: connUnitStatus
+                    value: connUnitStatus
+                    num_oid: '.1.3.6.1.3.94.1.6.1.6.{{ $index }}'
+                    descr: 'Connectivity Unit Status'
+                    index: 'connUnitStatus.{{ $index }}'
+                    state_name: connUnitStatus
+                    snmp_flags: ['-OteQUsab']
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: none }
+                        - { value: 2, generic: 3, graph: 0, descr: Unused }
+                        - { value: 3, generic: 0, graph: 0, descr: Ok }
+                        - { value: 4, generic: 1, graph: 0, descr: Warning }
+                        - { value: 5, generic: 2, graph: 0, descr: Failed }
+                -
+                    oid: connUnitPrincipal
+                    value: connUnitPrincipal
+                    num_oid: '.1.3.6.1.3.94.1.6.1.13.{{ $index }}'
+                    descr: 'Principal Unit'
+                    index: 'connUnitPrincipal.{{ $index }}'
+                    state_name: connUnitPrincipal
+                    snmp_flags: ['-OteQUsab']
+                    skip_values:
+                        -
+                            oid: connUnitPrincipal
+                            op: '='
+                            value: 1
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: Unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: No }
+                        - { value: 3, generic: 0, graph: 0, descr: Yes }
+                -
+                    oid: connUnitSensorTable
+                    value: connUnitSensorStatus
+                    num_oid: '.1.3.6.1.3.94.1.8.1.4.{{ $index }}'
+                    descr: '{{ $connUnitSensorName }}'
+                    index: 'connUnitSensorName.{{ $index }}'
+                    state_name: connUnitSensorName
+                    snmp_flags: ['-OteQUsab']
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: Unknown }
+                        - { value: 2, generic: 3, graph: 0, descr: Other }
+                        - { value: 3, generic: 0, graph: 0, descr: Ok }
+                        - { value: 4, generic: 1, graph: 0, descr: Warning }
+                        - { value: 5, generic: 2, graph: 0, descr: Failed }

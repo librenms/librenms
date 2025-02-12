@@ -23,10 +23,7 @@ if (is_array($oids)) {
 
     foreach ($oids as $index => $entry) {
         //Discover Sensors
-        discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, $index, $state_name, 'Temperature Sensor ' . $index, 1, 1, null, null, null, null, $entry['tempSensorStatus'], 'snmp', $index);
-
-        //Create Sensor To State Index
-        create_sensor_to_state_index($device, $state_name, $index);
+        discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, 'Temperature Sensor ' . $index, 1, 1, null, null, null, null, $entry['tempSensorStatus'], 'snmp', $index);
     }
 }
 
@@ -45,10 +42,7 @@ if (is_array($oids)) {
 
     foreach ($oids as $index => $entry) {
         //Discover Sensors
-        discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, $index, $state_name, 'Storage Status: ' . $entry['storageName'], 1, 1, null, null, null, null, $entry['storageDisruptionDetected'], 'snmp', $index);
-
-        //Create Sensor To State Index
-        create_sensor_to_state_index($device, $state_name, $index);
+        discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, 'Storage Status: ' . $entry['storageName'], 1, 1, null, null, null, null, $entry['storageDisruptionDetected'], 'snmp', $index);
     }
 }
 

@@ -30,14 +30,6 @@ use Symfony\Component\Yaml\Yaml;
 class DocsTest extends TestCase
 {
     private $hidden_pages = [
-        'General/Changelogs/2013.md',
-        'General/Changelogs/2014.md',
-        'General/Changelogs/2015.md',
-        'General/Changelogs/2016.md',
-        'General/Changelogs/2017.md',
-        'General/Changelogs/2018.md',
-        'General/Changelogs/2019.md',
-        'General/Changelogs/2020.md',
     ];
 
     /**
@@ -47,9 +39,21 @@ class DocsTest extends TestCase
     {
         $mkdocs = Yaml::parse(file_get_contents(__DIR__ . '/../mkdocs.yml'));
         $dir = __DIR__ . '/../doc/';
-        $files = str_replace($dir, '', rtrim(`find $dir -name '*.md'`));
 
-        // check for missing pages
+        // Define paths to exclude
+        $exclude_paths = [
+            '*/Extensions/Applications/*',
+            '*/General/Changelogs/*',
+        ];
+
+        // Build the exclusion part of the find command
+        $exclude_conditions = implode(' -not -path ', array_map(fn ($path) => escapeshellarg($path), $exclude_paths));
+        $find_command = "find $dir -name '*.md' -not -path $exclude_conditions";
+
+        // Run the find command with exclusions
+        $files = str_replace($dir, '', rtrim(`$find_command`));
+
+        // Check for missing pages
         collect(explode(PHP_EOL, $files))
             ->diff(collect($mkdocs['nav'])->flatten()->merge($this->hidden_pages)) // grab defined pages and diff
             ->each(function ($missing_doc) {

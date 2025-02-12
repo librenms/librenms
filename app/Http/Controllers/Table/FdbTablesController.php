@@ -32,10 +32,10 @@ use App\Models\Vlan;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Mac;
-use LibreNMS\Util\Url;
 
 class FdbTablesController extends TableController
 {
@@ -68,7 +68,8 @@ class FdbTablesController extends TableController
     protected function baseQuery($request)
     {
         return PortsFdb::hasAccess($request->user())
-            ->with(['device', 'port', 'vlan', 'ipv4Addresses']);
+            ->with(['device', 'port', 'vlan', 'ipv4Addresses'])
+            ->select('ports_fdb.*');
     }
 
     /**
@@ -163,7 +164,7 @@ class FdbTablesController extends TableController
         $ips = $fdb_entry->ipv4Addresses->pluck('ipv4_address');
 
         $item = [
-            'device' => $fdb_entry->device ? Url::deviceLink($fdb_entry->device) : '',
+            'device' => Blade::render('<x-device-link :device="$device"/>', ['device' => $fdb_entry->device]),
             'mac_address' => $mac->readable(),
             'mac_oui' => $mac->vendor(),
             'ipv4_address' => $ips->implode(', '),
@@ -184,10 +185,10 @@ class FdbTablesController extends TableController
         }
 
         if ($fdb_entry->port) {
-            $item['interface'] = Url::portLink($fdb_entry->port, $fdb_entry->port->getShortLabel());
+            $item['interface'] = Blade::render('<x-port-link :port="$port">{{ $port->getShortLabel() }}</x-port-link>', ['port' => $fdb_entry->port]);
             $item['description'] = $fdb_entry->port->ifAlias;
-            if ($fdb_entry->port->ifInErrors > 0 || $fdb_entry->port->ifOutErrors > 0) {
-                $item['interface'] .= ' ' . Url::portLink($fdb_entry->port, '<i class="fa fa-flag fa-lg" style="color:red" aria-hidden="true"></i>');
+            if ($fdb_entry->port->ifInErrors_delta > 0 || $fdb_entry->port->ifOutErrors_delta > 0) {
+                $item['interface'] .= Blade::render(' <x-port-link :port="$port"><i class="fa fa-flag fa-lg" style="color:red" aria-hidden="true"></i></x-port-link>', ['port' => $fdb_entry->port]);
             }
             if ($this->getMacCount($fdb_entry->port) == 1) {
                 // only one mac on this port, likely the endpoint

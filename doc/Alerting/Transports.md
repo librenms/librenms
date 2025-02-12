@@ -49,6 +49,23 @@ alerts from many other monitoring tools on a single screen.
 | Alert state | critical |
 | Recover state | cleared |
 
+## AlertOps
+
+Using AlertOps integration with LibreNMS, you can seamlessly forward alerts to AlertOps with detailed information. AlertOps acts as a dispatcher for LibreNMS alerts, allowing you to determine the right individuals or teams to notify based on on-call schedules. Notifications can be sent via various channels including email, text messages (SMS), phone calls, and mobile push notifications for iOS & Android devices. Additionally, AlertOps provides escalation policies to ensure alerts are appropriately managed until they are assigned or closed. You can also filter out/aggregate alerts based on different values.
+
+To set up the integration:
+
+- Create a LibreNMS Integration: Sign up for an AlertOps account and create a LibreNMS integration from the integrations page. This will generate an Inbound Integration Endpoint URL that you'll need to copy to LibreNMS.
+
+- Configure LibreNMS Integration: In LibreNMS, navigate to the integration settings and paste the inbound integration URL obtained from AlertOps.
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| WebHook URL | <https://url/path/to/webhook> |
+
+
 ## Alertmanager
 
 Alertmanager is an alert handling software, initially developed for
@@ -252,20 +269,23 @@ Here an example using 3 numbers, any amount of numbers is supported:
 ## Discord
 
 The Discord transport will POST the alert message to your Discord
-Incoming WebHook. Simple html tags are stripped from  the message.
+Incoming WebHook. The only required value is Discord URL, without this no call to Discord will be made. 
 
-The only required value is for url, without this no call to Discord
-will be made. The Options field supports the JSON/Form Params listed
-in the Discord Docs below.
+Graphs can be included in the template using: ```<img class="librenms-graph" src=""/>```. The rest of the html tags are stripped from the message.
 
-[Discord Docs](https://discordapp.com/developers/docs/resources/webhook#execute-webhook)
+
+ The Options field supports JSON/Form Params listed
+in the 
+[Discord Docs](https://discordapp.com/developers/docs/resources/webhook#execute-webhook). Fields to embed is a comma separated list from the [Alert Data](https://github.com/librenms/librenms/blob/master/LibreNMS/Alert/AlertData.php)).
+
 
 **Example:**
 
 | Config | Example |
 | ------ | ------- |
 | Discord URL | <https://discordapp.com/api/webhooks/4515489001665127664/82-sf4385ysuhfn34u2fhfsdePGLrg8K7cP9wl553Fg6OlZuuxJGaa1d54fe> |
-| Options | username=myname |
+| Options | username=myname</br>content=Some content</br>tts=false |
+| Fields to embed | hostname,name,timestamp,severity |
 
 ## Elasticsearch
 
@@ -297,7 +317,64 @@ tokens to authenticate with GitLab and will store the token in cleartext.
 
 ## Grafana Oncall
 
-Send alerts to Grafana Oncall using a [Formatted Webhook](https://grafana.com/docs/oncall/latest/integrations/webhook/)
+Send alerts to Grafana Oncall via either a Formatted Webhook or Webhook.
+[See the Grafana documentation for both](https://grafana.com/docs/oncall/latest/integrations/webhook/).
+
+There is little difference between the two, but the Formatted Webhook will 
+provide a more friendly view of things by default.
+
+> NOTE: By default Grafana translates acknowledged alerts to resolved alerts.
+> This can be changed by updating the Template settings for the integration you
+> added as follows.
+
+Autoresolution: `{{ payload.get("raw_state", "") != 2 and payload.get("state", "").upper() == "OK" }}`
+
+Auto acknowledge: `{{ payload.get("raw_state", "") == 2 }}`
+
+You will also find additional information is sent as part of the payload to Grafana which 
+can be useful within the templates or routes. If you perform a test of the LibreNMS transport 
+you will be able to see the payload within the Grafana interface.
+
+customise what is sent to Grafana and override or add additional fields, you can create
+a custom template which outputs the correct information via JSON. As an example:
+
+```
+{
+    "message": "Severity: {{ $alert->severity }}\nTimestamp: {{ $alert->timestamp }}\nRule: {{ $alert->title }}\n @foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}\n @endforeach",
+    "number_of_processors": \App\Models\Processors::where('device_id', $alert->device_id)->count(),
+    "title": "{{ $alert->title }}",
+    "link_to_upstream_details": "{{ \LibreNMS\Util\Url::deviceUrl($device) }}",
+}
+```
+If you are using more than one transport for an alert rule and need to customise the output per
+transport then you can do the following:
+
+```
+@if ($alert->transport == 'grafana')
+{
+  "message": "Severity: {{ $alert->severity }}\nTimestamp: {{ $alert->timestamp }}\nRule: {{ $alert->title }}\n @foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}\n @endforeach",
+  "number_of_processors": \App\Models\Processors::where('device_id', $alert->device_id)->count(),
+  "title": "{{ $alert->title }}",
+  "link_to_upstream_details": "{{ \LibreNMS\Util\Url::deviceUrl($device) }}",
+}
+@else
+{{ $alert->title }}
+Severity: {{ $alert->severity }}
+@if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
+Timestamp: {{ $alert->timestamp }}
+Unique-ID: {{ $alert->uid }}
+Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
+@if ($alert->faults) Faults:
+@foreach ($alert->faults as $key => $value)
+  {{ $key }}: {{ $value['string'] }}
+@endforeach
+@endif
+Alert sent to:
+@foreach ($alert->contacts as $key => $value)
+  {{ $value }} <{{ $key }}>
+@endforeach
+@endif
+```
 
 **Example:**
 
@@ -339,6 +416,50 @@ Configuration of the LibreNMS IRC-Bot is described [here](https://github.com/lib
 | Config | Example |
 | ------ | ------- |
 | IRC | enabled |
+
+## IBM On Call Manager
+
+## IBM On Call Manager (OCM)
+
+LibreNMS can integrate with IBM On Call Manager by using a webhook URL you create by adding the LibreNMS integration.
+
+The webhook URL (referred to as `ocm-url`) can be found under 'Integrations' in the IBM On Call Manager portal after selecting LibreNMS as the integration.
+
+IBM On Call Manager uses the webhook to send the name of the alert rule, along with other relevant details. It will include the name or IP address of the system sending the alert, the name of the alert, the severity, timestamp, OS, location, and a unique ID. 
+
+**Example:**
+
+| Config  | Example                                  |
+| ------- | ---------------------------------------- |
+| ocm-url | https://ibm-ocm-webhook.example.com/api |
+
+**Payload Example**:
+
+```json
+{
+  "eventSource": {
+    "name": "{{ $alert->sysName }}",
+    "description": "{{ $alert->sysDescr }}",
+    "displayName": "LibreNMS Alerts - DBAoC",
+    "type": "server",
+    "sourceID": "LibreNMS-DBAoC"
+  },
+  "resourceAffected": {
+    "hostname": "{{ $alert->hostname }}",
+    "ipAddress": "{{ $alert->ip }}",
+    "os": "{{ $alert->os }}",
+    "location": "{{ $alert->location }}",
+    "component": "{{ $alert->sysName }}"
+  },
+  "eventInfo": {
+    "summary": "{{ $alert->title }}",
+    "msg": "{{ $alert->msg }}",
+    "severity": "{{ $alert->severity }}",
+    "timestamp": "{{ $alert->timestamp }}",
+    "uniqueID": "{{ $alert->uid }}"
+  }
+}
+```
 
 ## JIRA
 
@@ -749,7 +870,7 @@ websrv08.dc4.eu.corp.example.net gets shortened to websrv08.dc4.eu.cen).
 - Sensu will reject rules with special characters - the Transport will attempt
 to fix up rule names, but it's best to stick to letters, numbers and spaces
 - The transport only deals in absolutes - it ignores the got worse/got better
-states
+/changed states
 - The agent will buffer alerts, but LibreNMS will not - if your agent is
 offline, alerts will be dropped
 - There is no backchannel between Sensu and LibreNMS - if you make changes in
@@ -764,6 +885,22 @@ Sensu to LibreNMS alerts, they'll be lost on the next event (silences will work)
 | Check Prefix    | lnms                  |
 | Source Key      | hostname              |
 
+## SIGNL4
+
+SIGNL4 offers critical alerting, incident response and service dispatching for operating critical infrastructure. It alerts you persistently via app push, SMS text, voice calls, and email including tracking, escalation, on-call duty scheduling and collaboration.
+
+Integrating SIGNL4 with LibreNMS to forward critical alerts with detailed information to responsible people or on-call teams. The integration supports triggering as well as closing alerts.
+
+In the configuration for your SIGNL4 alert transport you just need to enter your SIGNL4 webhook URL including team or integration secret.
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| Webhook URL | https://connect.signl4.com/webhook/{team-secret} |
+
+You can find more information about the integration [here](https://docs.signl4.com/integrations/librenms/librenms.html).
+
 ## Slack
 
 The Slack transport will POST the alert message to your Slack Incoming
@@ -774,16 +911,36 @@ only required value is for url, without this  then no call to Slack will be made
 
 We currently support the following attachment options:
 
-`author_name`
+- `author_name`
+
+We currently support the following global message options:
+
+- `channel_name` : Slack channel name (without the leading '#') to which the alert will go
+- `icon_emoji` : Emoji name in colon format to use as the author icon
 
 [Slack docs](https://api.slack.com/docs/message-attachments)
+
+The alert template can make use of
+[Slack markdown](https://api.slack.com/reference/surfaces/formatting#basic-formatting).
+In the Slack markdown dialect, custom links are denoted with HTML angled
+brackets, but LibreNMS strips these out. To support embedding custom links in alerts,
+use the bracket/parentheses markdown syntax for links.  For example if you would
+typically use this for a Slack link:
+
+`<https://www.example.com|My Link>`
+
+Use this in your alert template:
+
+`[My Link](https://www.example.com)`
 
 **Example:**
 
 | Config | Example |
 | ------ | ------- |
 | Webhook URL | <https://slack.com/url/somehook> |
-| Slack Options | author_name=Me |
+| Channel | network-alerts |
+| Author Name | LibreNMS Bot |
+| Icon | `:scream:` |
 
 ## SMSEagle
 
@@ -1047,15 +1204,19 @@ They can be in international dialling format only.
 
 ## Zenduty
 
-Leveraging LibreNMS<>Zenduty Integration, users can send new LibreNMS 
+Two options are available for ZenDuty support, the first, [native ZenDuty](#native-zenduty)
+is via the API Transport as detailed in official [ZenDuty integration documentation](https://docs.zenduty.com/docs/librenms).
+The other way is by utilising a [native LibreNMS transport](#native-librenms-transport).
+
+### Native ZenDuty
+Leveraging LibreNMS > Zenduty Integration, users can send new LibreNMS 
 alerts to the right team and notify them based on on-call schedules
 via email, SMS, Phone Calls, Slack, Microsoft Teams and mobile push
 notifications. Zenduty provides engineers with detailed context around 
 the LibreNMS alert along with playbooks and a complete incident command
 framework to triage, remediate and resolve incidents with speed.
 
-Create a [LibreNMS
-Integration](https://docs.zenduty.com/docs/librenms) from inside 
+Create a [LibreNMS Integration](https://docs.zenduty.com/docs/librenms) from inside 
 [Zenduty](https://www.zenduty.com), then copy the Webhook URL from Zenduty
 to LibreNMS.
 
@@ -1067,3 +1228,95 @@ For a detailed guide with screenshots, refer to the
 | Config | Example |
 | ------ | ------- |
 | WebHook URL | <https://www.zenduty.com/api/integration/librenms/integration-key/> |
+
+### Native LibreNMS Transport
+This integration uses the [ZenDuty Webhooks](https://zenduty.com/docs/generic-integration/) 
+which allows you to use all available ZenDuty parameters such as URLs, SLA, 
+Escalation Policies, etc.
+
+Follow the instructions in the above link to obtain your Webhook URL and then paste that 
+into the `ZenDuty WebHook` field when setting up the LibreNMS transport.
+
+You can also set the SLA ID and Escalation Policy ID from within the Transport configuration 
+which will be sent with all alerts.
+
+This transport will send over the following fields:
+
+`message` - The alert title
+`alert_type` - The severity of the alert rule, acknowledged or resolved depending on the state of the alert.
+`entity_id` - The alert ID
+`urls` - A link back to the device generating the alert.
+`summary` - The output of the template associated with the alert rule.
+
+To customise what is sent to ZenDuty and override or add additional fields, you can create 
+a custom template which outputs the correct information via JSON. As an example:
+
+```json
+{
+    "message": "{{ $alert->title }}",
+    "payload": {
+        "sysName": "{{ $alert->sysName }}",
+        "Device Type": "{{ $alert->type }}"
+    },
+    "summary": "Severity: {{ $alert->severity }}\nTimestamp: {{ $alert->timestamp }}\nRule: {{ $alert->title }}\n @foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}\n @endforeach",
+    "sla": "ccaf3fd6-db51-4f9f-818b-de42aee54f29",
+    "urls": [
+        {
+            "link_url": "{{ route('device', ['device' => $alert->device_id ?: 1]) }}",
+            "link_text": "{{ $alert->hostname }}"
+        },
+        {
+            "link_url": "{{ route('device', ['device' => $alert->device_id ?? 1, 'tab' => 'alerts']) }}",
+            "link_text": "{{ $alert->hostname }} - Alerts"
+        }
+    ]
+}
+```
+If you are using more than one transport for an alert rule and need to customise the output per 
+transport then you can do the following:
+
+```
+@if ($alert->transport == 'ZenDuty')
+{
+  "message": "{{ $alert->title }}",
+  "payload": {
+    "sysName": "{{ $alert->sysName }}",
+    "Device Type": "{{ $alert->type }}"
+  },
+  "summary": "Severity: {{ $alert->severity }}\nTimestamp: {{ $alert->timestamp }}\nRule: {{ $alert->title }}\n @foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}\n @endforeach",
+  "sla": "ccaf3fd6-db51-4f9f-818b-de42aee54f29",
+  "urls": [
+    {
+      "link_url": "{{ route('device', ['device' => $alert->device_id ?: 1]) }}",
+      "link_text": "{{ $alert->hostname }}"
+    },
+    {
+      "link_url": "{{ route('device', ['device' => $alert->device_id ?? 1, 'tab' => 'alerts']) }}",
+      "link_text": "{{ $alert->hostname }} - Alerts"
+    }
+  ]
+}
+@else
+{{ $alert->title }}
+Severity: {{ $alert->severity }}
+@if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
+Timestamp: {{ $alert->timestamp }}
+Unique-ID: {{ $alert->uid }}
+Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
+@if ($alert->faults) Faults:
+@foreach ($alert->faults as $key => $value)
+  {{ $key }}: {{ $value['string'] }}
+@endforeach
+@endif
+Alert sent to:
+@foreach ($alert->contacts as $key => $value)
+  {{ $value }} <{{ $key }}>
+@endforeach
+@endif
+```
+
+| Config               | Example                                                      |
+|----------------------|--------------------------------------------------------------|
+| WebHook URL          | <https://events.zenduty.com/integration/we8jv/generic/hash/> |
+| SLA ID               | g27u4gr824r-dd32rf2wdedeas-3e2wd223d23                       |
+| Escalation Policy ID | KIJDi23rwnef23-dankjd323r-DSAD£2232fds                        |

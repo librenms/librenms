@@ -78,7 +78,7 @@ if ($device['os'] == 'dell-os10') {
                 }
                 echo '+';
             } else {
-                BgpPeer::where('bgpPeerRemoteAs', $value['os10bgp4V2PeerRemoteAs'])->where('astext', $astext)->update(['bgpPeerIdentifier' => $address, 'device_id' => $device['device_id'], 'vrf_id' => $vrfId]);
+                BgpPeer::where('device_id', $device['device_id'])->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->update(['bgpPeerRemoteAs' => $value['os10bgp4V2PeerRemoteAs'], 'astext' => $astext]);
                 echo '.';
             }
         }

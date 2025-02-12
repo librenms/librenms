@@ -28,12 +28,15 @@ namespace LibreNMS;
 use App\Models\Device;
 use App\Models\DeviceGraph;
 use DeviceCache;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\Interfaces\Discovery\StorageDiscovery;
 use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
 use LibreNMS\Interfaces\Discovery\StpPortDiscovery;
 use LibreNMS\Interfaces\Polling\Netstats\IcmpNetstatsPolling;
@@ -46,12 +49,13 @@ use LibreNMS\Interfaces\Polling\StpInstancePolling;
 use LibreNMS\Interfaces\Polling\StpPortPolling;
 use LibreNMS\OS\Generic;
 use LibreNMS\OS\Traits\BridgeMib;
+use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\OS\Traits\HostResources;
 use LibreNMS\OS\Traits\NetstatsPolling;
-use LibreNMS\OS\Traits\ResolvesPortIds;
 use LibreNMS\OS\Traits\UcdResources;
 use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
+use LibreNMS\OS\Traits\YamlStorageDiscovery;
 use LibreNMS\Util\StringHelpers;
 
 class OS implements
@@ -60,10 +64,12 @@ class OS implements
     MempoolsDiscovery,
     StpInstanceDiscovery,
     StpPortDiscovery,
+    EntityPhysicalDiscovery,
     IcmpNetstatsPolling,
     IpNetstatsPolling,
     IpForwardNetstatsPolling,
     SnmpNetstatsPolling,
+    StorageDiscovery,
     StpInstancePolling,
     StpPortPolling,
     TcpNetstatsPolling,
@@ -72,16 +78,19 @@ class OS implements
     use HostResources {
         HostResources::discoverProcessors as discoverHrProcessors;
         HostResources::discoverMempools as discoverHrMempools;
+        HostResources::discoverStorage as discoverHrStorage;
     }
     use UcdResources {
         UcdResources::discoverProcessors as discoverUcdProcessors;
         UcdResources::discoverMempools as discoverUcdMempools;
+        UcdResources::discoverStorage as discoverUcdStorage;
     }
     use YamlOSDiscovery;
     use YamlMempoolsDiscovery;
+    use YamlStorageDiscovery;
     use NetstatsPolling;
-    use ResolvesPortIds;
     use BridgeMib;
+    use EntityMib;
 
     /**
      * @var float|null
@@ -91,6 +100,8 @@ class OS implements
     private $graphs; // stores device graphs
     private $cache; // data cache
     private $pre_cache; // pre-fetch data cache
+
+    protected ?string $entityVendorTypeMib = null;
 
     /**
      * OS constructor. Not allowed to be created directly.  Use OS::make()
@@ -236,8 +247,7 @@ class OS implements
     public static function make(array &$device): OS
     {
         if (isset($device['os'])) {
-            // load os definition and populate os_group
-            \LibreNMS\Util\OS::loadDefinition($device['os']);
+            // Populate os_group
             $device['os_group'] = Config::get("os.{$device['os']}.group");
 
             $class = StringHelpers::toClass($device['os'], 'LibreNMS\\OS\\');
@@ -341,6 +351,23 @@ class OS implements
         }
 
         return $this->discoverUcdMempools();
+    }
+
+    public function discoverStorage(): Collection
+    {
+        if ($this->hasYamlDiscovery('storage')) {
+            $storage = $this->discoverYamlStorage();
+            if ($storage->isNotEmpty()) {
+                return $storage;
+            }
+        }
+
+        $storage = $this->discoverHrStorage();
+        if ($storage->isNotEmpty()) {
+            return $storage;
+        }
+
+        return $this->discoverUcdStorage();
     }
 
     public function getDiscovery($module = null)

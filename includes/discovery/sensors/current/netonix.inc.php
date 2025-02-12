@@ -30,5 +30,5 @@ $descr = 'DC Input Current';
 $divisor = 10;
 
 if (is_numeric($dcinput_value) && $dcinput_value > 0) {
-    discover_sensor($valid['sensor'], 'current', $device, $dcinput_oid, 0, $device['os'], $descr, $divisor, 1, null, null, null, null, $dcinput_value / $divisor);
+    discover_sensor(null, 'current', $device, $dcinput_oid, 0, $device['os'], $descr, $divisor, 1, null, null, null, null, $dcinput_value / $divisor);
 }

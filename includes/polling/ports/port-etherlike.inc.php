@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Number;
 
 if ($this_port['dot3StatsIndex'] and $port['ifType'] == 'ethernetCsmacd') {
     $etherlike_oids = [
@@ -28,7 +29,7 @@ if ($this_port['dot3StatsIndex'] and $port['ifType'] == 'ethernetCsmacd') {
         $oid_ds = str_replace('dot3Stats', '', $oid);
         $rrd_def->addDataset($oid_ds, 'COUNTER', null, 100000000000);
 
-        $data = cast_number($this_port[$oid]);
+        $data = Number::cast($this_port[$oid]);
         $fields[$oid] = $data;
     }
 

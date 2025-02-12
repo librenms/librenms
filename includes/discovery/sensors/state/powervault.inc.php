@@ -25,6 +25,5 @@ if (is_numeric($value)) {
     ];
     create_state_index($state_name, $states);
 
-    discover_sensor($valid['sensor'], 'state', $device, $oid, 1, $state_name, $descr, 1, 1);
-    create_sensor_to_state_index($device, $state_name, 1);
+    discover_sensor(null, 'state', $device, $oid, 1, $state_name, $descr, 1, 1);
 }

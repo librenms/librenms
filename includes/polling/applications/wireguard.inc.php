@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Eventlog;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
@@ -53,11 +54,7 @@ foreach ($interface_client_map as $interface => $client_list) {
     $bytes_rcvd_total_intf = null;
     $bytes_sent_total_intf = null;
 
-    $finterface = is_string($interface)
-        ? filter_var($interface, FILTER_SANITIZE_STRING)
-        : null;
-
-    if (is_null($finterface)) {
+    if (! is_string($interface)) {
         echo PHP_EOL .
             $name .
             ':' .
@@ -66,14 +63,11 @@ foreach ($interface_client_map as $interface => $client_list) {
 
         continue;
     }
+    $interface = \LibreNMS\Util\Clean::fileName($interface);
 
-    $mappings[$finterface] = [];
+    $mappings[$interface] = [];
     foreach ($client_list as $client => $client_data) {
-        $fclient = is_string($client)
-            ? filter_var($client, FILTER_SANITIZE_STRING)
-            : null;
-
-        if (is_null($fclient)) {
+        if (! is_string($client)) {
             echo PHP_EOL .
                 $name .
                 ':' .
@@ -82,26 +76,27 @@ foreach ($interface_client_map as $interface => $client_list) {
 
             continue;
         }
+        $client = \LibreNMS\Util\Clean::fileName($client);
 
-        array_push($mappings[$finterface], $fclient);
-        $bytes_rcvd = is_int($client_data['bytes_rcvd'])
+        array_push($mappings[$interface], $client);
+        $bytes_rcvd = is_numeric($client_data['bytes_rcvd'])
             ? $client_data['bytes_rcvd']
             : null;
-        $bytes_sent = is_int($client_data['bytes_sent'])
+        $bytes_sent = is_numeric($client_data['bytes_sent'])
             ? $client_data['bytes_sent']
             : null;
-        $minutes_since_last_handshake = is_int(
+        $minutes_since_last_handshake = is_numeric(
             $client_data['minutes_since_last_handshake']
         )
             ? $client_data['minutes_since_last_handshake']
             : null;
 
-        if (is_int($bytes_rcvd)) {
+        if (is_numeric($bytes_rcvd)) {
             $bytes_rcvd_total_intf += $bytes_rcvd;
             $bytes_rcvd_total += $bytes_rcvd;
         }
 
-        if (is_int($bytes_sent)) {
+        if (is_numeric($bytes_sent)) {
             $bytes_sent_total_intf += $bytes_sent;
             $bytes_sent_total += $bytes_sent;
         }
@@ -113,7 +108,7 @@ foreach ($interface_client_map as $interface => $client_list) {
         ];
 
         // create flattened metrics
-        $metrics['intf_' . $finterface . '_client_' . $fclient] = $fields_intfclient;
+        $metrics['intf_' . $interface . '_client_' . $client] = $fields_intfclient;
         $tags_intfclient = [
             'name' => $name,
             'app_id' => $app->app_id,
@@ -122,8 +117,8 @@ foreach ($interface_client_map as $interface => $client_list) {
                 $polling_type,
                 $name,
                 $app->app_id,
-                $finterface,
-                $fclient,
+                $interface,
+                $client,
             ],
         ];
         data_update($device, $polling_type, $tags_intfclient, $fields_intfclient);
@@ -136,13 +131,13 @@ foreach ($interface_client_map as $interface => $client_list) {
     ];
 
     // create interface metrics
-    $metrics['intf_' . $finterface] = $fields_intf;
+    $metrics['intf_' . $interface] = $fields_intf;
 
     $tags_intf = [
         'name' => $name,
         'app_id' => $app->app_id,
         'rrd_def' => $rrd_def_intf,
-        'rrd_name' => [$polling_type, $name, $app->app_id, $finterface],
+        'rrd_name' => [$polling_type, $name, $app->app_id, $interface],
     ];
     data_update($device, $polling_type, $tags_intf, $fields_intf);
 }
@@ -170,11 +165,13 @@ $mappings_updated = false;
 // get old mappings
 $old_mappings = $app->data['mappings'] ?? [];
 
+// update here even if there are no added or reel in any changes for table info display
+$app->data = ['mappings' => $mappings, 'data' => $interface_client_map];
+
 // check for interface changes
 $added_interfaces = array_diff_key($mappings, $old_mappings);
 $removed_interfaces = array_diff_key($old_mappings, $mappings);
 if (count($added_interfaces) > 0 || count($removed_interfaces) > 0) {
-    $app->data = ['mappings' => $mappings];
     $mappings_updated = true;
     $log_message = 'Wireguard Interfaces Change:';
     $log_message .=
@@ -185,7 +182,7 @@ if (count($added_interfaces) > 0 || count($removed_interfaces) > 0) {
         count($removed_interfaces) > 0
             ? ' Removed ' . implode(',', $removed_interfaces)
             : '';
-    log_event($log_message, $device, 'application');
+    Eventlog::log($log_message, $device['device_id'], 'application');
 }
 
 // check for client changes
@@ -208,7 +205,7 @@ foreach ($mappings as $interface => $client_list) {
             count($removed_clients) > 0
                 ? ' Removed ' . implode(',', $removed_clients)
                 : '';
-        log_event($log_message, $device, 'application');
+        Eventlog::log($log_message, $device['device_id'], 'application');
     }
 }
 

@@ -1,9 +1,9 @@
 -- ================================================================
--- Copyright (C) 2017 by HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2021 by HUAWEI TECHNOLOGIES. All rights reserved
 --
 -- Description:The mib file is for management of VRRP extension
 -- Reference:
--- Version: V2.14
+-- Version: V2.17
 -- History:
 -- 2006.6.20, publish
 -- ================================================================
@@ -20,7 +20,7 @@
                      FROM SNMPv2-TC
                    InterfaceIndex, ifIndex
                      FROM IF-MIB
-                   VrId, vrrpOperState, vrrpOperMasterIpAddr, vrrpOperPrimaryIpAddr
+                   VrId, vrrpOperState, vrrpOperMasterIpAddr, vrrpOperPrimaryIpAddr, vrrpOperVrId
                      FROM VRRP-MIB
                    EnabledStatus
                      FROM P-BRIDGE-MIB  
@@ -29,11 +29,13 @@
                    sysName                             
                      FROM SNMPv2-MIB
                    IpAddress
-                     FROM SNMPv2-SMI;
+                     FROM SNMPv2-SMI
+                   vrrpv3OperationsVrId, vrrpv3OperationsInetAddrType, vrrpv3OperationsPrimaryIpAddr
+                     FROM VRRPV3-MIB;    				 
                      
                     
     hwVrrpExt MODULE-IDENTITY
-        LAST-UPDATED "201708170000Z"        
+        LAST-UPDATED "202102010000Z"        
         ORGANIZATION
             "Huawei Technologies Co.,Ltd."
         CONTACT-INFO
@@ -46,6 +48,19 @@
              "
         DESCRIPTION
             "It supplies for VRRP tracking function."
+
+      REVISION "202102010000Z"
+            DESCRIPTION 
+               "Add the hwVrrpExtTrapResLimit trap and hwVrrp6ExtTrapResLimit trap." 
+
+      REVISION "201905290000Z"
+            DESCRIPTION 
+               "Add the hwVrrpExtTrapVirtualIPConflict trap and hwVrrpExtTrapVirtualIPConflictResume trap."
+
+       REVISION "201712080000Z"
+            DESCRIPTION 
+               "Change the hwVrrpTrackEfmIfName size."
+
         REVISION "201708170000Z"
             DESCRIPTION 
                "Change the hwVrrpExtStateChangeReasonString Description."
@@ -117,7 +132,7 @@ But for the VRRP v3 version,this time value is truncated to 40950 milliseconds w
     DESCRIPTION
         "Current protocol verison for VRRP on the specified device.The default value is v2(2) ,
          and the other value for this element is v3(3)."
-    DEFVAL { 2 }
+    DEFVAL { v2 }
     ::= { hwVrrpExtGlobal 5 }    
     
     hwVrrpExtSendV3AdverPktMode OBJECT-TYPE
@@ -133,7 +148,7 @@ But for the VRRP v3 version,this time value is truncated to 40950 milliseconds w
         "This value specifies the mode of sending advertisement packet for VRRP v3.It has three 
          configurable value: VRRP_PROTO_V3_SEND_V2_ONLY(1), VRRP_PROTO_V3_SEND_V3_ONLY(2) and
          VRRP_PROTO_V3_SEND_V3V2_BOTH(3)."
-    DEFVAL { 2 }
+    DEFVAL { v3only }
     ::= { hwVrrpExtGlobal 6 }    
      
     hwVrrpExtStateChangeReasonString OBJECT-TYPE 
@@ -636,7 +651,7 @@ But for the VRRP v3 version,this time value is truncated to 40950 milliseconds w
                         ::= { hwVrrpTrackEfmEntry 1 }         
                         
              hwVrrpTrackEfmIfName OBJECT-TYPE
-                        SYNTAX DisplayString (SIZE (1..255))
+                        SYNTAX DisplayString (SIZE (0..255))
                         MAX-ACCESS read-only
                         STATUS current
                         DESCRIPTION
@@ -975,6 +990,53 @@ But for the VRRP v3 version,this time value is truncated to 40950 milliseconds w
                "The ExpectStateResume trap indicates that the state of vrrp         
                is consistant with the expected state."                          
                ::= { hwVrrpExtNotifications 4 }
+
+	    hwVrrpExtTrapVirtualIPConflict NOTIFICATION-TYPE  
+            OBJECTS  {
+	                vrrpv3OperationsPrimaryIpAddr
+                     }
+            STATUS       current
+            DESCRIPTION                                                                                                                                  
+               "The hwVrrpExtTrapVirtualIPConflict trap indicates that VRRP 
+			   detects a virtual IP address conflict."                          
+               ::= { hwVrrpExtNotifications 5 }
+			   
+			hwVrrpExtTrapVirtualIPConflictResume NOTIFICATION-TYPE  
+            OBJECTS  {
+			             vrrpv3OperationsPrimaryIpAddr
+                     }
+            STATUS       current
+            DESCRIPTION                                                                                                                                  
+               "The hwVrrpExtTrapVirtualIPConflictResume trap indicates that
+			   the VRRP virtual IP address conflict is rectified."                          
+               ::= { hwVrrpExtNotifications 6 }
+
+	        hwVrrpExtTrapResLimit  NOTIFICATION-TYPE  
+            OBJECTS  {
+                         ifIndex,
+                         ifName,
+                         vrrpOperVrId
+                         
+			              
+                     }
+            STATUS       current
+            DESCRIPTION                                                                                                                                  
+               "The hwVrrpExtTrapResLimit  trap indicates that
+			   The board resources used for VRRP negotiation exceeded the threshold."                          
+               ::= { hwVrrpExtNotifications 7 }
+
+        hwVrrp6ExtTrapResLimit  NOTIFICATION-TYPE  
+            OBJECTS  {
+                         ifIndex,
+                         ifName,
+                         vrrpOperVrId
+                     }
+            STATUS       current
+            DESCRIPTION                                                                                                                                  
+               "The hwVrrp6ExtTrapResLimit  trap indicates that
+			   The board resources used for VRRP6 negotiation exceeded the threshold."                          
+               ::= { hwVrrpExtNotifications 8 }
+
                   
             vrrpExtConformance     OBJECT IDENTIFIER ::= { hwVrrpExt 3 }   
                         
@@ -1082,7 +1144,7 @@ But for the VRRP v3 version,this time value is truncated to 40950 milliseconds w
                                 "The VrrpStatExt attributes."
                         ::= { hwvrrpExtGroups 11 }   
        hwVrrpExtNotificationGroup NOTIFICATION-GROUP
-                        NOTIFICATIONS {hwVrrpExtTrapMasterDown, hwVrrpExtTrapNonMaster, hwVrrpExtTrapExpectStateChange, hwVrrpExtTrapExpectStateResume}
+                        NOTIFICATIONS {hwVrrpExtTrapMasterDown, hwVrrpExtTrapNonMaster, hwVrrpExtTrapExpectStateChange, hwVrrpExtTrapExpectStateResume, hwVrrpExtTrapVirtualIPConflict, hwVrrpExtTrapVirtualIPConflictResume, hwVrrpExtTrapResLimit, hwVrrp6ExtTrapResLimit}
                         STATUS current
                         DESCRIPTION
                         "The VRRP MIB Notification Group."

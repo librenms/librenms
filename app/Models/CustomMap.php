@@ -29,6 +29,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Permissions;
 
 class CustomMap extends BaseModel
 {
@@ -36,11 +37,14 @@ class CustomMap extends BaseModel
     protected $primaryKey = 'custom_map_id';
     protected $casts = [
         'options' => 'array',
+        'legend_colours' => 'array',
         'newnodeconfig' => 'array',
         'newedgeconfig' => 'array',
+        'background_data' => 'array',
     ];
     protected $fillable = [
         'name',
+        'menu_group',
         'width',
         'height',
         'node_align',
@@ -52,21 +56,42 @@ class CustomMap extends BaseModel
         'legend_font_size',
         'legend_hide_invalid',
         'legend_hide_overspeed',
-        'background_suffix',
-        'background_version',
+        'background_type',
+        'background_data',
     ];
 
-    // default values for attributes
-    protected $attributes = [
-        'options' => '{"interaction":{"dragNodes":false,"dragView":false,"zoomView":false},"manipulation":{"enabled":false},"physics":{"enabled":false}}',
-        'newnodeconfig' => '{"borderWidth":1,"color":{"border":"#2B7CE9","background":"#D2E5FF"},"font":{"color":"#343434","size":14,"face":"arial"},"icon":[],"label":true,"shape":"box","size":25}',
-        'newedgeconfig' => '{"arrows":{"to":{"enabled":true}},"smooth":{"type":"dynamic"},"font":{"color":"#343434","size":12,"face":"arial"},"label":true}',
-        'background_version' => 0,
-    ];
-
-    public function hasAccess(): bool
+    /**
+     * Get background data intended to be passed to javascript to configure the background
+     */
+    public function getBackgroundConfig(): array
     {
-        return false; // TODO calculate based on device access
+        $config = $this->background_data ?? [];
+        $config['engine'] = \LibreNMS\Config::get('geoloc.engine');
+        $config['api_key'] = \LibreNMS\Config::get('geoloc.api_key');
+        $config['tile_url'] = \LibreNMS\Config::get('leaflet.tile_url');
+        /* @phpstan-ignore-next-line seems to think version is not in array 100% of the time... which is wrong */
+        $config['image_url'] = route('maps.custom.background', ['map' => $this->custom_map_id]) . '?version=' . ($config['version'] ?? 0);
+
+        return $config;
+    }
+
+    public function hasReadAccess(User $user): bool
+    {
+        $device_ids = $this->nodes()->whereNotNull('device_id')->pluck('device_id');
+
+        // Restricted users can only view maps that have at least one device
+        if (count($device_ids) === 0) {
+            return false;
+        }
+
+        // Deny access if we don't have permission on any device
+        foreach ($device_ids as $device_id) {
+            if (! Permissions::canAccessDevice($device_id, $user)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function scopeHasAccess($query, User $user)

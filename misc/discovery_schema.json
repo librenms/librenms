@@ -157,7 +157,8 @@
                                     },
                                     "value": {"$ref": "#/definitions/oid"},
                                     "type": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "maxLength": 16
                                     },
                                     "skip_values": {
                                         "$ref": "#/definitions/skip_values"
@@ -229,7 +230,7 @@
                                             },
                                             "num_oid": {
                                                 "type": "string",
-                                                "pattern": "^(\\.\\d+)+(\\.?\\{\\{ \\$index \\}\\})?(\\.\\d+)*$"
+                                                "pattern": "^(\\.\\d+)+(\\.?\\{\\{ \\$(index|str_index_as_numeric|subindex\\d) \\}\\})?(\\.\\d+)*$"
                                             },
                                             "descr": {
                                                 "type": "string"
@@ -363,6 +364,69 @@
                         "waterflow": {"$ref": "#/definitions/sensor"},
                         "eer": {"$ref": "#/definitions/sensor"}
                     }
+                },
+                "storage": {
+                    "type": "object",
+                    "properties": {
+                        "data": {
+                            "type": "array",
+                            "items": {
+                                "properties": {
+                                    "descr": {
+                                        "type": "string"
+                                    },
+                                    "free": {
+                                        "type": "string"
+                                    },
+                                    "free_num_oid": {"$ref": "#/definitions/num_oid"},
+                                    "index": {
+                                        "type": [
+                                            "integer",
+                                            "string"
+                                        ]
+                                    },
+                                    "oid": {"$ref": "#/definitions/oid"},
+                                    "percent_used": {
+                                        "type": "string"
+                                    },
+                                    "percent_used_num_oid": {"$ref": "#/definitions/num_oid"},
+                                    "units": {
+                                        "type": [
+                                            "integer",
+                                            "string"
+                                        ]
+                                    },
+                                    "size": {
+                                        "type": [
+                                            "integer",
+                                            "string"
+                                        ]
+                                    },
+                                    "size_num_oid": {"$ref": "#/definitions/num_oid"},
+                                    "skip_values": {
+                                        "$ref": "#/definitions/skip_values"
+                                    },
+                                    "type": {
+                                        "type": "string"
+                                    },
+                                    "poller_type": {
+                                        "type": "string"
+                                    },
+                                    "used": {
+                                        "type": "string"
+                                    },
+                                    "used_num_oid": {"$ref": "#/definitions/num_oid"},
+                                    "warn_percent": {
+                                        "type": [
+                                            "integer",
+                                            "string"
+                                        ]
+                                    }
+                                },
+                                "additionalProperties": false
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -374,6 +438,10 @@
     "definitions": {
         "oid": {
             "type": "string"
+        },
+        "num_oid": {
+            "type": "string",
+            "pattern": "^(\\.\\d+)+(\\.?\\{\\{ \\$(index|str_index_as_numeric) \\}\\})?(\\.\\d+)*$"
         },
         "oids": {
             "type": ["string", "array"],
@@ -412,10 +480,7 @@
                             "oid": {
                                 "type": "string"
                             },
-                            "num_oid": {
-                                "type": "string",
-                                "pattern": "^(\\.\\d+)+\\.?\\{\\{ \\$index \\}\\}(\\.\\d+)*$"
-                            },
+                            "num_oid": {"$ref": "#/definitions/num_oid"},
                             "index": {
                                 "type": ["integer", "string"]
                             },
@@ -423,10 +488,10 @@
                                 "type": "string"
                             },
                             "divisor": {
-                                "type": "integer"
+                                "type": ["number", "string"]
                             },
                             "multiplier": {
-                                "type": "integer"
+                                "type": ["number", "string"]
                             },
                             "value": {
                                 "type": "string"

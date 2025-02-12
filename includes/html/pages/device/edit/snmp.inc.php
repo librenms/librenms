@@ -38,7 +38,7 @@ if (isset($_POST['editing'])) {
             $device->features = null;
             $device->hardware = $_POST['hardware'];
             $device->icon = null;
-            $device->os = $_POST['os'] ? $_POST['os_id'] : 'ping';
+            $device->os = $_POST['os'] ? strip_tags($_POST['os_id']) : 'ping';
             $device->snmp_disable = 1;
             $device->sysName = $_POST['sysName'] ?: null;
             $device->version = null;
@@ -159,31 +159,27 @@ $max_repeaters = $device->getAttrib('snmp_max_repeaters');
 if (isset($update_message)) {
     if (is_array($update_message)) {
         foreach ($update_message as $message) {
-            flash()->addSuccess($message);
+            toast()->success($message);
         }
     }
 
     if (is_string($update_message)) {
-        flash()->addSuccess($update_message);
+        toast()->success($update_message);
     }
 
     unset($message, $update_message);
 }
 
-// use flash()->addError to call attention to the problem; don't let it time out
+// use flash()->error to call attention to the problem; don't let it time out
 if (isset($update_failed_message)) {
     if (is_array($update_failed_message)) {
         foreach ($update_failed_message as $error) {
-            flash()
-                ->option('timeout', 30000)
-                ->addError($error);
+            toast()->error($error, options: ['timeOut' => 30000]);
         }
     }
 
     if (is_string($update_failed_message)) {
-        flash()
-            ->option('timeout', 30000)
-            ->addError($update_failed_message);
+        toast()->error($update_failed_message, options: ['timeOut' => 30000]);
     }
 
     unset($error, $update_failed_message);
@@ -215,7 +211,7 @@ echo "
     <label for='os' class='col-sm-2 control-label'>OS (optional)</label>
     <div class='col-sm-4'>
     <input id='os' class='form-control' name='os' value='" . htmlspecialchars(Config::get("os.{$device->os}.text")) . "'/>
-    <input type='hidden' id='os_id' class='form-control' name='os_id' value='" . $device->os . "'/>
+    <input type='hidden' id='os_id' class='form-control' name='os_id' value='" . htmlspecialchars($device->os) . "'/>
     </div>
     </div>
     </div>

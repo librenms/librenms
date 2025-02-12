@@ -30,7 +30,7 @@ use LibreNMS\RRD\RrdDefinition;
 $data = '';
 $name = 'powerdns-recursor';
 
-if ($agent_data['app'][$name]) {
+if (! empty($agent_data['app'][$name])) {
     $data = $agent_data['app'][$name];
 } elseif (Config::has('apps.powerdns-recursor.api-key')) {
     $port = Config::get('apps.powerdns-recursor.port', 8082);

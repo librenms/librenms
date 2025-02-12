@@ -93,7 +93,9 @@ class DeviceController extends TableController
     protected function baseQuery($request)
     {
         /** @var Builder $query */
-        $query = Device::hasAccess($request->user())->with('location')->withCount(['ports', 'sensors', 'wirelessSensors']);
+        $query = Device::hasAccess($request->user())
+            ->with(['location', 'groups'])
+            ->withCount(['ports', 'sensors', 'wirelessSensors']);
 
         // if searching or sorting the location field, join the locations table
         if ($request->get('searchPhrase') || in_array('location', array_keys($request->get('sort', [])))) {
@@ -196,7 +198,7 @@ class DeviceController extends TableController
         } elseif ($device->status == 0) {
             return 'label-danger';
         } else {
-            $warning_time = \LibreNMS\Config::get('uptime_warning', 84600);
+            $warning_time = \LibreNMS\Config::get('uptime_warning', 86400);
             if ($device->uptime < $warning_time && $device->uptime != 0) {
                 return 'label-warning';
             }

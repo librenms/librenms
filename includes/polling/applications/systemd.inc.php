@@ -1,10 +1,12 @@
 <?php
 
-require_once 'includes/systemd-shared.inc.php';
-
+use App\Models\Eventlog;
+use LibreNMS\Config;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
+
+require_once Config::get('install_dir') . '/includes/systemd-shared.inc.php';
 
 $name = 'systemd';
 $output = 'OK';
@@ -122,7 +124,7 @@ foreach ($systemd_mapper as $state_type => $state_statuses) {
                 $state_status .
                 ' state status: ' .
                 $field_value;
-            log_event($log_message, $device, 'application');
+            Eventlog::log($log_message, $device['device_id'], 'application');
             continue;
         }
 

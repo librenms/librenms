@@ -33,11 +33,6 @@ class DeviceObserver
      */
     public function updated(Device $device): void
     {
-        // handle device dependency updates
-        if ($device->isDirty('max_depth')) {
-            $device->children->each->updateMaxDepth();
-        }
-
         // log up/down status changes
         if ($device->isDirty(['status', 'status_reason'])) {
             $type = $device->status ? 'up' : 'down';
@@ -105,7 +100,6 @@ class DeviceObserver
         $device->bgppeers()->delete();
         \DB::table('bgpPeers_cbgp')->where('device_id', $device->device_id)->delete();
         $device->cefSwitching()->delete();
-        \DB::table('ciscoASA')->where('device_id', $device->device_id)->delete();
         $device->components()->delete();
         \DB::table('customoids')->where('device_id', $device->device_id)->delete();
         \DB::table('devices_perms')->where('device_id', $device->device_id)->delete();
@@ -142,7 +136,6 @@ class DeviceObserver
         $device->ospfPorts()->delete();
         $device->outages()->delete();
         $device->packages()->delete();
-        $device->perf()->delete();
         $device->portsFdb()->delete();
         $device->portsNac()->delete();
         \DB::table('ports_stack')->where('device_id', $device->device_id)->delete();

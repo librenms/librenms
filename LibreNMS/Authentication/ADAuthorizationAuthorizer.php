@@ -78,6 +78,9 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
             $this->userFilter($username),
             ['samaccountname']
         );
+        if ($search === false) {
+            throw new AuthenticationException('User search failed: ' . ldap_error($this->ldap_connection));
+        }
         $entries = ldap_get_entries($this->ldap_connection, $search);
 
         if ($entries['count']) {
@@ -151,6 +154,9 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
             $this->userFilter($username),
             $attributes
         );
+        if ($search === false) {
+            throw new AuthenticationException('Role search failed: ' . ldap_error($this->ldap_connection));
+        }
         $entries = ldap_get_entries($this->ldap_connection, $search);
 
         if ($entries['count']) {

@@ -21,11 +21,13 @@
  *
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
+ * @author     Rudy Broersma <r.broersma@ctnet.nl>
  */
 
 // One could add more entries from deviceGroup, but this will do as a start
 $tables = [
     ['cpqDaPhyDrvStatus', '.1.3.6.1.4.1.232.3.2.5.1.1.6.', 'Status', 'CPQIDA-MIB', [
+        ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'noDisk'],
         ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'other'],
         ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'ok'],
         ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'failed'],
@@ -58,7 +60,7 @@ foreach ($tables as $tablevalue) {
 
             //Discover Sensors
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'state',
                 $device,
                 $num_oid . $index,
@@ -75,9 +77,6 @@ foreach ($tables as $tablevalue) {
                 'snmp',
                 $index
             );
-
-            //Create Sensor To State Index
-            create_sensor_to_state_index($device, $state_name, $index);
         }
     }
 }

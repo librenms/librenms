@@ -154,62 +154,6 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbDelete\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
-			"""
-			count: 1
-			path: LibreNMS/Device/Sensor.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRow\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 2
-			path: LibreNMS/Device/Sensor.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 2
-			path: LibreNMS/Device/Sensor.php
-
-		-
-			message: """
-				#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 2
-			path: LibreNMS/Device/Sensor.php
-
-		-
-			message: """
-				#^Call to deprecated function dbInsert\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 1
-			path: LibreNMS/Device/Sensor.php
-
-		-
-			message: """
-				#^Call to deprecated function dbUpdate\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 2
-			path: LibreNMS/Device/Sensor.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchColumn\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: LibreNMS/Device/WirelessSensor.php
-
-		-
-			message: """
 				#^Call to deprecated function dbFetchCell\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
@@ -2462,14 +2406,6 @@ parameters:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
 			count: 1
-			path: includes/html/graphs/c6kxbar/auth.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRow\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
 			path: includes/html/graphs/cefswitching/auth.inc.php
 
 		-
@@ -3346,14 +3282,6 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/pages/device/neighbours/list.inc.php
-
-		-
-			message: """
 				#^Call to deprecated function dbFetchRow\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
@@ -4074,14 +4002,6 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 2
-			path: includes/html/print-interface-adsl.inc.php
-
-		-
-			message: """
 				#^Call to deprecated function dbFetchCell\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
@@ -4751,30 +4671,6 @@ parameters:
 			"""
 			count: 1
 			path: includes/polling/cisco-ace-serverfarms.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchCell\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/polling/cisco-asa-firewall.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbInsert\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 1
-			path: includes/polling/cisco-asa-firewall.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbUpdate\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 1
-			path: includes/polling/cisco-asa-firewall.inc.php
 
 		-
 			message: """

@@ -21,6 +21,7 @@
  * @copyright  2024 Peca Nesovanovic
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
+
 use LibreNMS\Util\Oid;
 
 echo 'eltexPhyTransceiverDiagnosticTable' . PHP_EOL;
@@ -44,9 +45,9 @@ if (! empty($eltexPhyTransceiverDiagnosticTable['supplyVoltage'])) {
             $low_warn_limit = $data['eltexPhyTransceiverDiagnosticLowWarningThreshold'] / 1000;
             $low_limit = $data['eltexPhyTransceiverDiagnosticLowAlarmThreshold'] / 1000;
             $descr = get_port_by_index_cache($device['device_id'], $ifIndex)['ifName'];
-            $oid = Oid::toNumeric('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.2.1');
+            $oid = Oid::of('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.2.1')->toNumeric();
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'voltage',
                 $device,
                 $oid,

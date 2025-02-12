@@ -43,7 +43,7 @@ print_optionbar_start(28);
 print_optionbar_end();
 
 if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
-    $results = $_POST['results'];
+    $results = (int) $_POST['results_amount'];
 } else {
     $results = 50;
 }
@@ -70,7 +70,6 @@ if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
 <?php
 
 $count_query = 'SELECT COUNT(*) FROM ( ';
-$full_query = '';
 $query = 'SELECT packages.name FROM packages,devices ';
 $param = [];
 
@@ -80,7 +79,8 @@ if (! Auth::user()->hasGlobalRead()) {
     $param = array_merge($param, $device_ids);
 }
 
-$query .= " WHERE packages.device_id = devices.device_id AND packages.name LIKE '%" . $_POST['package'] . "%' $sql_where GROUP BY packages.name";
+$query .= " WHERE packages.device_id = devices.device_id AND packages.name LIKE ? $sql_where GROUP BY packages.name";
+$param[] = '%' . $_POST['package'] . '%';
 
 $where = '';
 $ver = '';
@@ -107,7 +107,7 @@ if (! isset($_POST['page_number']) && $_POST['page_number'] < 1) {
 }
 
 $start = ($page_number - 1) * $results;
-$full_query = $full_query . $query . " LIMIT $start,$results";
+$full_query = $query . " LIMIT $start,$results";
 
 ?>
         <tr>
@@ -151,7 +151,7 @@ foreach ($ordered as $name => $entry) {
             $devs[] = generate_device_link($variation);
         }
     }
-    if (sizeof($arch) > 0 && sizeof($vers) > 0) {
+    if (count($arch) > 0 && count($vers) > 0) {
         ?>
         <tr>
             <td><a href="<?php echo \LibreNMS\Util\Url::generate(['page' => 'packages', 'name' => $name]); ?>"><?php echo $name; ?></a></td>

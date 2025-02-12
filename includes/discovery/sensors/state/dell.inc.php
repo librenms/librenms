@@ -22,13 +22,12 @@ $tables = [
     ['batteryTable', '.1.3.6.1.4.1.674.10893.1.20.130.15.1.4.', 'batteryState', 'batteryName', 'StorageManagement-MIB', 'dell'],
 ];
 
-foreach ($tables as $tablevalue) {
-    $temp = snmpwalk_cache_multi_oid($device, $tablevalue[0], [], $tablevalue[4], $tablevalue[5]);
-    $cur_oid = $tablevalue[1];
+foreach ($tables as [$table, $num_oid, $value_oid, $descr_oid, $mib, $mib_dir]) {
+    $temp = snmpwalk_cache_multi_oid($device, $table, [], $mib, $mib_dir);
 
     if (is_array($temp)) {
         //Create State Index
-        $state_name = 'dell.' . $tablevalue[2];
+        $state_name = 'dell.' . $value_oid;
         if ($state_name == 'dell.processorDeviceStatusStatus' || $state_name == 'dell.memoryDeviceStatus' || $state_name == 'dell.powerSupplyStatus' || $state_name == 'dell.intrusionStatus') {
             $states = [
                 ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'other'],
@@ -107,21 +106,18 @@ foreach ($tables as $tablevalue) {
         create_state_index($state_name, $states);
 
         foreach ($temp as $index => $entry) {
-            if (strpos($index, '54.') === false) { //Because Dell is buggy
+            if (array_key_exists($value_oid, $entry)) { // ward against extra data from newer MIBs
                 if ($state_name == 'dell.intrusionStatus') {
-                    $descr = $tablevalue[3];
+                    $descr = $descr_oid;
                 } elseif ($state_name == 'dell.batteryState') {
-                    $descr = str_replace('"', '', snmp_get($device, 'batteryConnectionControllerName.' . $index . '', '-Ovqn', $tablevalue[4])) . ' - ' . $temp[$index][$tablevalue[3]];
+                    $descr = str_replace('"', '', snmp_get($device, 'batteryConnectionControllerName.' . $index, '-Ovqn', $mib)) . ' - ' . $entry[$descr_oid];
                 } elseif ($state_name == 'dell.arrayDiskState') {
-                    $descr = str_replace('"', '', snmp_get($device, 'arrayDiskEnclosureConnectionEnclosureName.' . $index . '', '-Ovqn', $tablevalue[4])) . ' - ' . $temp[$index][$tablevalue[3]];
+                    $descr = str_replace('"', '', snmp_get($device, 'arrayDiskEnclosureConnectionEnclosureName.' . $index, '-Ovqn', $mib)) . ' - ' . $entry[$descr_oid];
                 } else {
-                    $descr = strip_tags($temp[$index][$tablevalue[3]]); // Use clean as virtualDiskDeviceName is user defined
+                    $descr = strip_tags($entry[$descr_oid]); // Use clean as virtualDiskDeviceName is user defined
                 }
                 //Discover Sensors
-                discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index][$tablevalue[2]], 'snmp', $index);
-
-                //Create Sensor To State Index
-                create_sensor_to_state_index($device, $state_name, $index);
+                discover_sensor(null, 'state', $device, $num_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $entry[$value_oid], 'snmp', $index);
             }
         }
     }

@@ -26,6 +26,7 @@
 namespace LibreNMS\Util;
 
 use App\Actions\Device\ValidateDeviceAndCreate;
+use App\Jobs\PollDevice;
 use App\Models\Device;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Model;
@@ -35,7 +36,6 @@ use LibreNMS\Config;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
-use LibreNMS\Poller;
 
 class ModuleTestHelper
 {
@@ -178,8 +178,7 @@ class ModuleTestHelper
         Debug::set();
         Debug::setVerbose();
         discover_device($device, $this->parseArgs('discovery'));
-        $poller = app(Poller::class, ['device_spec' => $device_id, 'module_override' => $this->modules]);
-        $poller->poll();
+        (new PollDevice($device_id, $this->modules))->handle();
         Debug::set($save_debug);
         Debug::setVerbose($save_vdebug);
         $collection_output = ob_get_contents();
@@ -312,7 +311,7 @@ class ModuleTestHelper
      * Probably needs to be more robust
      *
      * @param  array  $modules
-     * @return array
+     * @return array<string, bool|string[]>
      *
      * @throws InvalidModuleException
      */
@@ -320,17 +319,22 @@ class ModuleTestHelper
     {
         // generate a full list of modules
         $full_list = [];
-        foreach ($modules as $module) {
+        foreach ($modules as $index => $module) {
+            $module = is_string($index) ? $index : $module;
+
             // only allow valid modules
-            if (! (Config::has("poller_modules.$module") || Config::has("discovery_modules.$module"))) {
+            if (! Module::exists($module)) {
                 throw new InvalidModuleException("Invalid module name: $module");
             }
 
-            $full_list = array_merge($full_list, Module::fromName($module)->dependencies());
-            $full_list[] = $module;
+            foreach (Module::fromName($module)->dependencies() as $dependency) {
+                $full_list[$dependency] = true;
+            }
+
+            $full_list[$module] = true;
         }
 
-        return array_unique($full_list);
+        return $full_list;
     }
 
     private function parseArgs($type)
@@ -339,7 +343,7 @@ class ModuleTestHelper
             return false;
         }
 
-        return parse_modules($type, ['m' => implode(',', $this->modules)]);
+        return parse_modules($type, ['m' => implode(',', array_keys($this->modules))]);
     }
 
     private function qPrint($var)
@@ -546,7 +550,7 @@ class ModuleTestHelper
 
         // don't allow external DNS queries that could fail
         app()->bind(\LibreNMS\Util\AutonomousSystem::class, function ($app, $parameters) {
-            $asn = $parameters['asn'];
+            $asn = $parameters['asn'] ?? '?';
             $mock = \Mockery::mock(\LibreNMS\Util\AutonomousSystem::class);
             $mock->shouldReceive('name')->withAnyArgs()->zeroOrMoreTimes()->andReturnUsing(function () use ($asn) {
                 return "AS$asn-MOCK-TEXT";
@@ -560,17 +564,17 @@ class ModuleTestHelper
         }
 
         // Remove existing device in case it didn't get removed previously
-        if (($existing_device = device_by_name($snmpsim->getIp())) && isset($existing_device['device_id'])) {
+        if (($existing_device = device_by_name($snmpsim->ip)) && isset($existing_device['device_id'])) {
             delete_device($existing_device['device_id']);
         }
 
         // Add the test device
         try {
             $new_device = new Device([
-                'hostname' => $snmpsim->getIp(),
-                'version' => 'v2c',
+                'hostname' => $snmpsim->ip,
+                'snmpver' => 'v2c',
                 'community' => $this->file_name,
-                'port' => $snmpsim->getPort(),
+                'port' => $snmpsim->port,
                 'disabled' => 1, // disable to block normal pollers
             ]);
             (new ValidateDeviceAndCreate($new_device, true))->execute();
@@ -627,8 +631,7 @@ class ModuleTestHelper
         ob_start();
 
         \Log::setDefaultDriver('console');
-        $poller = app(Poller::class, ['device_spec' => $device_id, 'module_override' => $this->modules]);
-        $poller->poll();
+        (new PollDevice($device_id, $this->modules))->handle();
 
         $this->poller_output = ob_get_contents();
         if ($this->quiet) {
@@ -647,7 +650,7 @@ class ModuleTestHelper
         $data = array_merge_recursive($data, $this->dumpDb($device_id, $polled_modules, 'poller'));
 
         // Remove the test device, we don't need the debug from this
-        if ($device['hostname'] == $snmpsim->getIp()) {
+        if ($device['hostname'] == $snmpsim->ip) {
             Debug::set(false);
             delete_device($device_id);
         }
@@ -656,7 +659,9 @@ class ModuleTestHelper
             d_echo($data);
 
             // Save the data to the default test data location (or elsewhere if specified)
-            $existing_data = json_decode(file_get_contents($this->json_file), true);
+            $existing_data = is_readable($this->json_file)
+                ? json_decode(file_get_contents($this->json_file), true)
+                : [];
 
             // insert new data, don't store duplicate data
             foreach ($data as $module => $module_data) {
@@ -664,7 +669,7 @@ class ModuleTestHelper
                 if (empty($module_data['discovery']) && empty($module_data['poller'])) {
                     continue;
                 }
-                if ($module_data['discovery'] == $module_data['poller']) {
+                if (isset($module_data['discovery']) && isset($module_data['poller']) && $module_data['discovery'] == $module_data['poller']) {
                     $existing_data[$module] = [
                         'discovery' => $module_data['discovery'],
                         'poller' => 'matches discovery',
@@ -730,8 +735,8 @@ class ModuleTestHelper
 
         // only dump data for the given modules (and modules that support dumping)
         foreach ($modules as $module) {
-            $module_data = Module::fromName($module)->dump(DeviceCache::get($device_id));
-            if ($module_data !== false) {
+            $module_data = Module::fromName($module)->dump(DeviceCache::get($device_id), $type);
+            if ($module_data !== null) {
                 $data[$module][$type] = $this->dumpToArray($module_data);
             }
         }
@@ -771,7 +776,7 @@ class ModuleTestHelper
             if (isset($this->discovery_module_output[$module])) {
                 return $this->discovery_module_output[$module];
             } else {
-                return "Module $module not run. Modules: " . implode(',', array_keys($this->poller_module_output));
+                return "Module $module not run. Modules: " . implode(',', array_keys($this->discovery_module_output));
             }
         }
 

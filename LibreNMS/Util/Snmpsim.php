@@ -25,163 +25,89 @@
 
 namespace LibreNMS\Util;
 
-use App;
-use LibreNMS\Config;
-use LibreNMS\Proc;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\Process\Process;
 
-class Snmpsim
+class Snmpsim extends Process
 {
-    private $snmprec_dir;
-    private $ip;
-    private $port;
-    private $log;
-    /** @var Proc */
-    private $proc;
+    public readonly string $snmprec_dir;
 
-    public function __construct($ip = '127.1.6.1', $port = 1161, $log = '/tmp/snmpsimd.log')
+    public function __construct(
+        public readonly string $ip = '127.1.6.1',
+        public readonly int $port = 1161,
+        public readonly ?string $log_method = null)
     {
-        $this->ip = $ip;
-        $this->port = $port;
-        $this->log = $log;
-        $this->snmprec_dir = Config::get('install_dir') . '/tests/snmpsim/';
+        $this->snmprec_dir = base_path('tests/snmpsim');
+
+        $cmd = [
+            $this->getVenvPath('bin/snmpsim-command-responder-lite'),
+            "--data-dir={$this->snmprec_dir}",
+            "--agent-udpv4-endpoint={$this->ip}:{$this->port}",
+            '--log-level=error',
+        ];
+
+        if ($this->log_method !== null) {
+            $cmd[] = "--logging-method=$this->log_method";
+        }
+
+        parent::__construct($cmd, base_path());
+        $this->setTimeout(null); // no timeout by default
     }
 
-    /**
-     * Run snmpsimd and fork it into the background
-     * Captures all output to the log
-     *
-     * @param  int  $wait  Wait for x seconds after starting before returning
-     */
-    public function fork($wait = 2)
+    public function waitForStartup(): string
     {
-        if ($this->isRunning()) {
-            echo "Snmpsim is already running!\n";
+        $listen = $this->ip . ':' . $this->port;
+        $this->waitUntil(function ($type, $buffer) use ($listen, &$last) {
+            $last = $buffer;
 
-            return;
+            return $type == Process::ERR && str_contains($buffer, $listen);
+        });
+
+        return trim($last);
+    }
+
+    public function isVenvSetUp(): bool
+    {
+        if (! is_executable($this->getVenvPath('bin/snmpsim-command-responder-lite'))) {
+            return false;
         }
 
-        $cmd = $this->getCmd();
+        // check that snmpsim package actually exists
+        $pipCheck = new Process([$this->getVenvPath('bin/pip'), 'show', 'snmpsim']);
+        $pipCheck->run();
 
-        if (App::runningInConsole()) {
-            echo "Starting snmpsim listening on {$this->ip}:{$this->port}... \n";
-            d_echo($cmd);
-        }
+        return $pipCheck->isSuccessful();
+    }
 
-        $this->proc = new Proc($cmd);
+    public function setupVenv($print_output = false): void
+    {
+        $snmpsim_venv_path = $this->getVenvPath();
 
-        if ($wait) {
-            sleep($wait);
-        }
+        if (! $this->isVenvSetUp()) {
+            Log::info('Setting up snmpsim virtual env in ' . $snmpsim_venv_path);
 
-        if (App::runningInConsole() && ! $this->proc->isRunning()) {
-            // if starting failed, run snmpsim again and output to the console and validate the data
-            passthru($this->getCmd(false) . ' --validate-data');
+            $setupProcess = new Process(['/usr/bin/env', 'python3', '-m', 'venv', $snmpsim_venv_path]);
+            $setupProcess->setTty($print_output);
+            $setupProcess->run();
 
-            if (! is_executable($this->findSnmpsimd())) {
-                echo "\nCould not find snmpsim, you can install it with 'pip install snmpsim'.  If it is already installed, make sure snmpsimd or snmpsimd.py is in PATH\n";
-            } else {
-                echo "\nFailed to start Snmpsim. Scroll up for error.\n";
+            if (! $setupProcess->isSuccessful()) {
+                Log::info($setupProcess->getOutput());
+                Log::error($setupProcess->getErrorOutput());
             }
-            exit(1);
-        }
-    }
 
-    /**
-     * Stop and start the running snmpsim process
-     */
-    public function restart()
-    {
-        $this->stop();
-        $this->proc = new Proc($this->getCmd());
-    }
+            $installProcess = new Process([$snmpsim_venv_path . '/bin/pip', 'install', 'snmpsim>=1.1.7']);
+            $installProcess->setTty($print_output);
+            $installProcess->run();
 
-    public function stop()
-    {
-        if (isset($this->proc)) {
-            if ($this->proc->isRunning()) {
-                $this->proc->terminate();
+            if (! $installProcess->isSuccessful()) {
+                Log::info($installProcess->getOutput());
+                Log::error($installProcess->getErrorOutput());
             }
-            unset($this->proc);
         }
     }
 
-    /**
-     * Run snmpsimd but keep it in the foreground
-     * Outputs to stdout
-     */
-    public function run()
+    public function getVenvPath(string $subdir = ''): string
     {
-        echo "Starting snmpsim listening on {$this->ip}:{$this->port}... \n";
-        shell_exec($this->getCmd(false));
-    }
-
-    public function isRunning()
-    {
-        if (isset($this->proc)) {
-            return $this->proc->isRunning();
-        }
-
-        return false;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDir()
-    {
-        return $this->snmprec_dir;
-    }
-
-    /**
-     * @return string
-     */
-    public function getIp()
-    {
-        return $this->ip;
-    }
-
-    /**
-     * @return int
-     */
-    public function getPort()
-    {
-        return $this->port;
-    }
-
-    /**
-     * Generate the command for snmpsimd
-     *
-     * @param  bool  $with_log
-     * @return string
-     */
-    private function getCmd($with_log = true)
-    {
-        $cmd = $this->findSnmpsimd();
-
-        $cmd .= " --data-dir={$this->snmprec_dir} --agent-udpv4-endpoint={$this->ip}:{$this->port}";
-
-        if (is_null($this->log)) {
-            $cmd .= ' --logging-method=null';
-        } elseif ($with_log) {
-            $cmd .= " --logging-method=file:{$this->log}";
-        }
-
-        return $cmd;
-    }
-
-    public function __destruct()
-    {
-        // unset $this->proc to make sure it isn't referenced
-        unset($this->proc);
-    }
-
-    public function findSnmpsimd()
-    {
-        $cmd = Config::locateBinary('snmpsimd');
-        if (! is_executable($cmd)) {
-            $cmd = Config::locateBinary('snmpsimd.py');
-        }
-
-        return $cmd;
+        return base_path('.python_venvs/snmpsim/' . $subdir);
     }
 }

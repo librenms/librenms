@@ -18,10 +18,19 @@ Connect to the server command line and follow the instructions below.
 
 ## Install Required Packages
 
+=== "Ubuntu 24.04"
+    === "NGINX"
+        ```
+        apt install acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip rrdtool snmp snmpd unzip python3-command-runner python3-pymysql python3-dotenv python3-redis python3-setuptools python3-psutil python3-systemd python3-pip whois traceroute
+        ```
+
 === "Ubuntu 22.04"
     === "NGINX"
         ```
-        apt install acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip rrdtool snmp snmpd unzip python3-pymysql python3-dotenv python3-redis python3-setuptools python3-systemd python3-pip whois traceroute
+        apt install software-properties-common
+        LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php
+        apt update
+        apt install acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip rrdtool snmp snmpd unzip python3-pymysql python3-dotenv python3-redis python3-setuptools python3-psutil python3-systemd python3-pip whois traceroute
         ```
 
 === "Ubuntu 20.04"
@@ -29,7 +38,7 @@ Connect to the server command line and follow the instructions below.
         ```
         apt install software-properties-common
         add-apt-repository universe
-        add-apt-repository ppa:ondrej/php
+        LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php
         apt update
         apt install acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip rrdtool snmp snmpd unzip python3-pymysql python3-dotenv python3-redis python3-setuptools python3-systemd python3-pip whois traceroute
         ```
@@ -38,7 +47,7 @@ Connect to the server command line and follow the instructions below.
         ```
         apt install software-properties-common
         add-apt-repository universe
-        add-apt-repository ppa:ondrej/php
+        LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php
         apt update
         apt install acl curl apache2 fping git graphviz imagemagick libapache2-mod-fcgid mariadb-client mariadb-server mtr-tiny nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip rrdtool snmp snmpd whois python3-pymysql python3-dotenv python3-redis python3-setuptools python3-systemd python3-pip unzip traceroute
         ```
@@ -49,7 +58,7 @@ Connect to the server command line and follow the instructions below.
         dnf -y install epel-release
         dnf -y install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm
         dnf module reset php
-        dnf module enable php:8.1
+        dnf module enable php:8.2
         dnf install bash-completion cronie fping git ImageMagick mariadb-server mtr net-snmp net-snmp-utils nginx nmap php-fpm php-cli php-common php-curl php-gd php-gmp php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached python3-pip python3-systemd rrdtool unzip
         ```
 
@@ -58,14 +67,14 @@ Connect to the server command line and follow the instructions below.
         dnf -y install epel-release
         dnf -y install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm
         dnf module reset php
-        dnf module enable php:remi-8.1
+        dnf module enable php:8.2
         dnf install bash-completion cronie fping gcc git httpd ImageMagick mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-gmp php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-devel python3-PyMySQL python3-redis python3-memcached python3-pip python3-systemd rrdtool unzip 
         ```
 
 === "Debian 12"
     === "NGINX"
         ```
-        apt install apt-transport-https lsb-release ca-certificates wget acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php8.2-cli php8.2-curl php8.2-fpm php8.2-gd php8.2-gmp php8.2-mbstring php8.2-mysql php8.2-snmp php8.2-xml php8.2-zip python3-dotenv python3-pymysql python3-redis python3-setuptools python3-systemd python3-pip rrdtool snmp snmpd unzip whois
+        apt install lsb-release ca-certificates wget acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-mbstring php-mysql php-snmp php-xml php-zip python3-dotenv python3-pymysql python3-redis python3-setuptools python3-systemd python3-pip rrdtool snmp snmpd unzip whois
         ```
 
 ## Add librenms user
@@ -110,16 +119,22 @@ See <https://php.net/manual/en/timezones.php> for a list of supported
 timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".
 Ensure date.timezone is set in php.ini to your preferred time zone.
 
+=== "Ubuntu 24.04"
+    ```bash
+    vi /etc/php/8.3/fpm/php.ini
+    vi /etc/php/8.3/cli/php.ini
+    ```
+
 === "Ubuntu 22.04"
     ```bash
-    vi /etc/php/8.1/fpm/php.ini
-    vi /etc/php/8.1/cli/php.ini
+    vi /etc/php/8.3/fpm/php.ini
+    vi /etc/php/8.3/cli/php.ini
     ```
 
 === "Ubuntu 20.04"
     ```bash
-    vi /etc/php/8.1/fpm/php.ini
-    vi /etc/php/8.1/cli/php.ini
+    vi /etc/php/8.3/fpm/php.ini
+    vi /etc/php/8.3/cli/php.ini
     ```
 
 === "CentOS 8"
@@ -141,6 +156,11 @@ timedatectl set-timezone Etc/UTC
 
 
 ## Configure MariaDB
+
+=== "Ubuntu 24.04"
+    ```
+    vi /etc/mysql/mariadb.conf.d/50-server.cnf
+    ```
 
 === "Ubuntu 22.04"
     ```
@@ -192,16 +212,22 @@ exit
 
 ## Configure PHP-FPM
 
+=== "Ubuntu 24.04"
+    ```bash
+    cp /etc/php/8.3/fpm/pool.d/www.conf /etc/php/8.3/fpm/pool.d/librenms.conf
+    vi /etc/php/8.3/fpm/pool.d/librenms.conf
+    ```
+
 === "Ubuntu 22.04"
     ```bash
-    cp /etc/php/8.1/fpm/pool.d/www.conf /etc/php/8.1/fpm/pool.d/librenms.conf
-    vi /etc/php/8.1/fpm/pool.d/librenms.conf
+    cp /etc/php/8.3/fpm/pool.d/www.conf /etc/php/8.3/fpm/pool.d/librenms.conf
+    vi /etc/php/8.3/fpm/pool.d/librenms.conf
     ```
 
 === "Ubuntu 20.04"
     ```bash
-    cp /etc/php/8.1/fpm/pool.d/www.conf /etc/php/8.1/fpm/pool.d/librenms.conf
-    vi /etc/php/8.1/fpm/pool.d/librenms.conf
+    cp /etc/php/8.3/fpm/pool.d/www.conf /etc/php/8.3/fpm/pool.d/librenms.conf
+    vi /etc/php/8.3/fpm/pool.d/librenms.conf
     ```
 
 === "CentOS 8"
@@ -237,6 +263,44 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
 
 ## Configure Web Server
 
+=== "Ubuntu 24.04"
+    === "NGINX"
+        ```bash
+        vi /etc/nginx/conf.d/librenms.conf
+        ```
+
+        Add the following config, edit `server_name` as required:
+
+        ```nginx
+        server {
+         listen      80;
+         server_name librenms.example.com;
+         root        /opt/librenms/html;
+         index       index.php;
+
+         charset utf-8;
+         gzip on;
+         gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
+         location / {
+          try_files $uri $uri/ /index.php?$query_string;
+         }
+         location ~ [^/]\.php(/|$) {
+          fastcgi_pass unix:/run/php-fpm-librenms.sock;
+          fastcgi_split_path_info ^(.+\.php)(/.+)$;
+          include fastcgi.conf;
+         }
+         location ~ /\.(?!well-known).* {
+          deny all;
+         }
+        }
+        ```
+
+        ```bash
+        rm /etc/nginx/sites-enabled/default /etc/nginx/sites-available/default
+        systemctl restart nginx
+        systemctl restart php8.3-fpm
+        ```
+
 === "Ubuntu 22.04"
     === "NGINX"
         ```bash
@@ -272,7 +336,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         ```bash
         rm /etc/nginx/sites-enabled/default
         systemctl restart nginx
-        systemctl restart php8.1-fpm
+        systemctl restart php8.3-fpm
         ```
 
 === "Ubuntu 20.04"
@@ -310,7 +374,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         ```bash
         rm /etc/nginx/sites-enabled/default
         systemctl restart nginx
-        systemctl restart php8.1-fpm
+        systemctl restart php8.3-fpm
         ```
 
     === "Apache"
@@ -348,7 +412,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         a2enmod proxy_fcgi setenvif rewrite
         a2ensite librenms.conf
         systemctl restart apache2
-        systemctl restart php8.1-fpm
+        systemctl restart php8.3-fpm
         ```
 
 === "CentOS 8"
@@ -473,6 +537,9 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
 
 ## SELinux
 
+=== "Ubuntu 24.04"
+    SELinux not enabled by default
+
 === "Ubuntu 22.04"
     SELinux not enabled by default
 
@@ -492,7 +559,9 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
     semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/html(/.*)?'
     semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/(rrd|storage)(/.*)?'
     semanage fcontext -a -t httpd_log_t "/opt/librenms/logs(/.*)?"
+    semanage fcontext -a -t httpd_cache_t '/opt/librenms/cache(/.*)?'
     semanage fcontext -a -t bin_t '/opt/librenms/librenms-service.py'
+    semanage fcontext -a -t httpd_cache_t '/opt/librenms/cache(/.*)?'
     restorecon -RFvv /opt/librenms
     setsebool -P httpd_can_sendmail=1
     setsebool -P httpd_execmem 1
@@ -538,6 +607,8 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
     SELinux not enabled by default
 
 ## Allow access through firewall
+=== "Ubuntu 24.04"
+    Firewall not enabled by default
 
 === "Ubuntu 22.04"
     Firewall not enabled by default
@@ -677,5 +748,5 @@ page](../General/Callback-Stats-and-Privacy.md) on
 what it is and how to enable it.
 
 If you would like to help make LibreNMS better there are [many ways to
-help](../Support/FAQ.md#a-namefaq9-what-can-i-do-to-help). You
+help](../Support/FAQ.md#faq9). You
 can also [back LibreNMS on Open Collective](https://t.libren.ms/donations).

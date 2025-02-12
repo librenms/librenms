@@ -121,8 +121,10 @@ Route::prefix('v0')->namespace('\App\Api\Controllers')->group(function () {
         Route::get('{hostname}/ports', 'LegacyApiController@get_port_graphs')->name('get_port_graphs');
         Route::get('{hostname}/ip', 'LegacyApiController@get_device_ip_addresses')->name('get_ip_addresses');
         Route::get('{hostname}/port_stack', 'LegacyApiController@get_port_stack')->name('get_port_stack');
+        Route::get('{hostname}/transceivers', 'LegacyApiController@get_transceivers')->name('get_transceivers');
         Route::get('{hostname}/components', 'LegacyApiController@get_components')->name('get_components');
         Route::get('{hostname}/groups', 'LegacyApiController@get_device_groups')->name('get_device_groups_device');
+        Route::get('{hostname}/maintenance', 'LegacyApiController@device_under_maintenance')->name('device_under_maintenance');
         // consumes the route below, but passes to it when detected
         Route::get('{hostname}/ports/{ifname}', 'LegacyApiController@get_port_stats_by_port_hostname')->name('get_port_stats_by_port_hostname')->where('ifname', '.*');
         Route::get('{hostname}/ports/{ifname}/{type}', 'LegacyApiController@get_graph_by_port_hostname')->name('get_graph_by_port_hostname');
@@ -134,7 +136,10 @@ Route::prefix('v0')->namespace('\App\Api\Controllers')->group(function () {
 
     Route::prefix('ports')->group(function () {
         Route::get('{portid}', 'LegacyApiController@get_port_info')->name('get_port_info');
+        Route::get('{portid}/fdb', 'LegacyApiController@get_port_fdb')->name('get_port_fdb');
         Route::get('{portid}/ip', 'LegacyApiController@get_port_ip_addresses')->name('get_port_ip_info');
+        Route::get('{portid}/transceiver', 'LegacyApiController@get_port_transceiver')->name('get_port_transceiver');
+        Route::patch('transceiver/metric/{metric}', 'LegacyApiController@update_transceiver_metric_thresholds')->name('update_transceiver_metric_thresholds');
         Route::get('search/{field}/{search?}', 'LegacyApiController@search_ports')->name('search_ports')->where('search', '.*');
         Route::get('mac/{search}', 'LegacyApiController@search_by_mac')->name('search_mac');
         Route::get('', 'LegacyApiController@get_all_ports')->name('get_all_ports');

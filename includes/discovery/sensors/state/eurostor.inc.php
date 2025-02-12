@@ -39,8 +39,7 @@ foreach ($walk as $mib => $num_oid) {
                     break;
                 }
             }
-            discover_sensor($valid['sensor'], 'state', $device, $num_oid . $index, $mib . $index, $state_name, $entry[$mib . 'Desc'], 1, 1, null, null, null, null, $stateLookupTable[$entry[$mib . 'State']], 'snmp', $mib . $index, null, null, $group);
-            create_sensor_to_state_index($device, $state_name, $mib . $index);
+            discover_sensor(null, 'state', $device, $num_oid . $index, $mib . $index, $state_name, $entry[$mib . 'Desc'], 1, 1, null, null, null, null, $stateLookupTable[$entry[$mib . 'State']], 'snmp', $mib . $index, null, null, $group);
         }
     }
 }

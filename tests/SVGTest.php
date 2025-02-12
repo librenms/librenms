@@ -57,6 +57,10 @@ class SVGTest extends TestCase
                 continue;
             }
 
+            if (str_starts_with($file, 'html/images/custommap/background/')) {
+                continue;
+            }
+
             $svg = file_get_contents($file);
 
             $this->assertEquals(
@@ -79,7 +83,7 @@ class SVGTest extends TestCase
         }
     }
 
-    private function getSvgFiles()
+    private function getSvgFiles(): RegexIterator
     {
         $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('html/images'));
 

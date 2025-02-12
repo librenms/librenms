@@ -58,9 +58,15 @@ if (isset($vars['errors'])) {
                     Packets Out
                 </th>
                 <th data-column-id="ifInErrors_delta" data-searchable="false" data-visible="<?php echo $errors_visible ?>"
-                    data-css-class="red"<?php echo $error_sort ?>>Errors In
+                    data-css-class="red"<?php echo $error_sort ?>>Errors In Rate
                 </th>
                 <th data-column-id="ifOutErrors_delta" data-searchable="false" data-visible="<?php echo $errors_visible ?>"
+                    data-css-class="red">Errors Out Rate
+                </th>
+                <th data-column-id="ifInErrors" data-searchable="false" data-visible="<?php echo $errors_visible ?>"
+                    data-css-class="red"<?php echo $error_sort ?>>Errors In
+                </th>
+                <th data-column-id="ifOutErrors" data-searchable="false" data-visible="<?php echo $errors_visible ?>"
                     data-css-class="red">Errors Out
                 </th>
                 <th data-column-id="ifType">Media</th>

@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\Maps\CustomMapBackgroundController;
 use App\Http\Controllers\Maps\CustomMapController;
 use App\Http\Controllers\Maps\CustomMapDataController;
+use App\Http\Controllers\Maps\CustomMapNodeImageController;
 use App\Http\Controllers\Maps\DeviceDependencyController;
 use App\Http\Controllers\PushNotificationController;
 use App\Http\Controllers\ValidateController;
@@ -46,6 +47,7 @@ Route::middleware(['auth'])->group(function () {
     Route::any('inventory', \App\Http\Controllers\InventoryController::class)->name('inventory');
     Route::get('inventory/purge', [\App\Http\Controllers\InventoryController::class, 'purge'])->name('inventory.purge');
     Route::resource('port', 'PortController')->only('update');
+    Route::get('vlans', [\App\Http\Controllers\VlansController::class, 'index'])->name('vlans.index');
     Route::prefix('poller')->group(function () {
         Route::get('', 'PollerController@pollerTab')->name('poller.index');
         Route::get('log', 'PollerController@logTab')->name('poller.log');
@@ -75,19 +77,35 @@ Route::middleware(['auth'])->group(function () {
     // Device Tabs
     Route::prefix('device/{device}')->namespace('Device\Tabs')->name('device.')->group(function () {
         Route::put('notes', 'NotesController@update')->name('notes.update');
+        Route::put('module/{module}', [\App\Http\Controllers\Device\Tabs\ModuleController::class, 'update'])->name('module.update');
+        Route::delete('module/{module}', [\App\Http\Controllers\Device\Tabs\ModuleController::class, 'delete'])->name('module.delete');
     });
 
     Route::match(['get', 'post'], 'device/{device}/{tab?}/{vars?}', 'DeviceController@index')
         ->name('device')->where('vars', '.*');
 
     // Maps
-    Route::prefix('maps')->group(function () {
+    Route::get('fullscreenmap', 'Maps\FullscreenMapController@fullscreenMap');
+    Route::get('availability-map', 'Maps\AvailabilityMapController@availabilityMap');
+    Route::get('map/{vars?}', 'Maps\NetMapController@netMap');
+    Route::prefix('maps')->namespace('Maps')->group(function () {
         Route::resource('custom', CustomMapController::class, ['as' => 'maps'])
             ->parameters(['custom' => 'map'])->except('create');
+        Route::post('custom/{map}/clone', 'CustomMapController@clone')->name('maps.custom.clone');
         Route::get('custom/{map}/background', [CustomMapBackgroundController::class, 'get'])->name('maps.custom.background');
         Route::post('custom/{map}/background', [CustomMapBackgroundController::class, 'save'])->name('maps.custom.background.save');
         Route::get('custom/{map}/data', [CustomMapDataController::class, 'get'])->name('maps.custom.data');
         Route::post('custom/{map}/data', [CustomMapDataController::class, 'save'])->name('maps.custom.data.save');
+        Route::get('devicedependency', 'DeviceDependencyController@dependencyMap');
+        Route::post('getdevices', 'MapDataController@getDevices')->name('maps.getdevices');
+        Route::post('getdevicelinks', 'MapDataController@getDeviceLinks')->name('maps.getdevicelinks');
+        Route::post('getgeolinks', 'MapDataController@getGeographicLinks')->name('maps.getgeolinks');
+        Route::post('getservices', 'MapDataController@getServices')->name('maps.getservices');
+        Route::get('nodeimage', [CustomMapNodeImageController::class, 'index'])->name('maps.nodeimage.index');
+        Route::post('nodeimage', [CustomMapNodeImageController::class, 'store'])->name('maps.nodeimage.store');
+        Route::delete('nodeimage/{image}', [CustomMapNodeImageController::class, 'destroy'])->name('maps.nodeimage.destroy');
+        Route::get('nodeimage/{image}', [CustomMapNodeImageController::class, 'show'])->name('maps.nodeimage.show');
+        Route::post('nodeimage/{image}', [CustomMapNodeImageController::class, 'update'])->name('maps.nodeimage.update');
     });
     Route::get('maps/devicedependency', [DeviceDependencyController::class, 'dependencyMap']);
 
@@ -99,6 +117,8 @@ Route::middleware(['auth'])->group(function () {
     Route::put('dashboard/{dashboard}/widgets', 'DashboardWidgetController@update')->name('dashboard.widget.update');
     Route::delete('dashboard/widgets/{widget}', 'DashboardWidgetController@remove')->name('dashboard.widget.remove');
     Route::put('dashboard/widgets/{widget}', 'WidgetSettingsController@update')->name('dashboard.widget.settings');
+
+    Route::get('tool/oui-lookup', OuiLookupController::class)->name('tool.oui-lookup');
 
     // Push notifications
     Route::prefix('push')->group(function () {
@@ -171,6 +191,8 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('select')->namespace('Select')->group(function () {
             Route::get('application', 'ApplicationController')->name('ajax.select.application');
             Route::get('bill', 'BillController')->name('ajax.select.bill');
+            Route::get('custom-map', 'CustomMapController')->name('ajax.select.custom-map');
+            Route::get('custom-map-menu-group', 'CustomMapMenuGroupController')->name('ajax.select.custom-map-menu-group');
             Route::get('dashboard', 'DashboardController')->name('ajax.select.dashboard');
             Route::get('device', 'DeviceController')->name('ajax.select.device');
             Route::get('device-field', 'DeviceFieldController')->name('ajax.select.device-field');
@@ -212,6 +234,8 @@ Route::middleware(['auth'])->group(function () {
             Route::post('routes', 'RoutesTablesController');
             Route::post('syslog', 'SyslogController');
             Route::post('tnmsne', 'TnmsneController')->name('table.tnmsne');
+            Route::post('vlan-ports', 'VlanPortsController')->name('table.vlan-ports');
+            Route::post('vlan-devices', 'VlanDevicesController')->name('table.vlan-devices');
             Route::post('vminfo', 'VminfoController');
         });
 
@@ -221,6 +245,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('alertlog', 'AlertlogController');
             Route::post('availability-map', 'AvailabilityMapController');
             Route::post('component-status', 'ComponentStatusController');
+            Route::post('custom-map', 'CustomMapController');
             Route::post('device-summary-horiz', 'DeviceSummaryHorizController');
             Route::post('device-summary-vert', 'DeviceSummaryVertController');
             Route::post('device-types', 'DeviceTypeController');
@@ -236,7 +261,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('top-devices', 'TopDevicesController');
             Route::post('top-interfaces', 'TopInterfacesController');
             Route::post('top-errors', 'TopErrorsController');
-            Route::post('worldmap', 'WorldMapController');
+            Route::post('worldmap', 'WorldMapController')->name('widget.worldmap');
             Route::post('alertlog-stats', 'AlertlogStatsController');
         });
     });

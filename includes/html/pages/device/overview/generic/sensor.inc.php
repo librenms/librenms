@@ -1,8 +1,11 @@
 <?php
 
-$sensors = dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND device_id = ? ORDER BY `group`, `sensor_descr`, `sensor_oid`, `sensor_index`', [$sensor_class, $device['device_id']]);
+$sensors = DeviceCache::getPrimary()->sensors->where('sensor_class', $sensor_class)->where('group', '!=', 'transceiver')->sortBy([
+    ['group', 'asc'],
+    ['sensor_descr', 'asc'],
+]); // cache all sensors on device and exclude transceivers
 
-if (count($sensors)) {
+if ($sensors->isNotEmpty()) {
     $icons = \App\Models\Sensor::getIconMap();
     $sensor_fa_icon = 'fa-' . (isset($icons[$sensor_class]) ? $icons[$sensor_class] : 'delicious');
 
@@ -16,12 +19,12 @@ if (count($sensors)) {
         <table class="table table-hover table-condensed table-striped">';
     $group = '';
     foreach ($sensors as $sensor) {
-        if (! isset($sensor['sensor_current'])) {
-            $sensor['sensor_current'] = 'NaN';
+        if (! isset($sensor->sensor_current)) {
+            $sensor->sensor_current = 'NaN';
         }
 
-        if ($group != $sensor['group']) {
-            $group = $sensor['group'];
+        if ($group != $sensor->group) {
+            $group = $sensor->group;
             echo "<tr><td colspan='3'><strong>$group</strong></td></tr>";
         }
 
@@ -32,7 +35,7 @@ if (count($sensors)) {
         $graph_array['height'] = '100';
         $graph_array['width'] = '210';
         $graph_array['to'] = \LibreNMS\Config::get('time.now');
-        $graph_array['id'] = $sensor['sensor_id'];
+        $graph_array['id'] = $sensor->sensor_id;
         $graph_array['type'] = $graph_type;
         $graph_array['from'] = \LibreNMS\Config::get('time.day');
         $graph_array['legend'] = 'no';
@@ -42,13 +45,13 @@ if (count($sensors)) {
         unset($link_array['height'], $link_array['width'], $link_array['legend']);
         $link = \LibreNMS\Util\Url::generate($link_array);
 
-        if ($sensor['poller_type'] == 'ipmi') {
-            $sensor['sensor_descr'] = substr(ipmiSensorName($device['hardware'], $sensor['sensor_descr']), 0, 48);
+        if ($sensor->poller_type == 'ipmi') {
+            $sensor->sensor_descr = substr(ipmiSensorName($device['hardware'], $sensor->sensor_descr), 0, 48);
         } else {
-            $sensor['sensor_descr'] = substr($sensor['sensor_descr'], 0, 48);
+            $sensor->sensor_descr = substr($sensor->sensor_descr, 0, 48);
         }
 
-        $overlib_content = '<div class=overlib><span class=overlib-text>' . $device['hostname'] . ' - ' . $sensor['sensor_descr'] . '</span><br />';
+        $overlib_content = '<div class=overlib><span class=overlib-text>' . $device['hostname'] . ' - ' . $sensor->sensor_descr . '</span><br />';
         foreach (['day', 'week', 'month', 'year'] as $period) {
             $graph_array['from'] = \LibreNMS\Config::get("time.$period");
             $overlib_content .= str_replace('"', "\'", \LibreNMS\Util\Url::graphTag($graph_array));
@@ -65,11 +68,11 @@ if (count($sensors)) {
 
         $sensor_current = $graph_type == 'sensor_state' ? get_state_label($sensor) : get_sensor_label_color($sensor);
 
-        echo '<tr>
-            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Rewrite::shortenIfType($sensor['sensor_descr']), $overlib_content, $sensor_class) . '</td>
-            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $sensor_minigraph, $overlib_content, $sensor_class) . '</td>
-            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $sensor_current, $overlib_content, $sensor_class) . '</td>
-            </tr>';
+        echo '<tr><td><div style="display: grid; grid-gap: 10px; grid-template-columns: 3fr 1fr 1fr;">
+            <div>' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Rewrite::shortenIfName($sensor->sensor_descr), $overlib_content, $sensor_class) . '</div>
+            <div>' . \LibreNMS\Util\Url::overlibLink($link, $sensor_minigraph, $overlib_content, $sensor_class) . '</div>
+            <div>' . \LibreNMS\Util\Url::overlibLink($link, $sensor_current, $overlib_content, $sensor_class) . '</div>
+            </div></td></tr>';
     }//end foreach
 
     echo '</table>';
