@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('access_points', function (Blueprint $table) {
-            $table->smallInteger('interference')->change();
+            $table->unsignedSmallInteger('interference')->change();
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('access_points', function (Blueprint $table) {
-            $table->tinyInteger('interference')->change();
+            $table->unsignedTinyInteger('interference')->change();
         });
     }
 };
