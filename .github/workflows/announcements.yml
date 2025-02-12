@@ -11,9 +11,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check Out Repository
-        uses: actions/checkout@v3
-
       - name: Check for Specific Label
         id: check_label
         run: |
@@ -27,7 +24,7 @@ jobs:
 
           if [[ "$LABEL_FOUND" != "true" ]]; then
             echo "PR does not contain the specific label. Skipping."
-            exit 0
+            exit 1
           fi
 
 
