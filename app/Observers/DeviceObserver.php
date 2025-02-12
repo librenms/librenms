@@ -100,7 +100,6 @@ class DeviceObserver
         $device->bgppeers()->delete();
         \DB::table('bgpPeers_cbgp')->where('device_id', $device->device_id)->delete();
         $device->cefSwitching()->delete();
-        \DB::table('ciscoASA')->where('device_id', $device->device_id)->delete();
         $device->components()->delete();
         \DB::table('customoids')->where('device_id', $device->device_id)->delete();
         \DB::table('devices_perms')->where('device_id', $device->device_id)->delete();
