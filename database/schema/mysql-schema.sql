@@ -45,7 +45,7 @@ CREATE TABLE `access_points` (
   `nummonclients` smallint(6) NOT NULL DEFAULT 0,
   `numactbssid` tinyint(4) NOT NULL DEFAULT 0,
   `nummonbssid` tinyint(4) NOT NULL DEFAULT 0,
-  `interference` tinyint(3) unsigned NOT NULL,
+  `interference` smallint(6) unsigned NOT NULL,
   PRIMARY KEY (`accesspoint_id`),
   KEY `name` (`name`,`radio_number`),
   KEY `access_points_deleted_index` (`deleted`)
