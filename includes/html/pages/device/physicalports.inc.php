@@ -47,35 +47,6 @@ if (isset($data['ports'])) {
     echo '<!-- Found switches: ' . print_r($switches, true) . " -->\n";
 }
 
-function loopEntPhysical($device, $ent, $level)
-{
-    // This recurses, make sure to get entire result
-    global $entphysical;
-    // Needs rewrite into eloquent
-    //$ents = dbFetchRows('SELECT * FROM `entPhysical` WHERE device_id = ? AND entPhysicalContainedIn = ? ORDER BY entPhysicalContainedIn,entPhysicalIndex', [$device['device_id'], $ent]);
-    $ents = DeviceCache::getPrimary()->entityPhysical()->where('entPhysicalContainedIn', $ent)->orderBy('entPhysicalContainedIn')->orderBy('entPhysicalIndex')->get()->toArray();
-    $i = 0;
-    foreach ($ents as $ent) {
-        if ($ent['entPhysicalClass'] == 'port') {
-            $entphysical[$ent['entPhysicalName']] = $ent;
-        // echo print_r($ent, true);
-        } elseif ($ent['entPhysicalClass'] == 'container') {
-            $entphysical[$ent['entPhysicalName']] = $ent;
-        }
-        if ($ent['entPhysicalSerialNum'] && ($ent['entPhysicalClass'] == 'chassis')) {
-            //echo " <br /><span style='color: #000099;'>Serial No. " . $ent['entPhysicalSerialNum'] . '</span> ';
-            $entphysical['switches'][$i + 1] = $ent['entPhysicalSerialNum'];
-        }
-
-        $count = DeviceCache::getPrimary()->entityPhysical()->where('entPhysicalContainedIn', $ent['entPhysicalIndex'])->count();
-        if (floatval($count) > 0) {
-            loopEntPhysical($device, $ent['entPhysicalIndex'], $level + 1);
-        }
-        $i++;
-    }//end foreach
-
-    return $entphysical;
-}//end loopEntPhysical()
 
 // echo "</pre>";
 
@@ -84,22 +55,22 @@ echo <<<'CSS'
 <style>
     .switch-container {
         border: 2px solid black;
-        margin: 10px;
-        padding: 10px;
+        margin: 5px;
+        padding: 5px;
         display: inline-block;
     }
 
     .module-container {
         border: 1px solid gray;
         margin: 5px;
-        padding: 10px;
+        padding: 5px;
         display: inline-block;
     }
 
     .block-container {
         border: 1px solid gray;
         margin: 5px;
-        padding: 10px;
+        padding: 5px;
         display: inline-block;
     }
 
@@ -184,7 +155,7 @@ echo <<<'CSS'
     }
 
     /* Tooltip container */
-    .port-cell .tooltip {
+    .port-cell-cu .tooltip {
         display: none;
         position: absolute;
         bottom: 110%; /* Position tooltip above the port */
@@ -201,7 +172,47 @@ echo <<<'CSS'
         white-space: nowrap;
     }
 
-    .port-cell:hover .tooltip {
+    .port-cell-sfp .tooltip {
+        display: none;
+        position: absolute;
+        bottom: 110%; /* Position tooltip above the port */
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        text-align: left;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        z-index: 10;
+        white-space: nowrap;
+    }
+
+    .port-cell-qsfp .tooltip {
+        display: none;
+        position: absolute;
+        bottom: 110%; /* Position tooltip above the port */
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        text-align: left;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        z-index: 10;
+        white-space: nowrap;
+    }
+
+    .port-cell-cu:hover .tooltip {
+        display: block;
+    }
+    .port-cell-sfp:hover .tooltip {
+        display: block;
+    }
+    .port-cell-qsfp:hover .tooltip {
         display: block;
     }
 </style>
@@ -211,9 +222,37 @@ CSS;
 echo generateVisualTableWithAttributes($switches, $transformedPorts, $indexports, $entPhysical);
 
 // Functions below
+function loopEntPhysical($device, $ent, $level)
+{
+    // This recurses, make sure to get entire result
+    global $entphysical;
+    // Needs rewrite into eloquent
+    //$ents = dbFetchRows('SELECT * FROM `entPhysical` WHERE device_id = ? AND entPhysicalContainedIn = ? ORDER BY entPhysicalContainedIn,entPhysicalIndex', [$device['device_id'], $ent]);
+    $ents = DeviceCache::getPrimary()->entityPhysical()->where('entPhysicalContainedIn', $ent)->orderBy('entPhysicalContainedIn')->orderBy('entPhysicalIndex')->get()->toArray();
+    $i = 0;
+    foreach ($ents as $ent) {
+        if ($ent['entPhysicalClass'] == 'port') {
+            $entphysical[$ent['entPhysicalName']] = $ent;
+        // echo print_r($ent, true);
+        } elseif ($ent['entPhysicalClass'] == 'container') {
+            $entphysical[$ent['entPhysicalName']] = $ent;
+        }
+        if ($ent['entPhysicalSerialNum'] && ($ent['entPhysicalClass'] == 'chassis')) {
+            //echo " <br /><span style='color: #000099;'>Serial No. " . $ent['entPhysicalSerialNum'] . '</span> ';
+            $entphysical['switches'][$i + 1] = $ent['entPhysicalSerialNum'];
+        }
+
+        $count = DeviceCache::getPrimary()->entityPhysical()->where('entPhysicalContainedIn', $ent['entPhysicalIndex'])->count();
+        if (floatval($count) > 0) {
+            loopEntPhysical($device, $ent['entPhysicalIndex'], $level + 1);
+        }
+        $i++;
+    }//end foreach
+
+    return $entphysical;
+}//end loopEntPhysical()
 
 // Generate switch layout from hints file
-
 function generateTransformPorts($json, $side = 'front')
 {
     if (! is_array($json)) {
@@ -338,7 +377,7 @@ function findEntPhysicalPortType($entPhysical, $ifDescr)
         } elseif (preg_match('/(sfp|WiredSwitch[125][0]Gb)/i', $entPhysical[$str]['entPhysicalVendorType'])) {
             $result[] = 'sfp';
         } else {
-            echo "Could not determine phy type '{$entPhysical[$str]['entPhysicalVendorType']}' ";
+		echo "<!-- Could not determine phy type '{$entPhysical[$str]['entPhysicalVendorType']}' from {$ifDescr} -->\n";
         }
     }
     if (isset($entPhysical[$ifDescr])) {
@@ -351,7 +390,7 @@ function findEntPhysicalPortType($entPhysical, $ifDescr)
         } elseif (preg_match('/(basesx)/i', $entPhysical[$ifDescr]['entPhysicalVendorType'])) {
             $result[] = 'mmsr';
         } else {
-            echo "Could not determine phy type {$entPhysical[$ifDescr]['entPhysicalVendorType']} ";
+            echo "<!-- Could not determine phy type {$entPhysical[$ifDescr]['entPhysicalVendorType']} from {$ifDescr} -->\n ";
         }
     }
 
@@ -371,7 +410,7 @@ function transformPortsAuto($ports, $rowHeight = 2, $entPhysical): array
 
     foreach ($ports->items() as $port_id => $port) {
         // Extract ifName and split into components
-        foreach (['ifType', 'ifName', 'ifDescr', 'ifOperStatus', 'ifAdminStatus', 'ifVlan', 'ifTrunk'] as $field) {
+        foreach (['ifType', 'ifName', 'ifDescr', 'ifOperStatus', 'ifAdminStatus', 'ifVlan', 'ifTrunk', 'ifSpeed'] as $field) {
             $$field = $port[$field] ?? null;
         }
 
@@ -383,13 +422,14 @@ function transformPortsAuto($ports, $rowHeight = 2, $entPhysical): array
             if ($ifType != 'ethernetCsmacd') {
                 continue;
             }
+			$bumpblock = false;
 
             // Checl for Container first, might hold transceiver, Cisco uses ifDescr to match
             $types = findEntPhysicalPortType($entPhysical, $ifDescr);
             // just compare on 1st entry.
             // Check if type has changed, if so, increment block
             if (isset($prevtype) && ($prevtype != $types[0])) {
-                $block = $block + 1;
+                $bumpblock = true;
             }
 
             // See if we have a prefix like GigabitEthernet
@@ -397,7 +437,7 @@ function transformPortsAuto($ports, $rowHeight = 2, $entPhysical): array
 
             // Check if ascii prefix has changed, if so, increment module
             if (isset($prevprefix) && ($prevprefix != $prefix[0])) {
-                $block = $block + 1;
+                $bumpblock = true;
             }
 
             // figure out the layout, count parts, split accordingly
@@ -405,8 +445,13 @@ function transformPortsAuto($ports, $rowHeight = 2, $entPhysical): array
             $partscount = count($parts);
 
             if (isset($prevpartscount) && ($prevpartscount != $partscount)) {
-                $block = $block + 1;
+                $bumpblock = true;
             }
+
+			if($bumpblock === true) {
+                $block = $block + 1;
+				$i = 0;
+			}
 
             // reset block count on new module, switch
             if ((isset($prevmodule)) && ($prevmodule != $module)) {
@@ -423,20 +468,23 @@ function transformPortsAuto($ports, $rowHeight = 2, $entPhysical): array
                 case 3:
                     preg_match('/([0-9]+)/', $parts[0], $switchmatch);
                     $switch = $switchmatch[0];
-                    $module = floatval($parts[1]) ?? null;
-                    $portNumber = $parts[2] ?? '1';
+                    $module = floatval($parts[1]) ?? 0;
+					$portNumber = $parts[2] ?? '1';
                     $Height = $rowHeight;
                     break;
                 case 2:
-                    $switch = 1;
+					if(!isset($switch))
+                        $switch = 1;
                     $module = floatval($parts[0]);
                     $portNumber = $parts[1] ?? '1';
                     $Height = $rowHeight;
                     break;
                 default:
                     /// Just the 1 item?
-                    $switch = 1;
-                    $module = 0;
+					if(!isset($switch))
+                        $switch = 1;
+					if(!isset($module))
+                        $module = 0;
                     $portNumber = $parts[0] ?? '1';
                     $Height = 1;
                     break;
@@ -574,8 +622,9 @@ function generateVisualTableWithAttributes($switches = [1 => true], array $trans
                                 }
 
                                 // Needs STP Port Blocking status color
+								// Needs Port speed bg for 10mbit ports 
                                 // Add the port cell with custom tooltip
-                                // add tooltip helper here, doesn't work yet.
+                                // add tooltip helper here, doesn't work yet, seems to be stuck behind a layer.
                                 $tooltipContent = <<<TOOLTIP
         <div>Port: $portName</div>
         <div>Admin Status: $adminStatus</div>
