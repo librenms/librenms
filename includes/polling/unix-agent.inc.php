@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Device;
+use Illuminate\Support\Facades\Cache;
 use LibreNMS\RRD\RrdDefinition;
 
 if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
@@ -74,7 +75,6 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
             'gpsd',
         ];
 
-        global $agent_data;
         $agent_data = [];
         foreach (explode('<<<', $agent_raw) as $section) {
             if (empty($section)) {
@@ -205,9 +205,12 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
         DeviceCache::getPrimary()->save();
     }
 
+    // store results in array cache
+    Cache::driver('array')->put('agent_data', $agent_data);
+
     if (! empty($agent_sensors)) {
         echo 'Sensors: ';
-        check_valid_sensors($device, 'temperature', $valid['sensor'], 'agent');
+        app('sensor-discovery')->sync(sensor_class: 'temperature', poller_type: 'agent');
         d_echo($agent_sensors);
         if (count($agent_sensors) > 0) {
             record_sensor_data($device, $agent_sensors);

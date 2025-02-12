@@ -2,12 +2,13 @@
 
 use App\Facades\DeviceCache;
 use LibreNMS\Config;
+use LibreNMS\Util\Rewrite;
 
 if (! Auth::user()->hasGlobalRead()) {
     include 'includes/html/error-no-perm.inc.php';
 } else {
     $link_array = [
-        'page'     => 'routing',
+        'page' => 'routing',
         'protocol' => 'vrf',
     ];
 
@@ -41,10 +42,10 @@ if (! Auth::user()->hasGlobalRead()) {
     echo ' Graphs: ';
 
     $graph_types = [
-        'bits'      => 'Bits',
-        'upkts'     => 'Unicast Packets',
-        'nupkts'    => 'Non-Unicast Packets',
-        'errors'    => 'Errors',
+        'bits' => 'Bits',
+        'upkts' => 'Unicast Packets',
+        'nupkts' => 'Non-Unicast Packets',
+        'errors' => 'Errors',
         'etherlike' => 'Etherlike',
     ];
 
@@ -106,7 +107,7 @@ if (! Auth::user()->hasGlobalRead()) {
         $i = '1';
         echo '<tbody>';
         foreach (dbFetchRows('SELECT `vrf_name`, `mplsVpnVrfRouteDistinguisher`, `mplsVpnVrfDescription` FROM `vrfs` GROUP BY `mplsVpnVrfRouteDistinguisher`, `mplsVpnVrfDescription`,`vrf_name`') as $vrf) {
-            echo '<td></td>';
+            echo '<tr><td></td>';
             echo '<td width=240>';
             echo '<a class=list-large href=' . \LibreNMS\Util\Url::generate($vars, ['view' => 'detail', 'vrf' => $vrf['vrf_name']]) . '>';
             echo $vrf['vrf_name'] . '</a><br />';
@@ -157,20 +158,20 @@ if (! Auth::user()->hasGlobalRead()) {
                             $port['graph_type'] = 'port_' . $vars['graph'];
                             echo "<div style='display: block; padding: 3px; margin: 3px; min-width: 135px; max-width:135px; min-height:75px; max-height:75px;
                             text-align: center; float: left; background-color: " . Config::get('list_colour.odd_alt2') . ";'>
-                                <div style='font-weight: bold;'>" . makeshortif($port['ifDescr']) . '</div>';
+                                <div style='font-weight: bold;'>" . Rewrite::shortenIfName($port['ifDescr']) . '</div>';
                             print_port_thumbnail($port);
                             echo "<div style='font-size: 9px;'>" . substr(short_port_descr($port['ifAlias']), 0, 22) . '</div>
                                 </div>';
                             break;
 
                         default:
-                            echo $seperator . generate_port_link($port, makeshortif($port['ifDescr']));
+                            echo $seperator . generate_port_link($port, Rewrite::shortenIfName($port['ifDescr']));
                             $seperator = ', ';
                             break;
                     }//end switch
                 }//end foreach
 
-                echo '</td>';
+                echo '</td></tr>';
                 $x++;
             } //end foreach
 

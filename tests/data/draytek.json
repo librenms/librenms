@@ -1029,5 +1029,9 @@
                 }
             ]
         }
+    },
+    "mempools": {
+        "discovery": {},
+        "poller": "matches discovery"
     }
 }

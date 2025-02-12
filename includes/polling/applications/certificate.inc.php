@@ -32,7 +32,7 @@ foreach ($certificate_data as $data) {
     $rrd_name = ['app', $name, $app->app_id, $cert_name];
 
     $fields = [
-        'age'            => $age,
+        'age' => $age,
         'remaining_days' => $remaining_days,
     ];
 

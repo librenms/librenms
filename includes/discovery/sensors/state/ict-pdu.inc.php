@@ -44,8 +44,6 @@ if (is_array($oids)) {
             $current_value = 2;
         }
 
-        discover_sensor($valid['sensor'], 'state', $device, $fuse_state_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current_value, 'snmp', $index);
-
-        create_sensor_to_state_index($device, $state_name, $index);
+        discover_sensor(null, 'state', $device, $fuse_state_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current_value, 'snmp', $index);
     }
 }

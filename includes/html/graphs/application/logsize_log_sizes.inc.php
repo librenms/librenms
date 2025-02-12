@@ -19,12 +19,12 @@ foreach ($log_files as $index => $log_file) {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], $vars['log_set'] . '_____-_____' . $log_file]);
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => $log_file,
-        'ds'       => 'size',
+        'descr' => $log_file,
+        'ds' => 'size',
     ];
 }
 
-if (sizeof($rrd_list)) {
+if (count($rrd_list)) {
     d_echo('No relevant log file RRDs found');
 }
 

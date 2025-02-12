@@ -1,9 +1,9 @@
 <?php
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'loadbalancer',
+    'tab' => 'loadbalancer',
 ];
 
 $type_text['loadbalancer_rservers'] = 'Rservers';       // Cisco ACE
@@ -14,6 +14,7 @@ $type_text['ltm_pool'] = 'LTM Pools';                   // F5 BigIP
 $type_text['ltm_bwc'] = 'LTM Bandwidth Controller';     // F5 BigIP
 $type_text['gtm_wide'] = 'GTM Wide IPs';                // F5 BigIP
 $type_text['gtm_pool'] = 'GTM Pools';                   // F5 BigIP
+$type_text['f5-cert'] = 'Certificates';                 // F5 BigIP
 
 print_optionbar_start();
 

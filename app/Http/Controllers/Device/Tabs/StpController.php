@@ -26,6 +26,7 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use Illuminate\Http\Request;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Util\Url;
 
@@ -51,7 +52,7 @@ class StpController implements DeviceTab
         return __('STP');
     }
 
-    public function data(Device $device): array
+    public function data(Device $device, Request $request): array
     {
         $active_vlan = Url::parseOptions('vlan', 1);
         $stpInstances = $device->stpInstances;
@@ -71,7 +72,7 @@ class StpController implements DeviceTab
             'vlan' => $active_vlan,
             'device_id' => $device->device_id,
             'stpInstances' => $stpInstances->filter(function ($instance) use ($active_vlan) {
-                return $active_vlan == 1 && $instance->vlan !== null || $instance->vlan == $active_vlan;
+                return $active_vlan == 1 && $instance->vlan == null || $instance->vlan == $active_vlan;
             }),
             'stpPorts' => $device->stpPorts()->where('vlan', $active_vlan)->when($active_vlan == 1, function ($query) {
                 return $query->orWhereNull('vlan');

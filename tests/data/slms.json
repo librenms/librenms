@@ -1,0 +1,192 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": null,
+                    "sysObjectID": ".1.3.6.1.4.1.5504.1.8.1",
+                    "sysDescr": "zhone-mxk",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "location": null,
+                    "os": "slms",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "zhone.png"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "processors": {
+        "discovery": {
+            "processors": [
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.5504.3.3.3.1.5.1.1",
+                    "processor_index": "1.1",
+                    "processor_type": "slms",
+                    "processor_usage": 40,
+                    "processor_descr": "Processor 1.1",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.5504.3.3.3.1.5.1.28",
+                    "processor_index": "1.28",
+                    "processor_type": "slms",
+                    "processor_usage": 52,
+                    "processor_descr": "Processor 1.28",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.5504.3.3.3.1.5.1.29",
+                    "processor_index": "1.29",
+                    "processor_type": "slms",
+                    "processor_usage": 3,
+                    "processor_descr": "Processor 1.29",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.5504.3.3.3.1.5.1.30",
+                    "processor_index": "1.30",
+                    "processor_type": "slms",
+                    "processor_usage": 17,
+                    "processor_descr": "Processor 1.30",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.5504.3.3.3.1.5.1.31",
+                    "processor_index": "1.31",
+                    "processor_type": "slms",
+                    "processor_usage": 15,
+                    "processor_descr": "Processor 1.31",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "mempools": {
+        "discovery": {
+            "mempools": [
+                {
+                    "mempool_index": "1.1",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "slms",
+                    "mempool_class": "system",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "MxkLcGp3 (1.1)",
+                    "mempool_perc": 23,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 174306304,
+                    "mempool_used_oid": null,
+                    "mempool_free": 599154688,
+                    "mempool_free_oid": ".1.3.6.1.4.1.5504.3.3.3.1.2.1.1",
+                    "mempool_total": 773460992,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
+                },
+                {
+                    "mempool_index": "1.28",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "slms",
+                    "mempool_class": "system",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "MXK-F (1.28)",
+                    "mempool_perc": 20,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 337406976,
+                    "mempool_used_oid": null,
+                    "mempool_free": 1374636032,
+                    "mempool_free_oid": ".1.3.6.1.4.1.5504.3.3.3.1.2.1.28",
+                    "mempool_total": 1712043008,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
+                },
+                {
+                    "mempool_index": "1.29",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "slms",
+                    "mempool_class": "system",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "MXK-F (1.29)",
+                    "mempool_perc": 10,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 169545728,
+                    "mempool_used_oid": null,
+                    "mempool_free": 1542498304,
+                    "mempool_free_oid": ".1.3.6.1.4.1.5504.3.3.3.1.2.1.29",
+                    "mempool_total": 1712044032,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
+                },
+                {
+                    "mempool_index": "1.30",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "slms",
+                    "mempool_class": "system",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "MxkFcAe (1.30)",
+                    "mempool_perc": 23,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 186559488,
+                    "mempool_used_oid": null,
+                    "mempool_free": 622750720,
+                    "mempool_free_oid": ".1.3.6.1.4.1.5504.3.3.3.1.2.1.30",
+                    "mempool_total": 809310208,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
+                },
+                {
+                    "mempool_index": "1.31",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "slms",
+                    "mempool_class": "system",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "MxkFcAe (1.31)",
+                    "mempool_perc": 23,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 186466304,
+                    "mempool_used_oid": null,
+                    "mempool_free": 622842880,
+                    "mempool_free_oid": ".1.3.6.1.4.1.5504.3.3.3.1.2.1.31",
+                    "mempool_total": 809309184,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

@@ -1,10 +1,12 @@
 <?php
 
-require_once 'includes/ss-shared.inc.php';
-
+use App\Models\Eventlog;
+use LibreNMS\Config;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
+
+require_once Config::get('install_dir') . '/includes/ss-shared.inc.php';
 
 $name = 'ss';
 $output_success = 'OK';
@@ -81,9 +83,8 @@ foreach ($ss_section_list as $gen_type) {
     } elseif (in_array($gen_type, $ss_af_list)) {
         array_push($allowed_afs, $gen_type);
     } else {
-        $fgen_type = is_string($gen_type) ? filter_var($gen_type, FILTER_SANITIZE_STRING) : null;
-        $log_message = 'Socket Statistics Invalid Socket or AF Returned by Script: ' . $fgen_type;
-        log_event($log_message, $device, 'application');
+        $log_message = 'Socket Statistics Invalid Socket or AF Returned by Script: ' . $gen_type;
+        Eventlog::log($log_message, $device['device_id'], 'application');
         continue;
     }
 
@@ -113,7 +114,7 @@ foreach ($ss_section_list as $gen_type) {
                 $log_message = 'Secure Sockets Polling Warning: Invalid data returned by ';
                 $log_message .= 'application for socket ' . 'type ' . $gen_type . ' with socket ';
                 $log_message .= 'state' . $socket_state . '.';
-                log_event($log_message, $device, 'application');
+                Eventlog::log($log_message, $device['device_id'], 'application');
                 continue;
             }
             $rrd_def->addDataset($field_name, 'GAUGE', 0);
@@ -134,9 +135,8 @@ foreach ($ss_section_list as $gen_type) {
             if (in_array($netid, $ss_socket_list)) {
                 array_push($allowed_sockets, $netid);
             } else {
-                $fgen_type = is_string($gen_type) ? filter_var($gen_type, FILTER_SANITIZE_STRING) : null;
-                $log_message = 'Socket Statistics Invalid Socket Returned by Script: ' . $fgen_type;
-                log_event($log_message, $device, 'application');
+                $log_message = 'Socket Statistics Invalid Socket Returned by Script: ' . $gen_type;
+                Eventlog::log($log_message, $device['device_id'], 'application');
                 continue;
             }
 
@@ -163,7 +163,7 @@ foreach ($ss_section_list as $gen_type) {
                     $log_message = 'Secure Sockets Polling Warning: Invalid data returned by ';
                     $log_message .= 'application for socket ' . 'type ' . $gen_type . ' with ';
                     $log_message .= 'netid ' . $netid . ' and socket state' . $socket_state . '.';
-                    log_event($log_message, $device, 'application');
+                    Eventlog::log($log_message, $device['device_id'], 'application');
                     continue;
                 }
                 $rrd_def->addDataset($field_name, 'GAUGE', 0);
@@ -192,7 +192,7 @@ if (count($added_sockets) > 0 || count($removed_sockets) > 0) {
     $log_message = 'Socket Statistics Allowed Sockets Change:';
     $log_message .= count($added_sockets) > 0 ? ' Added ' . implode(',', $added_sockets) : '';
     $log_message .= count($removed_sockets) > 0 ? ' Removed ' . implode(',', $removed_sockets) : '';
-    log_event($log_message, $device, 'application');
+    Eventlog::log($log_message, $device['device_id'], 'application');
 }
 
 // Check for address family changes.
@@ -202,7 +202,7 @@ if (count($added_afs) > 0 || count($removed_afs) > 0) {
     $log_message = 'Socket Statistics Allowed Address Families Change:';
     $log_message .= count($added_afs) > 0 ? ' Added ' . implode(',', $added_afs) : '';
     $log_message .= count($removed_afs) > 0 ? ' Removed ' . implode(',', $removed_afs) : '';
-    log_event($log_message, $device, 'application');
+    Eventlog::log($log_message, $device['device_id'], 'application');
 }
 
 $app->data = $updated_app_data;

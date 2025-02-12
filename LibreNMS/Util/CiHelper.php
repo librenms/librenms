@@ -203,7 +203,7 @@ class CiHelper
             array_push($phpunit_cmd, '--group', 'docs');
         } elseif ($this->flags['unit_svg']) {
             $phpunit_cmd[] = 'tests/SVGTest.php';
-        } elseif ($this->flags['unit_modules']) {
+        } elseif ($this->flags['unit_modules'] || $this->flags['os-modules-only']) {
             $phpunit_cmd[] = 'tests/OSModulesTest.php';
         }
 
@@ -295,7 +295,7 @@ class CiHelper
             $py_lint_cmd = [$this->checkPythonExec('pylint'), '-E', '-j', '0'];
 
             $files = $this->flags['full']
-                ? explode(PHP_EOL, rtrim(shell_exec("find . -name '*.py' -not -path './vendor/*' -not -path './tests/*'")))
+                ? explode(PHP_EOL, rtrim(shell_exec("find . -name '*.py' -not -path './vendor/*' -not -path './tests/*' -not -path './.python_venvs/*'")))
                 : $this->changed['python'];
 
             $py_lint_cmd = array_merge($py_lint_cmd, $files);

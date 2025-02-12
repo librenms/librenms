@@ -29,6 +29,7 @@ class LoadUserPreferences
         });
 
         $this->setPreference($request, 'timezone', function ($timezone) use ($request) {
+            $request->session()->put('preferences.timezone', $timezone);
             $request->session()->put('preferences.timezone_static', true);
         });
 
@@ -46,7 +47,7 @@ class LoadUserPreferences
     {
         if (! $request->session()->has('preferences') && ! is_null($request->user())) {
             $loaded = $request->user()->preferences()->whereIn('pref', $preferences)->pluck('value', 'pref');
-            $request->session()->put('preferences', $loaded);
+            $request->session()->put('preferences', $loaded->toArray());
         }
     }
 

@@ -9,5 +9,7 @@ over:
     - { graph: device_voltage, text: Voltage }
     - { graph: device_power, text: Power }
 discovery:
-    -
-        sysObjectID: .1.3.6.1.4.1.21317
+    - sysObjectID:
+        - .1.3.6.1.4.1.21317.
+    - sysDescr:
+        - 'Aten'

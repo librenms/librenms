@@ -23,6 +23,7 @@ if (! isset($options['q'])) {
     echo \LibreNMS\Config::get('project_name') . " Discovery\n";
 }
 
+$where = '';
 if (isset($options['h'])) {
     if ($options['h'] == 'odd') {
         $options['n'] = '1';
@@ -68,7 +69,7 @@ if (Debug::set(isset($options['d']), false) || isset($options['v'])) {
 
     echo "DEBUG!\n";
     Debug::setVerbose(isset($options['v']));
-    \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
+    LibrenmsConfig::invalidateAndReload();
 }
 
 if (! $where) {
@@ -103,7 +104,6 @@ if (! empty(\LibreNMS\Config::get('distributed_poller_group'))) {
 global $device;
 foreach (dbFetchRows("SELECT * FROM `devices` WHERE disabled = 0 $where ORDER BY device_id DESC", $sqlparams) as $device) {
     $device_start = microtime(true);
-    DeviceCache::setPrimary($device['device_id']);
 
     if (discover_device($device, $module_override)) {
         $discovered_devices++;

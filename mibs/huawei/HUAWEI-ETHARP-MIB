@@ -1,11 +1,10 @@
 -- =================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2021 by  HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description: Huawei Ethernet ARP MIB
 -- Reference: HUAWEI Enterprise MIB
--- Version: V3.11
+-- Version: V3.25
 -- History:
--- Version:     V3.02
 -- History:
 --              chenzhiwei, 2009-08-07, add nodes for arp anti-attack.
 -- =================================================================
@@ -26,7 +25,7 @@
              FROM SNMPv2-CONF
             InterfaceIndex
                 FROM  IF-MIB 
-            InetAddressIPv4
+            InetAddressIPv4, InetAddress
                 FROM INET-ADDRESS-MIB 
             PhysicalIndex, entPhysicalIndex, entPhysicalName
                 FROM ENTITY-MIB
@@ -34,7 +33,7 @@
                 FROM P-BRIDGE-MIB;
             
         hwEthernetARPMIB MODULE-IDENTITY 
-            LAST-UPDATED "201707270000Z"  
+            LAST-UPDATED "202110221800Z"  
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -50,6 +49,60 @@
                 "This MIB describes objects used for managing Ethernet ARP,
                  including  ARP Speed-limit,ARP Limit etc. "
 
+       REVISION "202110221800Z"
+            DESCRIPTION
+              "MODIFY hwEthernetARPSpeedLimitAlarm"
+
+       REVISION "202104191800Z"
+            DESCRIPTION
+              "MODIFY Notes"
+
+       REVISION "202103041800Z"
+            DESCRIPTION
+              "Add  hwEthernetARPBdSuppressEntryExceedAlarm hwEthernetARPBdSuppressEntryResumeAlarm"
+
+       REVISION "202008101800Z"
+            DESCRIPTION
+              "Add  hwEthernetARPMACMismatch hwEthernetARPMACMismatchClear"
+
+        REVISION "202007231140Z"
+        DESCRIPTION
+            "Correct wrong translation information"
+
+       REVISION "202006051800Z"
+            DESCRIPTION
+              "MODIFY  hwEthernetARPIPConflictEvent"
+
+       REVISION "201909061800Z"
+            DESCRIPTION
+              "MODIFY  hwARPHostObjects"
+
+       REVISION "201902151800Z"
+            DESCRIPTION
+              "Add hwEthernetARPMACConflict hwEthernetARPMACConflictClear"
+
+       REVISION "201901211800Z"
+            DESCRIPTION
+              "Add hwEthernetARPDynamicEntryExceedAlarm hwEthernetARPDynamicEntryResumeAlarm"
+
+       REVISION "201805281800Z"
+            DESCRIPTION
+              "MODIFY  hwEthernetARPHostIPConflict and hwEthernetARPHostIPConflictResume"
+
+        REVISION "201803282023Z"
+            DESCRIPTION
+              "MODIFY  hwARPBDHostConflictAlarm and hwARPBDHostConflictResume"
+
+        REVISION "201803121130Z"
+            DESCRIPTION
+              "add hwEthernetARPDuplicateIPaddr  hwEthernetARPDuplicateIPaddrClear hwEthernetARPProbeFailure hwEthernetARPProbeFailureClear hwEthernetARPReplaceExceed hwEthernetARPReplaceExceedClear hwEthernetARPSpeedLimit hwEthernetARPSpeedLimitClear hwEthernetARPDuplicateMacEvent hwEthernetARPEntryExceedAlarm hwEthernetARPEntryResumeAlarm"
+        REVISION "201802062147Z"
+            DESCRIPTION
+              "add hwARPBDHostConflictAlarm and hwARPBDHostConflictResume"
+
+        REVISION "201801180000Z"
+            DESCRIPTION
+              "modify description of hwFwdArpSlotName hwFwdArpPortName hwEthernetARPSpeedLimitAlarm hwEthernetARPMACIPConflict hwEthernetARPMACIPConflictResolved hwFwdArpAlarmOccur hwFwdArpAlarmResume hwEthernetARPLimitExceed hwEthernetARPLimitExceedResume hwEthernetARPLimitExceedInterface hwEthernetARPLimitExceedLimitNumber hwEthernetARPLimitExceedLearnedNumber hwEthernetARPLimitExceedRecoverReason"
         REVISION "201707270000Z"
             DESCRIPTION
               "MODIFY  hwFwdArpAlarmResume"
@@ -67,6 +120,22 @@
           REVISION "201705081520Z"
             DESCRIPTION
               "MODIFY  hwEthernetARPLimitExceed,hwEthernetARPLimitExceedResume"
+              
+          REVISION "201611301919Z"
+            DESCRIPTION
+              "MODIFY  hwEthernetARPGateWayDuplicateAlarmResume"
+
+          REVISION "201611211648Z"
+            DESCRIPTION
+                "MODIFY  hwEthernetARPGateWayDuplicateAlarm, hwEthernetARPGateWayDuplicateAlarmResume"
+                
+          REVISION "201611181626Z"
+            DESCRIPTION
+                "ADD  hwFwdArpAlarmOccur, hwFwdArpAlarmResume"
+                
+          REVISION "201611172050Z"
+            DESCRIPTION
+                "ADD  hwEthernetARPGateWayDuplicateAlarm, hwEthernetARPGateWayDuplicateAlarmResume"
 
             REVISION "201607011000Z"
             DESCRIPTION
@@ -91,23 +160,13 @@
             DESCRIPTION
                 "The initial revision of this MIB module."
 
-          --add by chenlong 00230926
-          REVISION "201611172050Z"
-            DESCRIPTION
-                "ADD  hwEthernetARPGateWayDuplicateAlarm, hwEthernetARPGateWayDuplicateAlarmResume"
-         
-          --add by liupeng  00349956
-          REVISION "201611181626Z"
-            DESCRIPTION
-                "ADD  hwFwdArpAlarmOccur, hwFwdArpAlarmResume"
-         
-          REVISION "201611211648Z"
-            DESCRIPTION
-                "MODIFY  hwEthernetARPGateWayDuplicateAlarm, hwEthernetARPGateWayDuplicateAlarmResume"
 
-          REVISION "201611301919Z"
-            DESCRIPTION
-              "MODIFY  hwEthernetARPGateWayDuplicateAlarmResume"
+         
+
+         
+
+
+
 
             ::= { hwDatacomm 123 }
             
@@ -1465,6 +1524,7 @@ hwEthernetARPObjects OBJECT IDENTIFIER ::= { hwEthernetARPMIB 1 }
                 "This object indicates the destination MAC of the received packet."
             ::= { hwETHARPIPConflictObjects 12 }   
 
+       			
 -- =================================================================
 -- 29th The Node of ConflictDetect
 -- =================================================================
@@ -1618,7 +1678,7 @@ hwEthernetARPObjects OBJECT IDENTIFIER ::= { hwEthernetARPMIB 1 }
                 STATUS current
                 DESCRIPTION
                         "Entries of the host information table."
-                INDEX { hwEthernetARPHostIPAddress,hwEthernetARPGatewayVNIID }
+                INDEX { hwEthernetARPHostIPAddress, hwEthernetARPGatewayVNIID }
                 ::= { hwEthernetARPHostInfoTable 1 }
         
         HwEthernetARPHostInfoEntry ::=
@@ -1630,7 +1690,9 @@ hwEthernetARPObjects OBJECT IDENTIFIER ::= { hwEthernetARPMIB 1 }
                         hwEthernetARPHostMAC
                                 MacAddress,
                         hwEthernetARPGatewayVtepIP
-                                IpAddress                  
+                                IpAddress,
+                        hwEthernetARPInterface
+                               OCTET STRING
                  }   
             
         hwEthernetARPHostIPAddress  OBJECT-TYPE
@@ -1665,6 +1727,13 @@ hwEthernetARPObjects OBJECT IDENTIFIER ::= { hwEthernetARPMIB 1 }
                 "This object indicates the VTEP IP of gateway."
             ::= { hwEthernetARPHostInfoEntry 4 }   
 
+        hwEthernetARPInterface OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the interface of gateway."
+            ::= { hwEthernetARPHostInfoEntry 5 }
 -- =================================================================
 -- 33th The Node of number of ARP entries of the slot
 -- =================================================================
@@ -1781,7 +1850,7 @@ hwEthernetARPObjects OBJECT IDENTIFIER ::= { hwEthernetARPMIB 1 }
              MAX-ACCESS read-write
              STATUS current
              DESCRIPTION
-                   "Indicates the slot of the interface."
+                   "This object indicates the slot ID."
                    ::= { hwEthernetARPObjects 35 }
 
            hwFwdArpPortName OBJECT-TYPE
@@ -1789,7 +1858,7 @@ hwEthernetARPObjects OBJECT IDENTIFIER ::= { hwEthernetARPMIB 1 }
                  MAX-ACCESS read-only
                  STATUS current
                  DESCRIPTION
-                 "Indicates the interface name."
+                 "This object indicates the interface name."
                    ::= { hwEthernetARPObjects 36}
 			
 -- =================================================================
@@ -1801,7 +1870,7 @@ hwEthernetARPObjects OBJECT IDENTIFIER ::= { hwEthernetARPMIB 1 }
                 STATUS current
                 DESCRIPTION
                         "The table contains the information of learnt ARP packet. 
-                         The information includes interface of arp packet, the learnt number of arp packet, the limitnumber of arp packet, the recover reason of arp limit."
+                         The information includes interface of arp packet, the learnt number of arp packet, the limit number of arp packet, the recover reason of arp limit."
                 ::= { hwEthernetARPObjects 37 }
         
         hwEthernetARPLimitExceedInfoEntry OBJECT-TYPE
@@ -1810,7 +1879,7 @@ hwEthernetARPObjects OBJECT IDENTIFIER ::= { hwEthernetARPMIB 1 }
                 STATUS current
                 DESCRIPTION
                         "This object indicates Entries of the learnt ARP packet."
-                INDEX { hwEthernetARPLimitExceedInterface,hwEthernetARPLimitExceedLimitNumber,hwEthernetARPLimitExceedLearnedNumber,hwEthernetARPLimitExceedRecoverReason }
+                INDEX { hwEthernetARPLimitExceedInterface, hwEthernetARPLimitExceedLimitNumber, hwEthernetARPLimitExceedLearnedNumber, hwEthernetARPLimitExceedRecoverReason }
                 ::= { hwEthernetARPLimitExceedInfoTable 1 }
         
         HwEthernetARPLimitExceedInfoEntry::=
@@ -1830,7 +1899,7 @@ hwEthernetARPObjects OBJECT IDENTIFIER ::= { hwEthernetARPMIB 1 }
             MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
-                "This object indicates  interface of arp limt entries."
+                "This object indicates the interface name."
             ::= { hwEthernetARPLimitExceedInfoEntry 1 }   
         
         hwEthernetARPLimitExceedLimitNumber  OBJECT-TYPE
@@ -1838,7 +1907,7 @@ hwEthernetARPObjects OBJECT IDENTIFIER ::= { hwEthernetARPMIB 1 }
             MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
-                "This object indicates  number of limit arp entries."
+                "This object indicates the maximum number of entries."
             ::= { hwEthernetARPLimitExceedInfoEntry 2 }
             
         hwEthernetARPLimitExceedLearnedNumber  OBJECT-TYPE
@@ -1846,7 +1915,7 @@ hwEthernetARPObjects OBJECT IDENTIFIER ::= { hwEthernetARPMIB 1 }
             MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
-                "This object indicates  number of learnt arp entries."
+                "This object indicates the number of learned entries."
             ::= { hwEthernetARPLimitExceedInfoEntry 3 }
 
         hwEthernetARPLimitExceedRecoverReason  OBJECT-TYPE
@@ -1854,19 +1923,255 @@ hwEthernetARPObjects OBJECT IDENTIFIER ::= { hwEthernetARPMIB 1 }
             MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
-                "This recover reason of the alarm arp limt entries."
+                "This object indicates the cause of the recovery."
             ::= { hwEthernetARPLimitExceedInfoEntry 4 }   
 
+-- =================================================================
+-- 38th The Node of ARP host conflict
+-- ================================================================= 
+    hwARPHostObjects OBJECT IDENTIFIER ::= { hwEthernetARPObjects 38 }    
+            
+        hwARPLocalIPAddr  OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the local IP address."
+            ::= { hwARPHostObjects 1 }   
+			
+        hwARPLocalBDId  OBJECT-TYPE
+            SYNTAX Integer32(1..32768)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the local bridge domain."
+            ::= { hwARPHostObjects 2 }  
+
+        hwARPLocalMAC  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the local MAC."
+            ::= { hwARPHostObjects 3 } 			
+
+        hwARPRemoteIPAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the remote IP address."
+            ::= { hwARPHostObjects 4 }   
+			
+        hwARPRemoteBDId  OBJECT-TYPE
+            SYNTAX Integer32(1..32768)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the remote bridge domain."
+            ::= { hwARPHostObjects 5 }  
+
+        hwARPRemoteMAC  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the remote MAC."
+            ::= { hwARPHostObjects 6 } 	
+
+        hwARPLocalInterface  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the local interface."
+            ::= { hwARPHostObjects 7 } 	
+
+        hwARPRemoteInterface  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the remote interface."
+            ::= { hwARPHostObjects 8 } 	
+
+        hwARPTunnelPeer OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the tunnel peer IP."
+            ::= { hwARPHostObjects 9 }   
+
+    hwEthernetARPTrapObjects OBJECT IDENTIFIER ::= { hwEthernetARPObjects 39 }    
+            
+        hwEthernetARPEntrySpecValue  OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the spec of the alarm generated."
+            ::= { hwEthernetARPTrapObjects 1 }    
+            
+        hwEthernetARPEntrySpecDynamicNumber  OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of dynamic ARP entries."
+            ::= { hwEthernetARPTrapObjects 2 } 
+            
+        hwEthernetARPEntrySpecStaticNumber  OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of static ARP entries."
+            ::= { hwEthernetARPTrapObjects 3 }  
+        hwEthernetARPInterfaceName  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the interface name."
+            ::= { hwEthernetARPTrapObjects 4 } 			
+        hwEthernetARPIPAddress  OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP address."
+            ::= { hwEthernetARPTrapObjects 5 }
+        hwEthernetARPLocalMAC  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the MAC before duplicate."
+            ::= { hwEthernetARPTrapObjects 6}
+        hwEthernetARPReceivePeVLAN  OBJECT-TYPE
+            SYNTAX Integer32(0..4094)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the PE VLAN of the received packet."
+            ::= { hwEthernetARPTrapObjects 7}  
+            
+        hwEthernetARPReceiveCEVLAN  OBJECT-TYPE
+            SYNTAX Integer32(0..4094)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the CE VLAN of the received packet."
+            ::= { hwEthernetARPTrapObjects 8}
+        hwEthernetARPProbePortName  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the probe portname."
+            ::= { hwEthernetARPTrapObjects 9 } 
+        hwEthernetARPReplaceRateOldMAC  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates replace rate old mac."
+            ::= { hwEthernetARPTrapObjects 10 }
+        hwEthernetARPReplaceRateNewMAC  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates replace rate new mac."
+            ::= { hwEthernetARPTrapObjects 11 }
+        hwEthernetARPReplaceRateThresholdValue  OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates replace rate threshold value."
+            ::= { hwEthernetARPTrapObjects 12}
+        hwEthernetARPSpeedLimitOldValue  OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates ARP speed limit old value."
+            ::= { hwEthernetARPTrapObjects 13}
+        hwEthernetARPSpeedLimitCurValue  OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates ARP speed limit cur value."
+            ::= { hwEthernetARPTrapObjects 14}
+        hwEthernetARPSpeedLimitSupType  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates ARP speed limit suptype."
+            ::= { hwEthernetARPTrapObjects 15}
+         hwEthernetARPSpeedLimitSrcIp  OBJECT-TYPE
+             SYNTAX IpAddress
+             MAX-ACCESS accessible-for-notify
+             STATUS current
+             DESCRIPTION
+	             "This object indicates ARP speed limit src ip."
+	        ::= { hwEthernetARPTrapObjects 16 }
+         hwEthernetARPSpeedLimitDstIp  OBJECT-TYPE
+             SYNTAX IpAddress
+             MAX-ACCESS accessible-for-notify
+             STATUS current
+             DESCRIPTION
+			     "This object indicates ARP speed limit dst ip."
+			::= { hwEthernetARPTrapObjects 17 }
+         hwEthernetARPSpeedLimitVpnName  OBJECT-TYPE
+             SYNTAX OCTET STRING
+             MAX-ACCESS accessible-for-notify
+             STATUS current
+             DESCRIPTION
+	              "This object indicates ARP speed limit vpn name."
+	         ::= { hwEthernetARPTrapObjects 18 }
+        hwEthernetARPReceiveInterfaceName  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the inbound interface name of the received packet."
+            ::= { hwEthernetARPTrapObjects 19 } 			
+        hwEthernetARPReceiveSrcIPAddr  OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the source IP address of the received packet."
+            ::= { hwEthernetARPTrapObjects 20 }
+         hwEthernetARPVpnName  OBJECT-TYPE
+             SYNTAX OCTET STRING
+             MAX-ACCESS accessible-for-notify
+             STATUS current
+             DESCRIPTION
+	              "This object indicates ARP vpn name."
+	         ::= { hwEthernetARPTrapObjects 21 }
+        hwEthernetARPEntrySpecBdSuppressNumber  OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of broadcast-suppress ARP entries."
+            ::= { hwEthernetARPTrapObjects 22 }
 
 --  Notifications(trap) Definitions
 --       
     hwEthernetARPNotifications OBJECT IDENTIFIER ::= { hwEthernetARPMIB 2 }
      
     hwEthernetARPSpeedLimitAlarm NOTIFICATION-TYPE
-            OBJECTS { hwEthernetARPSpeedLimitIfIndex,hwEthernetARPSpeedLimitConfigured,hwEthernetARPSpeedLimitCurrent,hwEthernetARPSpeedLimitType,hwEthernetARPSpeedLimitSrcIPAddr,hwEthernetARPSpeedLimitDstIPAddr,hwEthernetARPSpeedLimitVPNinstance} 
+            OBJECTS { hwEthernetARPSpeedLimitIfIndex,hwEthernetARPSpeedLimitConfigured,hwEthernetARPSpeedLimitCurrent,hwEthernetARPSpeedLimitType,hwEthernetARPSpeedLimitSrcIPAddr,hwEthernetARPSpeedLimitDstIPAddr,hwEthernetARPSpeedLimitVPNinstance, hwEthernetARPInterfaceName} 
             STATUS current   
             DESCRIPTION 
-                "Trap information about ARP speed limit: interface index, current configured limit number, current received number, limit type (ARP, ARP-MISS), source IP address, destination IP address, VPN instance."
+                "This object indicates that the packet rate exceeds the configured threshold."
             ::= { hwEthernetARPNotifications 1 }  
     
     hwEthernetARPAntiAttackAlarm NOTIFICATION-TYPE
@@ -1898,7 +2203,7 @@ hwEthernetARPObjects OBJECT IDENTIFIER ::= { hwEthernetARPMIB 1 }
             ::= { hwEthernetARPNotifications 5 }             
             
     hwEthernetARPIPConflictEvent NOTIFICATION-TYPE
-            OBJECTS { hwEthernetARPIPConflictIPAddress,hwEthernetARPIPConflictLocalInterfaceName,hwEthernetARPIPConflictLocalMAC,hwEthernetARPIPConflictLocalVLAN,hwEthernetARPIPConflictLocalCEVLAN,hwEthernetARPIPConflictReceiveInterfaceName,hwEthernetARPIPConflictReceiveMAC,hwEthernetARPIPConflictReceiveVLAN,hwEthernetARPIPConflictReceiveCEVLAN,hwEthernetARPIPConflictType } 
+            OBJECTS { hwEthernetARPIPConflictIPAddress,hwEthernetARPIPConflictLocalMAC,hwEthernetARPIPConflictLocalInterfaceName,hwEthernetARPIPConflictLocalVLAN,hwEthernetARPIPConflictLocalCEVLAN,hwEthernetARPIPConflictReceiveMAC,hwEthernetARPIPConflictReceiveInterfaceName,hwEthernetARPIPConflictReceiveVLAN,hwEthernetARPIPConflictReceiveCEVLAN,hwEthernetARPIPConflictType } 
             STATUS current     
             DESCRIPTION 
                 "Trap information about ARP IP conflict."
@@ -1908,14 +2213,14 @@ hwEthernetARPObjects OBJECT IDENTIFIER ::= { hwEthernetARPMIB 1 }
             OBJECTS { hwEthernetARPIPConflictLocalInterfaceName,hwEthernetARPIPConflictReceiveMAC,hwEthernetARPIPConflictIPAddress,hwEthernetARPReceiveDstMAC,hwEthernetARPReceiveDstIPAddr,hwEthernetARPIPConflictReceiveVLAN,hwEthernetARPIPConflictReceiveCEVLAN,hwEthernetARPIPConflictReceiveInterfaceName} 
             STATUS current   
             DESCRIPTION 
-                "Trap information about MAC and IP address conflict: conflict interface name, conflict MAC address, conflict IP address, and the received packet's destination MAC address, destination IP address, vlan, ce-vlan, receive interface."
+                "This object indicates a MAC or IP address conflict."
             ::= { hwEthernetARPNotifications 7 }  
     
     hwEthernetARPMACIPConflictResolved NOTIFICATION-TYPE
             OBJECTS { hwEthernetARPIPConflictLocalInterfaceName,hwEthernetARPIPConflictReceiveMAC,hwEthernetARPIPConflictIPAddress} 
             STATUS current   
             DESCRIPTION 
-                "Trap information about MAC and IP address conflict resolved: conflict interface name, conflict MAC address, conflict IP address."
+                "This object indicates a MAC or IP address conflict."
             ::= { hwEthernetARPNotifications 8 }
 
     hwEthernetARPLearnStopAlarm NOTIFICATION-TYPE
@@ -1947,20 +2252,19 @@ hwEthernetARPObjects OBJECT IDENTIFIER ::= { hwEthernetARPMIB 1 }
             ::= { hwEthernetARPNotifications 12 }   
       
     hwEthernetARPHostIPConflict NOTIFICATION-TYPE
-            OBJECTS { hwEthernetARPHostMAC,hwEthernetARPGatewayVtepIP,hwEthernetARPHostMAC,hwEthernetARPGatewayVtepIP} 
+            OBJECTS { hwEthernetARPHostMAC,hwEthernetARPGatewayVtepIP,hwEthernetARPHostMAC,hwEthernetARPGatewayVtepIP,hwEthernetARPInterface,hwEthernetARPInterface} 
             STATUS current   
             DESCRIPTION 
-                "Trap information about host IP address conflict: local host MAC address, local gateway VTEP IP address, remote host MAC address, remote gateway VTEP IP address."
+                "Trap information about host IP address conflict: local host MAC address, local gateway VTEP IP address, remote host MAC address, remote gateway VTEP IP address, local host interface, remote host conflict interface."
             ::= { hwEthernetARPNotifications 13 }  
 			
     hwEthernetARPHostIPConflictResume NOTIFICATION-TYPE
-            OBJECTS { hwEthernetARPHostMAC,hwEthernetARPGatewayVtepIP,hwEthernetARPHostMAC,hwEthernetARPGatewayVtepIP} 
+            OBJECTS { hwEthernetARPHostMAC,hwEthernetARPGatewayVtepIP,hwEthernetARPHostMAC,hwEthernetARPGatewayVtepIP,hwEthernetARPInterface,hwEthernetARPInterface} 
             STATUS current   
             DESCRIPTION 
-                "Trap information about host IP address conflict resolved: local host MAC address, local gateway VTEP IP address, remote host MAC address, remote gateway VTEP IP address."
+                "Trap information about host IP address conflict resolved: local host MAC address, local gateway VTEP IP address, remote host MAC address, remote gateway VTEP IP address, local host interface, remote host conflict interface."
             ::= { hwEthernetARPNotifications 14 }
             
-    --begin add by chenlong 230926, arp anti-attack gateway-duplicate Alarm
     hwEthernetARPGateWayDuplicateAlarm NOTIFICATION-TYPE
             OBJECTS { hwEthernetARPGateWayIfName,hwEthernetARPGateWayPortName,hwEthernetARPGateWayIP} 
             STATUS current   
@@ -1974,37 +2278,164 @@ hwEthernetARPObjects OBJECT IDENTIFIER ::= { hwEthernetARPMIB 1 }
             DESCRIPTION 
                 "Trap information about ARP gateway duplicate resolved: Received an ARP packet with a duplicate IP address from the interface."
             ::= { hwEthernetARPNotifications 16 }
-    --end add by chenlong 230926, arp anti-attack gateway-duplicate Alarm
     
 	hwFwdArpAlarmOccur NOTIFICATION-TYPE
 			OBJECTS { hwFwdArpSlotName , hwFwdArpPortName}
 			STATUS current
 			DESCRIPTION 
-				"Arp MISS alarm occur."
+				"This object indicates that an alarm is reported."
 			::= { hwEthernetARPNotifications 17 }
 			
 	hwFwdArpAlarmResume NOTIFICATION-TYPE
 			OBJECTS { hwFwdArpSlotName , hwFwdArpPortName}
 			STATUS current
 			DESCRIPTION 
-				"Arp MISS alarm resume."
+				"This object indicates that the alarm is cleared."
 			::= { hwEthernetARPNotifications 18 }
 
-    --begin add by z00360178, arp limit threshold
     hwEthernetARPLimitExceed NOTIFICATION-TYPE
             OBJECTS { hwEthernetARPLimitExceedInterface,hwEthernetARPLimitExceedLimitNumber,hwEthernetARPLimitExceedLearnedNumber} 
             STATUS current   
             DESCRIPTION 
-                "Enter the threhold about ARP limit number, the alarm is appear."
+                "This object indicates the alarm generated when the number of ARP entries on an interface exceeds the specified alarm threshold."
             ::= { hwEthernetARPNotifications 19 }
             
     hwEthernetARPLimitExceedResume NOTIFICATION-TYPE
-            OBJECTS { hwEthernetARPLimitExceedInterface,hwEthernetARPLimitExceedLimitNumber,hwEthernetARPLimitExceedLearnedNumber,hwEthernetARPLimitExceedRecoverReason }
+            OBJECTS { hwEthernetARPLimitExceedInterface, hwEthernetARPLimitExceedLimitNumber, hwEthernetARPLimitExceedLearnedNumber, hwEthernetARPLimitExceedRecoverReason }
             STATUS current   
             DESCRIPTION 
-                "Not enter the threhold about ARP limit number, then resume the alarm ."
+                "This object indicates the clear alarm of the alarm generated when the number of ARP entries on an interface exceeds the specified alarm threshold."
             ::= { hwEthernetARPNotifications 20 }
-    --end add by z00360178, arp limit threshold
+
+    hwARPBDHostConflictAlarm NOTIFICATION-TYPE
+            OBJECTS { hwARPLocalIPAddr,hwARPLocalBDId,hwARPLocalMAC,hwARPRemoteIPAddr,hwARPRemoteBDId,hwARPRemoteMAC,hwARPLocalInterface,hwARPRemoteInterface,hwARPTunnelPeer } 
+            STATUS current   
+            DESCRIPTION 
+                "Trap information about host conflict: local IP address, local MAC address, local bridge domain, remote IP address, remote MAC address, remote bridge domain."
+            ::= { hwEthernetARPNotifications 21 }  
+    
+    hwARPBDHostConflictResume NOTIFICATION-TYPE
+            OBJECTS { hwARPLocalIPAddr,hwARPLocalBDId,hwARPLocalMAC,hwARPRemoteIPAddr,hwARPRemoteBDId,hwARPRemoteMAC,hwARPLocalInterface,hwARPRemoteInterface,hwARPTunnelPeer } 
+            STATUS current   
+            DESCRIPTION 
+                "Trap information about host conflict resolved: local IP address, local MAC address, local bridge domain, remote IP address, remote MAC address, remote bridge domain."
+            ::= { hwEthernetARPNotifications 22 }
+	hwEthernetARPDuplicateIPaddr NOTIFICATION-TYPE
+            OBJECTS { hwEthernetARPInterfaceName,hwEthernetARPIPAddress,hwEthernetARPLocalMAC,hwEthernetARPReceivePeVLAN,hwEthernetARPReceiveCEVLAN } 
+            STATUS current     
+            DESCRIPTION 
+                "When customer config interface IP address with the same as the current IP address on the network, trigger the warning."
+            ::= { hwEthernetARPNotifications 23 } 
+            
+    hwEthernetARPDuplicateIPaddrClear NOTIFICATION-TYPE
+            OBJECTS { hwEthernetARPInterfaceName,hwEthernetARPIPAddress,hwEthernetARPLocalMAC,hwEthernetARPReceivePeVLAN,hwEthernetARPReceiveCEVLAN } 
+            STATUS current     
+            DESCRIPTION 
+                "The alarm of Received an ARP packet with a duplicate IP address from the interface is resolved."
+            ::= { hwEthernetARPNotifications 24 }
+   hwEthernetARPProbeFailure NOTIFICATION-TYPE
+            OBJECTS { hwEthernetARPInterfaceName,hwEthernetARPProbePortName,hwEthernetARPIPAddress } 
+            STATUS current     
+            DESCRIPTION 
+                "The ARP on the interface failed to probe the IPv4 address of the peer-end device."
+            ::= { hwEthernetARPNotifications 25 }
+   hwEthernetARPProbeFailureClear NOTIFICATION-TYPE
+            OBJECTS { hwEthernetARPInterfaceName,hwEthernetARPProbePortName,hwEthernetARPIPAddress } 
+            STATUS current     
+            DESCRIPTION 
+                "The probe failure of ARP on the interface was resolved."
+            ::= { hwEthernetARPNotifications 26 }
+   hwEthernetARPReplaceExceed NOTIFICATION-TYPE
+            OBJECTS { hwEthernetARPInterfaceName,hwEthernetARPIPAddress,hwEthernetARPReplaceRateOldMAC,hwEthernetARPReplaceRateNewMAC,hwEthernetARPReplaceRateThresholdValue } 
+            STATUS current     
+            DESCRIPTION 
+                "When the times of ARP table replaced in one minute exceed the threshold."
+            ::= { hwEthernetARPNotifications 27 }
+   hwEthernetARPReplaceExceedClear NOTIFICATION-TYPE
+            OBJECTS {hwEthernetARPInterfaceName,hwEthernetARPIPAddress,hwEthernetARPReplaceRateOldMAC,hwEthernetARPReplaceRateNewMAC,hwEthernetARPReplaceRateThresholdValue } 
+            STATUS current     
+            DESCRIPTION 
+                "The alarm of ARP table replace rate exceeding threshold is resolved."
+            ::= { hwEthernetARPNotifications 28 }
+   hwEthernetARPSpeedLimit NOTIFICATION-TYPE
+            OBJECTS { hwEthernetARPInterfaceName,hwEthernetARPSpeedLimitOldValue,hwEthernetARPSpeedLimitCurValue,hwEthernetARPSpeedLimitSupType,hwEthernetARPSpeedLimitSrcIp,hwEthernetARPSpeedLimitDstIp,hwEthernetARPSpeedLimitVpnName } 
+            STATUS current     
+            DESCRIPTION 
+                "ARP packet speed in 1s exceeded the configured speed limit."
+            ::= { hwEthernetARPNotifications 29 }
+   hwEthernetARPSpeedLimitClear NOTIFICATION-TYPE
+            OBJECTS { hwEthernetARPInterfaceName,hwEthernetARPSpeedLimitOldValue,hwEthernetARPSpeedLimitCurValue,hwEthernetARPSpeedLimitSupType,hwEthernetARPSpeedLimitSrcIp,hwEthernetARPSpeedLimitDstIp,hwEthernetARPSpeedLimitVpnName } 
+            STATUS current     
+            DESCRIPTION 
+                "ARP packet speed in 1s belowed 90 percent of the configured speed limit."
+            ::= { hwEthernetARPNotifications 30 }
+   hwEthernetARPDuplicateMacEvent NOTIFICATION-TYPE
+        OBJECTS { hwEthernetARPInterfaceName,hwEthernetARPIPAddress,hwEthernetARPLocalMAC,hwEthernetARPReceivePeVLAN,hwEthernetARPReceiveCEVLAN}
+        STATUS current
+        DESCRIPTION
+            "Received an ARP packet with a conflictive MAC address from the interface: interface name, IP address, MAC address, PE VLAN and CE VLAN."
+        ::= { hwEthernetARPNotifications 31 }
+   hwEthernetARPEntryExceedAlarm NOTIFICATION-TYPE
+        OBJECTS { entPhysicalName,hwEthernetARPEntrySpecValue,hwEthernetARPEntrySpecDynamicNumber,hwEthernetARPEntrySpecStaticNumber }
+        STATUS current
+        DESCRIPTION
+            "Trap information about ARP entries exceed spec: slot, spec, number of dynamic ARP and number of static ARP."
+        ::= { hwEthernetARPNotifications 32 }
+
+   hwEthernetARPEntryResumeAlarm NOTIFICATION-TYPE
+        OBJECTS { entPhysicalName,hwEthernetARPEntrySpecValue,hwEthernetARPEntrySpecDynamicNumber,hwEthernetARPEntrySpecStaticNumber }
+        STATUS current
+        DESCRIPTION
+            "Trap information about ARP entries resume spec: slot, spec, number of dynamic ARP and number of static ARP."
+        ::= { hwEthernetARPNotifications 33 }
+   hwEthernetARPDynamicEntryExceedAlarm NOTIFICATION-TYPE
+        OBJECTS { entPhysicalName,hwEthernetARPEntrySpecValue,hwEthernetARPEntrySpecDynamicNumber }
+        STATUS current
+        DESCRIPTION
+            "Trap information about ARP dynamic entries exceed spec: slot, spec, number of dynamic ARP."
+        ::= { hwEthernetARPNotifications 34 }
+   hwEthernetARPDynamicEntryResumeAlarm NOTIFICATION-TYPE
+        OBJECTS { entPhysicalName,hwEthernetARPEntrySpecValue,hwEthernetARPEntrySpecDynamicNumber }
+        STATUS current
+        DESCRIPTION
+            "Trap information about ARP dynamic entries resume spec: slot, spec, number of dynamic ARP."
+        ::= { hwEthernetARPNotifications 35 }
+   hwEthernetARPMACConflict NOTIFICATION-TYPE
+        OBJECTS { hwEthernetARPInterfaceName,hwEthernetARPLocalMAC,hwEthernetARPReceiveSrcIPAddr,hwEthernetARPReceivePeVLAN,hwEthernetARPReceiveCEVLAN,hwEthernetARPReceiveInterfaceName }
+        STATUS current
+        DESCRIPTION
+            "Trap information about the alarm of received an ARP packet with a conflictive MAC address from the interface."
+        ::= { hwEthernetARPNotifications 36 }
+   hwEthernetARPMACConflictClear NOTIFICATION-TYPE
+        OBJECTS { hwEthernetARPInterfaceName,hwEthernetARPLocalMAC,hwEthernetARPReceiveSrcIPAddr,hwEthernetARPReceivePeVLAN,hwEthernetARPReceiveCEVLAN,hwEthernetARPReceiveInterfaceName }
+        STATUS current
+        DESCRIPTION
+            "Trap information about the resolved alarm of received an ARP packet with a conflictive MAC address from the interface."
+        ::= { hwEthernetARPNotifications 37 }
+   hwEthernetARPMACMismatch NOTIFICATION-TYPE
+        OBJECTS { hwARPLocalIPAddr,hwEthernetARPVpnName,hwARPLocalMAC,hwARPRemoteMAC }
+        STATUS current
+        DESCRIPTION
+            "Trap information about the alarm of received an ARP packet with a conflictive MAC address from the static ARP."
+        ::= { hwEthernetARPNotifications 38 }
+   hwEthernetARPMACMismatchClear NOTIFICATION-TYPE
+        OBJECTS { hwARPLocalIPAddr,hwEthernetARPVpnName,hwARPLocalMAC }
+        STATUS current
+        DESCRIPTION
+            "Trap information about the resolved alarm of received an ARP packet with a conflictive MAC address from the static ARP."
+        ::= { hwEthernetARPNotifications 39 }
+   hwEthernetARPBdSuppressEntryExceedAlarm NOTIFICATION-TYPE
+        OBJECTS { entPhysicalName,hwEthernetARPEntrySpecValue,hwEthernetARPEntrySpecBdSuppressNumber }
+        STATUS current
+        DESCRIPTION
+            "Trap information about ARP broadcast-suppress entries exceed spec: slot, spec, number of broadcast-suppress ARP."
+        ::= { hwEthernetARPNotifications 40 }
+   hwEthernetARPBdSuppressEntryResumeAlarm NOTIFICATION-TYPE
+        OBJECTS { entPhysicalName,hwEthernetARPEntrySpecValue,hwEthernetARPEntrySpecBdSuppressNumber }
+        STATUS current
+        DESCRIPTION
+            "Trap information about ARP broadcast-suppress entries resume spec: slot, spec, number of broadcast-suppress ARP."
+        ::= { hwEthernetARPNotifications 41 }
 	
 --
 -- Conformance information
@@ -2108,7 +2539,46 @@ hwEthernetARPObjects OBJECT IDENTIFIER ::= { hwEthernetARPMIB 1 }
     
     
     hwEthernetARPNotificationsGroup NOTIFICATION-GROUP   
-        NOTIFICATIONS{ hwEthernetARPSpeedLimitAlarm, hwEthernetARPAntiAttackAlarm, hwEthernetARPAntiGatewayConflictAlarm, hwEthernetARPThresholdExceedAlarm, hwEthernetARPThresholdResumeAlarm, hwEthernetARPIPConflictEvent, hwEthernetARPMACIPConflict, hwEthernetARPMACIPConflictResolved, hwEthernetARPLearnStopAlarm, hwEthernetARPLearnResumeAlarm, hwEthernetARPRemoteBackupFailAlarm, hwEthernetARPRemoteBackupFailResumeAlarm, hwEthernetARPHostIPConflict, hwEthernetARPHostIPConflictResume, hwEthernetARPGateWayDuplicateAlarm, hwEthernetARPGateWayDuplicateAlarmResume, hwEthernetARPLimitExceed, hwEthernetARPLimitExceedResume}
+        NOTIFICATIONS{ 
+          hwEthernetARPSpeedLimitAlarm, 
+          hwEthernetARPAntiAttackAlarm, 
+          hwEthernetARPAntiGatewayConflictAlarm, 
+          hwEthernetARPThresholdExceedAlarm, 
+          hwEthernetARPThresholdResumeAlarm, 
+          hwEthernetARPIPConflictEvent, 
+          hwEthernetARPMACIPConflict, 
+          hwEthernetARPMACIPConflictResolved, 
+          hwEthernetARPLearnStopAlarm, 
+          hwEthernetARPLearnResumeAlarm, 
+          hwEthernetARPRemoteBackupFailAlarm, 
+          hwEthernetARPRemoteBackupFailResumeAlarm, 
+          hwEthernetARPHostIPConflict, 
+          hwEthernetARPHostIPConflictResume, 
+          hwEthernetARPGateWayDuplicateAlarm, 
+          hwEthernetARPGateWayDuplicateAlarmResume, 
+          hwEthernetARPLimitExceed, 
+          hwEthernetARPLimitExceedResume, 
+          hwARPBDHostConflictAlarm, 
+          hwARPBDHostConflictResume, 
+          hwEthernetARPDuplicateIPaddr, 
+          hwEthernetARPDuplicateIPaddrClear, 
+          hwEthernetARPProbeFailure, 
+          hwEthernetARPProbeFailureClear, 
+          hwEthernetARPReplaceExceed, 
+          hwEthernetARPReplaceExceedClear, 
+          hwEthernetARPSpeedLimit, 
+          hwEthernetARPSpeedLimitClear, 
+          hwEthernetARPDuplicateMacEvent, 
+          hwEthernetARPEntryExceedAlarm, 
+          hwEthernetARPEntryResumeAlarm, 
+          hwEthernetARPDynamicEntryExceedAlarm, 
+          hwEthernetARPDynamicEntryResumeAlarm,
+          hwEthernetARPMACConflict,
+          hwEthernetARPMACConflictClear,
+          hwEthernetARPMACMismatch,
+          hwEthernetARPMACMismatchClear,
+          hwEthernetARPBdSuppressEntryExceedAlarm,
+          hwEthernetARPBdSuppressEntryResumeAlarm}
         STATUS current
         DESCRIPTION
                  "notification Group."   
@@ -2240,7 +2710,23 @@ hwFwdArpTrapGroup NOTIFICATION-GROUP
 		"Group for all base traps."
 	::= { hwEthernetARPGroups 17 }
 
-    
+    hwARPHostGroup OBJECT-GROUP
+    OBJECTS {
+        hwARPLocalIPAddr,
+        hwARPLocalBDId,
+        hwARPLocalMAC,
+        hwARPRemoteIPAddr,
+        hwARPRemoteBDId,
+        hwARPRemoteMAC,
+        hwARPLocalInterface,
+        hwARPRemoteInterface,
+        hwARPTunnelPeer
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for host conflict trap."
+    ::= { hwEthernetARPGroups 18 }
+
 hwEthernetARPCompliance MODULE-COMPLIANCE
     STATUS  current
     DESCRIPTION

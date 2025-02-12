@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Eventlog;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\RRD\RrdDefinition;
@@ -13,13 +15,13 @@ try {
     $legacy = $e->getOutput();
     $lines = explode("\n", $legacy);
 
-    $data = ['disks'=>[], 'legacy'=>1];
+    $data = ['disks' => [], 'legacy' => 1];
 
     $int = 0;
     while (isset($lines[$int])) {
         [$disk, $id5, $id10, $id173, $id177, $id183, $id184, $id187, $id188, $id190, $id194,
             $id196, $id197, $id198, $id199, $id231, $id233, $completed, $interrupted, $read_failure,
-            $unknown_failure, $extended, $short, $conveyance, $selective] = explode(',', $lines[$int]);
+            $unknown_failure, $extended, $short, $conveyance, $selective, $id9] = explode(',', $lines[$int]);
         $int++;
 
         // could really be any of these, but make sure we have something defined,
@@ -110,24 +112,24 @@ $new_disks_with_failed_health = [];
 $data['disks_with_failed_tests'] = [];
 $data['disks_with_failed_health'] = [];
 $data['has'] = [
-    'id5'=>0,
-    'id9'=>0,
-    'id10'=>0,
-    'id173'=>0,
-    'id177'=>0,
-    'id183'=>0,
-    'id184'=>0,
-    'id187'=>0,
-    'id188'=>0,
-    'id190'=>0,
-    'id194'=>0,
-    'id196'=>0,
-    'id197'=>0,
-    'id198'=>0,
-    'id199'=>0,
-    'id231'=>0,
-    'id232'=>0,
-    'id233'=>0,
+    'id5' => 0,
+    'id9' => 0,
+    'id10' => 0,
+    'id173' => 0,
+    'id177' => 0,
+    'id183' => 0,
+    'id184' => 0,
+    'id187' => 0,
+    'id188' => 0,
+    'id190' => 0,
+    'id194' => 0,
+    'id196' => 0,
+    'id197' => 0,
+    'id198' => 0,
+    'id199' => 0,
+    'id231' => 0,
+    'id232' => 0,
+    'id233' => 0,
 ];
 
 $metrics = [
@@ -261,27 +263,27 @@ foreach ($data['disks'] as $disk_id => $disk) {
 }
 
 // log any disks with failed tests found
-if (sizeof($new_disks_with_failed_tests) > 0) {
+if (count($new_disks_with_failed_tests) > 0) {
     $log_message = 'SMART found new disks with failed tests: ' . json_encode($new_disks_with_failed_tests);
-    log_event($log_message, $device, 'application', 5);
+    Eventlog::log($log_message, $device['device_id'], 'application', Severity::Error);
 }
 
 // log when there when we go to having no failed disks from having them previously
-if (sizeof($data['disks_with_failed_tests']) == 0 && sizeof($old_data['disks_with_failed_tests']) > 0) {
+if (count($data['disks_with_failed_tests']) == 0 && count($old_data['disks_with_failed_tests']) > 0) {
     $log_message = 'SMART is no longer finding any disks with failed tests';
-    log_event($log_message, $device, 'application', 1);
+    Eventlog::log($log_message, $device['device_id'], 'application', Severity::Ok);
 }
 
 // log any disks with failed tests found
-if (sizeof($new_disks_with_failed_health) > 0) {
+if (count($new_disks_with_failed_health) > 0) {
     $log_message = 'SMART found new disks with failed health checks: ' . json_encode($new_disks_with_failed_health);
-    log_event($log_message, $device, 'application', 5);
+    Eventlog::log($log_message, $device['device_id'], 'application', Severity::Error);
 }
 
 // log when there when we go to having no failed disks from having them previously
-if (sizeof($data['disks_with_failed_health']) == 0 && sizeof($old_data['disks_with_failed_health']) > 0) {
+if (count($data['disks_with_failed_health']) == 0 && count($old_data['disks_with_failed_health']) > 0) {
     $log_message = 'SMART is no longer finding any disks with failed health checks';
-    log_event($log_message, $device, 'application', 1);
+    Eventlog::log($log_message, $device['device_id'], 'application', Severity::Ok);
 }
 
 $app->data = $data;

@@ -1,0 +1,491 @@
+--**MOD+************************************************************************
+--* Module:    ARUBAWIRED-PORTSECURITY-MIB : Port Security MIB file
+--*
+--* (c) Copyright 2021 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-PORTSECURITY-MIB
+--*
+--**MOD-************************************************************************
+
+ARUBAWIRED-PORTSECURITY-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+            MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+            Counter32, Unsigned32
+                 FROM SNMPv2-SMI
+            DisplayString, TruthValue, MacAddress, RowStatus, TEXTUAL-CONVENTION
+                 FROM  SNMPv2-TC
+            MODULE-COMPLIANCE , OBJECT-GROUP, NOTIFICATION-GROUP
+                 FROM SNMPv2-CONF
+            wndFeatures
+              FROM ARUBAWIRED-NETWORKING-OID;
+
+arubaWiredPortSecurityMIB MODULE-IDENTITY
+        LAST-UPDATED "202110200000Z" -- October 20, 2021
+        ORGANIZATION "HPE/Aruba Networking Division"
+        CONTACT-INFO "Hewlett Packard Enterprise
+                          3000 Hanover St.
+                          Palo Alto, CA 94304-1112"
+        DESCRIPTION
+                     "This MIB module for Port Security"
+        REVISION     "202110200000Z" -- October 20, 2021
+        DESCRIPTION
+                     "Initial version of this MIB module"
+        ::= { wndFeatures 21 }
+
+
+  -- Top-level structure of MIB
+     arubaWiredPortSecurityNotifications  OBJECT IDENTIFIER ::= { arubaWiredPortSecurityMIB 0}
+     arubaWiredPortSecurityObjects        OBJECT IDENTIFIER ::= { arubaWiredPortSecurityMIB 1}
+     arubaWiredPortSecurityGlobalObjects  OBJECT IDENTIFIER ::= { arubaWiredPortSecurityObjects 1}
+     arubaWiredPortSecurityPortObjects  OBJECT IDENTIFIER ::= { arubaWiredPortSecurityObjects 2}
+
+     -- textual conventions
+
+     VidList ::= TEXTUAL-CONVENTION
+     DISPLAY-HINT "512x"
+     STATUS      current
+     DESCRIPTION
+        "Each octet within this value specifies a set of eight
+        VLAN index (VID), with the first octet specifying VIDs 1
+        through 8, the second octet specifying VIDs 9 through 16,
+        etc.  Within each octet, the most significant bit represents
+        the lowest numbered VID, and the least significant bit
+        represents the highest numbered VID.  Thus, each VID
+        is represented by a single bit within the value of this
+        object.  If that bit has a value of 1 then that VID is
+        included in the set of VIDs; the VID is not included if its
+        bit has a value of 0.  This list represents the entire
+        range of VLAN index values defined in the scope of IEEE
+        802.1Q."
+     SYNTAX      OCTET STRING (SIZE (512))
+
+     ArubaWiredPortSecurityMacAddrType ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION
+                  "These are the different type of secure mac addresss.
+
+                  dynamic(0) - A secure MAC address which is
+                               learned on the switch.
+                  static(1) - A secure MAC address which is
+                              configured by user.
+                  stickyDynamic(2) - A secure MAC address which is learned on
+                                      the switch and sticks to the port.
+                  stickyStatic(3) -  A secure MAC address which is configured
+                                      by user and sticks to the port."
+     SYNTAX INTEGER {
+         dynamic(0),
+         static(1),
+         stickyDynamic(2),
+         stickyStatic(3)
+     }
+
+     -- Port Security Global Configuration Objects
+
+     arubaWiredPortSecurityGlobalEnable OBJECT-TYPE
+          SYNTAX          TruthValue
+          MAX-ACCESS      read-write
+          STATUS          current
+          DESCRIPTION     "Indicates whether Port Security is enabled or
+                           disabled. By default this object will have a
+                           value of false."
+          DEFVAL          { false }
+        ::= { arubaWiredPortSecurityGlobalObjects 1 }
+
+     -- Port Security Port Configuration Table
+
+     arubaWiredPortSecurityPortTable OBJECT-TYPE
+          SYNTAX          SEQUENCE OF ArubaWiredPortSecurityPortEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+                "A list of port security configuration and status entries.
+                The number of entries is determined by the number of
+                ports in the system that can support the
+                port security feature.  Ports that are not
+                port security capable will not be displayed
+                in this table.  This table includes ports
+                on which port security parameters can be set even
+                if port security feature itself cannot be enabled
+                due to conflict with other features."
+          ::= { arubaWiredPortSecurityPortObjects 1 }
+
+     arubaWiredPortSecurityPortEntry OBJECT-TYPE
+          SYNTAX          ArubaWiredPortSecurityPortEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+               "Port Security configuration information for a single port."
+          INDEX           { arubaWiredifIndex }
+          ::= { arubaWiredPortSecurityPortTable 1 }
+
+     ArubaWiredPortSecurityPortEntry ::= SEQUENCE {
+          arubaWiredifIndex                          Unsigned32,
+          arubaWiredPortSecurityEnable               TruthValue,
+          arubaWiredClientLimit                      Unsigned32,
+          arubaWiredCurrentSecureMacAddrCount        Unsigned32,
+          arubaWiredViolationAction                  INTEGER,
+          arubaWiredClientViolationStatus            TruthValue,
+          arubaWiredClientViolationReason            INTEGER,
+          arubaWiredClientLimitViolationCount        Counter32,
+          arubaWiredStickyClientMoveViolationCount   Counter32,
+          arubaWiredRecoveryTimer                    Unsigned32,
+          arubaWiredShutdownRecovery                 TruthValue,
+          arubaWiredStickyEnable                     TruthValue
+     }
+
+     arubaWiredifIndex OBJECT-TYPE
+             SYNTAX          Unsigned32 (0..4294967295)
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION     "Indicates the unique port index."
+             ::= { arubaWiredPortSecurityPortEntry 1 }
+
+     arubaWiredPortSecurityEnable OBJECT-TYPE
+             SYNTAX          TruthValue
+             MAX-ACCESS      read-write
+             STATUS          current
+             DESCRIPTION     "This object indicates whether port security
+                              feature is enabled on a port. The default value
+                              is false."
+             DEFVAL          { false }
+             ::= { arubaWiredPortSecurityPortEntry 2 }
+
+     arubaWiredClientLimit OBJECT-TYPE
+             SYNTAX        Unsigned32 (1..64)
+             MAX-ACCESS    read-write
+             STATUS        current
+             DESCRIPTION   "The maximum number (N) of MAC addresss to be
+                           secured on the interface. The first N MAC
+                           addresss learned or configured are made secured."
+             DEFVAL          { 1 }
+             ::= { arubaWiredPortSecurityPortEntry 3 }
+
+     arubaWiredCurrentSecureMacAddrCount OBJECT-TYPE
+             SYNTAX        Unsigned32 (0..64)
+             MAX-ACCESS    read-only
+             STATUS        current
+             DESCRIPTION   "The current number of MAC addresss secured
+                           on this interface."
+             ::= { arubaWiredPortSecurityPortEntry 4 }
+
+     arubaWiredViolationAction  OBJECT-TYPE
+             SYNTAX        INTEGER { notify(1), shutdown(2)}
+             MAX-ACCESS    read-write
+             STATUS        current
+             DESCRIPTION   "Determines the action that the device will
+                            take if the traffic matches the port security
+                            violation.
+                             notify(1) - Send an SNMP trap and log an event when
+                                         a violation occurs.
+                             shutdown(2) - Send an SNMP trap, log an event and
+                                           shutdown the port when a violation
+                                           occurs."
+             DEFVAL          { 1 }
+             ::= { arubaWiredPortSecurityPortEntry 5 }
+
+     arubaWiredClientViolationStatus OBJECT-TYPE
+             SYNTAX        TruthValue
+             MAX-ACCESS    read-only
+             STATUS        current
+             DESCRIPTION   "Indicates whether this port is
+                            currently in violation state or not."
+             ::= { arubaWiredPortSecurityPortEntry 6 }
+
+     arubaWiredClientViolationReason OBJECT-TYPE
+             SYNTAX          INTEGER { none(0), clientLimitExceeded(1),
+                                       stickyClientMove(2) }
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION     "This object represents the reason for violation.
+
+                             none(0) - None of the violation is triggered.
+                             clientLimitExceeded(1) - Indicates whether the
+                             port is in a state where its client limit has been
+                             violated. This will be reset when the client limit
+                             reduces to below the threshold or the link goes
+                             down.
+                             stickyClientMove(2) - Indicates whether the port
+                             is in a state where sticky mac client move has been
+                             violated. This will be reset when the link goes
+                             down."
+             DEFVAL          { 0 }
+             ::= { arubaWiredPortSecurityPortEntry 7 }
+
+     arubaWiredClientLimitViolationCount  OBJECT-TYPE
+             SYNTAX        Counter32
+             MAX-ACCESS    read-only
+             STATUS        current
+             DESCRIPTION   "Number of client limit violations that have occurred
+                            on this port since system boot."
+             ::= { arubaWiredPortSecurityPortEntry 8 }
+
+     arubaWiredStickyClientMoveViolationCount  OBJECT-TYPE
+             SYNTAX        Counter32
+             MAX-ACCESS    read-only
+             STATUS        current
+             DESCRIPTION   "Number of sticky mac client move violations that
+                            have occurred on this port since system boot."
+             ::= { arubaWiredPortSecurityPortEntry 9 }
+
+     arubaWiredRecoveryTimer  OBJECT-TYPE
+             SYNTAX        Unsigned32 (10..600)
+             UNITS         "seconds"
+             MAX-ACCESS    read-write
+             STATUS        current
+             DESCRIPTION   "Time in seconds after which the port will be
+                           re-enabled if it was shutdown in response to a
+                           violation event. This is only applicable if shutdown
+                           recovery is enabled."
+             DEFVAL        { 10 }
+             ::= { arubaWiredPortSecurityPortEntry 10 }
+
+     arubaWiredShutdownRecovery OBJECT-TYPE
+             SYNTAX        TruthValue
+             MAX-ACCESS    read-write
+             STATUS        current
+             DESCRIPTION   "Enable auto-recovery for the port. This is only
+                            relevant when the violation action is set to
+                            shutdown. The port is re-enabled after the recovery
+                            timer has expired."
+             DEFVAL        { false }
+             ::= { arubaWiredPortSecurityPortEntry 11 }
+
+     arubaWiredStickyEnable OBJECT-TYPE
+             SYNTAX        TruthValue
+             MAX-ACCESS    read-write
+             STATUS        current
+             DESCRIPTION   "Indicates whether port security sticky MAC learning
+                            is enabled on this port. This is only supported on
+                            physical ports."
+             DEFVAL        { false }
+             ::= { arubaWiredPortSecurityPortEntry 12 }
+
+     -- Port Security Client Table.
+     -- This table is used to display port security MAC addresss
+     -- on a port.
+
+     arubaWiredPortSecurityClientTable OBJECT-TYPE
+          SYNTAX          SEQUENCE OF ArubaWiredPortSecurityClientEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+               "Information describing the port security
+               clients."
+          ::= { arubaWiredPortSecurityPortObjects 2 }
+
+     arubaWiredPortSecurityClientEntry OBJECT-TYPE
+          SYNTAX          ArubaWiredPortSecurityClientEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+               "Information describing the port security client."
+          INDEX           { arubaWiredClientPortName, arubaWiredClientMac }
+          ::= { arubaWiredPortSecurityClientTable 1 }
+
+     ArubaWiredPortSecurityClientEntry ::= SEQUENCE {
+          arubaWiredClientPortName
+               DisplayString,
+          arubaWiredClientMac
+               MacAddress,
+          arubaWiredClientAuthorizationState
+               DisplayString,
+          arubaWiredClientMacType
+               ArubaWiredPortSecurityMacAddrType
+     }
+
+     arubaWiredClientPortName OBJECT-TYPE
+          SYNTAX         DisplayString (SIZE (0..8))
+          MAX-ACCESS     not-accessible
+          STATUS         current
+          DESCRIPTION    "The port ifIndex of the client"
+          ::= { arubaWiredPortSecurityClientEntry 1 }
+
+     arubaWiredClientMac OBJECT-TYPE
+           SYNTAX       MacAddress
+           MAX-ACCESS   read-only
+           STATUS       current
+           DESCRIPTION  "MAC address of the client"
+           ::= { arubaWiredPortSecurityClientEntry 2 }
+
+     arubaWiredClientAuthorizationState OBJECT-TYPE
+           SYNTAX        DisplayString (SIZE (0..32))
+           MAX-ACCESS    read-only
+           STATUS        current
+           DESCRIPTION   "State of the port security client."
+           ::= { arubaWiredPortSecurityClientEntry 3 }
+
+      arubaWiredClientMacType OBJECT-TYPE
+           SYNTAX       ArubaWiredPortSecurityMacAddrType
+           MAX-ACCESS   read-only
+           STATUS       current
+           DESCRIPTION  "The learnt type of the MAC address."
+           ::= { arubaWiredPortSecurityClientEntry 4 }
+
+     -- Port Security Port Static MAC Configuration Table
+
+     arubaWiredPortSecurityMacCfgTable OBJECT-TYPE
+          SYNTAX          SEQUENCE OF ArubaWiredPortSecurityMacCfgEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+                "A list of port security static MAC configuration entries."
+          ::= { arubaWiredPortSecurityPortObjects 3 }
+
+     arubaWiredPortSecurityMacCfgEntry OBJECT-TYPE
+          SYNTAX          ArubaWiredPortSecurityMacCfgEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+               "Information describing the port security static MAC
+                configuration entries."
+          INDEX           { arubaWiredPortifIndex,  arubaWiredStaticMacType,
+                            arubaWiredStaticClientMac}
+          ::= { arubaWiredPortSecurityMacCfgTable 1 }
+
+     ArubaWiredPortSecurityMacCfgEntry ::= SEQUENCE {
+          arubaWiredPortifIndex                Unsigned32,
+          arubaWiredStaticMacType              TruthValue,
+          arubaWiredStaticClientMac            MacAddress,
+          arubaWiredClientMacVidList           VidList,
+          arubaWiredMacAddrRowStatus           RowStatus
+     }
+
+     arubaWiredPortifIndex OBJECT-TYPE
+             SYNTAX          Unsigned32 (0..4294967295)
+             MAX-ACCESS      not-accessible
+             STATUS          current
+             DESCRIPTION     "Indicates the unique port index."
+             ::= { arubaWiredPortSecurityMacCfgEntry 1 }
+
+     arubaWiredStaticMacType  OBJECT-TYPE
+             SYNTAX        TruthValue
+             MAX-ACCESS    not-accessible
+             STATUS        current
+             DESCRIPTION   "Determines the type of MAC address.
+                             0 - The non sticky MAC address.
+                             1 - The sticky MAC address."
+             ::= { arubaWiredPortSecurityMacCfgEntry 2 }
+
+     arubaWiredStaticClientMac OBJECT-TYPE
+          SYNTAX       MacAddress
+          MAX-ACCESS   not-accessible
+          STATUS       current
+          DESCRIPTION  "MAC address of the client."
+          ::= { arubaWiredPortSecurityMacCfgEntry 3 }
+
+     arubaWiredClientMacVidList  OBJECT-TYPE
+             SYNTAX        VidList
+             MAX-ACCESS    read-create
+             STATUS        current
+             DESCRIPTION   "List of VLANs on which this mac address
+                            is configured."
+             ::= { arubaWiredPortSecurityMacCfgEntry 4 }
+
+     arubaWiredMacAddrRowStatus OBJECT-TYPE
+             SYNTAX        RowStatus
+             MAX-ACCESS    read-create
+             STATUS        current
+             DESCRIPTION
+                  "This object is a conceptual row entry that allows adding
+                   or deleting static port security mac entries on a port."
+             ::= { arubaWiredPortSecurityMacCfgEntry 5 }
+
+  -- arubaWiredPortSecurity Notifications
+     arubaWiredPortSecurityViolationStatusChange NOTIFICATION-TYPE
+         OBJECTS {
+             arubaWiredifIndex,
+             arubaWiredClientMac,
+             arubaWiredClientViolationStatus,
+             arubaWiredClientViolationReason
+         }
+         STATUS        current
+         DESCRIPTION
+                 "This notification is generated when a violation is triggered."
+         ::= { arubaWiredPortSecurityNotifications 1 }
+
+-- Conformance Information
+
+     arubaWiredPortSecurityConformance OBJECT IDENTIFIER ::= { arubaWiredPortSecurityMIB 2 }
+     arubaWiredPortSecurityGroups OBJECT IDENTIFIER ::= { arubaWiredPortSecurityConformance 1 }
+
+     arubaWiredPortSecurityPortGroup OBJECT-GROUP
+         OBJECTS {  arubaWiredifIndex,
+                    arubaWiredPortSecurityEnable,
+                    arubaWiredClientLimit,
+                    arubaWiredCurrentSecureMacAddrCount,
+                    arubaWiredViolationAction,
+                    arubaWiredClientViolationStatus,
+                    arubaWiredClientViolationReason,
+                    arubaWiredClientLimitViolationCount,
+                    arubaWiredStickyClientMoveViolationCount,
+                    arubaWiredRecoveryTimer,
+                    arubaWiredShutdownRecovery,
+                    arubaWiredStickyEnable
+                   }
+        STATUS          current
+        DESCRIPTION     "These objects are used for describing
+                         Port Security port parameters"
+        ::= { arubaWiredPortSecurityGroups 1 }
+
+     arubaWiredPortSecurityClientGroup OBJECT-GROUP
+         OBJECTS {  arubaWiredClientMac,
+                    arubaWiredClientAuthorizationState,
+                    arubaWiredClientMacType
+                   }
+        STATUS          current
+        DESCRIPTION     "These objects are used for describing
+                         Port Security Client parameters"
+        ::= { arubaWiredPortSecurityGroups 2 }
+
+     arubaWiredPortSecurityMacCfgGroup OBJECT-GROUP
+         OBJECTS {  arubaWiredClientMacVidList,
+                    arubaWiredMacAddrRowStatus
+                   }
+        STATUS          current
+        DESCRIPTION     "These objects are used for describing
+                         Port Security static mac parameters"
+        ::= { arubaWiredPortSecurityGroups 3 }
+
+     arubaWiredPortSecurityGlobalCfgGroup  OBJECT-GROUP
+            OBJECTS       {
+                           arubaWiredPortSecurityGlobalEnable
+                          }
+            STATUS        current
+            DESCRIPTION   "These objects are used for describing
+                           port security global configuration parameters"
+            ::= { arubaWiredPortSecurityGroups 4 }
+
+     arubaWiredPortSecurityNotificationsGroup NOTIFICATION-GROUP
+         NOTIFICATIONS   {
+                          arubaWiredPortSecurityViolationStatusChange
+                         }
+         STATUS      current
+         DESCRIPTION "A collection of Port security notification objects."
+         ::= { arubaWiredPortSecurityGroups 5 }
+
+-- Compliance Statements
+
+     arubaWiredPortSecurityCompliances OBJECT IDENTIFIER ::=
+                    {arubaWiredPortSecurityConformance 2}
+
+     arubaWiredPortSecurityCompliance MODULE-COMPLIANCE
+          STATUS      current
+          DESCRIPTION "The compliance statement for devices
+                       with support of Port Access Clients"
+          MODULE  -- this module
+          MANDATORY-GROUPS { arubaWiredPortSecurityPortGroup,
+                             arubaWiredPortSecurityClientGroup,
+                             arubaWiredPortSecurityMacCfgGroup,
+                             arubaWiredPortSecurityGlobalCfgGroup,
+                             arubaWiredPortSecurityNotificationsGroup
+                           }
+          ::= { arubaWiredPortSecurityCompliances 1 }
+END
+

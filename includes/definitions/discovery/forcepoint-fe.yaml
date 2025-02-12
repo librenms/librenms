@@ -1,0 +1,19 @@
+mib: FORCEPOINT-NGFW-ENGINE-MIB
+modules:
+    mempools:
+        data:
+            -
+                total: FORCEPOINT-NGFW-ENGINE-MIB::fwMemBytesTotal
+                free: FORCEPOINT-NGFW-ENGINE-MIB::fwMemBytesUnused
+                used: FORCEPOINT-NGFW-ENGINE-MIB::fwMemBytesUsed
+                descr: 'Local Memory {{ $index }}'
+    processors:
+        data:
+            -
+                oid: FORCEPOINT-NGFW-ENGINE-MIB::fwCpuTotal
+                num_oid: '.1.3.6.1.4.1.47565.1.1.1.11.1.1.3.{{ $index }}'
+                descr: 'Processor {{ $index }}'
+    os:
+        serial: FORCEPOINT-NGFW-ENGINE-MIB::nodeHardwareSerialNumber.0
+        version: FORCEPOINT-NGFW-ENGINE-MIB::fwSoftwareVersion.0
+        hardware: FORCEPOINT-NGFW-ENGINE-MIB::nodeApplianceModel.0

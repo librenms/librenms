@@ -29,10 +29,10 @@ $rrd_def = RrdDefinition::make()
 
 $fields = [
     'Requests' => $req,
-    'Active'   => $active,
-    'Reading'  => $reading,
-    'Writing'  => $writing,
-    'Waiting'  => $waiting,
+    'Active' => $active,
+    'Reading' => $reading,
+    'Writing' => $writing,
+    'Waiting' => $waiting,
 ];
 
 $tags = [

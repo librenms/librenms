@@ -95,6 +95,9 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
 
         $filter = '(' . Config::get('auth_ldap_prefix') . $username . ')';
         $search = ldap_search($this->ldap_connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
+        if ($search === false) {
+            throw new AuthenticationException('User search failed: ' . ldap_error($this->ldap_connection));
+        }
         $entries = ldap_get_entries($this->ldap_connection, $search);
         if ($entries['count']) {
             /*
@@ -125,6 +128,9 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         // Find all defined groups $username is in
         $filter = '(&(|(cn=' . implode(')(cn=', array_keys(Config::get('auth_ldap_groups'))) . '))(' . Config::get('auth_ldap_groupmemberattr') . '=' . $this->getMembername($username) . '))';
         $search = ldap_search($this->ldap_connection, Config::get('auth_ldap_groupbase'), $filter);
+        if ($search === false) {
+            throw new AuthenticationException('Role search failed: ' . ldap_error($this->ldap_connection));
+        }
         $entries = ldap_get_entries($this->ldap_connection, $search);
 
         $authLdapGroups = Config::get('auth_ldap_groups');
@@ -207,8 +213,8 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
                     return [
                         'username' => $username,
                         'realname' => $realname,
-                        'user_id'  => $user_id,
-                        'email'    => $email,
+                        'user_id' => $user_id,
+                        'email' => $email,
                     ];
                 }
             }

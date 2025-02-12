@@ -18,73 +18,73 @@ $tw_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, '
 
 $rrd_list[] = [
     'filename' => $ti_rrd_filename,
-    'descr'    => 'Index',
-    'ds'       => 'ti_time',
+    'descr' => 'Index',
+    'ds' => 'ti_time',
 ];
 $rrd_list[] = [
     'filename' => $ti_rrd_filename,
-    'descr'    => 'Delete',
-    'ds'       => 'ti_del_time',
+    'descr' => 'Delete',
+    'ds' => 'ti_del_time',
 ];
 $rrd_list[] = [
     'filename' => $ts_rrd_filename,
-    'descr'    => 'Query',
-    'ds'       => 'ts_q_time',
+    'descr' => 'Query',
+    'ds' => 'ts_q_time',
 ];
 $rrd_list[] = [
     'filename' => $ts_rrd_filename,
-    'descr'    => 'Fetch',
-    'ds'       => 'ts_f_time',
+    'descr' => 'Fetch',
+    'ds' => 'ts_f_time',
 ];
 $rrd_list[] = [
     'filename' => $ts_rrd_filename,
-    'descr'    => 'Scroll',
-    'ds'       => 'ts_sc_time',
+    'descr' => 'Scroll',
+    'ds' => 'ts_sc_time',
 ];
 $rrd_list[] = [
     'filename' => $ts_rrd_filename,
-    'descr'    => 'Suggest',
-    'ds'       => 'ts_su_time',
+    'descr' => 'Suggest',
+    'ds' => 'ts_su_time',
 ];
 $rrd_list[] = [
     'filename' => $tr_rrd_filename,
-    'descr'    => 'Refresh',
-    'ds'       => 'tr_time',
+    'descr' => 'Refresh',
+    'ds' => 'tr_time',
 ];
 $rrd_list[] = [
     'filename' => $tr_rrd_filename,
-    'descr'    => 'Ext. Refresh',
-    'ds'       => 'tr_ext_time',
+    'descr' => 'Ext. Refresh',
+    'ds' => 'tr_ext_time',
 ];
 $rrd_list[] = [
     'filename' => $tf_rrd_filename,
-    'descr'    => 'Flush',
-    'ds'       => 'tf_time',
+    'descr' => 'Flush',
+    'ds' => 'tf_time',
 ];
 $rrd_list[] = [
     'filename' => $tg_rrd_filename,
-    'descr'    => 'Get',
-    'ds'       => 'tg_time',
+    'descr' => 'Get',
+    'ds' => 'tg_time',
 ];
 $rrd_list[] = [
     'filename' => $tg_rrd_filename,
-    'descr'    => 'Get Exists',
-    'ds'       => 'tg_exists_time',
+    'descr' => 'Get Exists',
+    'ds' => 'tg_exists_time',
 ];
 $rrd_list[] = [
     'filename' => $tg_rrd_filename,
-    'descr'    => 'Get Missing',
-    'ds'       => 'tg_missing_time',
+    'descr' => 'Get Missing',
+    'ds' => 'tg_missing_time',
 ];
 $rrd_list[] = [
     'filename' => $tm_rrd_filename,
-    'descr'    => 'Merges',
-    'ds'       => 'tm_time',
+    'descr' => 'Merges',
+    'ds' => 'tm_time',
 ];
 $rrd_list[] = [
     'filename' => $tw_rrd_filename,
-    'descr'    => 'Warmer',
-    'ds'       => 'tw_time',
+    'descr' => 'Warmer',
+    'ds' => 'tw_time',
 ];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

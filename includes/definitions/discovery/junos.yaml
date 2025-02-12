@@ -60,6 +60,7 @@ modules:
                     descr: '{{ ifDescr:0 }} preFEC BER'
                     entPhysicalIndex: '{{ $subindex0 }}'
                     entPhysicalIndex_measured: 'ports'
+                    group: transceiver
         chromatic_dispersion:
             data:
                 -
@@ -69,6 +70,7 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     descr: '{{ $ifDescr }} CD'
+                    group: transceiver
                     index: 'jnxPMCurChromaticDispersion.{{ $index }}'
         delay:
             data:
@@ -80,6 +82,7 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     divisor: 1000000000000
                     descr: '{{ $ifDescr }} DGD'
+                    group: transceiver
                     index: 'jnxPMCurDiffGroupDelay.{{ $index }}'
         dbm:
             data:
@@ -97,7 +100,7 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     index: 'rx-{{ $index }}'
-                    group: 'Modules'
+                    group: transceiver
                 -
                     oid: JUNIPER-DOM-MIB::jnxDomCurrentTable
                     value: JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPower
@@ -112,7 +115,7 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     index: 'tx-{{ $index }}'
-                    group: 'Modules'
+                    group: transceiver
                 -
                     oid: JUNIPER-DOM-MIB::jnxDomModuleLaneTable
                     value: JUNIPER-DOM-MIB::jnxDomCurrentLaneRxLaserPower
@@ -127,7 +130,7 @@ modules:
                     entPhysicalIndex: '{{ $subindex0 }}'
                     entPhysicalIndex_measured: 'ports'
                     index: 'rx-{{ $index }}'
-                    group: 'Modules'
+                    group: transceiver
                 -
                     oid: JUNIPER-DOM-MIB::jnxDomModuleLaneTable
                     value: JUNIPER-DOM-MIB::jnxDomCurrentLaneTxLaserOutputPower
@@ -142,7 +145,7 @@ modules:
                     entPhysicalIndex: '{{ $subindex0 }}'
                     entPhysicalIndex_measured: 'ports'
                     index: 'tx-{{ $index }}'
-                    group: 'Modules'
+                    group: transceiver
                 -
                     oid: jnxOpticsPMCurrentTable
                     value: jnxPMCurRxInputPower
@@ -151,6 +154,7 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     divisor: 100
                     descr: '{{ $ifDescr }} Rx Power'
+                    group: transceiver
                     index: 'jnxPMCurRxInputPower.{{ $index }}'
                 -
                     oid: jnxOpticsPMCurrentTable
@@ -160,6 +164,7 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     divisor: 100
                     descr: '{{ $ifDescr }} Tx Power'
+                    group: transceiver
                     index: 'jnxPMCurTxOutputPower.{{ $index }}'
         quality_factor:
             data:
@@ -171,6 +176,7 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     divisor: 10
                     descr: '{{ $ifDescr }} Q2-factor'
+                    group: transceiver
                     index: 'jnxPMCurQ.{{ $index }}'
         snr:
             data:
@@ -182,6 +188,7 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     divisor: 10
                     descr: '{{ $ifDescr }} electrical SNR'
+                    group: transceiver
                     index: 'jnxPMCurSNR.{{ $index }}'
         frequency:
             data:
@@ -193,6 +200,7 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     multiplier: 1000000
                     descr: '{{ $ifDescr }} Carrier Freq Offset'
+                    group: transceiver
                     index: 'jnxPMCurCarFreqOffset.{{ $index }}'
         temperature:
             data:
@@ -215,7 +223,7 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     index: 'rx-{{ $index }}'  # match old php discovery
-                    group: 'Modules'
+                    group: transceiver
                 -
                     oid: jnxOpticsPMCurrentTable
                     value: jnxPMCurTemperature
@@ -224,7 +232,7 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     descr: '{{ $ifDescr }} Temperature'
                     index: 'jnxPMCurTemperature.{{ $index }}'
-                    group: 'Modules'
+                    group: transceiver
         current:
             data:
                 -
@@ -241,7 +249,7 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     index: 'rx-{{ $index }}'
-                    group: 'Modules'
+                    group: transceiver
                 -
                     oid: jnxOpticsPMCurrentTable
                     value: jnxPMCurTxLaserBiasCurrent
@@ -250,16 +258,15 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     divisor: 1000
                     descr: '{{ $ifDescr }} Tx Bias'
+                    group: transceiver
                     index: 'jnxPMCurTxLaserBiasCurrent.{{ $index }}'
         loss:
             data:
                 -
                     oid: jnxRpmResultsSummaryTable
                     value: jnxRpmResSumPercentLost
-                    num_oid: '.1.3.6.1.4.1.2636.3.50.1.2.1.{{ $index_string }}'
-                    entPhysicalIndex: '{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.2636.3.50.1.2.1.{{ $str_index_as_numeric }}'
                     group: RPM Probes
-                    entPhysicalIndex_measured: 'probes'
                     descr: '{{ $index }} Probe Loss'
                     index: 'jnxRpmResSumPercentLost.{{ $index }}'
         count:

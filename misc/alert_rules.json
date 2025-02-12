@@ -10,8 +10,9 @@
   },
   {
     "rule": "macros.device_down = \"1\" && devices.status_reason = \"snmp\"",
-    "name": "SNMP not responding on Device - Check on SNMP Service - Device marked Down!",
-    "default": true
+    "name": "Device Down (SNMP unreachable)",
+    "default": true,
+    "notes": "Device may responds on ICMP but not on SNMP."
   },
   {
     "rule": "devices.uptime < \"300\" && macros.device = \"1\"",
@@ -110,10 +111,6 @@
     "name": "Device took too long to poll"
   },
   {
-    "rule": "macros.device_up = \"1\" && devices.os = \"asa\" && ciscoASA.data > \"5000\"",
-    "name": "Cisco ASA connections over 5000"
-  },
-  {
     "rule": "processors.processor_usage > \"85\" && macros.device_up = \"1\"",
     "name": "Processor usage over 85%"
   },
@@ -174,7 +171,7 @@
     "name": "APC UPS Diagonstics Test Result"
   },
   {
-    "builder": {"condition":"AND","rules":[{"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"3"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsBasicOutputStatus"}]},{"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"not_equal","value":"4"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsAdvTestDiagnosticsResults"}]}],"valid":true},
+    "builder": {"condition":"AND","rules":[{"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"3"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsBasicOutputStatus"}]}],"valid":true},
     "name": "APC UPS Switched to Battery Power"
   },
   {
@@ -699,12 +696,12 @@
     "severity": "critical"
   },
   {
-    "rule": "storage.storage_deleted = 0 AND storage.storage_descr = \"/\" AND storage.storage_perc >= 90 AND storage.storage_perc < 95",
+    "rule": "storage.storage_descr = \"/\" && storage.storage_perc >= 90 && storage.storage_perc < 95",
     "name": "Space on / is >= 90% and < 95% in use",
     "severity":"warning"
   },
   {
-    "rule": "storage.storage_deleted = 0 AND storage.storage_descr = \"/\" AND storage.storage_perc >= 95",
+    "rule": "storage.storage_descr = \"/\" && storage.storage_perc >= 95",
     "name": "Space on / is >= 95% in use",
     "severity":"critical"
   },
@@ -782,5 +779,70 @@
     "rule": "applications.app_type = \"suricata_extract\" && application_metrics.metric = \"zero_sized\" && application_metrics.value > \"0\"",
     "name": "Suricata Extract Submit zero sized files > 0",
     "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"cape\" && application_metrics.metric = \"reported\" && application_metrics.value > 0",
+    "name": "CAPE reported = 0, nothing is processing",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"cape\" && application_metrics.metric = \"critical\" && application_metrics.value > 0",
+    "name": "CAPE Criticals > 0",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"cape\" && application_metrics.metric = \"error\" && application_metrics.value > 0",
+    "name": "CAPE Errors > 0",
+    "severity": "critical"
+  },
+  {
+    "builder": {"condition":"AND","rules":[
+                                           {"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},
+                                           {"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"regex","value":"disk.*fail.*"},
+                                           {"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"number","operator":"greater_or_equal","value":"1"}
+                                         ],"valid":false},
+    "name": "SMART: one or more disk is has failures",
+    "severity": "critical"
+  },
+  {
+    "builder": {"condition":"AND","rules":[
+                                           {"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},
+                                           {"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"regex","value":"disk.*readfailure"},
+                                           {"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"number","operator":"greater_or_equal","value":"1"}
+                                         ],"valid":false},
+    "name": "SMART: one or more disk is has self test read failures",
+    "severity": "critical"
+  },
+  {
+    "builder": {"condition":"AND","rules":[
+                                           {"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},
+                                           {"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"regex","value":"disk.*unknownfail"},
+                                           {"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"number","operator":"greater_or_equal","value":"1"}
+                                         ],"valid":false},
+    "name": "SMART: one or more disk is has self test unknown failures",
+    "severity": "critical"
+  },
+  {
+    "builder": {"condition":"AND","rules":[
+                                           {"id":"mempools.mempool_class","field":"mempools.mempool_class","type":"string","input":"text","operator":"equal","value":"system"},
+                                           {"id":"mempools.mempool_perc","field":"mempools.mempool_perc","type":"string","input":"number","operator":"greater_or_equal","value":"90"},
+                                           {"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"linux"}
+                                         ],"valid":false},
+    "name": "Linux High Memory Usage, >= 90% in use",
+    "severity": "warning"
+  },
+  {
+    "builder": {"condition":"AND","rules":[
+                                           {"id":"mempools.mempool_class","field":"mempools.mempool_class","type":"string","input":"text","operator":"equal","value":"system"},
+                                           {"id":"mempools.mempool_perc","field":"mempools.mempool_perc","type":"string","input":"number","operator":"greater_or_equal","value":"95"},
+                                           {"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"linux"}
+                                         ],"valid":false},
+    "name": "Linux High Memory Usage, >= 95% in use",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"zfs\" && application_metrics.metric like \"pool_%_%_errors\" && application_metrics.value > \"0\"",
+    "name": "ZFS: pool with errors present",
+    "severity": "critical"
   }
 ]

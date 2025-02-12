@@ -28,7 +28,7 @@ namespace App\Http\Controllers\Table;
 use App\Models\EntPhysical;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use LibreNMS\Util\Url;
+use Illuminate\Support\Facades\Blade;
 
 class InventoryController extends TableController
 {
@@ -37,7 +37,7 @@ class InventoryController extends TableController
         return [
             'device' => 'nullable|int',
             'descr' => 'nullable|string',
-            'model'=> 'nullable|string',
+            'model' => 'nullable|string',
             'serial' => 'nullable|string',
         ];
     }
@@ -86,7 +86,7 @@ class InventoryController extends TableController
     public function formatItem($entPhysical)
     {
         return [
-            'device' => Url::deviceLink($entPhysical->device),
+            'device' => Blade::render('<x-device-link :device="$device"/>', ['device' => $entPhysical->device]),
             'descr' => htmlspecialchars($entPhysical->entPhysicalDescr),
             'name' => htmlspecialchars($entPhysical->entPhysicalName),
             'model' => htmlspecialchars($entPhysical->entPhysicalModelName),

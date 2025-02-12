@@ -4,12 +4,12 @@ $rrd_filename = Rrd::name($device['hostname'], 'netstats-ip');
 
 $stats = [
     'ipForwDatagrams' => [],
-    'ipInDelivers'    => [],
-    'ipInReceives'    => [],
-    'ipOutRequests'   => [],
-    'ipInDiscards'    => [],
-    'ipOutDiscards'   => [],
-    'ipOutNoRoutes'   => [],
+    'ipInDelivers' => [],
+    'ipInReceives' => [],
+    'ipOutRequests' => [],
+    'ipInDiscards' => [],
+    'ipOutDiscards' => [],
+    'ipOutNoRoutes' => [],
 ];
 
 $i = 0;

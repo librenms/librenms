@@ -27,9 +27,9 @@ namespace App\Http\Controllers\Table;
 
 use App\Models\Port;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Blade;
 use LibreNMS\Config;
 use LibreNMS\Util\Html;
-use LibreNMS\Util\Url;
 
 class CustomersController extends TableController
 {
@@ -103,12 +103,12 @@ class CustomersController extends TableController
     public function formatItem($port)
     {
         return [
-            'port_descr_descr'   => $port->port_descr_descr,
-            'hostname'          => Url::deviceLink($port->device),
-            'ifDescr'            => Url::portLink($port),
-            'port_descr_speed'   => $port->port_descr_speed,
+            'port_descr_descr' => $port->port_descr_descr,
+            'hostname' => Blade::render('<x-device-link :device="$device"/>', ['device' => $port->device]),
+            'ifDescr' => Blade::render('<x-port-link :port="$port"/>', ['port' => $port]),
+            'port_descr_speed' => $port->port_descr_speed,
             'port_descr_circuit' => $port->port_descr_circuit,
-            'port_descr_notes'   => $port->port_descr_notes,
+            'port_descr_notes' => $port->port_descr_notes,
         ];
     }
 
@@ -124,12 +124,12 @@ class CustomersController extends TableController
         $graph_data = Html::graphRow($graph_array);
 
         return [
-            'port_descr_descr'   => $graph_data[0],
-            'hostname'          => $graph_data[1],
-            'ifDescr'            => '',
-            'port_descr_speed'   => '',
+            'port_descr_descr' => $graph_data[0],
+            'hostname' => $graph_data[1],
+            'ifDescr' => '',
+            'port_descr_speed' => '',
             'port_descr_circuit' => $graph_data[2],
-            'port_descr_notes'   => $graph_data[3],
+            'port_descr_notes' => $graph_data[3],
         ];
     }
 

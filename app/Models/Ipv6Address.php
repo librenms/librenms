@@ -26,6 +26,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 class Ipv6Address extends PortRelatedModel
 {
     public $timestamps = false;
@@ -39,4 +41,9 @@ class Ipv6Address extends PortRelatedModel
         'port_id',
         'context_name',
     ];
+
+    public function network(): BelongsTo
+    {
+        return $this->belongsTo(Ipv6Network::class, 'ipv6_network_id', 'ipv6_network_id');
+    }
 }

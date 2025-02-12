@@ -9,10 +9,10 @@ if (Config::get('discover_services_templates')) {
 if (Config::get('discover_services')) {
     // FIXME: use /etc/services?
     $known_services = [
-        22  => 'ssh',
-        25  => 'smtp',
-        53  => 'dns',
-        80  => 'http',
+        22 => 'ssh',
+        25 => 'smtp',
+        53 => 'dns',
+        80 => 'http',
         110 => 'pop',
         143 => 'imap',
     ];

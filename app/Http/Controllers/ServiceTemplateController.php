@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Interfaces\ToastInterface;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\Service;
 use App\Models\ServiceTemplate;
-use Flasher\Prime\FlasherInterface;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use LibreNMS\Alerting\QueryBuilderFilter;
@@ -60,7 +60,7 @@ class ServiceTemplateController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function store(Request $request, FlasherInterface $flasher)
+    public function store(Request $request, ToastInterface $toast)
     {
         $this->validate(
             $request, [
@@ -69,7 +69,7 @@ class ServiceTemplateController extends Controller
                 'groups.*' => 'integer',
                 'devices' => 'array',
                 'devices.*' => 'integer',
-                'check' => 'string',
+                'check' => 'required|string',
                 'type' => 'required|in:dynamic,static',
                 'rules' => 'json|required_if:type,dynamic',
                 'param' => 'nullable|string',
@@ -105,7 +105,7 @@ class ServiceTemplateController extends Controller
         }
 
         $template->groups()->sync($request->groups);
-        $flasher->addSuccess(__('Service Template :name created', ['name' => $template->name]));
+        $toast->success(__('Service Template :name created', ['name' => $template->name]));
 
         return redirect()->route('services.templates.index');
     }
@@ -146,7 +146,7 @@ class ServiceTemplateController extends Controller
      * @param  \App\Models\ServiceTemplate  $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function update(Request $request, ServiceTemplate $template, FlasherInterface $flasher)
+    public function update(Request $request, ServiceTemplate $template, ToastInterface $toast)
     {
         $this->validate(
             $request, [
@@ -214,9 +214,9 @@ class ServiceTemplateController extends Controller
         if ($template->isDirty() || $devices_updated || isset($device_groups_updated)) {
             try {
                 if ($template->save() || $devices_updated || isset($device_groups_updated)) {
-                    $flasher->addSuccess(__('Service Template :name updated', ['name' => $template->name]));
+                    $toast->success(__('Service Template :name updated', ['name' => $template->name]));
                 } else {
-                    $flasher->addError(__('Failed to save'));
+                    $toast->error(__('Failed to save'));
 
                     return redirect()->back()->withInput();
                 }
@@ -226,7 +226,7 @@ class ServiceTemplateController extends Controller
                 ]);
             }
         } else {
-            $flasher->addInfo(__('No changes made'));
+            $toast->info(__('No changes made'));
         }
 
         return redirect()->route('services.templates.index');

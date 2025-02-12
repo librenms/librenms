@@ -35,6 +35,7 @@ We list below what we make use of including the license compliance.
 - Code for UBNT Devices Mark Gibbons <mgibbons@oemcomp.com> Initial code base submitted via PR721
 - [Jquery LazyLoad](http://www.appelsiini.net/projects/lazyload): MIT License
 - [influxdb-php](https://github.com/influxdb/influxdb-php): MIT License
+- [influxdb-client-php](https://github.com/influxdata/influxdb-client-php): MIT License
 - [HTML Purifier](http://htmlpurifier.org/): LGPL v2.1
 - [Symfony Yaml](https://github.com/symfony/yaml): MIT
 - [PHPMailer](https://github.com/PHPMailer/PHPMailer): LGPL v2.1

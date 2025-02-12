@@ -28,39 +28,39 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Min',
-        'ds'       => 's0dropped_files',
+        'descr' => 'Min',
+        'ds' => 's0dropped_files',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Max',
-        'ds'       => 's1dropped_files',
+        'descr' => 'Max',
+        'ds' => 's1dropped_files',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Mean',
-        'ds'       => 's3dropped_files',
+        'descr' => 'Mean',
+        'ds' => 's3dropped_files',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Median',
-        'ds'       => 's4dropped_files',
+        'descr' => 'Median',
+        'ds' => 's4dropped_files',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Mode',
-        'ds'       => 's5dropped_files',
+        'descr' => 'Mode',
+        'ds' => 's5dropped_files',
     ];
     if ($vars['stddev'] == 'on') {
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr'    => 'StdDev',
-            'ds'       => 's7dropped_files',
+            'descr' => 'StdDev',
+            'ds' => 's7dropped_files',
         ];
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr'    => 'StdDevP',
-            'ds'       => 's9dropped_files',
+            'descr' => 'StdDevP',
+            'ds' => 's9dropped_files',
         ];
     }
 } else {

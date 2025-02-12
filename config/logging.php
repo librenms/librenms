@@ -80,15 +80,15 @@ return [
 
         'single' => [
             'driver' => 'single',
-            'path' => env('APP_LOG', \LibreNMS\Config::get('log_file', base_path('logs/librenms.log'))),
-            'formatter' => \App\Logging\NoColorFormatter::class,
-            'level' => env('LOG_LEVEL', 'error'),
+            'path' => env('APP_LOG', base_path('logs/librenms.log')),
+            'formatter' => \App\Logging\LogFileFormatter::class,
+            'level' => env('LOG_LEVEL', 'warning'),
             'replace_placeholders' => true,
         ],
 
         'daily' => [
             'driver' => 'daily',
-            'path' => env('APP_LOG', \LibreNMS\Config::get('log_file', base_path('logs/librenms.log'))),
+            'path' => env('APP_LOG', base_path('logs/librenms.log')),
             'formatter' => \App\Logging\NoColorFormatter::class,
             'level' => env('LOG_LEVEL', 'error'),
             'days' => 14,

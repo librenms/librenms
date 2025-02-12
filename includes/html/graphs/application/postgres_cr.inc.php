@@ -24,15 +24,15 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Rollbacks',
-            'ds'       => 'rollbacks',
-            'colour'   => '28774F',
+            'descr' => 'Rollbacks',
+            'ds' => 'rollbacks',
+            'colour' => '28774F',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Commits',
-            'ds'       => 'commits',
-            'colour'   => '28774F',
+            'descr' => 'Commits',
+            'ds' => 'commits',
+            'colour' => '28774F',
         ],
     ];
 } else {

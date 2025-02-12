@@ -1,0 +1,433 @@
+ELTEX-MES-ISS-ENV-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC
+    eltMesIss
+        FROM ELTEX-MES-ISS-MIB
+    issSwitchFanEntry
+        FROM ARICENT-ISS-MIB
+    issSwitchFanIndex, issSwitchFanStatus
+        FROM ARICENT-ISS-MIB;
+
+eltMesIssEnvMIB MODULE-IDENTITY
+    LAST-UPDATED "202106230000Z"
+    ORGANIZATION "Eltex Enterprise, Ltd."
+    CONTACT-INFO
+        "eltex-co.ru"
+    DESCRIPTION
+        "This private MIB module contains Eltex's hardware enviroment
+         definition."
+    REVISION "201904040000Z"
+    DESCRIPTION "Initial revision."
+    REVISION "202011250000Z"
+    DESCRIPTION "Added eltMesIssEnvDyingGasp, eltMesIssBatteryMonitorEnable objects."
+    REVISION "202104010000Z"
+    DESCRIPTION "Added eltMesIssEnvFan object."
+    REVISION "202106230000Z"
+    DESCRIPTION "Added eltMesIssEnvFanThresholdTable object."
+    ::= { eltMesIss 12 }
+
+-- Top level MIB structure
+
+eltMesIssEnvObjects        OBJECT IDENTIFIER ::= { eltMesIssEnvMIB 1 }
+eltMesIssEnvNotifications  OBJECT IDENTIFIER ::= { eltMesIssEnvMIB 2 }
+
+-- MIB Groups
+
+eltMesIssEnvDryContacts OBJECT IDENTIFIER ::= { eltMesIssEnvObjects 1 }
+eltMesIssEnvResetButton OBJECT IDENTIFIER ::= { eltMesIssEnvObjects 2 }
+eltMesIssEnvBattery     OBJECT IDENTIFIER ::= { eltMesIssEnvObjects 3 }
+eltMesIssEnvDyingGasp   OBJECT IDENTIFIER ::= { eltMesIssEnvObjects 4 }
+eltMesIssEnvFan         OBJECT IDENTIFIER ::= { eltMesIssEnvObjects 5 }
+eltMesIssEnvPowerSource OBJECT IDENTIFIER ::= { eltMesIssEnvObjects 6 }
+
+eltMesIssEnvNotificationsPrefix  OBJECT IDENTIFIER ::= { eltMesIssEnvNotifications 0 }
+
+-- -----------------------------------------------------------------------------
+--  Textual Conversions
+-- -----------------------------------------------------------------------------
+
+EltMesIssBatteryState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "States of the battery."
+    SYNTAX  INTEGER {
+        notoperational(1),
+        notpresent(2),
+        recharge(3),
+        low(4),
+        discharge(5),
+        operational(6)
+    }
+
+-- -----------------------------------------------------------------------------
+-- Dry Contacts global configuration
+-- -----------------------------------------------------------------------------
+
+eltMesIssEnvDryContactsNotificationEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Disable or enable generation of eltMesIssEnvDryContactsTrap
+         notification upon changing state of any dry contacts."
+    DEFVAL { false }
+    ::= { eltMesIssEnvDryContacts 1 }
+
+-- -----------------------------------------------------------------------------
+-- Dry Contacts state table
+-- -----------------------------------------------------------------------------
+
+eltMesIssEnvDryContactsStateTable OBJECT-TYPE
+    SYNTAX      SEQUENCE  OF EltMesIssEnvDryContactsStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains information about dry contacts state."
+   ::=  { eltMesIssEnvDryContacts 2 }
+
+eltMesIssEnvDryContactsStateEntry OBJECT-TYPE
+    SYNTAX      EltMesIssEnvDryContactsStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in eltMesIssEnvDryContactsStateTable."
+    INDEX { eltMesIssEnvDryContactsGroup, eltMesIssEnvDryContactsIndex }
+    ::=  { eltMesIssEnvDryContactsStateTable 1 }
+
+EltMesIssEnvDryContactsStateEntry ::= SEQUENCE {
+        eltMesIssEnvDryContactsGroup  Integer32,
+        eltMesIssEnvDryContactsIndex  Integer32,
+        eltMesIssEnvDryContactsState  INTEGER
+    }
+
+eltMesIssEnvDryContactsGroup OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This variable uniquely identifies the group containing the
+         dry contacts pair."
+    ::= { eltMesIssEnvDryContactsStateEntry 1 }
+
+eltMesIssEnvDryContactsIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This variable uniquely identifies the dry contacts pair within group
+         eltMesIssEnvDryContactsGroup."
+    ::= { eltMesIssEnvDryContactsStateEntry 2 }
+
+eltMesIssEnvDryContactsState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        opened(1),
+        closed(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable describes current state of dry contacts pair."
+    ::= { eltMesIssEnvDryContactsStateEntry 3 }
+
+-- -----------------------------------------------------------------------------
+-- Reset button global mode
+-- -----------------------------------------------------------------------------
+
+eltEnvResetButtonMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enable(0),
+        disable(1),
+        reset-only(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Mode of reset button: 0 - Enable, 1 - Disable, 2 - Reset-only mode"
+    DEFVAL { enable }
+    ::= { eltMesIssEnvResetButton 1 }
+
+-- -----------------------------------------------------------------------------
+-- External battery state table
+-- -----------------------------------------------------------------------------
+
+eltMesIssBatteryStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EltMesIssBatteryStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table of battery status maintained by the environmental monitor
+         card."
+    ::= { eltMesIssEnvBattery 1 }
+
+eltMesIssBatteryStatusEntry OBJECT-TYPE
+    SYNTAX      EltMesIssBatteryStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the battery status table, representing the status of
+         the associated battery maintained by the environmental monitor."
+    INDEX  { eltMesIssBatteryStatusIndex }
+    ::= { eltMesIssBatteryStatusTable 1 }
+
+EltMesIssBatteryStatusEntry ::= SEQUENCE {
+    eltMesIssBatteryStatusIndex INTEGER,
+    eltMesIssBatteryStatus      EltMesIssBatteryState,
+    eltMesIssBatteryLevel       INTEGER
+}
+
+eltMesIssBatteryStatusIndex OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Unique index for the battery being instrumented. This index is for SNMP
+         purposes only, and has no intrinsic meaning."
+    ::= { eltMesIssBatteryStatusEntry 1 }
+
+eltMesIssBatteryStatus OBJECT-TYPE
+    SYNTAX      EltMesIssBatteryState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The mandatory state of the battery being instrumented."
+    ::= { eltMesIssBatteryStatusEntry 2 }
+
+eltMesIssBatteryLevel OBJECT-TYPE
+    SYNTAX      INTEGER (0..100 | 255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remaining percentage of battery charge. Value of 255 means that this
+         parameter is undefined due to battery not supporting this feature or
+         because it cannot be obtained in current state."
+    ::= { eltMesIssBatteryStatusEntry 3 }
+
+-- -----------------------------------------------------------------------------
+-- External battery monitor
+-- -----------------------------------------------------------------------------
+eltMesIssBatteryMonitorEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the presence of a battery in the system
+         should be monitored or not."
+    DEFVAL { true }
+    ::= { eltMesIssEnvBattery 2 }
+
+-- -----------------------------------------------------------------------------
+-- Dying Gasp configuration
+-- -----------------------------------------------------------------------------
+
+eltMesIssDyingGaspStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the dying gasp event handler is
+         enabled or disabled in the system."
+    DEFVAL  { enable }
+    ::= { eltMesIssEnvDyingGasp 1 }
+
+-- -----------------------------------------------------------------------------
+-- Fan Table extension
+-- -----------------------------------------------------------------------------
+
+eltMesIssEnvFanTable    OBJECT-TYPE
+    SYNTAX                            SEQUENCE OF EltMesIssEnvFanEntry
+    MAX-ACCESS                        not-accessible
+    STATUS                            current
+    DESCRIPTION
+        "This table augments the IssSwitchFanTable table."
+    ::= { eltMesIssEnvFan 1 }
+
+eltMesIssEnvFanEntry    OBJECT-TYPE
+    SYNTAX                            EltMesIssEnvFanEntry
+    MAX-ACCESS                        not-accessible
+    STATUS                            current
+    DESCRIPTION
+        "Contains information related to fan speed."
+    AUGMENTS { issSwitchFanEntry }
+    ::= { eltMesIssEnvFanTable 1 }
+
+EltMesIssEnvFanEntry ::= SEQUENCE {
+        eltMesIssEnvFanSpeed          Integer32,
+        eltMesIssEnvFanSpeedLevel     Integer32
+    }
+
+eltMesIssEnvFanSpeed OBJECT-TYPE
+    SYNTAX     Integer32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Numeric representation of the switch fan speed in RPM."
+    ::= { eltMesIssEnvFanEntry 1 }
+
+eltMesIssEnvFanSpeedLevel OBJECT-TYPE
+    SYNTAX     Integer32 (0..3)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates the switch fan speed level (0 - lowest, 3 - highest)."
+    ::= { eltMesIssEnvFanEntry 2 }
+
+eltMesIssEnvFanThresholdTable    OBJECT-TYPE
+    SYNTAX            SEQUENCE OF EltMesIssEnvFanThresholdEntry
+    MAX-ACCESS        not-accessible
+    STATUS            current
+    DESCRIPTION
+        "This table contains the information about fan speed thresholds."
+    ::= { eltMesIssEnvFan 2 }
+
+eltMesIssEnvFanThresholdEntry    OBJECT-TYPE
+    SYNTAX            EltMesIssEnvFanThresholdEntry
+    MAX-ACCESS        not-accessible
+    STATUS            current
+    DESCRIPTION
+        "Contains information related to fan speed thresholds."
+    INDEX { issSwitchFanIndex,
+            eltMesIssEnvFanThresholdLevel }
+    ::= { eltMesIssEnvFanThresholdTable 1 }
+
+EltMesIssEnvFanThresholdEntry ::= SEQUENCE {
+        eltMesIssEnvFanThresholdLevel   Integer32,
+        eltMesIssEnvFanThresholdMin     Integer32,
+        eltMesIssEnvFanThresholdMax     Integer32
+    }
+
+eltMesIssEnvFanThresholdLevel    OBJECT-TYPE
+    SYNTAX            Integer32
+    MAX-ACCESS        not-accessible
+    STATUS            current
+    DESCRIPTION
+        "Indicates the fan speed level"
+    ::= { eltMesIssEnvFanThresholdEntry 1 }
+
+eltMesIssEnvFanThresholdMin OBJECT-TYPE
+    SYNTAX            Integer32
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "Low fan speed threshold in RPM."
+    ::= { eltMesIssEnvFanThresholdEntry 2 }
+
+eltMesIssEnvFanThresholdMax OBJECT-TYPE
+    SYNTAX            Integer32
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "High fan speed threshold in RPM."
+    ::= { eltMesIssEnvFanThresholdEntry 3 }
+
+-- -----------------------------------------------------------------------------
+-- Power source table
+-- -----------------------------------------------------------------------------
+
+eltMesIssEnvPowerSourceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE  OF EltMesIssEnvPowerSourceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains information about power sources state."
+   ::=  { eltMesIssEnvPowerSource 1 }
+
+eltMesIssEnvPowerSourceEntry OBJECT-TYPE
+    SYNTAX      EltMesIssEnvPowerSourceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in eltMesIssEnvPowerSourceStateTable."
+    INDEX { eltMesIssEnvPowerSourceIndex }
+    ::=  { eltMesIssEnvPowerSourceTable 1 }
+
+EltMesIssEnvPowerSourceEntry ::= SEQUENCE {
+        eltMesIssEnvPowerSourceIndex  Integer32,
+        eltMesIssEnvPowerSourceType   INTEGER,
+        eltMesIssEnvPowerSourceState  INTEGER
+    }
+
+eltMesIssEnvPowerSourceIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This variable uniquely identifies the power source number."
+    ::= { eltMesIssEnvPowerSourceEntry 1 }
+
+eltMesIssEnvPowerSourceType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        main(1),
+        redundant(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable describes current type of power source."
+    ::= { eltMesIssEnvPowerSourceEntry 2 }
+
+eltMesIssEnvPowerSourceState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        operational(1),
+        not-operational(2),
+        not-present(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable describes current state of power source."
+    ::= { eltMesIssEnvPowerSourceEntry 3 }
+
+-- -----------------------------------------------------------------------------
+-- Notifications
+-- -----------------------------------------------------------------------------
+
+eltMesIssEnvDryContactsTrap NOTIFICATION-TYPE
+    OBJECTS  {
+        eltMesIssEnvDryContactsGroup,
+        eltMesIssEnvDryContactsIndex,
+        eltMesIssEnvDryContactsState
+    }
+    STATUS   current
+    DESCRIPTION
+        "A eltMesIssEnvDryContactsTrap is generated upon dry contacts status
+         change."
+    ::= { eltMesIssEnvNotificationsPrefix 1 }
+
+-- -----------------------------------------------------------------------------
+-- External battery trap notify
+-- -----------------------------------------------------------------------------
+
+eltMesIssBatteryTrap NOTIFICATION-TYPE
+    OBJECTS  {
+        eltMesIssBatteryStatus,
+        eltMesIssBatteryLevel
+    }
+    STATUS   current
+    DESCRIPTION
+        "Battery status notification trap message."
+    ::= { eltMesIssEnvNotificationsPrefix 2 }
+
+-- -----------------------------------------------------------------------------
+-- Fan status trap notify
+-- -----------------------------------------------------------------------------
+
+eltMesIssEnvFanStatusTrap NOTIFICATION-TYPE
+    OBJECTS  {
+        issSwitchFanIndex,
+        issSwitchFanStatus,
+        eltMesIssEnvFanSpeed,
+        eltMesIssEnvFanSpeedLevel
+    }
+    STATUS   current
+    DESCRIPTION
+        "Fan status notification trap message."
+    ::= { eltMesIssEnvNotificationsPrefix 3 }
+
+END

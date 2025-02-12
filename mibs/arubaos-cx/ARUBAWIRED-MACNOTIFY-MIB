@@ -1,0 +1,280 @@
+--**MOD+***********************************************************************
+--* Module:    ARUBAWIRED-MACNOTIFY-MIB.mib
+--*
+--* (c) Copyright 2020-2021 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This MIB is used for MAC specific SNMP traps notifications
+--*          that display dynamic MAC table changes for learn, age, move, and
+--*          remove events.
+--*
+--**MOD-***********************************************************************
+
+ARUBAWIRED-MACNOTIFY-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      Unsigned32, Integer32, OBJECT-TYPE, MODULE-IDENTITY,
+      NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+      MacAddress 
+            FROM SNMPv2-TC
+      OBJECT-GROUP, NOTIFICATION-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+      wndFeatures
+        FROM ARUBAWIRED-NETWORKING-OID;
+
+   macNotify MODULE-IDENTITY
+      LAST-UPDATED "202103240000Z" -- March 24, 2021
+      ORGANIZATION "HPE/Aruba Networking Division"
+      CONTACT-INFO "Hewlett Packard Company
+                     8000 Foothills Blvd.
+                     Roseville, CA 95747"
+    DESCRIPTION
+        "This MIB module describes the MAC notification objects
+        that are sent when dynamic MAC events occur: learn, move, age,
+        remove."
+
+   REVISION     "202103240000Z"  -- Mar 24, 2021
+   DESCRIPTION  "Added MAC-NOTIFY MIB module."
+   ::= { wndFeatures 19 }
+
+   macNotifyConformance         OBJECT IDENTIFIER
+          ::= { macNotify 4 }
+
+   arubaWiredMacNotify  OBJECT IDENTIFIER
+          ::= { macNotify 3 }
+
+   arubaWiredMacNotifyConformance  OBJECT IDENTIFIER
+          ::= { macNotify 2 }
+
+   arubaWiredMacNotifyConfigObjects       OBJECT IDENTIFIER
+          ::= { macNotify 1 }
+
+   arubaWiredMacNotifyNotificationObjects OBJECT IDENTIFIER
+          ::= { macNotify 0 }
+
+
+-- **********************
+--  Group Definitions
+-- ***********************
+
+macNotifyDataGroups          OBJECT IDENTIFIER ::= { macNotifyConformance 1 }
+macNotifyTrapsGroups         OBJECT IDENTIFIER ::= { macNotifyConformance 2 }
+macNotifySystemGroups        OBJECT IDENTIFIER ::= { macNotifyConformance 3 }
+macNotifyCompliance          OBJECT IDENTIFIER ::= { macNotifyConformance 4 }
+
+macNotifyDataGroup OBJECT-GROUP
+    OBJECTS {
+        arubaWiredMacNotifyAction,
+        arubaWiredMacNotifyMacAddress,
+        arubaWiredMacNotifyFromPortId,
+        arubaWiredMacNotifyToPortId,
+        arubaWiredMacNotifyVlanId
+    }
+    STATUS      current
+    DESCRIPTION
+        "Information for MAC-Notify Traps."
+    ::= { macNotifyDataGroups 1 }
+
+macNotifyTrapsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        arubaWiredMacNotifyMacAddressTableChange
+    }
+    STATUS      current
+    DESCRIPTION
+        "Trap definition for MAC-Notify."
+    ::= { macNotifyDataGroups 2 }
+
+macNotifySystemGroup OBJECT-GROUP
+    OBJECTS {
+        arubaWiredMacNotifyEnable
+    }
+    STATUS      current
+    DESCRIPTION
+        "Information for MAC-Notify System configurations."
+    ::= { macNotifyDataGroups 3 }
+
+-- **********************
+--  Global trap attributes
+-- ***********************
+
+-- trap enable / disable
+
+   arubaWiredMacNotifyEnable  OBJECT-TYPE
+         SYNTAX      INTEGER
+            {
+               enable (1),
+               disable(2)
+            }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION "Indicates whether the SNMP entity is permitted
+                     to generate learned, moved or removed
+                     arubaWiredMacNotifyMacAddressTableChange trap
+                     notifications.
+
+                     Default is disabled."
+         DEFVAL      { 2 } -- Notifications disabled
+         ::= { arubaWiredMacNotifyConfigObjects 1 }
+
+--****************************************************************
+--* MAC NOTIFY TABLE:
+--* This table tracks four dynamic MAC events (Learn / Age / Remove / Move)
+--* Each SNMP trap will display the following information:
+--*    arubaWiredMacNotifyAction is the Event Type
+--*    arubaWiredMacNotifyMacAddress is a Mac address
+--*    arubaWiredMacNotifyFromPortId is the From Port value
+--*    arubaWiredMacNotifyToPortId is the Port ID
+--*    arubaWiredMacNotifyVlanId is the VLAN ID
+--****************************************************************
+
+macNotifyChangeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MacNotifyChangeTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " The table structure that holds the entries
+        for the change events that occur in the MAC table."
+    REFERENCE
+        "ARUBAWIRED-MACNOTIFY-MIB.mib"
+    ::= { arubaWiredMacNotify 1 }
+
+macNotifyChangeTableEntry OBJECT-TYPE
+    SYNTAX      MacNotifyChangeTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MAC entry that holds information about a MAC table change"
+    INDEX   { arubaWiredMacNotifyMacAddress }
+    ::= { macNotifyChangeTable 1 }
+
+MacNotifyChangeTableEntry ::=
+    SEQUENCE {
+         arubaWiredMacNotifyAction
+            Integer32,
+         arubaWiredMacNotifyMacAddress
+            MacAddress,
+         arubaWiredMacNotifyFromPortId
+            Integer32,
+         arubaWiredMacNotifyToPortId
+            Integer32,
+         arubaWiredMacNotifyVlanId
+            Integer32
+    }
+
+arubaWiredMacNotifyAction OBJECT-TYPE
+        SYNTAX      Integer32 {
+                        aged(0),
+                        learned(1),
+                        moved(2),
+                        removed(3)
+                    }
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION "Indicate the dynamic MAC address table change
+                     action for arubaWiredMacNotifyMacAddress:
+                     learned, moved, removed or aged."
+        ::= { macNotifyChangeTableEntry 1 }
+
+arubaWiredMacNotifyMacAddress OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION "The MAC address that has been
+                     learned, moved, removed or aged
+                     in the MAC address table."
+        ::= { macNotifyChangeTableEntry 2 }
+
+arubaWiredMacNotifyFromPortId  OBJECT-TYPE
+        SYNTAX    Integer32
+        MAX-ACCESS  accessible-for-notify
+        STATUS    current
+        DESCRIPTION "The related from port index of the
+                     MAC address arubaWiredMacNotifyMacAddress.
+                     Port index will be determined by the action
+                     in arubaWiredMacNotifyAction.
+                     Action:
+                     Learned: The value will be zero
+                     Moved:   The port from which the MAC was moved
+                     Removed: The port from which MAC was removed
+                     Aged: The port on which the MAC has aged"
+        ::= { macNotifyChangeTableEntry 3 }
+
+   arubaWiredMacNotifyToPortId  OBJECT-TYPE
+        SYNTAX    Integer32
+        MAX-ACCESS  accessible-for-notify
+        STATUS    current
+        DESCRIPTION "The related port index of the
+                     MAC address arubaWiredMacNotifyMacAddress.
+                     Port index will be determined by the action
+                     in arubaWiredMacNotifyAction.
+                     Action:
+                     Learned: The actual port the MAC was learned
+                     Moved:   The port to which the MAC was moved
+                     Removed: The value will be zero
+                     Aged: The value will be zero "
+        ::= { macNotifyChangeTableEntry 4 }
+
+   arubaWiredMacNotifyVlanId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  accessible-for-notify
+        STATUS       current
+        DESCRIPTION "The related VLAN ID of the
+                     MAC address arubaWiredMacNotifyMacAddress.
+                     VLAN ID will be determined by the action
+                     in arubaWiredMacNotifyAction.
+                     Action:
+                     Learned: VLAN that the arubaWiredMacNotifyToPortId belongs to
+                     Moved:   VLAN that the arubaWiredMacNotifyToPortId belongs to
+                     Removed: VLAN that arubaWiredMacNotifyFromPortId belongs to
+                     Aged: VLAN that arubaWiredMacNotifyFromPortId belongs to"
+        ::= { macNotifyChangeTableEntry 5 }
+
+-- Trap Definition
+
+     arubaWiredMacNotifyMacAddressTableChange NOTIFICATION-TYPE
+        OBJECTS
+              {
+                 arubaWiredMacNotifyAction,
+                 arubaWiredMacNotifyMacAddress,
+                 arubaWiredMacNotifyFromPortId,
+                 arubaWiredMacNotifyToPortId,
+                 arubaWiredMacNotifyVlanId
+              }
+        STATUS      current
+        DESCRIPTION "The arubaWiredMacNotifyMacAddressTableChange
+                     notification signifies that arubaWiredMacNotifyEnable
+                     is enabled and either a MAC address table change
+                     learn / remove / age / moved occurred on a configured
+                     arubaWiredMacNotifyTrapConfig interface."
+        ::= { arubaWiredMacNotifyNotificationObjects 1 }
+
+macNotifyComplianceGroups MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for device support of MAC-Notify.
+         This supports 32-bit Path Cost values and the
+         more restricted bridge and port priorities."
+
+   MODULE
+
+   GROUP macNotifyDataGroup
+   DESCRIPTION
+        "Implementation is mandatory to provide traps with needed values."
+
+   GROUP macNotifyTrapsGroup
+    DESCRIPTION
+        "Implementation is mandatory to provide the definition of traps."
+
+   GROUP macNotifySystemGroup
+    DESCRIPTION
+        "Implementation is mandatory to provide global user settings for MAC-Notify."
+
+   ::= { macNotifyCompliance 1 }
+END

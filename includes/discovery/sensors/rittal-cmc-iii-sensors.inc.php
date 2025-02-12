@@ -22,6 +22,9 @@
  * @copyright 2020 Denny Friebe
  * @author    Denny Friebe <denny.friebe@icera-network.de>
  */
+
+use LibreNMS\Util\StringHelpers;
+
 $cmc_iii_var_table = snmpwalk_cache_oid($device, 'cmcIIIVarTable', [], 'RITTAL-CMC-III-MIB', null);
 $cmc_iii_sensors = [];
 
@@ -77,7 +80,7 @@ foreach ($cmc_iii_var_table as $index => $entry) {
             }
 
             // encode string to ensure that degree sign may be used properly for unit comparison
-            $unit = utf8_encode($entry['cmcIIIVarUnit']);
+            $unit = StringHelpers::inferEncoding($entry['cmcIIIVarUnit']);
             $type = 'state';
             $temperature_units = ['degree C', 'degree F', '°C', '°F'];
             if ($unit == 'mA') {
@@ -143,16 +146,16 @@ foreach ($cmc_iii_sensors as $sensor_id => $sensor_data) {
         $sensor_data['name'] = $sensor_data['name'] . '_' . $serial_number;
         $sensor_logic = [
             [
-                'value'   => 0,
+                'value' => 0,
                 'generic' => 0,
-                'graph'   => 1,
-                'descr'   => $sensor_data['logic'][0],
+                'graph' => 1,
+                'descr' => $sensor_data['logic'][0],
             ],
             [
-                'value'   => 1,
+                'value' => 1,
                 'generic' => 0,
-                'graph'   => 1,
-                'descr'   => $sensor_data['logic'][1],
+                'graph' => 1,
+                'descr' => $sensor_data['logic'][1],
             ],
         ];
 
@@ -190,11 +193,7 @@ foreach ($cmc_iii_sensors as $sensor_id => $sensor_data) {
 
         $sensor_data['value'] = ($sensor_data['value'] * $sensor_data['multiplier']);
     }
-    discover_sensor($valid['sensor'], $sensor_data['type'], $device, $sensor_data['oid'], $sensor_id, $sensor_data['name'], $sensor_data['desc'], $sensor_data['divisor'] ?? 1, $sensor_data['multiplier'] ?? 1, $sensor_data['low_limit'] ?? null, $sensor_data['low_warn_limit'] ?? null, $sensor_data['warn_limit'] ?? null, $sensor_data['high_limit'] ?? null, $sensor_data['value']);
-
-    if (isset($sensor_data['logic'])) {
-        create_sensor_to_state_index($device, $sensor_data['name'], $sensor_id);
-    }
+    discover_sensor(null, $sensor_data['type'], $device, $sensor_data['oid'], $sensor_id, $sensor_data['name'], $sensor_data['desc'], $sensor_data['divisor'] ?? 1, $sensor_data['multiplier'] ?? 1, $sensor_data['low_limit'] ?? null, $sensor_data['low_warn_limit'] ?? null, $sensor_data['warn_limit'] ?? null, $sensor_data['high_limit'] ?? null, $sensor_data['value']);
 }
 
 unset($cmc_iii_var_table, $cmc_iii_sensors, $index, $entry, $var_name_parts, $sensor_name, $var_type, $sensor_id, $sensor_logic, $unit, $type, $sensor_data, $serial_number);

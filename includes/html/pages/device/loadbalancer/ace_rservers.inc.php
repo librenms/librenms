@@ -33,9 +33,9 @@ echo ' Graphs: ';
 // "pkts"   => "Packets",
 // "errors" => "Errors");
 $graph_types = [
-    'curr'   => 'CurrentConns',
+    'curr' => 'CurrentConns',
     'failed' => 'FailedConns',
-    'total'  => 'TotalConns',
+    'total' => 'TotalConns',
 ];
 
 foreach ($graph_types as $type => $descr) {
@@ -88,7 +88,6 @@ foreach (dbFetchRows('SELECT * FROM `loadbalancer_rservers` WHERE `device_id` = 
 
         require 'includes/html/print-graphrow.inc.php';
 
-        // include("includes/html/print-interface-graphs.inc.php");
         echo '
    </td>
    </tr>';

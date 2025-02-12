@@ -74,9 +74,9 @@ class SocialiteController extends Controller
         if (array_key_exists('error', $request->query())) {
             $error = $request->query('error');
             $error_description = $request->query('error_description');
-            flash()->addError($error . ': ' . $error_description);
+            toast()->error($error . ': ' . $error_description);
 
-            return redirect()->route('login');
+            return redirect()->route('login')->with('block_auto_redirect', true);
         }
 
         $this->socialite_user = Socialite::driver($provider)->user();
@@ -121,10 +121,10 @@ class SocialiteController extends Controller
 
             return redirect()->intended();
         } catch (AuthenticationException $e) {
-            flash()->addError($e->getMessage());
-        }
+            toast()->error($e->getMessage());
 
-        return redirect()->route('login');
+            return redirect()->route('login')->with('block_auto_redirect', true);
+        }
     }
 
     private function register(string $provider): void
@@ -135,7 +135,7 @@ class SocialiteController extends Controller
 
         $user = User::firstOrNew([
             'auth_type' => "socialite_$provider",
-            'auth_id'   => $this->socialite_user->getId(),
+            'auth_id' => $this->socialite_user->getId(),
         ]);
 
         if ($user->user_id) {
@@ -147,13 +147,17 @@ class SocialiteController extends Controller
         $user->realname = $this->buildRealName();
 
         $user->save();
+
+        $default_role = LibreNMSConfig::get('auth.socialite.default_role');
+        if ($default_role !== null && $default_role != 'none') {
+            $user->setRoles([$default_role], true);
+        }
     }
 
     private function setRolesFromClaim(string $provider, $user): bool
     {
         $scopes = LibreNMSConfig::get('auth.socialite.scopes');
         $claims = LibreNMSConfig::get('auth.socialite.claims');
-        $default_role = LibreNMSConfig::get('auth.socialite.default_role');
 
         if (is_array($scopes) &&
             $this->socialite_user instanceof \Laravel\Socialite\AbstractUser &&
@@ -172,12 +176,6 @@ class SocialiteController extends Controller
 
                 return true;
             }
-        }
-
-        if ($default_role !== null && $default_role != 'none') {
-            $user->setRoles([$default_role], false);
-
-            return true;
         }
 
         return false;

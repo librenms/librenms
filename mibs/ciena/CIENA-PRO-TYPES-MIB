@@ -1,0 +1,117 @@
+CIENA-PRO-TYPES-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaPro
+        FROM CIENA-SMI
+    Counter64, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+cienaProTypesMIB MODULE-IDENTITY
+    LAST-UPDATED "202010010000Z"
+    ORGANIZATION 
+        "Ciena Corporation"
+    CONTACT-INFO 
+        "Web: http://www.ciena.com
+         Postal:   7035 Ridge Road
+                   Hanover, Maryland 21076
+                   U.S.A
+         Phone:    +1 800-921-1144
+         Fax:      +1 410-694-5750"
+    DESCRIPTION 
+        "This modules describes Ciena's release object for the all platform's"
+    REVISION    "202010010000Z"
+    DESCRIPTION 
+        "Initial Revision."
+    ::= { cienaPro 4 }
+
+
+TimeTicks64 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "This type is based on the timeticks type, but with 64-bit width."
+    SYNTAX      Counter64
+
+DateTime ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "YYYY-MM-DDTHH:MM:SSZ+-hh:mm
+         
+         where YYYY is the year, MM is the month expressed as a two-digit
+         month (zero padding if required), DD is the day of the month,
+         expressed as a two digit value. T is the literal character 'T',
+         HH is the hour of the day expressed as a two digit number, using
+         the 24-hour clock, MM is the minute of the hour expressed as a
+         two digit number. Z is the literal character 'Z', followed by a
+         timezone offset expressed in hours (hh) and minutes (mm), both
+         expressed as two digit numbers. The time offset is specified as
+         a positive or negative offset to UTC using the '+' or '-'
+         character preceding the offset.
+         
+         Optionally, fractional seconds can be expressed after the minute
+         of the hour as a decimal number of unspecified precision
+         reflecting fractions of a second."
+    SYNTAX      OCTET STRING
+
+DomainName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "253t"
+    STATUS      current
+    DESCRIPTION 
+        "A UTF-8 string with a max length of 253 characters"
+    SYNTAX      OCTET STRING (SIZE(1..253))
+
+AlarmDirection ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    SYNTAX      INTEGER { tx(1), rx(2), bi(3) }
+
+AlarmLocation ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    SYNTAX      INTEGER { nearend(2), farend(3) }
+
+AlarmSeverity ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Severity, based on X.733 perceived severity."
+    SYNTAX      INTEGER { unknown(1), critical(2), major(3), minor(4), 
+                    warning(5) }
+
+AlarmServiceImpact ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Service impact, either sa (service-affecting) or nsa (not-service-affecting)."
+    SYNTAX      INTEGER { nsa(1), sa(2) }
+
+DisplayString16 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "16t"
+    STATUS      current
+    DESCRIPTION 
+        "A UTF-8 string with a max length of 16 characters"
+    SYNTAX      OCTET STRING (SIZE(1..16))
+
+DisplayString32 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "32t"
+    STATUS      current
+    DESCRIPTION 
+        "A UTF-8 string with a max length of 32 characters"
+    SYNTAX      OCTET STRING (SIZE(1..32))
+
+DisplayString64 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "64t"
+    STATUS      current
+    DESCRIPTION 
+        "A UTF-8 string with a max length of 64 characters"
+    SYNTAX      OCTET STRING (SIZE(1..64))
+
+DisplayString128 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "128t"
+    STATUS      current
+    DESCRIPTION 
+        "A UTF-8 string with a max length of 128 characters"
+    SYNTAX      OCTET STRING (SIZE(1..128))
+
+END -- end of module CIENA-PRO-TYPES-MIB.

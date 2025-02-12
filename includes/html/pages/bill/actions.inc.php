@@ -79,15 +79,15 @@ if ($_POST['action'] == 'update_bill') {
     // NOTE: casting to string for mysqli bug (fixed by mysqlnd)
     if (dbUpdate(
         [
-            'bill_name'   => $_POST['bill_name'],
-            'bill_day'    => $_POST['bill_day'],
-            'bill_quota'  => (string) $bill_quota,
-            'bill_cdr'    => (string) $bill_cdr,
-            'bill_type'   => $_POST['bill_type'],
-            'dir_95th'    => $_POST['dir_95th'],
+            'bill_name' => $_POST['bill_name'],
+            'bill_day' => $_POST['bill_day'],
+            'bill_quota' => (string) $bill_quota,
+            'bill_cdr' => (string) $bill_cdr,
+            'bill_type' => $_POST['bill_type'],
+            'dir_95th' => $_POST['dir_95th'],
             'bill_custid' => $_POST['bill_custid'],
-            'bill_ref'    => $_POST['bill_ref'],
-            'bill_notes'  => $_POST['bill_notes'],
+            'bill_ref' => $_POST['bill_ref'],
+            'bill_notes' => $_POST['bill_notes'],
         ],
         'bills',
         '`bill_id` = ?',

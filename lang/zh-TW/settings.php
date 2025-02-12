@@ -58,7 +58,6 @@ return [
             'rrdtool' => ['name' => 'RRDTool 設定'],
             'snmp' => ['name' => 'SNMP'],
             'poller_modules' => ['name' => '輪詢器模組'],
-            'interface_types' => ['name' => 'RFC 7224 介面類型'],
         ],
         'system' => [
             'cleanup' => ['name' => '清理'],
@@ -375,10 +374,6 @@ return [
         'base_url' => [
             'description' => '指定 URL',
             'help' => 'This should *only* be set if you want to *force* a particular hostname/port. It will prevent the web interface being usable form any other hostname',
-        ],
-        'device_perf_purge' => [
-            'description' => '裝置效能項目大於',
-            'help' => 'Cleanup done by daily.sh',
         ],
         'distributed_poller' => [
             'description' => '啟用分散式輪詢 (需要額外設定)',
@@ -726,7 +721,7 @@ return [
             'help' => 'Cleanup done by daily.sh',
         ],
         'ports_purge' => [
-            'description' => '清除端口已刪除',
+            'description' => '清除已刪除的連接埠',
             'help' => 'Cleanup done by daily.sh',
         ],
         'prometheus' => [

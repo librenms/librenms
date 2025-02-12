@@ -20,27 +20,42 @@ if (Auth::user()->hasGlobalAdmin()) {
             echo generate_link('Latest', ['page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig']);
         }
 
-        if (Config::get('rancid_repo_type') == 'svn' && function_exists('svn_log')) {
-            $sep = ' | ';
-            $svnlogs = svn_log($rancid_file, SVN_REVISION_HEAD, null, 8);
-            $revlist = [];
-
-            foreach ($svnlogs as $svnlog) {
-                echo $sep;
-                $revlist[] = $svnlog['rev'];
-
-                if ($vars['rev'] == $svnlog['rev']) {
-                    echo '<span class="pagemenu-selected">';
-                }
-
-                $linktext = 'r' . $svnlog['rev'] . ' <small>' . date(Config::get('dateformat.byminute'), strtotime($svnlog['date'])) . '</small>';
-                echo generate_link($linktext, ['page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig', 'rev' => $svnlog['rev']]);
-
-                if ($vars['rev'] == $svnlog['rev']) {
-                    echo '</span>';
-                }
-
+        if (Config::get('rancid_repo_type') == 'svn') {
+            $svn_binary = Config::locateBinary('svn');
+            if (is_executable($svn_binary)) {
                 $sep = ' | ';
+
+                $process = new Process([$svn_binary, 'log', '-l 8', '-q', '--xml', $rancid_file], $rancid_path);
+                $process->run();
+                $svnlogs_xmlstring = $process->getOutput();
+                $svnlogs = [];
+
+                $svnlogs_xml = simplexml_load_string($svnlogs_xmlstring);
+                foreach ($svnlogs_xml->logentry as $svnlogentry) {
+                    $rev = $svnlogentry['revision'];
+                    $ts = strtotime($svnlogentry->date);
+                    $svnlogs[] = ['rev' => $rev, 'date' => $ts];
+                }
+
+                $revlist = [];
+
+                foreach ($svnlogs as $svnlog) {
+                    echo $sep;
+                    $revlist[] = $svnlog['rev'];
+
+                    if ($vars['rev'] == $svnlog['rev']) {
+                        echo '<span class="pagemenu-selected">';
+                    }
+
+                    $linktext = 'r' . $svnlog['rev'] . ' <small>' . date(Config::get('dateformat.byminute'), $svnlog['date']) . '</small>';
+                    echo generate_link($linktext, ['page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig', 'rev' => $svnlog['rev']]);
+
+                    if ($vars['rev'] == $svnlog['rev']) {
+                        echo '</span>';
+                    }
+
+                    $sep = ' | ';
+                }
             }
         }//end if
         if (Config::get('rancid_repo_type') == 'git') {
@@ -80,21 +95,29 @@ if (Auth::user()->hasGlobalAdmin()) {
         print_optionbar_end();
 
         if (Config::get('rancid_repo_type') == 'svn') {
-            if (function_exists('svn_log') && in_array($vars['rev'], $revlist)) {
-                [$diff, $errors] = svn_diff($rancid_file, $vars['rev'] - 1, $rancid_file, $vars['rev']);
+            $svn_binary = Config::locateBinary('svn');
+            if (is_executable($svn_binary) && in_array($vars['rev'], $revlist)) {
+                $process = new Process([$svn_binary, 'diff', '-c', 'r' . $vars['rev'], $rancid_file], $rancid_path);
+                $process->run();
+                $diff = $process->getOutput();
                 if (! $diff) {
                     $text = 'No Difference';
                 } else {
-                    $text = '';
-                    while (! feof($diff)) {
-                        $text .= fread($diff, 8192);
-                    }
-
-                    fclose($diff);
-                    fclose($errors);
+                    $text = $diff;
+                    $previous_config = $vars['rev'] . '^';
                 }
             } else {
-                $fh = fopen($rancid_file, 'r') or exit("Can't open file");
+                $fh = fopen($rancid_file, 'r');
+                if ($fh === false) {
+                    echo '<div class="alert alert-warning">Error: Cannot open Rancid configuration file for this device.</div>';
+
+                    return;
+                }
+                if (filesize($rancid_file) == 0) {
+                    echo '<div class="alert alert-warning">Error: Rancid configuration file for this device is empty.</div>';
+
+                    return;
+                }
                 $text = fread($fh, filesize($rancid_file));
                 fclose($fh);
             }
@@ -110,7 +133,17 @@ if (Auth::user()->hasGlobalAdmin()) {
                     $previous_config = $vars['rev'] . '^';
                 }
             } else {
-                $fh = fopen($rancid_file, 'r') or exit("Can't open file");
+                $fh = fopen($rancid_file, 'r');
+                if ($fh === false) {
+                    echo '<div class="alert alert-warning">Error: Cannot open Rancid configuration file for this device.</div>';
+
+                    return;
+                }
+                if (filesize($rancid_file) == 0) {
+                    echo '<div class="alert alert-warning">Error: Rancid configuration file for this device is empty.</div>';
+
+                    return;
+                }
                 $text = fread($fh, filesize($rancid_file));
                 fclose($fh);
             }
@@ -130,7 +163,8 @@ if (Auth::user()->hasGlobalAdmin()) {
         // Try with hostname as set in librenms first
         $oxidized_hostname = $device['hostname'];
         // fetch info about the node and then a list of versions for that node
-        $node_info = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/show/' . $oxidized_hostname . '?format=json'), true);
+        $response = (new \App\ApiClients\Oxidized())->getContent('/node/show/' . $oxidized_hostname . '?format=json');
+        $node_info = json_decode($response, true);
         if (! empty($node_info['last']['start'])) {
             $node_info['last']['start'] = date(Config::get('dateformat.long'), strtotime($node_info['last']['start']));
         }
@@ -166,7 +200,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             // populate current_version
             if (isset($_POST['config'])) {
                 [$oid,$date,$version] = explode('|', htmlspecialchars($_POST['config']));
-                $current_config = ['oid'=>$oid, 'date'=>$date, 'version'=>$version];
+                $current_config = ['oid' => $oid, 'date' => $date, 'version' => $version];
             } else { // no version selected
                 $current_config = ['oid' => $config_versions[0]['oid'], 'date' => $config_versions[0]['date'], 'version' => $config_total];
             }
@@ -175,7 +209,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             if (isset($_POST['diff'])) { // diff requested
                 [$oid,$date,$version] = explode('|', $_POST['prevconfig']);
                 if (isset($oid) && $oid != $current_config['oid']) {
-                    $previous_config = ['oid'=>$oid, 'date'=>$date, 'version'=>$version];
+                    $previous_config = ['oid' => $oid, 'date' => $date, 'version' => $version];
                 } elseif ($current_config['version'] != 1) {  // assume previous, unless current is first config
                     foreach ($config_versions as $key => $version) {
                         if ($version['oid'] == $current_config['oid']) {
@@ -281,6 +315,9 @@ if (Auth::user()->hasGlobalAdmin()) {
         } else {
             echo '<br />';
             print_error("We couldn't retrieve the device information from Oxidized");
+            if (isset($response) && preg_match('#<title>(.*)</title>#', $response, $error_matches)) {
+                print_error(strip_tags($error_matches[1]));
+            }
             $text = '';
         }
     }//end if

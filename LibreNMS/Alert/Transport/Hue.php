@@ -62,21 +62,21 @@ class Hue extends Transport
     public static function configTemplate(): array
     {
         return [
-            'config'=>[
+            'config' => [
                 [
-                    'title'=> 'Host',
+                    'title' => 'Host',
                     'name' => 'hue-host',
                     'descr' => 'Hue Host',
                     'type' => 'text',
                 ],
                 [
-                    'title'=> 'Hue User',
+                    'title' => 'Hue User',
                     'name' => 'hue-user',
                     'descr' => 'Phillips Hue Host',
                     'type' => 'text',
                 ],
                 [
-                    'title'=> 'Duration',
+                    'title' => 'Duration',
                     'name' => 'hue-duration',
                     'descr' => 'Phillips Hue Duration',
                     'type' => 'select',

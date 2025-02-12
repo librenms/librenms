@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\Eventlog;
 use Illuminate\Support\Str;
+use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\JsonAppBase64DecodeException;
 use LibreNMS\Exceptions\JsonAppBlankJsonException;
@@ -13,6 +15,7 @@ use LibreNMS\Exceptions\JsonAppWrongVersionException;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\Oid;
 use LibreNMS\Util\UserFuncHelper;
 
 function bulk_sensor_snmpget($device, $sensors)
@@ -40,8 +43,8 @@ function bulk_sensor_snmpget($device, $sensors)
 function sensor_precache($device, $type)
 {
     $sensor_cache = [];
-    if (file_exists('includes/polling/sensors/pre-cache/' . $device['os'] . '.inc.php')) {
-        include 'includes/polling/sensors/pre-cache/' . $device['os'] . '.inc.php';
+    if (file_exists(Config::get('install_dir') . '/includes/polling/sensors/pre-cache/' . $device['os'] . '.inc.php')) {
+        include Config::get('install_dir') . '/includes/polling/sensors/pre-cache/' . $device['os'] . '.inc.php';
     }
 
     return $sensor_cache;
@@ -49,8 +52,6 @@ function sensor_precache($device, $type)
 
 function poll_sensor($device, $class)
 {
-    global $agent_sensors;
-
     $sensors = [];
     $misc_sensors = [];
     $all_sensors = [];
@@ -70,17 +71,16 @@ function poll_sensor($device, $class)
     $sensor_cache = sensor_precache($device, $class);
 
     foreach ($sensors as $sensor) {
-        echo 'Checking (' . $sensor['poller_type'] . ") $class " . $sensor['sensor_descr'] . '... ' . PHP_EOL;
+        Log::info('Checking (' . $sensor['poller_type'] . ") $class " . $sensor['sensor_descr'] . '... ');
 
         if ($sensor['poller_type'] == 'snmp') {
             $mibdir = null;
 
             $sensor_value = trim(str_replace('"', '', $snmp_data[$sensor['sensor_oid']] ?? ''));
-
-            if (file_exists('includes/polling/sensors/' . $class . '/' . $device['os'] . '.inc.php')) {
-                require 'includes/polling/sensors/' . $class . '/' . $device['os'] . '.inc.php';
-            } elseif (isset($device['os_group']) && file_exists('includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php')) {
-                require 'includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php';
+            if (file_exists(Config::get('install_dir') . '/includes/polling/sensors/' . $class . '/' . $device['os'] . '.inc.php')) {
+                require Config::get('install_dir') . '/includes/polling/sensors/' . $class . '/' . $device['os'] . '.inc.php';
+            } elseif (isset($device['os_group']) && file_exists(Config::get('install_dir') . '/includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php')) {
+                require Config::get('install_dir') . '/includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php';
             }
 
             if ($class == 'state') {
@@ -113,15 +113,15 @@ function poll_sensor($device, $class)
                 $sensor['new_value'] = $sensor_value;
                 $all_sensors[] = $sensor;
             } else {
-                echo "no agent data!\n";
+                Log::info('no agent data!');
                 continue;
             }
         } elseif ($sensor['poller_type'] == 'ipmi') {
-            echo " already polled.\n";
+            Log::info(' already polled.');
             // ipmi should probably move here from the ipmi poller file (FIXME)
             continue;
         } else {
-            echo "unknown poller type!\n";
+            Log::info('unknown poller type!');
             continue;
         }//end if
     }
@@ -135,36 +135,36 @@ function poll_sensor($device, $class)
 function record_sensor_data($device, $all_sensors)
 {
     $supported_sensors = [
-        'airflow'        => 'cfm',
-        'ber'            => '',
-        'bitrate'        => 'bps',
-        'charge'         => '%',
+        'airflow' => 'cfm',
+        'ber' => '',
+        'bitrate' => 'bps',
+        'charge' => '%',
         'chromatic_dispersion' => 'ps/nm',
-        'cooling'        => 'W',
-        'count'          => '',
-        'current'        => 'A',
-        'delay'          => 's',
-        'dbm'            => 'dBm',
-        'eer'            => 'eer',
-        'fanspeed'       => 'rpm',
-        'frequency'      => 'Hz',
-        'humidity'       => '%',
-        'load'           => '%',
-        'loss'           => '%',
-        'percent'        => '%',
-        'power'          => 'W',
+        'cooling' => 'W',
+        'count' => '',
+        'current' => 'A',
+        'delay' => 's',
+        'dbm' => 'dBm',
+        'eer' => 'eer',
+        'fanspeed' => 'rpm',
+        'frequency' => 'Hz',
+        'humidity' => '%',
+        'load' => '%',
+        'loss' => '%',
+        'percent' => '%',
+        'power' => 'W',
         'power_consumed' => 'kWh',
-        'power_factor'   => '',
-        'pressure'       => 'kPa',
+        'power_factor' => '',
+        'pressure' => 'kPa',
         'quality_factor' => 'dB',
-        'runtime'        => 'Min',
-        'signal'         => 'dBm',
-        'snr'            => 'SNR',
-        'state'          => '#',
-        'temperature'    => 'C',
-        'tv_signal'      => 'dBmV',
-        'voltage'        => 'V',
-        'waterflow'      => 'l/m',
+        'runtime' => 'Min',
+        'signal' => 'dBm',
+        'snr' => 'SNR',
+        'state' => '#',
+        'temperature' => 'C',
+        'tv_signal' => 'dBmV',
+        'voltage' => 'V',
+        'waterflow' => 'l/m',
     ];
 
     foreach ($all_sensors as $sensor) {
@@ -198,7 +198,7 @@ function record_sensor_data($device, $all_sensors)
 
         $rrd_def = RrdDefinition::make()->addDataset('sensor', $sensor['rrd_type']);
 
-        echo "$sensor_value $unit\n";
+        Log::info("$sensor_value $unit");
 
         $fields = [
             'sensor' => $sensor_value,
@@ -217,10 +217,10 @@ function record_sensor_data($device, $all_sensors)
         // FIXME also warn when crossing WARN level!
         if ($sensor['sensor_limit_low'] != '' && $prev_sensor_value > $sensor['sensor_limit_low'] && $sensor_value < $sensor['sensor_limit_low'] && $sensor['sensor_alert'] == 1) {
             echo 'Alerting for ' . $device['hostname'] . ' ' . $sensor['sensor_descr'] . "\n";
-            log_event("$class under threshold: $sensor_value $unit (< {$sensor['sensor_limit_low']} $unit)", $device, $sensor['sensor_class'], 4, $sensor['sensor_id']);
+            Eventlog::log("$class under threshold: $sensor_value $unit (< {$sensor['sensor_limit_low']} $unit)", $device['device_id'], $sensor['sensor_class'], Severity::Warning, $sensor['sensor_id']);
         } elseif ($sensor['sensor_limit'] != '' && $prev_sensor_value < $sensor['sensor_limit'] && $sensor_value > $sensor['sensor_limit'] && $sensor['sensor_alert'] == 1) {
             echo 'Alerting for ' . $device['hostname'] . ' ' . $sensor['sensor_descr'] . "\n";
-            log_event("$class above threshold: $sensor_value $unit (> {$sensor['sensor_limit']} $unit)", $device, $sensor['sensor_class'], 4, $sensor['sensor_id']);
+            Eventlog::log("$class above threshold: $sensor_value $unit (> {$sensor['sensor_limit']} $unit)", $device['device_id'], $sensor['sensor_class'], Severity::Warning, $sensor['sensor_id']);
         }
         if ($sensor['sensor_class'] == 'state' && $prev_sensor_value != $sensor_value) {
             $trans = array_column(
@@ -232,7 +232,7 @@ function record_sensor_data($device, $all_sensors)
                 'state_value'
             );
 
-            log_event("$class sensor {$sensor['sensor_descr']} has changed from {$trans[$prev_sensor_value]} ($prev_sensor_value) to {$trans[$sensor_value]} ($sensor_value)", $device, $class, 3, $sensor['sensor_id']);
+            Eventlog::log("$class sensor {$sensor['sensor_descr']} has changed from {$trans[$prev_sensor_value]} ($prev_sensor_value) to {$trans[$sensor_value]} ($sensor_value)", $device['device_id'], $class, Severity::Notice, $sensor['sensor_id']);
         }
         if ($sensor_value != $prev_sensor_value) {
             dbUpdate(['sensor_current' => $sensor_value, 'sensor_prev' => $prev_sensor_value, 'lastupdate' => ['NOW()']], 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', [$sensor['sensor_class'], $sensor['sensor_id']]);
@@ -441,7 +441,7 @@ function update_application($app, $response, $metrics = [], $status = '')
  */
 function json_app_get($device, $extend, $min_version = 1)
 {
-    $output = snmp_get($device, 'nsExtendOutputFull.' . \LibreNMS\Util\Oid::ofString($extend), '-Oqv', 'NET-SNMP-EXTEND-MIB');
+    $output = snmp_get($device, 'nsExtendOutputFull.' . Oid::encodeString($extend), '-Oqv', 'NET-SNMP-EXTEND-MIB');
 
     // save for returning if not JSON
     $orig_output = $output;
@@ -470,10 +470,15 @@ function json_app_get($device, $extend, $min_version = 1)
         if (Debug::isVerbose()) {
             echo 'Decoded Base64+GZip Output: ' . $output . "\n\n";
         }
+    } else {
+        $output = stripslashes($output);
+        if (Debug::isVerbose()) {
+            echo 'Output post stripslashes: ' . $output . "\n\n";
+        }
     }
 
     //  turn the JSON into a array
-    $parsed_json = json_decode(stripslashes($output), true);
+    $parsed_json = json_decode($output, true);
 
     // improper JSON or something else was returned. Populate the variable with an error.
     if (json_last_error() !== JSON_ERROR_NONE) {

@@ -35,7 +35,7 @@ class DeviceOverview extends DeviceOverviewHook
 
 //    public string $view = 'resources.views.device-overview';
 
-    public function authorize(\App\Models\User $user, \App\Models\Device $device): bool
+    public function authorize(\Illuminate\Contracts\Auth\Authenticatable $user, \App\Models\Device $device): bool
     {
         // In this example, we check if the user has a custom role/permission and if it is member of any device groups
 //        return $user->can('view-extra-port-info') && $device->has('groups');

@@ -28,39 +28,39 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Min',
-        'ds'       => 's0api_calls',
+        'descr' => 'Min',
+        'ds' => 's0api_calls',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Max',
-        'ds'       => 's1api_calls',
+        'descr' => 'Max',
+        'ds' => 's1api_calls',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Mean',
-        'ds'       => 's3api_calls',
+        'descr' => 'Mean',
+        'ds' => 's3api_calls',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Median',
-        'ds'       => 's4api_calls',
+        'descr' => 'Median',
+        'ds' => 's4api_calls',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Mode',
-        'ds'       => 's5api_calls',
+        'descr' => 'Mode',
+        'ds' => 's5api_calls',
     ];
     if ($vars['stddev'] == 'on') {
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr'    => 'StdDev',
-            'ds'       => 's7api_calls',
+            'descr' => 'StdDev',
+            'ds' => 's7api_calls',
         ];
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr'    => 'StdDevP',
-            'ds'       => 's9api_calls',
+            'descr' => 'StdDevP',
+            'ds' => 's9api_calls',
         ];
     }
 } else {

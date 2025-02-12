@@ -1,4 +1,4 @@
-mib: FORTINET-FORTISWITCH-MIB
+mib: FORTINET-FORTISWITCH-MIB:ENTITY-MIB:ENTITY-SENSOR-MIB
 modules:
     mempools:
         data:
@@ -21,3 +21,25 @@ modules:
                 oid: fsSysCpuUsage
                 num_oid: '.1.3.6.1.4.1.12356.106.4.1.2.{{ $index }}'
                 index: 1
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - entPhysicalName
+        state:
+            data:
+                -
+                    oid: entPhySensorTable
+                    num_oid: '.1.3.6.1.2.1.99.1.1.1.5.{{ $index }}'
+                    index: 'entPhySensorTable.{{ $index }}'
+                    descr: entPhysicalName
+                    value: entPhySensorOperStatus
+                    skip_values:
+                        -
+                            oid: entPhySensorType
+                            op: '!='
+                            value: 12
+                    states:
+                        - { value: 1, descr: OK, graph: 1, generic: 0 }
+                        - { value: 2, descr: Not OK, graph: 1, generic: 2 }

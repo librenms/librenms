@@ -35,9 +35,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use LibreNMS\Util\Html;
-use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Url;
 use LibreNMS\Util\Validate;
 
@@ -130,7 +130,7 @@ class TopDevicesController extends WidgetController
 
         /** @var Builder $query */
         return $query->with(['device' => function ($query) {
-            return $query->select('device_id', 'hostname', 'sysName', 'status', 'os');
+            return $query->select('device_id', 'hostname', 'sysName', 'display', 'status', 'os');
         }])
             ->select("$left_table.device_id")
             ->leftJoin('devices', "$left_table.device_id", 'devices.device_id')
@@ -151,7 +151,7 @@ class TopDevicesController extends WidgetController
     {
         $settings = $this->getSettings();
 
-        return Device::hasAccess(Auth::user())->select('device_id', 'hostname', 'sysName', 'status', 'os')
+        return Device::hasAccess(Auth::user())->select('device_id', 'hostname', 'sysName', 'display', 'status', 'os')
             ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings['time_interval']))
             ->when($settings['device_group'], function ($query) use ($settings) {
                 return $query->inDeviceGroup($settings['device_group']);
@@ -186,7 +186,7 @@ class TopDevicesController extends WidgetController
         $settings = $this->getSettings();
 
         $query = Port::hasAccess(Auth::user())->with(['device' => function ($query) {
-            $query->select('device_id', 'hostname', 'sysName', 'status', 'os');
+            $query->select('device_id', 'hostname', 'sysName', 'display', 'status', 'os');
         }])
             ->select('device_id')
             ->groupBy('device_id')
@@ -231,7 +231,7 @@ class TopDevicesController extends WidgetController
 
         $results = $query->get()->map(function ($device) {
             /** @var Device $device */
-            return $this->standardRow($device, 'device_ping_perf', ['tab' => 'graphs', 'group' => 'poller']);
+            return $this->standardRow($device, 'device_icmp_perf', ['tab' => 'graphs', 'group' => 'poller']);
         });
 
         return $this->formatData('Response time', $results);
@@ -288,7 +288,7 @@ class TopDevicesController extends WidgetController
         $settings = $this->getSettings();
 
         $query = Storage::hasAccess(Auth::user())->with(['device' => function ($query) {
-            $query->select('device_id', 'hostname', 'sysName', 'status', 'os');
+            $query->select('device_id', 'hostname', 'sysName', 'display', 'status', 'os');
         }])
             ->leftJoin('devices', 'storage.device_id', 'devices.device_id')
             ->select('storage.device_id', 'storage_id', 'storage_descr', 'storage_perc', 'storage_perc_warn')
@@ -320,7 +320,7 @@ class TopDevicesController extends WidgetController
 
             return [
                 Url::deviceLink($device, $device->shortDisplayName()),
-                StringHelpers::shortenText($storage->storage_descr, 50),
+                Str::limit($storage->storage_descr, 50),
                 Url::overlibLink(
                     $link,
                     Html::percentageBar(150, 20, $storage->storage_perc, '', $storage->storage_perc . '%', $storage->storage_perc_warn),

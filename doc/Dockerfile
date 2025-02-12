@@ -1,4 +1,4 @@
-FROM squidfunk/mkdocs-material:8.3.9
+FROM squidfunk/mkdocs-material:9.5.20
 
 RUN \
   pip install --no-cache-dir \
@@ -7,4 +7,5 @@ RUN \
     'mkdocs-exclude' \
     'mkdocs-git-revision-date-localized-plugin' \
     'mkdocs-macros-plugin' \
+    'mkdocs-include-dir-to-nav' \
   && rm -rf /tmp/*

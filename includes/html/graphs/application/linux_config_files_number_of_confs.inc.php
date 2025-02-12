@@ -20,17 +20,17 @@ $rrd_filename = Rrd::name($device['hostname'], [
 if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($rrdArray as $rrdVar => $rrdValues) {
         $rrd_list[] = [
-            'cdef_rpn'   => $rrdValues['cdef_rpn'] ?? null,
-            'colour'     => $rrdValues['colour'] ?? null,
-            'descr'      => $rrdValues['descr'],
-            'divider'    => $rrdValues['divider'] ?? null,
-            'ds'         => $rrdVar,
-            'filename'   => $rrd_filename,
+            'cdef_rpn' => $rrdValues['cdef_rpn'] ?? null,
+            'colour' => $rrdValues['colour'] ?? null,
+            'descr' => $rrdValues['descr'],
+            'divider' => $rrdValues['divider'] ?? null,
+            'ds' => $rrdVar,
+            'filename' => $rrd_filename,
             'multiplier' => $rrdValues['multiplier'] ?? null,
         ];
     }
 } else {
-    d_echo('RRD ' . $rrd_filename . ' not found');
+    graph_error('No Data file ' . basename($rrd_filename), 'No Data');
 }
 
 require 'includes/html/graphs/generic_multi_line_exact_numbers.inc.php';

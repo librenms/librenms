@@ -14,43 +14,43 @@ if (! isset($vars['privoxyPage'])) {
 
 print_optionbar_start();
 
-$link_tmp = generate_link('General', $link_array, ['app'=>'privoxy', 'privoxyPage'=>'general']);
+$link_tmp = generate_link('General', $link_array, ['app' => 'privoxy', 'privoxyPage' => 'general']);
 if ($vars['privoxyPage'] == 'general') {
     $link_tmp = '<span class="pagemenu-selected">' . $link_tmp . '</span>';
 }
 echo $link_tmp . ' | ';
 
-$link_tmp = generate_link('Blocks', $link_array, ['app'=>'privoxy', 'privoxyPage'=>'blocks']);
+$link_tmp = generate_link('Blocks', $link_array, ['app' => 'privoxy', 'privoxyPage' => 'blocks']);
 if ($vars['privoxyPage'] == 'blocks') {
     $link_tmp = '<span class="pagemenu-selected">' . $link_tmp . '</span>';
 }
 echo $link_tmp . ' | ';
 
-$link_tmp = generate_link('Connections', $link_array, ['app'=>'privoxy', 'privoxyPage'=>'conn']);
+$link_tmp = generate_link('Connections', $link_array, ['app' => 'privoxy', 'privoxyPage' => 'conn']);
 if ($vars['privoxyPage'] == 'conn') {
     $link_tmp = '<span class="pagemenu-selected">' . $link_tmp . '</span>';
 }
 echo $link_tmp . ' | ';
 
-$link_tmp = generate_link('Domains', $link_array, ['app'=>'privoxy', 'privoxyPage'=>'domains']);
+$link_tmp = generate_link('Domains', $link_array, ['app' => 'privoxy', 'privoxyPage' => 'domains']);
 if ($vars['privoxyPage'] == 'domains') {
     $link_tmp = '<span class="pagemenu-selected">' . $link_tmp . '</span>';
 }
 echo $link_tmp . ' | ';
 
-$link_tmp = generate_link('HTTP Req Type', $link_array, ['app'=>'privoxy', 'privoxyPage'=>'http_type']);
+$link_tmp = generate_link('HTTP Req Type', $link_array, ['app' => 'privoxy', 'privoxyPage' => 'http_type']);
 if ($vars['privoxyPage'] == 'http_type') {
     $link_tmp = '<span class="pagemenu-selected">' . $link_tmp . '</span>';
 }
 echo $link_tmp . ' | ';
 
-$link_tmp = generate_link('HTTP Response Codes', $link_array, ['app'=>'privoxy', 'privoxyPage'=>'http_resp']);
+$link_tmp = generate_link('HTTP Response Codes', $link_array, ['app' => 'privoxy', 'privoxyPage' => 'http_resp']);
 if ($vars['privoxyPage'] == 'http_resp') {
     $link_tmp = '<span class="pagemenu-selected">' . $link_tmp . '</span>';
 }
 echo $link_tmp . ' | ';
 
-$link_tmp = generate_link('HTTP Version', $link_array, ['app'=>'privoxy', 'privoxyPage'=>'http_ver']);
+$link_tmp = generate_link('HTTP Version', $link_array, ['app' => 'privoxy', 'privoxyPage' => 'http_ver']);
 if ($vars['privoxyPage'] == 'http_ver') {
     $link_tmp = '<span class="pagemenu-selected">' . $link_tmp . '</span>';
 }
@@ -63,10 +63,10 @@ if ($vars['privoxyPage'] == 'general') {
         'privoxy_client_requests' => 'Client Requests',
         'privoxy_blocks' => 'Blocked Requests',
         'privoxy_block_percent' => 'Blocked Requests, Percent',
-        'privoxy_crunches'=>'Crunches',
-        'privoxy_unique_domains'=>'Unique Domains',
-        'privoxy_unique_bdomains'=>'Unique Domains Blocked',
-        'privoxy_ubd_per'=>'Unique Domains Blocked, Percent',
+        'privoxy_crunches' => 'Crunches',
+        'privoxy_unique_domains' => 'Unique Domains',
+        'privoxy_unique_bdomains' => 'Unique Domains Blocked',
+        'privoxy_ubd_per' => 'Unique Domains Blocked, Percent',
         'privoxy_bytes_to_client' => 'Bytes Sent To Clients',
         'privoxy_imp_accounted' => 'Improperly Accounted',
     ];
@@ -82,7 +82,7 @@ if ($vars['privoxyPage'] == 'general') {
     $graphs = [
         'privoxy_blocks' => 'Blocked Requests',
         'privoxy_block_percent' => 'Blocked Requests, Percent',
-        'privoxy_crunches'=>'Crunches',
+        'privoxy_crunches' => 'Crunches',
         'privoxy_unique_bdomains' => 'Unique Domains, Blocked',
         'privoxy_unique_bdomains_np' => 'Unique Domains Without Port, Blocked',
     ];

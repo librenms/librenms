@@ -20,7 +20,6 @@
 
 //We can use RFC1213 or IP-FORWARD-MIB or MPLS-L3VPN-STD-MIB
 
-use App\Models\Device;
 use LibreNMS\Config;
 use LibreNMS\Util\IPv4;
 
@@ -97,7 +96,7 @@ if (! isset($ipForwardNb['0']['inetCidrRouteNumber']) && $device['os'] != 'route
         $entryClean['inetCidrRouteIfIndex'] = $ipRoute['ipRouteIfIndex'];
         $entryClean['context_name'] = '';
         $entryClean['device_id'] = $device['device_id'];
-        $entryClean['port_id'] = Device::find($device['device_id'])->ports()->where('ifIndex', '=', $entryClean['inetCidrRouteIfIndex'])->first()->port_id;
+        $entryClean['port_id'] = \App\Facades\PortCache::getIdFromIfIndex($entryClean['inetCidrRouteIfIndex'], $device['device_id']);
         $entryClean['updated_at'] = $update_timestamp;
         $current = $mixed['']['ipv4'][$inetCidrRouteDest][$inetCidrRoutePfxLen][$entryClean['inetCidrRoutePolicy']]['ipv4'][$inetCidrRouteNextHop];
         if (isset($current) && isset($current['db']) && count($current['db']) > 0 && $delete_row[$current['db']['route_id']] != 1) {
@@ -142,7 +141,7 @@ if (isset($ipForwardNb['0']['inetCidrRouteNumber']) && $ipForwardNb['0']['inetCi
                     $entry['inetCidrRouteNextHop'] = normalize_snmp_ip_address($inetCidrRouteNextHop);
                     $entry['context_name'] = '';
                     $entry['device_id'] = $device['device_id'];
-                    $entry['port_id'] = Device::find($device['device_id'])->ports()->where('ifIndex', '=', $entry['inetCidrRouteIfIndex'])->first()->port_id;
+                    $entry['port_id'] = \App\Facades\PortCache::getIdFromIfIndex($entry['inetCidrRouteIfIndex'], $device['device_id']);
                     $entry['updated_at'] = $update_timestamp;
                     unset($entry['inetCidrRouteAge']);
                     unset($entry['inetCidrRouteMetric2']);
@@ -203,7 +202,7 @@ if (isset($ipForwardNb['0']['ipCidrRouteNumber']) && $ipForwardNb['0']['ipCidrRo
                         $entryClean['inetCidrRouteNextHopAS'] = $entry['IP-FORWARD-MIB::ipCidrRouteNextHopAS'];
                         $entryClean['context_name'] = '';
                         $entryClean['device_id'] = $device['device_id'];
-                        $entryClean['port_id'] = Device::find($device['device_id'])->ports()->where('ifIndex', '=', $entryClean['inetCidrRouteIfIndex'])->first()->port_id;
+                        $entryClean['port_id'] = PortCache::getIdFromIfIndex($entryClean['inetCidrRouteIfIndex'], $device['device_id']);
                         $entryClean['updated_at'] = $update_timestamp;
                         $current = $mixed['']['ipv4'][$inetCidrRouteDest][$inetCidrRoutePfxLen][$entryClean['inetCidrRoutePolicy']]['ipv4'][$inetCidrRouteNextHop] ?? null;
                         if (isset($current) && isset($current['db']) && count($current['db']) > 0 && $delete_row[$current['db']['route_id']] != 1) {
@@ -230,11 +229,13 @@ $oid = 'mplsL3VpnVrfPerfCurrNumRoutes';
 $mpls_vpn_route_nb = snmpwalk_group($device, $oid, $mib, 6, []);
 $mpls_skip = false;
 
-foreach ($mpls_vpn_route_nb as $vpnId => $route_nb) {
-    if ($route_nb['mplsL3VpnVrfPerfCurrNumRoutes'] > $max_routes) {
-        echo "Skipping all MPLS routes because vpn instance $vpnId has more than $max_routes routes.";
-        $mpls_skip = true;
-        break;
+if (! empty($mpls_vpn_route_nb) && count($mpls_vpn_route_nb) > 1) {
+    foreach ($mpls_vpn_route_nb as $vpnId => $route_nb) {
+        if ($route_nb['mplsL3VpnVrfPerfCurrNumRoutes'] > $max_routes) {
+            echo "Skipping all MPLS routes because vpn instance $vpnId has more than $max_routes routes.";
+            $mpls_skip = true;
+            break;
+        }
     }
 }
 
@@ -263,12 +264,18 @@ if ($mpls_skip == false) {
                         $entry['context_name'] = $vpnId;
                         $entry['device_id'] = $device['device_id'];
                         $entry['inetCidrRouteIfIndex'] = $entry['mplsL3VpnVrfRteInetCidrIfIndex'];
-                        $entry['port_id'] = Device::find($device['device_id'])->ports()->where('ifIndex', '=', $entry['inetCidrRouteIfIndex'])->first()->port_id;
+                        $entry['port_id'] = \App\Facades\PortCache::getIdFromIfIndex($entry['inetCidrRouteIfIndex'], $device['device_id']);
                         $entry['updated_at'] = $update_timestamp;
                         $entry['inetCidrRouteType'] = $entry['mplsL3VpnVrfRteInetCidrType'];
                         $entry['inetCidrRouteProto'] = $entry['mplsL3VpnVrfRteInetCidrProto'];
                         $entry['inetCidrRouteMetric1'] = $entry['mplsL3VpnVrfRteInetCidrMetric1'];
                         $entry['inetCidrRouteNextHopAS'] = $entry['mplsL3VpnVrfRteInetCidrNextHopAS'];
+                        unset($entry['mplsL3VpnVrfRteInetCidrPolicy']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrNextHop']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrNHopType']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrDest']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrDestType']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrPfxLen']);
                         unset($entry['mplsL3VpnVrfRteXCPointer']);
                         unset($entry['mplsL3VpnVrfRteInetCidrMetric1']);
                         unset($entry['mplsL3VpnVrfRteInetCidrMetric2']);

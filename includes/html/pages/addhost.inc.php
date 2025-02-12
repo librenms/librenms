@@ -26,69 +26,69 @@ if (! empty($_POST['hostname'])) {
     $hostname = strip_tags($_POST['hostname']);
     if (! \LibreNMS\Util\Validate::hostname($hostname) && ! IP::isValid($hostname)) {
         print_error("Invalid hostname or IP: $hostname");
-    }
-
-    $new_device = new \App\Models\Device(['hostname' => $hostname]);
-
-    if (Auth::user()->hasGlobalRead()) {
-        // Settings common to SNMPv2 & v3
-        if ($_POST['port']) {
-            $new_device->port = strip_tags($_POST['port']);
-        }
-
-        if ($_POST['transport']) {
-            $new_device->transport = strip_tags($_POST['transport']);
-        }
-
-        $additional = [];
-        if (! $snmp_enabled) {
-            $new_device->snmp_disable = 1;
-            $new_device->os = $_POST['os'] ? strip_tags($_POST['os_id']) : 'ping';
-            $new_device->hardware = strip_tags($_POST['hardware']);
-            $new_device->sysName = strip_tags($_POST['sysName']);
-        } elseif ($_POST['snmpver'] === 'v2c' || $_POST['snmpver'] === 'v1') {
-            $new_device->snmpver = strip_tags($_POST['snmpver']);
-            $communities = Config::get('snmp.community');
-            if ($_POST['community']) {
-                $new_device->community = $_POST['community'];
-                $communities = [$_POST['community']];
-            }
-            print_message("Adding host $hostname communit" . (count($communities) == 1 ? 'y' : 'ies') . ' ' . implode(', ', array_map('htmlspecialchars', $communities)) . " port $new_device->port using $new_device->transport");
-        } elseif ($_POST['snmpver'] === 'v3') {
-            $new_device->snmpver = 'v3';
-            $new_device->authlevel = strip_tags($_POST['authlevel']);
-            $new_device->authname = $_POST['authname'];
-            $new_device->authpass = $_POST['authpass'];
-            $new_device->authalgo = strip_tags($_POST['authalgo']);
-            $new_device->cryptopass = $_POST['cryptopass'];
-            $new_device->cryptoalgo = $_POST['cryptoalgo'];
-
-            print_message("Adding SNMPv3 host: $hostname port: $port");
-        } else {
-            print_error('Unsupported SNMP Version. There was a dropdown menu, how did you reach this error ?');
-        }//end if
-
-        try {
-            $new_device->poller_group = strip_tags($_POST['poller_group'] ?? '');
-            $new_device->port_association_mode = PortAssociationMode::getId($_POST['port_assoc_mode']);
-
-            $force_add = (isset($_POST['force_add']) && $_POST['force_add'] == 'on');
-            $result = (new ValidateDeviceAndCreate($new_device, $force_add))->execute();
-
-            if ($result) {
-                $link = \LibreNMS\Util\Url::deviceUrl($new_device->device_id);
-                print_message("Device added <a href='$link'>$hostname ($new_device->device_id)</a>");
-            }
-        } catch (HostUnreachableException $e) {
-            print_error($e->getMessage());
-            foreach ($e->getReasons() as $reason) {
-                print_error($reason);
-            }
-        } catch (Exception $e) {
-            print_error($e->getMessage());
-        }
     } else {
-        print_error("You don't have the necessary privileges to add hosts.");
+        $new_device = new \App\Models\Device(['hostname' => $hostname]);
+
+        if (Auth::user()->hasGlobalRead()) {
+            // Settings common to SNMPv2 & v3
+            if ($_POST['port']) {
+                $new_device->port = strip_tags($_POST['port']);
+            }
+
+            if ($_POST['transport']) {
+                $new_device->transport = strip_tags($_POST['transport']);
+            }
+
+            $additional = [];
+            if (! $snmp_enabled) {
+                $new_device->snmp_disable = 1;
+                $new_device->os = $_POST['os'] ? strip_tags($_POST['os_id']) : 'ping';
+                $new_device->hardware = strip_tags($_POST['hardware']);
+                $new_device->sysName = strip_tags($_POST['sysName']);
+            } elseif ($_POST['snmpver'] === 'v2c' || $_POST['snmpver'] === 'v1') {
+                $new_device->snmpver = strip_tags($_POST['snmpver']);
+                $communities = Config::get('snmp.community');
+                if ($_POST['community']) {
+                    $new_device->community = $_POST['community'];
+                    $communities = [$_POST['community']];
+                }
+                print_message("Adding host $hostname communit" . (count($communities) == 1 ? 'y' : 'ies') . ' ' . implode(', ', array_map('htmlspecialchars', $communities)) . " port $new_device->port using $new_device->transport");
+            } elseif ($_POST['snmpver'] === 'v3') {
+                $new_device->snmpver = 'v3';
+                $new_device->authlevel = strip_tags($_POST['authlevel']);
+                $new_device->authname = $_POST['authname'];
+                $new_device->authpass = $_POST['authpass'];
+                $new_device->authalgo = strip_tags($_POST['authalgo']);
+                $new_device->cryptopass = $_POST['cryptopass'];
+                $new_device->cryptoalgo = $_POST['cryptoalgo'];
+
+                print_message("Adding SNMPv3 host: $hostname port: $port");
+            } else {
+                print_error('Unsupported SNMP Version. There was a dropdown menu, how did you reach this error ?');
+            }//end if
+
+            try {
+                $new_device->poller_group = strip_tags($_POST['poller_group'] ?? '');
+                $new_device->port_association_mode = PortAssociationMode::getId($_POST['port_assoc_mode']);
+
+                $force_add = (isset($_POST['force_add']) && $_POST['force_add'] == 'on');
+                $result = (new ValidateDeviceAndCreate($new_device, $force_add))->execute();
+
+                if ($result) {
+                    $link = \LibreNMS\Util\Url::deviceUrl($new_device->device_id);
+                    print_message("Device added <a href='$link'>$hostname ($new_device->device_id)</a>");
+                }
+            } catch (HostUnreachableException $e) {
+                print_error($e->getMessage());
+                foreach ($e->getReasons() as $reason) {
+                    print_error(htmlentities($reason));
+                }
+            } catch (Exception $e) {
+                print_error($e->getMessage());
+            }
+        } else {
+            print_error("You don't have the necessary privileges to add hosts.");
+        }
     }
 }
 echo '    </div>
@@ -147,19 +147,28 @@ $pagetitle[] = 'Add host';
           <label for="snmpver" class="col-sm-3 control-label">SNMP Version</label>
           <div class="col-sm-3">
             <select name="snmpver" id="snmpver" class="form-control input-sm" onChange="changeForm();">
-              <option value="v1">v1</option>
-              <option value="v2c" selected>v2c</option>
-              <option value="v3">v3</option>
-            </select>
+                <?php
+                $snmpver_list = [ "v1", "v2c", "v3" ];
+                $snmpver_pref = Config::get('snmp.version.0', 'v2c');
+                foreach ($snmpver_list as $snmpver_item) {
+                    $selected = '';
+                    $snmpver_item == $snmpver_pref ? $selected = 'selected' : '';
+                    echo "<option value=\"" . $snmpver_item ."\"" . $selected . ">" . $snmpver_item. "</option>";
+                }
+                ?>
+	    </select>
           </div>
           <div class="col-sm-3">
-            <input type="text" name="port" placeholder="port" class="form-control input-sm">
+            <input type="text" name="port" placeholder="port" class="form-control input-sm" value="<?php echo Config::get('snmp.port', 161) ?>">
           </div>
           <div class="col-sm-3">
             <select name="transport" id="transport" class="form-control input-sm">
 <?php
-foreach (Config::get('snmp.transports') as $transport) {
-    echo "<option value='" . $transport . "'>" . $transport . '</option>';
+var_dump(Config::get('snmp.transports', ['udp']));
+foreach (Config::get('snmp.transports', 'udp') as $transport) {
+    $selected = '';
+    Config::get('snmp.transports')[0] == $transport ? $selected = 'selected' : ''; 
+    echo "<option value='" . $transport . $selected . "'>" . $transport . '</option>';
 }
 ?>
             </select>
@@ -193,7 +202,7 @@ foreach (PortAssociationMode::getModes() as $mode) {
           <div class="form-group">
             <label for="community" class="col-sm-3 control-label">Community</label>
             <div class="col-sm-9">
-              <input type="text" name="community" id="community" placeholder="Community" class="form-control input-sm">
+              <input type="text" name="community" id="community" placeholder="Community" class="form-control input-sm" value="<?php echo Config::get('snmp.community.0') ?>">
             </div>
           </div>
         </div>
@@ -207,22 +216,28 @@ foreach (PortAssociationMode::getModes() as $mode) {
             <label for="authlevel" class="col-sm-3 control-label">Auth Level</label>
             <div class="col-sm-3">
               <select name="authlevel" id="authlevel" class="form-control input-sm">
-                <option value="noAuthNoPriv" selected>noAuthNoPriv</option>
-                <option value="authNoPriv">authNoPriv</option>
-                <option value="authPriv">authPriv</option>
+                  <?php
+                  $authlevel_list = [ "noAuthNoPriv", "authNoPriv", "authPriv" ];
+                  $authlevel_pref = Config::get('snmp.v3.0.authlevel', 'noAuthNoPriv');
+                  foreach ($authlevel_list as $authlevel_item) {
+                      $selected = '';
+                      $authlevel_item == $authlevel_pref ? $selected = 'selected' : '';
+                      echo "<option value=\"" . $authlevel_item. "\" " . $selected . ">" . $authlevel_item. "</option>";
+                  }
+                  ?>
               </select>
             </div>
           </div>
           <div class="form-group">
             <label for="authname" class="col-sm-3 control-label">Auth User Name</label>
             <div class="col-sm-9">
-              <input type="text" name="authname" id="authname" class="form-control input-sm" autocomplete="off">
+              <input type="text" name="authname" id="authname" class="form-control input-sm" autocomplete="off" value="<?php echo Config::get('snmp.v3.0.authname') ?>">
             </div>
           </div>
           <div class="form-group">
             <label for="authpass" class="col-sm-3 control-label">Auth Password</label>
             <div class="col-sm-9">
-              <input type="text" name="authpass" id="authpass" placeholder="AuthPass" class="form-control input-sm" autocomplete="off">
+              <input type="text" name="authpass" id="authpass" placeholder="AuthPass" class="form-control input-sm" autocomplete="off" value="<?php echo Config::get('snmp.v3.0.authpass') ?>">
             </div>
           </div>
           <div class="form-group">
@@ -230,8 +245,11 @@ foreach (PortAssociationMode::getModes() as $mode) {
             <div class="col-sm-9">
               <select name="authalgo" id="authalgo" class="form-control input-sm">
                   <?php
+                  $algo_pref = Config::get('snmp.v3.0.authalgo');
                   foreach (\LibreNMS\SNMPCapabilities::authAlgorithms() as $algo => $enabled) {
-                      echo "<option value=\"$algo\"" . ($enabled ?: ' disabled') . ">$algo</option>";
+                      $selected = '';
+                      $algo == $algo_pref ? $selected = 'selected' : '';
+                      echo "<option value=\"$algo\"" . ($enabled ? '' : ' disabled') . " " . $selected . ">$algo</option>";
                   }
                   ?>
               </select>
@@ -243,7 +261,7 @@ foreach (PortAssociationMode::getModes() as $mode) {
           <div class="form-group">
             <label for="cryptopass" class="col-sm-3 control-label">Crypto Password</label>
             <div class="col-sm-9">
-              <input type="text" name="cryptopass" id="cryptopass" placeholder="Crypto Password" class="form-control input-sm" autocomplete="off">
+              <input type="text" name="cryptopass" id="cryptopass" placeholder="Crypto Password" class="form-control input-sm" autocomplete="off" value="<?php echo Config::get('snmp.v3.0.cryptopass') ?>">
             </div>
           </div>
           <div class="form-group">
@@ -251,8 +269,11 @@ foreach (PortAssociationMode::getModes() as $mode) {
             <div class="col-sm-9">
               <select name="cryptoalgo" id="cryptoalgo" class="form-control input-sm">
                   <?php
+                  $algo_pref = Config::get('snmp.v3.0.cryptoalgo');
                   foreach (\LibreNMS\SNMPCapabilities::cryptoAlgoritms() as $algo => $enabled) {
-                      echo "<option value=\"$algo\"" . ($enabled ?: ' disabled') . ">$algo</option>";
+                      $selected = '';
+                      $algo == $algo_pref ? $selected = 'selected' : '';
+                      echo "<option value=\"$algo\"" . ($enabled ? '' : ' disabled') . " ". $selected . ">$algo</option>";
                   }
                   ?>
               </select>
@@ -365,6 +386,8 @@ if (Config::get('distributed_poller') === true) {
 
     $("[name='snmp']").bootstrapSwitch('offColor','danger');
     $("[name='force_add']").bootstrapSwitch();
+
+    $(document).ready(function loadPage() { changeForm(); });
 <?php
 if (! $snmp_enabled) {
     echo '  $("[name=\'snmp\']").trigger(\'click\');';

@@ -46,7 +46,7 @@ class BasicApiTest extends DBTestCase
             ->assertJson([
                 'status' => 'ok',
                 'devices' => [$device->toArray()],
-                'count'=> 1,
+                'count' => 1,
             ]);
     }
 }

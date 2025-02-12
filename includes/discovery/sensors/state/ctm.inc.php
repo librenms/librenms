@@ -34,32 +34,32 @@ $states = [
 ];
 $octetSetup = [
     [
-        'oid'           => 'portOnM.0',
-        'state_name'    => 'portOnM',
-        'states'        => $states['power'],
-        'name'          => 'Master Port Enabled',
-        'num_oid'       => '.1.3.6.1.4.1.25868.1.12.0',
+        'oid' => 'portOnM.0',
+        'state_name' => 'portOnM',
+        'states' => $states['power'],
+        'name' => 'Master Port Enabled',
+        'num_oid' => '.1.3.6.1.4.1.25868.1.12.0',
     ],
     [
-        'oid'           => 'portSyncM.0',
-        'state_name'    => 'portSyncM',
-        'states'        => $states['sync'],
-        'name'          => 'Master Port Sync Status',
-        'num_oid'       => '.1.3.6.1.4.1.25868.1.13.0',
+        'oid' => 'portSyncM.0',
+        'state_name' => 'portSyncM',
+        'states' => $states['sync'],
+        'name' => 'Master Port Sync Status',
+        'num_oid' => '.1.3.6.1.4.1.25868.1.13.0',
     ],
     [
-        'oid'           => 'portOnS.0',
-        'state_name'    => 'portOnS',
-        'states'        => $states['power'],
-        'name'          => 'Slave Port Enabled',
-        'num_oid'       => '.1.3.6.1.4.1.25868.1.29.0',
+        'oid' => 'portOnS.0',
+        'state_name' => 'portOnS',
+        'states' => $states['power'],
+        'name' => 'Slave Port Enabled',
+        'num_oid' => '.1.3.6.1.4.1.25868.1.29.0',
     ],
     [
-        'oid'           => 'portSyncS.0',
-        'state_name'    => 'portSyncS',
-        'states'        => $states['sync'],
-        'name'          => 'Slave Port Sync Status',
-        'num_oid'       => '.1.3.6.1.4.1.25868.1.30.0',
+        'oid' => 'portSyncS.0',
+        'state_name' => 'portSyncS',
+        'states' => $states['sync'],
+        'name' => 'Slave Port Sync Status',
+        'num_oid' => '.1.3.6.1.4.1.25868.1.30.0',
     ],
 ];
 
@@ -73,7 +73,7 @@ foreach ($octetSetup as $entry) {
         foreach ($onStates as $index => $value) {
             $port_number = $index + 1;
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'state',
                 $device,
                 $entry['num_oid'],
@@ -90,7 +90,6 @@ foreach ($octetSetup as $entry) {
                 'snmp',
                 $port_number
             );
-            create_sensor_to_state_index($device, $entry['state_name'], $port_number);
         }
     }
     unset($octetString, $states, $octetSetup, $port_number);

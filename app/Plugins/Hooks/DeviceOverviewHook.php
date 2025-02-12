@@ -30,7 +30,7 @@ use App\Models\User;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Str;
 
-abstract class DeviceOverviewHook
+abstract class DeviceOverviewHook implements \LibreNMS\Interfaces\Plugins\Hooks\DeviceOverviewHook
 {
     public string $view = 'resources.views.device-overview';
 
@@ -43,7 +43,7 @@ abstract class DeviceOverviewHook
     {
         return [
             'title' => __CLASS__,
-            'device'  => $device,
+            'device' => $device,
         ];
     }
 

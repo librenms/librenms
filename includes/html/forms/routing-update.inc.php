@@ -16,7 +16,7 @@ header('Content-type: application/json');
 
 if (! Auth::user()->hasGlobalAdmin()) {
     $response = [
-        'status'  => 'error',
+        'status' => 'error',
         'message' => 'Need to be admin',
     ];
     echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
@@ -35,7 +35,7 @@ if (! is_numeric($device_id)) {
 } elseif (! is_numeric($routing_id)) {
     $message = 'Missing routing id';
 } else {
-    if (dbUpdate(['bgpPeerDescr'=>$data], 'bgpPeers', '`bgpPeer_id`=? AND `device_id`=?', [$routing_id, $device_id]) >= 0) {
+    if (dbUpdate(['bgpPeerDescr' => $data], 'bgpPeers', '`bgpPeer_id`=? AND `device_id`=?', [$routing_id, $device_id]) >= 0) {
         $message = 'Routing information updated';
         $status = 'ok';
     } else {
@@ -44,8 +44,8 @@ if (! is_numeric($device_id)) {
 }
 
 $response = [
-    'status'        => $status,
-    'message'       => $message,
-    'extra'         => $extra,
+    'status' => $status,
+    'message' => $message,
+    'extra' => $extra,
 ];
 echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

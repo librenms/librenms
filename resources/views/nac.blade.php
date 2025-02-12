@@ -28,7 +28,8 @@
                     <th data-column-id="authc_status" data-formatter="nac_authc" data-formatter="tooltip">{{ __('NAC Authc') }}</th>
                     <th data-column-id="authz_status" data-formatter="nac_authz">{{ __('NAC Authz') }}</th>
                     <th data-column-id="method" data-formatter="nac_method">{{ __('NAC Method') }}</th>
-
+                    <th data-column-id="created_at" data-formatter="tooltip">{{ __('First seen') }}</th>
+                    <th data-column-id="updated_at" data-formatter="tooltip">{{ __('Last seen') }}</th>
                 </tr>
                 </thead>
             </table>
@@ -48,12 +49,20 @@
 @push('scripts')
     <script>
         $(document).ready(function () {
-            locations_grid = $("#nac-grid").bootgrid({
+            nac_grid = $("#nac-grid").bootgrid({
                 ajax: true,
                 rowCount: [25, 50, 100, -1],
                 url: "{{ route('table.port-nac') }}",
                 post: function () {
+                    var check_showHistorical = document.getElementById('check_showHistorical');
+                    if (check_showHistorical) {
+                        var showHistorical = check_showHistorical.checked;
+                    } else {
+                        var showHistorical = false;
+                    }
+
                     return {
+                        showHistorical: showHistorical,
                     };
                 },
                 formatters: {
@@ -126,7 +135,22 @@
                     }
                 }
             });
+            var add = $(".actionBar").append(
+                    '<div class="search form-group pull-left" style="width:auto">' +
+                    '<?php echo csrf_field() ?>' +
+                    '<input type="checkbox" name="check_showHistorical" data-size="small" id="check_showHistorical">' +
+                    '&nbsp;Include historical NAC entries' +
+                    '</div>');
 
+            $("#check_showHistorical").bootstrapSwitch({
+                'onSwitchChange': function(event, state){
+                     updateTable();
+                }
+            });
+
+            function updateTable() {
+                $('#nac-grid').bootgrid('reload');
+            };
         });
     </script>
 @endpush

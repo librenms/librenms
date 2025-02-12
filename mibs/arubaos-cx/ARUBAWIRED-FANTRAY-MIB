@@ -1,0 +1,214 @@
+--**MOD+************************************************************************
+--* Module:    ARUBAWIRED-FANTRAY-MIB :FANTRAY MIB file
+--*
+--* (c) Copyright 2020,2023 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-FANTRAY-MIB
+--*
+--**MOD-************************************************************************
+
+ARUBAWIRED-FANTRAY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    DisplayString
+        FROM SNMPv2-TC
+    arubaWiredChassisMIB
+        FROM ARUBAWIRED-CHASSIS-MIB;
+
+arubaWiredFanTray MODULE-IDENTITY
+    LAST-UPDATED "202303310000Z" -- March 31, 2023
+    ORGANIZATION "HPE/Aruba Networking Division"
+    CONTACT-INFO "Hewlett Packard Company
+                  8000 Foothills Blvd.
+                  Roseville, CA 95747"
+    DESCRIPTION
+        "This MIB module describes management objects that manage Fan Trays."
+
+    REVISION     "202303310000Z" -- March 31, 2023
+    DESCRIPTION  "Added arubaWiredFanTrayStateEnum"
+
+    REVISION     "202002130000Z" -- February 13, 2020
+    DESCRIPTION  "Initial revision."
+    ::= { arubaWiredChassisMIB 4 }
+
+-- **********************************************************************
+-- Fan Tray notifications
+-- **********************************************************************
+
+arubaWiredFanTrayNotifications OBJECT IDENTIFIER
+      ::= { arubaWiredFanTray 0 }
+
+arubaWiredFanTrayStateNotification NOTIFICATION-TYPE
+      OBJECTS {
+                arubaWiredFanTrayName,
+                arubaWiredFanTrayState
+              }
+      STATUS current
+      DESCRIPTION
+               "A notification generated when a fan tray subsystem state change
+                occurs.  This can happen if a fan tray is inserted, removed, or
+                experiences a fault."
+      ::= { arubaWiredFanTrayNotifications 1 }
+
+-- **********************************************************************
+-- Fan Tray Objects
+-- **********************************************************************
+
+arubaWiredFanTrayTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF ArubaWiredFanTrayEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This table contains one row per switch fan tray entity."
+      ::= { arubaWiredFanTray 1 }
+
+arubaWiredFanTrayEntry OBJECT-TYPE
+      SYNTAX      ArubaWiredFanTrayEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "Information about the fan tray physical entity table."
+      INDEX       {
+                    arubaWiredFanTrayGroupIndex,
+                    arubaWiredFanTraySlotIndex
+                  }
+      ::= { arubaWiredFanTrayTable 1 }
+
+ArubaWiredFanTrayEntry ::=
+    SEQUENCE {
+        arubaWiredFanTrayGroupIndex   Integer32,
+        arubaWiredFanTraySlotIndex    Integer32,
+        arubaWiredFanTrayName         DisplayString,
+        arubaWiredFanTrayState        DisplayString,
+        arubaWiredFanTrayProductName  DisplayString,
+        arubaWiredFanTraySerialNumber DisplayString,
+        arubaWiredFanTrayNumberFans   Integer32,
+        arubaWiredFanTrayStateEnum    INTEGER
+    }
+
+arubaWiredFanTrayGroupIndex OBJECT-TYPE
+      SYNTAX      Integer32 (1..2147483647)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This variable uniquely identifies the group containing the
+                   fan tray. Group means chassis in the stack and the value 1
+                   MUST be used for non-modular devices."
+
+      ::= { arubaWiredFanTrayEntry 1 }
+
+arubaWiredFanTraySlotIndex OBJECT-TYPE
+      SYNTAX      Integer32 (1..2147483647)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This variable uniquely identifies the fan tray instance in a
+                   chassis and value 1 must be used for non-modular devices."
+
+      ::= { arubaWiredFanTrayEntry 2 }
+
+arubaWiredFanTrayName OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..20))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Identification of the fan tray for the system."
+      ::= { arubaWiredFanTrayEntry 3 }
+
+arubaWiredFanTrayState OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..20))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Current status for the fan tray."
+      ::= { arubaWiredFanTrayEntry 4 }
+
+arubaWiredFanTrayProductName OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..30))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Fan tray product name identification."
+      ::= { arubaWiredFanTrayEntry 5 }
+
+arubaWiredFanTraySerialNumber OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..20))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Fan tray serial number to uniquely identify the fan tray."
+      ::= { arubaWiredFanTrayEntry 6 }
+
+arubaWiredFanTrayNumberFans OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Number of fans the fan tray can contain."
+      DEFVAL      { 0 }
+      ::= { arubaWiredFanTrayEntry 7 }
+
+arubaWiredFanTrayStateEnum OBJECT-TYPE
+      SYNTAX      INTEGER {
+                    unknown      (1),
+                    empty        (2),
+                    initializing (3),
+                    ready        (4),
+                    down         (5),
+                    unsupported  (6)
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Current status for the fan tray represented as an enumerated value."
+      ::= { arubaWiredFanTrayEntry 8 }
+
+-- **********************************************************************
+-- compliance statements
+-- **********************************************************************
+
+arubaWiredFanTrayConformance OBJECT IDENTIFIER
+      ::= { arubaWiredFanTray 99 }
+
+arubaWiredFanTrayCompliances OBJECT IDENTIFIER
+      ::= { arubaWiredFanTrayConformance 1 }
+
+arubaWiredFanTrayGroups      OBJECT IDENTIFIER
+      ::= { arubaWiredFanTrayConformance 2 }
+
+arubaWiredFanTrayCompliance MODULE-COMPLIANCE
+      STATUS      current
+      DESCRIPTION "A compliance statement for Aruba switch chassis."
+      MODULE
+      MANDATORY-GROUPS
+      {
+         arubaWiredFanTrayTable,
+         arubaWiredFanTrayNotificationsGroup
+      }
+      GROUP       arubaWiredFanTrayTableGroup
+      DESCRIPTION "A Collection of Object(s) that display the current fan tray
+                   parameters information."
+
+      ::= { arubaWiredFanTrayCompliances 1 }
+
+arubaWiredFanTrayTableGroup OBJECT-GROUP
+      OBJECTS     {
+                    arubaWiredFanTrayName,
+                    arubaWiredFanTrayState,
+                    arubaWiredFanTrayProductName,
+                    arubaWiredFanTraySerialNumber,
+                    arubaWiredFanTrayNumberFans,
+                    arubaWiredFanTrayStateEnum
+                  }
+      STATUS      current
+      DESCRIPTION "A collection of objects display configuration, status,
+                   and measurements of Fan Tray table."
+      ::= { arubaWiredFanTrayGroups 1 }
+
+arubaWiredFanTrayNotificationsGroup NOTIFICATION-GROUP
+     NOTIFICATIONS { arubaWiredFanTrayStateNotification }
+     STATUS current
+     DESCRIPTION "Notifications sent by fan management."
+     ::= { arubaWiredFanTrayGroups 2 }
+END

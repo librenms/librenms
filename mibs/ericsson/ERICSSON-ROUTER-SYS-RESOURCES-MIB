@@ -1,0 +1,1297 @@
+-- %DNP% $Id: ERICSSON-ROUTER-SYS-RESOURCES-MIB.my,v 1.1.2.12.16.5 2011/07/11 20:00:30 ekimpri Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-SYS-RESOURCES-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-SYS-RESOURCES-MIB    System Resources MIB
+--
+-- Copyright (c) 2002-2003, 2005, 2007-2008, 2011, 2015 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-SYS-RESOURCES-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        NOTIFICATION-TYPE,
+        OBJECT-TYPE,
+        Unsigned32,
+        Integer32,
+        TimeTicks,
+        Counter32
+                FROM SNMPv2-SMI
+        TruthValue,
+        DateAndTime
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+        SnmpAdminString
+                FROM SNMP-FRAMEWORK-MIB
+        EriRouterKBytes,
+        EriRouterPercentage,
+        EriRouterSlot
+                FROM ERICSSON-ROUTER-TC
+        IANAItuEventType,
+        IANAItuProbableCause
+                FROM IANA-ITU-ALARM-TC-MIB
+        EriRouterAlarmId
+                FROM ERICSSON-ROUTER-ALARM-TC
+        ItuPerceivedSeverity
+                FROM ITU-ALARM-TC-MIB
+        eriRouterMgmt
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterSysResourcesMib MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+        ORGANIZATION    "Ericsson AB."
+        CONTACT-INFO
+                "       Ericsson AB.
+
+                Postal: 100 Headquarters Dr
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+                "
+        DESCRIPTION
+                "The management information definitions for the
+                system resources management of a network
+                device.  This MIB is viewable under all contexts."
+        
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201104291800Z" -- April 29, 2011
+        DESCRIPTION
+                "Add eriRouterChassisAlarmId,
+                     eriRouterChassisAlarmType,
+                     eriRouterChassisAlarmDateAndTime,
+                     eriRouterChassisAlarmDescription,
+                     eriRouterChassisAlarmProbableCause,
+                     eriRouterChassisAlarmSeverity
+                     eriRouterChassisAlarm,
+                     eriRouterChassisEventObjectGroup,
+                     eriRouterSRMIBCompliance6."
+
+        REVISION        "201101191800Z" -- Jan 19, 2011
+        DESCRIPTION
+                "Update CONTACT-INFO & ORGANIZATION."
+
+        REVISION        "200907160000Z" -- July 16, 2009
+        DESCRIPTION
+                "Add new eriRouterSRMIBCompliance,  new groups eriRouterSseDiskGroup
+                 and eriRouterSseDiskEventObjectGroup, new notification group 
+                 eriRouterSseDiskNotifyGroup."
+
+        REVISION        "200705290000Z" -- May 29, 2007
+        DESCRIPTION
+                "Add eriRouterSRMIBCompliance4,  new group eriRouterSRPowerExceeded,
+                 new notification group eriRouterSRPowerNotifyGroup, and 
+                 new group eriRouterSRPowerExceededGroup." 
+
+        REVISION        "200504180000Z" -- April 18, 2005
+        DESCRIPTION
+                "Add eriRouterSRStorageSlot, eriRouterSRStorageMountTime,
+                 eriRouterSRStorageStatus and eriRouterSRStorageErrors to
+                 eriRouterSRStorageTable.
+                 Add eriRouterSRStorageFailedEvent to report device
+                 failures.
+                 Add eriRouterSRMIBCompliance3, eriRouterSRStorageGroup2
+                 and eriRouterSRNotificationGroup2.
+                 Add new group eriRouterSRSystem.
+                 Add new objects eriRouterSRSystemUptime and eriRouterSRSystemDate."
+
+        REVISION        "200309021800Z" -- Sept 2, 2003, 1800Z
+        DESCRIPTION
+                "Add notification eriRouterSRSwitchoverEvent,
+                 eriRouterSRMIBCompliance2 and
+                 eriRouterSRNotificationGroup."
+
+        REVISION        "200210100000Z" -- October 10, 2002
+        DESCRIPTION
+                "Add new enumerations to eriRouterSRProcessNotifyEventCause."
+
+        REVISION        "200206040000Z" -- June 4, 2002
+        DESCRIPTION
+                "Initial version."
+
+        ::= { eriRouterMgmt 24 }
+
+eriRouterSRMIBNotifications   OBJECT IDENTIFIER ::= { eriRouterSysResourcesMib 0 }
+
+eriRouterSRMIBObjects         OBJECT IDENTIFIER ::= { eriRouterSysResourcesMib 1 }
+
+eriRouterSRMIBConformance     OBJECT IDENTIFIER ::= { eriRouterSysResourcesMib 2 }
+
+-- the Process Group
+
+eriRouterSRProcess            OBJECT IDENTIFIER ::= { eriRouterSRMIBObjects 1 }
+
+-- Process event notification information
+
+eriRouterSRProcessNotifyLastUpdate OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The value of sysUpTime when an entry in the
+                eriRouterSRProcessNotifyTable was last added.  Because
+                this table is likely to contain many entries, polling
+                of this object allows a management station to determine
+                when re-downloading of the table might be useful."
+        ::= { eriRouterSRProcess 1 }
+
+eriRouterSRProcessEventNotifyEnable    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                "Indicates whether eriRouterSRProcessEvent notification should
+                be generated for this system."
+        DEFVAL  { enabled }
+        ::= { eriRouterSRProcess 2 }
+
+eriRouterSRProcessNotifyTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF EriRouterSRProcessNotifyEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "A list of process event notifications since the agent
+                was last re-initialized.  If no process event has ever
+                been generated, this table is empty, i.e., has zero
+                entries."
+        ::= { eriRouterSRProcess 3 }
+
+eriRouterSRProcessNotifyEntry OBJECT-TYPE
+        SYNTAX      EriRouterSRProcessNotifyEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "Information about a death/birth process event
+                notification which was last generated on the particular
+                process."
+        INDEX { eriRouterSRProcessNotifyProcName }
+        ::= { eriRouterSRProcessNotifyTable 1 }
+
+EriRouterSRProcessNotifyEntry ::=
+        SEQUENCE {
+                eriRouterSRProcessNotifyProcName      SnmpAdminString,
+                eriRouterSRProcessNotifyPID           Unsigned32,
+                eriRouterSRProcessNotifyEventCause    INTEGER,
+                eriRouterSRProcessNotifyEventType     INTEGER,
+                eriRouterSRProcessNumOfSpawn          Unsigned32,
+                eriRouterSRProcessNotifyLastTimeSent  TimeTicks
+        }
+
+eriRouterSRProcessNotifyProcName OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE (1..64))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "A human readable name identifying a particular
+                process in the system."
+        ::= { eriRouterSRProcessNotifyEntry 1 }
+
+eriRouterSRProcessNotifyPID OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "A decimal number uniquely identifies the process.  The
+                value 0 indicates the process has not been started."
+        ::= { eriRouterSRProcessNotifyEntry 2 }
+
+eriRouterSRProcessNotifyEventCause OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        firstStart(1),
+                        hangup(2),
+                        interrupt(3),
+                        quit(4),
+                        illegalInstruction(5),
+                        traceTrap(6),
+                        abort(7),
+                        emt(8),
+                        floatingPointException(9),
+                        kill(10),
+                        busError(11),
+                        segmentFault(12),
+                        systemCallError(13),
+                        pipeError(14),
+                        alarmClock(15),
+                        softwareTermination(16),
+                        urgentConditionOnIOChannel(17),
+                        stopNotFromTty(18),
+                        stopFromTty(19),
+                        continueStopped(20),
+                        childExit(21),
+                        ttyInput(22),
+                        ttyOutput(23),
+                        inputOutput(24),
+                        exceededCpuTime(25),
+                        exceededFileSize(26),
+                        virtualAlarm(27),
+                        profilingAlarm(28),
+                        windowResize(29),
+                        infoRequest(30),
+                        userDefined1(31),
+                        userDefined2(32),
+                        powerFailRestart(33),
+                        unknown(34)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "This identifies the cause of a process death/birth event.
+                The value firstStart(1) indicates the process has been
+                started the first time.  The other values identifies the
+                process exit status recorded on the last process death
+                event.  On the SmartEdge platform, these values correspond
+                1-to-1 with the values displayed by the 'show process
+                crash-info' CLI command."
+        ::= { eriRouterSRProcessNotifyEntry 3 }
+
+eriRouterSRProcessNotifyEventType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        death(1),
+                        birth(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The type of event notification sent on the process
+                described by this row of the table.  The process
+                event type death(1) indicates that the agent has been
+                informed that the process is not available for any use.
+                The event type birth(2) indicates that the agent has
+                been informed that the process has been started."
+        ::= { eriRouterSRProcessNotifyEntry 4 }
+
+eriRouterSRProcessNumOfSpawn OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of times the process has been spawned since
+                the system was last initialized.  Note that this is
+                different from the restart of the network management
+                portion of the system."
+        ::= { eriRouterSRProcessNotifyEntry 5 }
+
+eriRouterSRProcessNotifyLastTimeSent OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The value of sysUpTime at the time this notification was
+                last generated on the process."
+        ::= { eriRouterSRProcessNotifyEntry 6 }
+
+-- Storage Group
+
+eriRouterSRStorage            OBJECT IDENTIFIER ::= { eriRouterSRMIBObjects 2 }
+
+-- Storage Usage Table - For XCRP
+
+eriRouterSRStorageTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF EriRouterSRStorageEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The (conceptual) table of long-term storage devices
+                contained by the system.  In particular, disk devices
+                accessed remotely over a network are not included
+                here."
+        ::= { eriRouterSRStorage 1 }
+
+eriRouterSRStorageEntry OBJECT-TYPE
+        SYNTAX      EriRouterSRStorageEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "A (conceptual) entry for one long-term storage device
+                contained by the system."
+        INDEX { eriRouterSRStorageIndex }
+        ::= { eriRouterSRStorageTable 1 }
+
+EriRouterSRStorageEntry ::=
+        SEQUENCE {
+                eriRouterSRStorageIndex           Integer32,
+                eriRouterSRStorageDescr           SnmpAdminString,
+                eriRouterSRStorageMedia           INTEGER,
+                eriRouterSRStorageRemovable       TruthValue,
+                eriRouterSRStorageSize            EriRouterKBytes,
+                eriRouterSRStorageUtilization     EriRouterPercentage,
+                eriRouterSRStorageSlot            EriRouterSlot,
+                eriRouterSRStorageMountTime       TimeTicks,
+                eriRouterSRStorageStatus          INTEGER,
+                eriRouterSRStorageErrors          Counter32
+        }
+
+eriRouterSRStorageIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "A unique value for each long-term storage device
+                contained by the system.  The value for each physical
+                storage device must remain constant at least from one
+                re-initialization of the agent to the next
+                re-initialization."
+        ::= { eriRouterSRStorageEntry 1 }
+
+eriRouterSRStorageDescr OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE (0..64))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "A textual description of this storage device, optionally
+                including the device's manufacturer, revision, and its
+                serial number."
+        ::= { eriRouterSRStorageEntry 2 }
+
+eriRouterSRStorageMedia OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        other(1),
+                        hardDisk(2),
+                        flashMemory(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "An indication of the type of media used in this long-term
+                storage device."
+        ::= { eriRouterSRStorageEntry 3 }
+
+eriRouterSRStorageRemovable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Denotes whether or not the storage media may be removed
+                from the drive/slot."
+        ::= { eriRouterSRStorageEntry 4 }
+
+eriRouterSRStorageSize OBJECT-TYPE
+        SYNTAX      EriRouterKBytes
+        UNITS       "KBytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The total size for this long-term storage device. If the
+                media is removable and is currently removed, this value
+                should be zero."
+        ::= { eriRouterSRStorageEntry 5 }
+
+eriRouterSRStorageUtilization OBJECT-TYPE
+        SYNTAX      EriRouterPercentage
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "This object is the percent utilization of the storage
+                space on a scale of 0 to 100 percent.  The formula used
+                to calculate the Utilization is as follows.
+
+                                           used blocks * 100
+                Utilization = ---------------------------------------------
+                               free blocks avail to the user + used blocks
+
+                Note that the divisor is the total number of blocks
+                available to the user which is a subset of the total
+                storage size on the device in eriRouterSRStorageSize."
+        ::= { eriRouterSRStorageEntry 6 }
+
+eriRouterSRStorageSlot   OBJECT-TYPE
+        SYNTAX      EriRouterSlot
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The chassis slot number in which the controller card
+                containing this storage device is present."
+        ::= { eriRouterSRStorageEntry 7 }
+
+eriRouterSRStorageMountTime OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The value of sysUpTime when this storage device was last
+                mounted."
+        ::= { eriRouterSRStorageEntry 8 }
+
+eriRouterSRStorageStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        operational(1),
+                        degrading(2),
+                        failed(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The functional status of this storage device."
+        ::= { eriRouterSRStorageEntry 9 }
+
+eriRouterSRStorageErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The cumulative count of soft errors on this storage device."
+        ::= { eriRouterSRStorageEntry 10 }
+
+
+-- SSE Disk Storage Usage Table - For Winchester
+
+eriRouterSseDiskStorageTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF EriRouterSseDiskStorageEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "File Server System Blade is a card on the SmartEdge platform that
+                 manages data on hard disks connected to the card.
+                 This table provides details of these disks."
+        ::= { eriRouterSRStorage 2 }
+
+eriRouterSseDiskStorageEntry OBJECT-TYPE
+        SYNTAX      EriRouterSseDiskStorageEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "A entry for the disk on the SSE."
+        INDEX { eriRouterSseDiskSlot, eriRouterSseDiskNum }
+        ::= { eriRouterSseDiskStorageTable 1 }
+
+EriRouterSseDiskStorageEntry ::=
+        SEQUENCE {
+            eriRouterSseDiskSlot        EriRouterSlot,
+            eriRouterSseDiskNum         Unsigned32,
+            eriRouterSseDiskState       INTEGER,
+            eriRouterSseDiskSize        Unsigned32,
+            eriRouterSseDiskUsed        Unsigned32
+        }
+
+eriRouterSseDiskSlot OBJECT-TYPE
+    SYNTAX      EriRouterSlot
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+            "The chassis slot number in which the disk resides."
+    ::= { eriRouterSseDiskStorageEntry 1 }
+
+eriRouterSseDiskNum  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10)  
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The disk number used to identity the disk."
+    ::= { eriRouterSseDiskStorageEntry 2 }
+
+eriRouterSseDiskState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        up(1),
+                        down(2)
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operational status of the disk."
+    ::= { eriRouterSseDiskStorageEntry 3 }
+
+eriRouterSseDiskSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "GBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total size of the disk in GBytes."
+    ::= { eriRouterSseDiskStorageEntry 4 }
+
+eriRouterSseDiskUsed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "GBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total disk space utilized in GBytes."
+    ::= { eriRouterSseDiskStorageEntry 5 }
+
+--
+-- System Group
+-- Modeled after objects in the RFC2790 Host Resources MIB
+--
+
+eriRouterSRSystem            OBJECT IDENTIFIER ::= { eriRouterSRMIBObjects 3 }
+
+eriRouterSRSystemUptime OBJECT-TYPE
+        SYNTAX     TimeTicks
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The amount of time since this system was last initialized.
+                Note that this is different from sysUpTime in the SNMPv2-MIB
+                [RFC1907] because sysUpTime is the uptime of the network
+                management portion of the system."
+        ::= { eriRouterSRSystem 1 }
+
+eriRouterSRSystemDate OBJECT-TYPE
+        SYNTAX     DateAndTime
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "The host's notion of the local date and time of day."
+        ::= { eriRouterSRSystem 2 }
+
+-- To monitor power capacity exceeding limit 
+
+eriRouterPowerExceeded          OBJECT IDENTIFIER ::= { eriRouterSRMIBObjects 4 }
+
+eriRouterSRPowerExceededStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                      normal(1),
+                      failed(2)
+                    }
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+                "The status of alarm when a controller card is inserted 
+	        and results in more power being drawn than recommended. 
+	        If an instance of this object has the value normal, then the 
+                chassis power has not exceeded. If an instance of this object 
+   	        has the value failed, then it means the chassis power was exceeded
+	        on inserting a controller card."
+        ::= { eriRouterPowerExceeded 1 }
+
+-- Notifications related to system resources management
+
+eriRouterSRProcessEvent NOTIFICATION-TYPE
+        OBJECTS { eriRouterSRProcessNotifyPID,
+                  eriRouterSRProcessNotifyEventCause,
+                  eriRouterSRProcessNotifyEventType,
+                  eriRouterSRProcessNumOfSpawn }
+        STATUS      current
+        DESCRIPTION
+                "This notification is sent each time the agent is informed of
+                a process death/birth event."
+        ::= { eriRouterSRMIBNotifications 1 }
+
+eriRouterSRSwitchoverEvent NOTIFICATION-TYPE
+        STATUS      current
+        DESCRIPTION
+                "This notification identifies when a switchover
+                occurs from one main processor module to a backup."
+        ::= { eriRouterSRMIBNotifications 2 }
+
+eriRouterSRStorageFailedEvent NOTIFICATION-TYPE
+        OBJECTS { eriRouterSRStorageDescr,
+                  eriRouterSRStorageMedia,
+                  eriRouterSRStorageSlot }
+        STATUS      current
+        DESCRIPTION
+                "This notification is sent when the value of
+                eriRouterSRStorageStatus for a device changes to 'failed'."
+        ::= { eriRouterSRMIBNotifications 3 }
+
+eriRouterSRPowerExceededEvent NOTIFICATION-TYPE
+        OBJECTS { eriRouterSRPowerExceededStatus }
+        STATUS      current
+        DESCRIPTION
+                "This notification identifies when a controller card
+		is inserted and results in more power being drawn
+		than recommended." 
+        ::= { eriRouterSRMIBNotifications 4 }
+
+ -- SSE Notification Definition section
+
+eriRouterSseDiskAlarmDateAndTime OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+                "The local date and time when the alarm was raised"
+        ::= { eriRouterSRMIBObjects 5 }
+
+eriRouterSseDiskAlarmSeverity OBJECT-TYPE
+        SYNTAX      ItuPerceivedSeverity
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+                "The perceived severity of the alarm."
+        ::= { eriRouterSRMIBObjects 6 }
+
+eriRouterSseDiskAlarmProbableCause OBJECT-TYPE
+        SYNTAX      IANAItuProbableCause
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+                "The probable cause for this alarm." 
+        ::= { eriRouterSRMIBObjects 7 }
+
+eriRouterSseDiskEventType OBJECT-TYPE
+        SYNTAX      IANAItuEventType
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION 
+                "The type of the alarm." 
+        ::= { eriRouterSRMIBObjects 8 }
+
+eriRouterSseDiskAlarmDescription OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..64))
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+                "A text string which conveys additional information
+                about the alarm."
+        ::= { eriRouterSRMIBObjects 9 }
+        
+--
+--  ISSU Objects for notification
+--
+eriRouterIssuObjects      OBJECT IDENTIFIER ::= { eriRouterSRMIBObjects 10}
+
+eriRouterIssuState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown(0),
+                    start(1),
+                    complete(2),
+                    aborted(3)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current    DESCRIPTION
+            "The current state of the inservice system upgrade (ISSU)."
+    ::= { eriRouterIssuObjects 1 }
+ 
+
+-- Notifications related to SSE Disk
+
+eriRouterSseDiskHealthDegradedAlarm NOTIFICATION-TYPE
+    OBJECTS     {
+        eriRouterSseDiskAlarmDateAndTime,
+        eriRouterSseDiskAlarmSeverity,
+        eriRouterSseDiskAlarmProbableCause,
+        eriRouterSseDiskEventType,
+        eriRouterSseDiskAlarmDescription,
+        eriRouterSseDiskState
+    }
+    STATUS      current
+    DESCRIPTION
+        "A eriRouterSseDiskHealthDegradedAlarm notification signifies that the
+         hard disk health has degraded."
+    ::= { eriRouterSRMIBNotifications 5 }
+
+eriRouterSseDiskFailedAlarm NOTIFICATION-TYPE
+    OBJECTS     {
+        eriRouterSseDiskAlarmDateAndTime,
+        eriRouterSseDiskAlarmSeverity,
+        eriRouterSseDiskAlarmProbableCause,
+        eriRouterSseDiskEventType,
+        eriRouterSseDiskAlarmDescription,
+        eriRouterSseDiskState
+    }
+    STATUS      current
+    DESCRIPTION
+        "A eriRouterSseDiskFailedAlarm notification signifies that the
+         hard disk has failed."
+    ::= { eriRouterSRMIBNotifications 6 }
+
+eriRouterSseDiskMissingAlarm NOTIFICATION-TYPE
+    OBJECTS     {
+        eriRouterSseDiskAlarmDateAndTime,
+        eriRouterSseDiskAlarmSeverity,
+        eriRouterSseDiskAlarmProbableCause,
+        eriRouterSseDiskEventType,
+        eriRouterSseDiskAlarmDescription,
+        eriRouterSseDiskState
+    }
+    STATUS      current
+    DESCRIPTION
+        "A eriRouterSseDiskMissingAlarm notification signifies that the
+         hard disk is missing."
+    ::= { eriRouterSRMIBNotifications 7 }
+
+eriRouterSseDiskUnsupportedAlarm NOTIFICATION-TYPE
+    OBJECTS     {
+        eriRouterSseDiskAlarmDateAndTime,
+        eriRouterSseDiskAlarmSeverity,
+        eriRouterSseDiskAlarmProbableCause,
+        eriRouterSseDiskEventType,
+        eriRouterSseDiskAlarmDescription,
+        eriRouterSseDiskState
+    }
+    STATUS      current
+    DESCRIPTION
+        "A eriRouterSseDiskUnsupportedAlarm notification signifies that the
+         hard disk is not supported."
+    ::= { eriRouterSRMIBNotifications 8 }
+
+eriRouterSseDiskOOSAlarm NOTIFICATION-TYPE
+    OBJECTS     {
+        eriRouterSseDiskAlarmDateAndTime,
+        eriRouterSseDiskAlarmSeverity,
+        eriRouterSseDiskAlarmProbableCause,
+        eriRouterSseDiskEventType,
+        eriRouterSseDiskAlarmDescription,
+        eriRouterSseDiskState
+    }
+    STATUS      current
+    DESCRIPTION
+        "A eriRouterSseDiskOOSAlarm notification signifies that the
+         hard disk is out of service."
+    ::= { eriRouterSRMIBNotifications 9 }
+
+eriRouterSseDiskVoltageFailureAlarm NOTIFICATION-TYPE
+    OBJECTS     {
+        eriRouterSseDiskAlarmDateAndTime,
+        eriRouterSseDiskAlarmSeverity,
+        eriRouterSseDiskAlarmProbableCause,
+        eriRouterSseDiskEventType,
+        eriRouterSseDiskAlarmDescription,
+        eriRouterSseDiskState
+    }
+    STATUS      current
+    DESCRIPTION
+        "A eriRouterSseDiskVoltageFailureAlarm notification signifies that the
+        hard disk voltage has failed."
+    ::= { eriRouterSRMIBNotifications 10 }
+
+eriRouterSseDiskOverHeatAlarm NOTIFICATION-TYPE
+    OBJECTS     {
+        eriRouterSseDiskAlarmDateAndTime,
+        eriRouterSseDiskAlarmSeverity,
+        eriRouterSseDiskAlarmProbableCause,
+        eriRouterSseDiskEventType,
+        eriRouterSseDiskAlarmDescription,
+        eriRouterSseDiskState
+    }
+    STATUS      current
+    DESCRIPTION
+        "A eriRouterSseDiskOverHeatAlarm notification signifies that the
+        hard disk overheating."
+    ::= { eriRouterSRMIBNotifications 11 }
+
+eriRouterSseDiskReadFailureAlarm NOTIFICATION-TYPE
+    OBJECTS     {
+        eriRouterSseDiskAlarmDateAndTime,
+        eriRouterSseDiskAlarmSeverity,
+        eriRouterSseDiskAlarmProbableCause,
+        eriRouterSseDiskEventType,
+        eriRouterSseDiskAlarmDescription,
+        eriRouterSseDiskState
+    }
+    STATUS      current
+    DESCRIPTION
+        "A eriRouterSseDiskReadFailureAlarm notification signifies that the
+         hard disk read failure."
+    ::= { eriRouterSRMIBNotifications 12 }
+
+--
+-- ISSU NOTIFICATION
+--
+eriRouterIssuStateChange NOTIFICATION-TYPE
+    OBJECTS     {
+        eriRouterIssuState
+    }
+    STATUS      current
+    DESCRIPTION
+        "A notification reporting a change in ISSU state. The new
+        state is returned in the notification."
+    ::= { eriRouterSRMIBNotifications 13 }
+
+ -- Chassis Notification Definition section
+
+eriRouterChassisGroup OBJECT IDENTIFIER ::= { eriRouterSRMIBObjects 11 }
+
+eriRouterChassisAlarmId OBJECT-TYPE
+        SYNTAX      EriRouterAlarmId 
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+                "The chassis alarm identifier"
+        ::= { eriRouterChassisGroup 1 }
+
+eriRouterChassisAlarmType OBJECT-TYPE
+        SYNTAX      IANAItuEventType
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION 
+                "The chassis alarm type." 
+        ::= { eriRouterChassisGroup 2 }
+
+eriRouterChassisAlarmDateAndTime OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+                "The local date and time when the chassis alarm was raised"
+        ::= { eriRouterChassisGroup 3 }
+
+eriRouterChassisAlarmDescription OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..64))
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+                "A text string which conveys additional information
+                about the chassis alarm."
+        ::= { eriRouterChassisGroup 4 }
+
+eriRouterChassisAlarmProbableCause OBJECT-TYPE
+        SYNTAX      IANAItuProbableCause
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+                "The probable cause for the chassis alarm." 
+        ::= { eriRouterChassisGroup 5 }
+
+eriRouterChassisAlarmSeverity OBJECT-TYPE
+        SYNTAX      ItuPerceivedSeverity
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+                "The perceived severity of the chassis alarm."
+        ::= { eriRouterChassisGroup 6 }
+
+-- Chassis Notification
+
+eriRouterChassisAlarm NOTIFICATION-TYPE
+    OBJECTS     {
+        eriRouterChassisAlarmId,
+        eriRouterChassisAlarmType,
+        eriRouterChassisAlarmDateAndTime,
+        eriRouterChassisAlarmDescription,
+        eriRouterChassisAlarmProbableCause,
+        eriRouterChassisAlarmSeverity
+    }
+    STATUS      current
+    DESCRIPTION
+        "A eriRouterChassisAlarm notification signifies that
+         an alarm has been raised/cleared on the chassis."
+    ::= { eriRouterSRMIBNotifications 14 }
+
+-- Conformance Statements
+
+eriRouterSRMIBCompliances     OBJECT IDENTIFIER ::= { eriRouterSRMIBConformance 1 }
+
+eriRouterSRMIBGroups          OBJECT IDENTIFIER ::= { eriRouterSRMIBConformance 2 }
+
+-- Compliance Statements
+
+eriRouterSRMIBCompliance6 MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION
+                "The requirements for conformance to the System
+                Resources MIB."
+        MODULE -- this module
+            MANDATORY-GROUPS {
+                eriRouterSRProcessNotifyGroup,
+                eriRouterSRNotificationGroup2,
+                eriRouterIssuGroup,
+                eriRouterIssuNotifyGroup
+            }
+
+        OBJECT      eriRouterSRProcessEventNotifyEnable
+        MIN-ACCESS  read-only
+        DESCRIPTION
+                "Write access is not required."
+
+        GROUP eriRouterSRStorageGroup2
+        DESCRIPTION
+                "Implementation of this group is mandatory for devices that
+                are capable of reporting storage utilization."
+
+        GROUP eriRouterSRSystemGroup
+        DESCRIPTION
+                "Implementation of this group is mandatory for devices that
+                are capable of reporting system information."
+
+        GROUP eriRouterSRPowerExceededGroup
+	DESCRIPTION
+	        "Implementation of this group is mandatory for devices that
+	        are capable of reporting chassis power exceeding limit information."
+
+        GROUP eriRouterSRPowerNotifyGroup
+	DESCRIPTION
+	        "Implementation of this group is mandatory for devices that
+	        are capable of reporting chassis power exceeding limit information."
+
+        GROUP eriRouterSseDiskGroup
+        DESCRIPTION 
+                "Implementation of this group is mandatory for the hard disk devices 
+                on File Server Blade."
+
+        GROUP eriRouterSseDiskEventObjectGroup 
+        DESCRIPTION 
+                "Implementation of this group is mandatory for hard disk
+                devices on SSE that
+                are capable of reporting these alarms objects."
+
+        GROUP eriRouterSseDiskNotifyGroup 
+        DESCRIPTION
+                "Implementation of this group is mandatory for hard disks devices on
+                SSE that are capable of reporting alarms."
+
+        GROUP eriRouterChassisEventObjectGroup 
+        DESCRIPTION 
+                "Implementation of this group is mandatory for devices 
+                that are capable of reporting chassis alarms objects."
+
+        GROUP eriRouterChassisNotifyGroup 
+        DESCRIPTION
+                "Implementation of this group is mandatory for devices
+                that are capable of reporting chassis alarms."
+
+        ::= { eriRouterSRMIBCompliances 6 }
+
+eriRouterSRMIBCompliance MODULE-COMPLIANCE
+        STATUS      deprecated 
+        DESCRIPTION
+                "The requirements for conformance to the System
+                Resources MIB."
+        MODULE -- this module
+            MANDATORY-GROUPS {
+                eriRouterSRProcessNotifyGroup,
+                eriRouterSRNotificationGroup2 }
+
+        OBJECT      eriRouterSRProcessEventNotifyEnable
+        MIN-ACCESS  read-only
+        DESCRIPTION
+                "Write access is not required."
+
+        GROUP eriRouterSRStorageGroup2
+        DESCRIPTION
+                "Implementation of this group is mandatory for devices that
+                are capable of reporting storage utilization."
+
+        GROUP eriRouterSRSystemGroup
+        DESCRIPTION
+                "Implementation of this group is mandatory for devices that
+                are capable of reporting system information."
+
+        GROUP eriRouterSRPowerExceededGroup
+	DESCRIPTION
+	        "Implementation of this group is mandatory for devices that
+	        are capable of reporting chassis power exceeding limit information."
+
+        GROUP eriRouterSRPowerNotifyGroup
+	DESCRIPTION
+	        "Implementation of this group is mandatory for devices that
+	        are capable of reporting chassis power exceeding limit information."
+
+        GROUP eriRouterSseDiskGroup
+        DESCRIPTION 
+                "Implementation of this group is mandatory for the hard disk devices 
+                on File Server Blade."
+
+        GROUP eriRouterSseDiskEventObjectGroup 
+        DESCRIPTION 
+                "Implementation of this group is mandatory for hard disk
+                devices on Sse that
+                are capable of reporting these alarms objects."
+
+        GROUP eriRouterSseDiskNotifyGroup 
+        DESCRIPTION
+                "Implementation of this group is mandatory for hard disks devices on
+                Sse that are capable of reporting alarms."
+
+        ::= { eriRouterSRMIBCompliances 5 }
+
+-- Units of Conformance
+
+eriRouterSRProcessNotifyGroup OBJECT-GROUP
+        OBJECTS { eriRouterSRProcessNotifyLastUpdate,
+                  eriRouterSRProcessEventNotifyEnable,
+                  eriRouterSRProcessNotifyPID,
+                  eriRouterSRProcessNotifyEventCause,
+                  eriRouterSRProcessNotifyEventType,
+                  eriRouterSRProcessNumOfSpawn,
+                  eriRouterSRProcessNotifyLastTimeSent }
+        STATUS      current
+        DESCRIPTION
+                "A collection of objects providing for remote monitoring
+                of the system process event notification."
+        ::= { eriRouterSRMIBGroups 1 }
+
+eriRouterSRStorageGroup2 OBJECT-GROUP
+        OBJECTS { eriRouterSRStorageDescr,
+                  eriRouterSRStorageMedia,
+                  eriRouterSRStorageRemovable,
+                  eriRouterSRStorageSize,
+                  eriRouterSRStorageUtilization,
+                  eriRouterSRStorageSlot,
+                  eriRouterSRStorageMountTime,
+                  eriRouterSRStorageStatus,
+                  eriRouterSRStorageErrors }
+        STATUS      current
+        DESCRIPTION
+                "The System Resources Storage Group."
+        ::= { eriRouterSRMIBGroups 5 }
+
+eriRouterSRNotificationGroup2 NOTIFICATION-GROUP
+        NOTIFICATIONS { eriRouterSRProcessEvent,
+                        eriRouterSRSwitchoverEvent,
+                        eriRouterSRStorageFailedEvent }
+        STATUS      current
+        DESCRIPTION
+                "A collection of notifications that may be implemented
+                for managing the system resources."
+        ::= { eriRouterSRMIBGroups 6 }
+
+eriRouterSRSystemGroup OBJECT-GROUP
+        OBJECTS { eriRouterSRSystemUptime,
+                  eriRouterSRSystemDate }
+        STATUS      current
+        DESCRIPTION
+                "A collection of objects providing for remote monitoring
+                of the system information."
+        ::= { eriRouterSRMIBGroups 7 }
+
+eriRouterSRPowerNotifyGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { eriRouterSRPowerExceededEvent }
+        STATUS      current
+        DESCRIPTION
+                "A notification that may be implemented
+                for tracking power capacity exceeding limit."
+        ::= { eriRouterSRMIBGroups 8 }
+
+eriRouterSRPowerExceededGroup OBJECT-GROUP
+        OBJECTS { eriRouterSRPowerExceededStatus }
+        STATUS      current
+        DESCRIPTION
+                "A  group providing for status of the power 
+                capacity exceeding limit."
+        ::= { eriRouterSRMIBGroups 9 }
+
+eriRouterSseDiskGroup OBJECT-GROUP
+        OBJECTS { eriRouterSseDiskState,
+                  eriRouterSseDiskSize,
+                  eriRouterSseDiskUsed
+        }
+        STATUS      current
+        DESCRIPTION
+                "A  group providing SSE disk details."
+        ::= { eriRouterSRMIBGroups 10 }
+
+eriRouterSseDiskEventObjectGroup OBJECT-GROUP
+        OBJECTS { eriRouterSseDiskEventType,
+                  eriRouterSseDiskAlarmDateAndTime,
+                  eriRouterSseDiskAlarmDescription,
+                  eriRouterSseDiskAlarmProbableCause,
+                  eriRouterSseDiskAlarmSeverity
+        }
+        STATUS    current
+        DESCRIPTION
+                "A collection of eriRouterSseDisk notification objects."
+        ::= { eriRouterSRMIBGroups 11 }
+
+eriRouterSseDiskNotifyGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { eriRouterSseDiskHealthDegradedAlarm,
+                        eriRouterSseDiskFailedAlarm,
+                        eriRouterSseDiskMissingAlarm,
+                        eriRouterSseDiskUnsupportedAlarm,
+                        eriRouterSseDiskOOSAlarm,
+                        eriRouterSseDiskVoltageFailureAlarm,
+                        eriRouterSseDiskOverHeatAlarm,
+                        eriRouterSseDiskReadFailureAlarm
+        }
+        STATUS      current
+        DESCRIPTION
+                "Notifications that are implemented for SSE disks."
+        ::= { eriRouterSRMIBGroups 12 }
+
+eriRouterIssuGroup OBJECT-GROUP
+        OBJECTS { eriRouterIssuState }
+        STATUS      current
+        DESCRIPTION
+                "A collection of ISSU notification objects."
+        ::= { eriRouterSRMIBGroups 13 }
+    
+eriRouterIssuNotifyGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { eriRouterIssuStateChange }
+        STATUS      current
+        DESCRIPTION
+                "Notifications that are implemented for ISSU."
+        ::= { eriRouterSRMIBGroups 14 }
+        
+eriRouterChassisEventObjectGroup OBJECT-GROUP
+        OBJECTS { eriRouterChassisAlarmId,
+                  eriRouterChassisAlarmType,
+                  eriRouterChassisAlarmDateAndTime,
+                  eriRouterChassisAlarmDescription,
+                  eriRouterChassisAlarmProbableCause,
+                  eriRouterChassisAlarmSeverity
+        }
+        STATUS    current
+        DESCRIPTION
+               "A collection of eriRouterChassis notification objects."
+        ::= { eriRouterSRMIBGroups 15 }
+
+eriRouterChassisNotifyGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { eriRouterChassisAlarm }
+        STATUS      current
+        DESCRIPTION
+                "Notifications that are implemented for chassis."
+        ::= { eriRouterSRMIBGroups 16 }
+
+-- Deprecated Definitions - Compliance
+
+eriRouterSRMIBCompliance1 MODULE-COMPLIANCE
+        STATUS      obsolete
+        DESCRIPTION
+                "The requirements for conformance to the System
+                Resources MIB.
+
+                eriRouterSRMIBCompliance2 replaces this compliance."
+        MODULE -- this module
+
+        OBJECT      eriRouterSRProcessEventNotifyEnable
+        MIN-ACCESS  read-only
+        DESCRIPTION
+                "Write access is not required."
+
+        GROUP eriRouterSRProcessNotifyGroup
+        DESCRIPTION
+                "Implementation of this group is mandatory for devices that
+                are capable of tracking process event notifications."
+
+        GROUP eriRouterSRStorageGroup
+        DESCRIPTION
+                "Implementation of this group is mandatory for devices that
+                are capable of reporting storage utilization."
+
+        GROUP eriRouterSRProcessEventNotificationGroup
+        DESCRIPTION
+                "Implementation of this group is mandatory only when the
+                eriRouterSRProcessNotifyGroup is implemented."
+        ::= { eriRouterSRMIBCompliances 1 }
+
+eriRouterSRMIBCompliance2 MODULE-COMPLIANCE
+        STATUS      deprecated
+        DESCRIPTION
+                "The requirements for conformance to the System
+                Resources MIB.
+
+                eriRouterSRMIBCompliance3 replaces this compliance."
+        MODULE -- this module
+            MANDATORY-GROUPS {
+                eriRouterSRProcessNotifyGroup,
+                eriRouterSRNotificationGroup }
+
+        OBJECT      eriRouterSRProcessEventNotifyEnable
+        MIN-ACCESS  read-only
+        DESCRIPTION
+                "Write access is not required."
+
+        GROUP eriRouterSRStorageGroup
+        DESCRIPTION
+                "Implementation of this group is mandatory for devices that
+                are capable of reporting storage utilization."
+
+        ::= { eriRouterSRMIBCompliances 2 }
+
+eriRouterSRMIBCompliance3 MODULE-COMPLIANCE
+        STATUS      deprecated
+        DESCRIPTION
+                "The requirements for conformance to the System
+                Resources MIB."
+        MODULE -- this module
+            MANDATORY-GROUPS {
+                eriRouterSRProcessNotifyGroup,
+                eriRouterSRNotificationGroup2 }
+
+        OBJECT      eriRouterSRProcessEventNotifyEnable
+        MIN-ACCESS  read-only
+        DESCRIPTION
+                "Write access is not required."
+
+        GROUP eriRouterSRStorageGroup2
+        DESCRIPTION
+                "Implementation of this group is mandatory for devices that
+                are capable of reporting storage utilization."
+
+        GROUP eriRouterSRSystemGroup
+        DESCRIPTION
+                "Implementation of this group is mandatory for devices that
+                are capable of reporting system information."
+
+::= { eriRouterSRMIBCompliances 3 }
+
+
+eriRouterSRMIBCompliance4 MODULE-COMPLIANCE
+        STATUS     deprecated 
+        DESCRIPTION
+                "The requirements for conformance to the System
+                Resources MIB."
+        MODULE -- this module
+            MANDATORY-GROUPS {
+                eriRouterSRProcessNotifyGroup,
+                eriRouterSRNotificationGroup2 }
+
+        OBJECT      eriRouterSRProcessEventNotifyEnable
+        MIN-ACCESS  read-only
+        DESCRIPTION
+                "Write access is not required."
+
+        GROUP eriRouterSRStorageGroup2
+        DESCRIPTION
+                "Implementation of this group is mandatory for devices that
+                are capable of reporting storage utilization."
+
+        GROUP eriRouterSRSystemGroup
+        DESCRIPTION
+                "Implementation of this group is mandatory for devices that
+                are capable of reporting system information."
+
+        GROUP eriRouterSRPowerExceededGroup
+        DESCRIPTION
+                "Implementation of this group is mandatory for devices that
+                are capable of reporting chassis power exceeding limit information."
+
+        GROUP eriRouterSRPowerNotifyGroup
+        DESCRIPTION
+                "Implementation of this group is mandatory for devices that
+                are capable of reporting chassis power exceeding limit information."
+
+        ::= { eriRouterSRMIBCompliances 4 }
+
+-- Deprecated Definitions - Groups
+
+eriRouterSRStorageGroup OBJECT-GROUP
+        OBJECTS { eriRouterSRStorageDescr,
+                  eriRouterSRStorageMedia,
+                  eriRouterSRStorageRemovable,
+                  eriRouterSRStorageSize,
+                  eriRouterSRStorageUtilization }
+        STATUS      deprecated
+        DESCRIPTION
+                "The System Resources Storage Group.
+
+                Replaced by eriRouterSRStorageGroup2."
+        ::= { eriRouterSRMIBGroups 2 }
+
+eriRouterSRProcessEventNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { eriRouterSRProcessEvent }
+        STATUS      obsolete
+        DESCRIPTION
+                "A collection of notifications that may be implemented
+                for managing the system process.
+
+                Replaced by eriRouterSRNotificationGroup."
+        ::= { eriRouterSRMIBGroups 3 }
+
+eriRouterSRNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { eriRouterSRProcessEvent,
+                        eriRouterSRSwitchoverEvent
+	              }
+        STATUS      deprecated
+        DESCRIPTION
+                "A collection of notifications that are implemented
+                for managing the system processes.
+
+                Replaced by eriRouterSRNotificationGroup2."
+        ::= { eriRouterSRMIBGroups 4 }
+
+END

@@ -25,13 +25,16 @@
 
 namespace LibreNMS\Modules;
 
+use App\Facades\PortCache;
 use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\PortAdsl;
 use App\Models\PortVdsl;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Enum\IntegerType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
@@ -99,19 +102,26 @@ class Xdsl implements Module
         }
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function cleanup(Device $device): void
+    public function dataExists(Device $device): bool
     {
-        $device->portsAdsl()->delete();
-        $device->portsVdsl()->delete();
+        return $device->portsAdsl()->exists() || $device->portsVdsl()->exists();
     }
 
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function cleanup(Device $device): int
+    {
+        $deleted = $device->portsAdsl()->delete();
+        $deleted += $device->portsVdsl()->delete();
+
+        return $deleted;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dump(Device $device, string $type): ?array
     {
         return [
             'ports_adsl' => $device->portsAdsl()->orderBy('ifIndex')
@@ -137,6 +147,10 @@ class Xdsl implements Module
             // Values are 1/10
             foreach ($this->adslTenthValues as $oid) {
                 if (isset($data[$oid])) {
+                    if ($oid == 'adslAtucCurrOutputPwr') {
+                        // workaround Cisco Bug CSCvj53634
+                        $data[$oid] = Number::constrainInteger($data[$oid], IntegerType::int32);
+                    }
                     $data[$oid] = $data[$oid] / 10;
                 }
             }
@@ -148,11 +162,17 @@ class Xdsl implements Module
                 $portAdsl->$oid = rtrim($portAdsl->$oid ?? '', '.');
             }
 
-            $portAdsl->port_id = $os->ifIndexToId($ifIndex);
+            $portAdsl->port_id = PortCache::getIdFromIfIndex($ifIndex, $os->getDevice());
+
+            if ($portAdsl->port_id == 0) {
+                // failure of ifIndexToId(), port_id is invalid, and syncModels will crash
+                Log::warning(' ADSL( Failed to discover this port, ifIndex invalid : ' . $portAdsl->adslLineCoding . '/' . Number::formatSi($portAdsl->adslAtucChanCurrTxRate, 2, 0, 'bps') . '/' . Number::formatSi($portAdsl->adslAturChanCurrTxRate, 2, 3, 'bps') . ') ');
+                continue;
+            }
 
             if ($datastore) {
                 $this->storeAdsl($portAdsl, $data, (int) $ifIndex, $os, $datastore);
-                echo ' ADSL(' . $portAdsl->adslLineCoding . '/' . Number::formatSi($portAdsl->adslAtucChanCurrTxRate, 2, 3, 'bps') . '/' . Number::formatSi($portAdsl->adslAturChanCurrTxRate, 2, 3, 'bps') . ') ';
+                Log::info(' ADSL(' . $portAdsl->adslLineCoding . '/' . Number::formatSi($portAdsl->adslAtucChanCurrTxRate, 2, 3, 'bps') . '/' . Number::formatSi($portAdsl->adslAturChanCurrTxRate, 2, 0, 'bps') . ') ');
             }
 
             $adslPorts->push($portAdsl);
@@ -175,7 +195,7 @@ class Xdsl implements Module
 
         foreach ($vdsl as $ifIndex => $data) {
             $portVdsl = new PortVdsl([
-                'port_id' => $os->ifIndexToId($ifIndex),
+                'port_id' => PortCache::getIdFromIfIndex($ifIndex, $os->getDevice()),
                 'xdsl2ChStatusActDataRateXtur' => $data['xdsl2ChStatusActDataRate']['xtur'] ?? 0,
                 'xdsl2ChStatusActDataRateXtuc' => $data['xdsl2ChStatusActDataRate']['xtuc'] ?? 0,
             ]);
@@ -190,7 +210,7 @@ class Xdsl implements Module
 
             if ($datastore) {
                 $this->storeVdsl($portVdsl, $data, (int) $ifIndex, $os, $datastore);
-                echo ' VDSL(' . $os->ifIndexToName($ifIndex) . '/' . Number::formatSi($portVdsl->xdsl2LineStatusAttainableRateDs, 2, 3, 'bps') . '/' . Number::formatSi($portVdsl->xdsl2LineStatusAttainableRateUs, 2, 3, 'bps') . ') ';
+                Log::info(' VDSL(' . PortCache::getNameFromIfIndex($ifIndex, $os->getDevice()) . '/' . Number::formatSi($portVdsl->xdsl2LineStatusAttainableRateDs, 2, 0, 'bps') . '/' . Number::formatSi($portVdsl->xdsl2LineStatusAttainableRateUs, 2, 0, 'bps') . ') ');
             }
 
             $vdslPorts->push($portVdsl);
@@ -206,12 +226,12 @@ class Xdsl implements Module
         $rrd_def = RrdDefinition::make()
             ->addDataset('AtucCurrSnrMgn', 'GAUGE', 0, 635)
             ->addDataset('AtucCurrAtn', 'GAUGE', 0, 635)
-            ->addDataset('AtucCurrOutputPwr', 'GAUGE', 0, 635)
+            ->addDataset('AtucCurrOutputPwr', 'GAUGE', -100, 635)
             ->addDataset('AtucCurrAttainableR', 'GAUGE', 0)
             ->addDataset('AtucChanCurrTxRate', 'GAUGE', 0)
             ->addDataset('AturCurrSnrMgn', 'GAUGE', 0, 635)
             ->addDataset('AturCurrAtn', 'GAUGE', 0, 635)
-            ->addDataset('AturCurrOutputPwr', 'GAUGE', 0, 635)
+            ->addDataset('AturCurrOutputPwr', 'GAUGE', -100, 635)
             ->addDataset('AturCurrAttainableR', 'GAUGE', 0)
             ->addDataset('AturChanCurrTxRate', 'GAUGE', 0)
             ->addDataset('AtucPerfLofs', 'COUNTER', null, 100000000000)
@@ -255,7 +275,7 @@ class Xdsl implements Module
         ];
 
         $datastore->put($os->getDeviceArray(), 'adsl', [
-            'ifName' => $os->ifIndexToName($ifIndex),
+            'ifName' => (string) PortCache::getNameFromIfIndex($ifIndex, $os->getDevice()),
             'rrd_name' => Rrd::portName($port->port_id, 'adsl'),
             'rrd_def' => $rrd_def,
         ], $fields);
@@ -265,7 +285,7 @@ class Xdsl implements Module
     {
         // Attainable
         $datastore->put($os->getDeviceArray(), 'xdsl2LineStatusAttainableRate', [
-            'ifName' => $os->ifIndexToName($ifIndex),
+            'ifName' => (string) PortCache::getNameFromIfIndex($ifIndex, $os->getDevice()),
             'rrd_name' => Rrd::portName($port->port_id, 'xdsl2LineStatusAttainableRate'),
             'rrd_def' => RrdDefinition::make()
                 ->addDataset('ds', 'GAUGE', 0)
@@ -277,7 +297,7 @@ class Xdsl implements Module
 
         // actual data rates
         $datastore->put($os->getDeviceArray(), 'xdsl2ChStatusActDataRate', [
-            'ifName' => $os->ifIndexToName($ifIndex),
+            'ifName' => (string) PortCache::getNameFromIfIndex($ifIndex, $os->getDevice()),
             'rrd_name' => Rrd::portName($port->port_id, 'xdsl2ChStatusActDataRate'),
             'rrd_def' => RrdDefinition::make()
                 ->addDataset('xtuc', 'GAUGE', 0)
@@ -289,11 +309,11 @@ class Xdsl implements Module
 
         // power levels
         $datastore->put($os->getDeviceArray(), 'xdsl2LineStatusActAtp', [
-            'ifName' => $os->ifIndexToName($ifIndex),
+            'ifName' => (string) PortCache::getNameFromIfIndex($ifIndex, $os->getDevice()),
             'rrd_name' => Rrd::portName($port->port_id, 'xdsl2LineStatusActAtp'),
             'rrd_def' => RrdDefinition::make()
-                ->addDataset('ds', 'GAUGE', 0)
-                ->addDataset('us', 'GAUGE', 0),
+                ->addDataset('ds', 'GAUGE', -100)
+                ->addDataset('us', 'GAUGE', -100),
         ], [
             'ds' => $data['xdsl2LineStatusActAtpDs'] ?? null,
             'us' => $data['xdsl2LineStatusActAtpUs'] ?? null,

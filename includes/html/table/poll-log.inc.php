@@ -19,9 +19,10 @@ if (! Auth::user()->hasGlobalAdmin()) {
 }
 
 if (isset($searchPhrase) && ! empty($searchPhrase)) {
-    $sql .= ' AND (hostname LIKE ? OR sysName LIKE ? OR last_polled LIKE ? OR last_polled_timetaken LIKE ?)';
+    $sql .= ' AND (hostname LIKE ? OR sysName LIKE ? OR IFNULL(CONVERT_TZ(last_polled, @@global.time_zone, ?),last_polled) LIKE ? OR last_polled_timetaken LIKE ?)';
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
+    $param[] = session('preferences.timezone');
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
 }
@@ -55,25 +56,26 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT D.device_id, L.location as `location`, D.hostname AS `hostname`, D.sysName, D.last_polled AS `last_polled`, `group_name`, D.last_polled_timetaken AS `last_polled_timetaken` $sql";
+$sql = "SELECT D.device_id, L.location as `location`, D.hostname AS `hostname`, D.sysName, IFNULL(CONVERT_TZ(D.last_polled, @@global.time_zone, ?),D.last_polled) AS `last_polled`, `group_name`, D.last_polled_timetaken AS `last_polled_timetaken` $sql";
+array_unshift($param, session('preferences.timezone'));
 
 foreach (dbFetchRows($sql, $param) as $device) {
     if (empty($device['group_name'])) {
         $device['group_name'] = 'General';
     }
     $response[] = [
-        'hostname'              => generate_device_link($device, null, ['tab' => 'graphs', 'group' => 'poller']),
-        'last_polled'           => $device['last_polled'],
-        'poller_group'          => $device['group_name'],
-        'location'              => $device['location'],
+        'hostname' => generate_device_link($device, null, ['tab' => 'graphs', 'group' => 'poller']),
+        'last_polled' => $device['last_polled'],
+        'poller_group' => $device['group_name'],
+        'location' => $device['location'],
         'last_polled_timetaken' => round($device['last_polled_timetaken'], 2),
     ];
 }
 
 $output = [
-    'current'  => $current,
+    'current' => $current,
     'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $total,
+    'rows' => $response,
+    'total' => $total,
 ];
 echo json_encode($output);

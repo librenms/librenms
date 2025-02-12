@@ -60,7 +60,7 @@ class NominatimApi extends BaseApi implements Geocoder
             ],
             'headers' => [
                 'User-Agent' => 'LibreNMS',
-                'Accept'     => 'application/json',
+                'Accept' => 'application/json',
             ],
         ];
     }

@@ -27,7 +27,7 @@ if (Auth::user()->hasGlobalAdmin() && isset($device_hostname)) {
 }
 
 $output = [
-    'status'  => $status,
+    'status' => $status,
     'message' => $message,
 ];
 

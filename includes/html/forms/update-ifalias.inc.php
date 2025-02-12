@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\Eventlog;
+use LibreNMS\Enum\Severity;
+
 /*
  * LibreNMS
  *
@@ -26,14 +29,14 @@ if (! empty($ifName) && is_numeric($port_id)) {
         $descr = 'repoll';
         // Set to repoll so we avoid using ifDescr on port poll
     }
-    if (dbUpdate(['ifAlias'=>$descr], 'ports', '`port_id`=?', [$port_id]) > 0) {
+    if (dbUpdate(['ifAlias' => $descr], 'ports', '`port_id`=?', [$port_id]) > 0) {
         $device = device_by_id_cache($device_id);
         if ($descr === 'repoll') {
             del_dev_attrib($device, 'ifName:' . $ifName);
-            log_event("$ifName Port ifAlias cleared manually", $device, 'interface', 3, $port_id);
+            Eventlog::log("$ifName Port ifAlias cleared manually", $device['device_id'], 'interface', Severity::Notice, $port_id);
         } else {
             set_dev_attrib($device, 'ifName:' . $ifName, 1);
-            log_event("$ifName Port ifAlias set manually: $descr", $device, 'interface', 3, $port_id);
+            Eventlog::log("$ifName Port ifAlias set manually: $descr", $device['device_id'], 'interface', Severity::Notice, $port_id);
         }
         $status = 'ok';
     } else {
@@ -42,6 +45,6 @@ if (! empty($ifName) && is_numeric($port_id)) {
 }
 
 $response = [
-    'status'        => $status,
+    'status' => $status,
 ];
 echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
