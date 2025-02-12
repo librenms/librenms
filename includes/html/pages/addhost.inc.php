@@ -149,7 +149,7 @@ $pagetitle[] = 'Add host';
             <select name="snmpver" id="snmpver" class="form-control input-sm" onChange="changeForm();">
                 <?php
                 $snmpver_list = [ "v1", "v2c", "v3" ];
-                $snmpver_pref = Config::get('snmp.version.0');
+                $snmpver_pref = Config::get('snmp.version.0', 'v2c');
                 foreach ($snmpver_list as $snmpver_item) {
                     $selected = '';
                     $snmpver_item == $snmpver_pref ? $selected = 'selected' : '';
@@ -159,12 +159,13 @@ $pagetitle[] = 'Add host';
 	    </select>
           </div>
           <div class="col-sm-3">
-            <input type="text" name="port" placeholder="port" class="form-control input-sm" value="<?php echo Config::get('snmp.port') ?>">
+            <input type="text" name="port" placeholder="port" class="form-control input-sm" value="<?php echo Config::get('snmp.port', 161) ?>">
           </div>
           <div class="col-sm-3">
             <select name="transport" id="transport" class="form-control input-sm">
 <?php
-foreach (Config::get('snmp.transports') as $transport) {
+var_dump(Config::get('snmp.transports', ['udp']));
+foreach (Config::get('snmp.transports', 'udp') as $transport) {
     $selected = '';
     Config::get('snmp.transports')[0] == $transport ? $selected = 'selected' : ''; 
     echo "<option value='" . $transport . $selected . "'>" . $transport . '</option>';
@@ -217,7 +218,7 @@ foreach (PortAssociationMode::getModes() as $mode) {
               <select name="authlevel" id="authlevel" class="form-control input-sm">
                   <?php
                   $authlevel_list = [ "noAuthNoPriv", "authNoPriv", "authPriv" ];
-                  $authlevel_pref = Config::get('snmp.v3.0.authlevel');
+                  $authlevel_pref = Config::get('snmp.v3.0.authlevel', 'noAuthNoPriv');
                   foreach ($authlevel_list as $authlevel_item) {
                       $selected = '';
                       $authlevel_item == $authlevel_pref ? $selected = 'selected' : '';
