@@ -74,7 +74,6 @@ disable it for one device then you can do this within the WebUI Device
     lnms config:set poller_modules.cipsec-tunnels false
     lnms config:set poller_modules.cisco-ace-loadbalancer false
     lnms config:set poller_modules.cisco-ace-serverfarms false
-    lnms config:set poller_modules.cisco-asa-firewall false
     lnms config:set poller_modules.cisco-cbqos false
     lnms config:set poller_modules.cisco-otv false
     lnms config:set poller_modules.cisco-vpdn false
@@ -182,8 +181,6 @@ configured to be ignored by config options.
 `applications`: Device application support.
 
 `availability`: Device Availability Calculation.
-
-`cisco-asa-firewall`: Cisco ASA firewall support.
 
 ## Running
 

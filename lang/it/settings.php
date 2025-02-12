@@ -1111,9 +1111,6 @@ return [
             'cisco-ace-serverfarms' => [
                 'description' => 'Cisco ACE Serverfarms',
             ],
-            'cisco-asa-firewall' => [
-                'description' => 'Cisco ASA Firewall',
-            ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',
             ],

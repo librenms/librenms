@@ -165,9 +165,6 @@
                 "aruba-controller": {
                     "type": "boolean"
                 },
-                "cisco-asa-firewall": {
-                    "type": "boolean"
-                },
                 "mib": {
                     "type": "boolean"
                 },

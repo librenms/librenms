@@ -1347,9 +1347,6 @@ return [
             'cisco-ace-serverfarms' => [
                 'description' => 'Серверные фермы Cisco ACE',
             ],
-            'cisco-asa-firewall' => [
-                'description' => 'Firewall Cisco ASA',
-            ],
             'cisco-cbqos' => [
                 'description' => 'Cisco CBQOS',
             ],
