@@ -164,9 +164,7 @@ $pagetitle[] = 'Add host';
 <?php
 var_dump(Config::get('snmp.transports', ['udp']));
 foreach (Config::get('snmp.transports', 'udp') as $transport) {
-    $selected = '';
-    Config::get('snmp.transports')[0] == $transport ? $selected = 'selected' : ''; 
-    echo "<option value='" . $transport . $selected . "'>" . $transport . '</option>';
+    echo '<option value="' . $transport . '"'. (Config::get('snmp.transports.0') == $transport ? ' selected' : '') . '>' . $transport . '</option>';
 }
 ?>
             </select>
@@ -179,12 +177,8 @@ foreach (Config::get('snmp.transports', 'udp') as $transport) {
 <?php
 
 foreach (PortAssociationMode::getModes() as $mode) {
-    $selected = '';
-    if ($mode == Config::get('default_port_association_mode')) {
-        $selected = 'selected';
-    }
-
-    echo "              <option value=\"$mode\" $selected>$mode</option>\n";
+    $selected = $mode == Config::get('default_port_association_mode') ? ' selected' : '';
+    echo "              <option value=\"$mode\"$selected>$mode</option>\n";
 }
 
 ?>
