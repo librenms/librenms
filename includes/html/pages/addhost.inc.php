@@ -159,16 +159,15 @@ $pagetitle[] = 'Add host';
 	    </select>
           </div>
           <div class="col-sm-3">
-            <input type="text" name="port" placeholder="port" class="form-control input-sm" value="<?php echo Config::get('snmp.port', 161) ?>">
+            <input type="text" name="port" placeholder="port" class="form-control input-sm" value="<?php echo htmlspecialchars(Config::get('snmp.port', 161)) ?>">
           </div>
           <div class="col-sm-3">
             <select name="transport" id="transport" class="form-control input-sm">
 <?php
-var_dump(Config::get('snmp.transports', ['udp']));
 foreach (Config::get('snmp.transports', 'udp') as $transport) {
     $selected = '';
     Config::get('snmp.transports')[0] == $transport ? $selected = 'selected' : ''; 
-    echo "<option value='" . $transport . $selected . "'>" . $transport . '</option>';
+    echo "<option value='" . htmlspecialchars($transport) . $selected . "'>" . htmlspecialchars($transport) . '</option>';
 }
 ?>
             </select>
@@ -202,7 +201,7 @@ foreach (PortAssociationMode::getModes() as $mode) {
           <div class="form-group">
             <label for="community" class="col-sm-3 control-label">Community</label>
             <div class="col-sm-9">
-              <input type="text" name="community" id="community" placeholder="Community" class="form-control input-sm" value="<?php echo Config::get('snmp.community.0') ?>">
+              <input type="text" name="community" id="community" placeholder="Community" class="form-control input-sm" value="<?php echo htmlspecialchars(Config::get('snmp.community.0')) ?>">
             </div>
           </div>
         </div>
@@ -231,13 +230,13 @@ foreach (PortAssociationMode::getModes() as $mode) {
           <div class="form-group">
             <label for="authname" class="col-sm-3 control-label">Auth User Name</label>
             <div class="col-sm-9">
-              <input type="text" name="authname" id="authname" class="form-control input-sm" autocomplete="off" value="<?php echo Config::get('snmp.v3.0.authname') ?>">
+              <input type="text" name="authname" id="authname" class="form-control input-sm" autocomplete="off" value="<?php echo htmlspecialchars(Config::get('snmp.v3.0.authname')) ?>">
             </div>
           </div>
           <div class="form-group">
             <label for="authpass" class="col-sm-3 control-label">Auth Password</label>
             <div class="col-sm-9">
-              <input type="text" name="authpass" id="authpass" placeholder="AuthPass" class="form-control input-sm" autocomplete="off" value="<?php echo Config::get('snmp.v3.0.authpass') ?>">
+              <input type="text" name="authpass" id="authpass" placeholder="AuthPass" class="form-control input-sm" autocomplete="off" value="<?php echo htmlspecialchars(Config::get('snmp.v3.0.authpass')) ?>">
             </div>
           </div>
           <div class="form-group">
@@ -261,7 +260,7 @@ foreach (PortAssociationMode::getModes() as $mode) {
           <div class="form-group">
             <label for="cryptopass" class="col-sm-3 control-label">Crypto Password</label>
             <div class="col-sm-9">
-              <input type="text" name="cryptopass" id="cryptopass" placeholder="Crypto Password" class="form-control input-sm" autocomplete="off" value="<?php echo Config::get('snmp.v3.0.cryptopass') ?>">
+              <input type="text" name="cryptopass" id="cryptopass" placeholder="Crypto Password" class="form-control input-sm" autocomplete="off" value="<?php echo htmlspecialchars(Config::get('snmp.v3.0.cryptopass')) ?>">
             </div>
           </div>
           <div class="form-group">
