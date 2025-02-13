@@ -1497,7 +1497,7 @@
                 {
                     "entPhysicalIndex": 1,
                     "entPhysicalDescr": "Power Unit",
-                    "entPhysicalClass": "13",
+                    "entPhysicalClass": "energyObject",
                     "entPhysicalName": "NGFC-E",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
