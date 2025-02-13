@@ -35,6 +35,7 @@ class Ospfv3Nbr extends DeviceRelatedModel
     protected $fillable = [
         'device_id',
         'port_id',
+        'ospfv3_instance_id',
         'ospfv3_nbr_id',
         'context_name',
         'ospfv3NbrIfId',

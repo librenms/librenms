@@ -36,6 +36,7 @@ class Ospfv3Port extends PortRelatedModel
     protected $fillable = [
         'device_id',
         'port_id',
+        'ospfv3_instance_id',
         'ospfv3_port_id',
         'context_name',
         'ospfv3IfIndex',
