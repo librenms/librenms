@@ -59,7 +59,7 @@ class DashboardPolicy
      */
     public function update(User $user, Dashboard $dashboard): bool
     {
-        return $dashboard->user_id == $user->user_id || $dashboard->access > 2 || ( $dashboard->access > 1 && $user->isAdmin() );
+        return $dashboard->user_id == $user->user_id || $dashboard->access > 2 || ($dashboard->access > 1 && $user->isAdmin());
     }
 
     /**
