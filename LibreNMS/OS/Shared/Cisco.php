@@ -778,14 +778,14 @@ class Cisco extends OS implements
                     // Type 1 is not polled, but we need to set RRD ID to somethign unique because it's part of the DB key
                     $rrd_id = 'cbqos-policymap-' . $policyId . '-' . $objectId;
                     $pm = $policyMaps[$qosObjectIndex] ?? [];
-                    $title = implode(' - ', array_intersect_key(['cbQosPolicyMapName', 'cbQosPolicyMapDesc'], $pm));
+                    $title = implode(' - ', array_intersect_key($pm, ['cbQosPolicyMapName' => true, 'cbQosPolicyMapDesc' => true]));
                 } elseif ($type == 2) {
                     // Class Map
                     $dbtype = 'cisco_cbqos_classmap';
                     // RRD name matches the original cbqos module
                     $rrd_id = 'port-' . $servicePolicies[$policyId]['cbQosIfIndex'] . '-cbqos-' . $policyId . '-' . $objectId;
                     $cm = $classMaps[$qosObjectIndex] ?? [];
-                    $title = implode(' - ', array_intersect_key(['cbQosCMName', 'cbQosCMDesc'], $cm));
+                    $title = implode(' - ', array_intersect_key($cm, ['cbQosCMName' => true, 'cbQosCMDesc' => true]));
 
                     // Fill in the match type
                     if ($cm['cbQosCMInfo'] == 2) {
