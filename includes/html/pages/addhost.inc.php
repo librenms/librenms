@@ -52,7 +52,7 @@ if (! empty($_POST['hostname'])) {
                     $new_device->community = $_POST['community'];
                     $communities = [$_POST['community']];
                 }
-                print_message("Adding host $hostname communit" . (count($communities) == 1 ? 'y' : 'ies') . ' ' . implode(', ', array_map('htmlspecialchars', $communities)) . " port $new_device->port using $new_device->transport");
+                print_message('Adding host ' . htmlentities($hostname) . (count($communities) == 1 ? ' community' : ' communities') . ' ' . implode(', ', array_map('htmlspecialchars', $communities)) . ' port ' . htmlentities($new_device->port) . ' using ' . htmlentities($new_device->transport));
             } elseif ($_POST['snmpver'] === 'v3') {
                 $new_device->snmpver = 'v3';
                 $new_device->authlevel = strip_tags($_POST['authlevel']);
@@ -62,7 +62,7 @@ if (! empty($_POST['hostname'])) {
                 $new_device->cryptopass = $_POST['cryptopass'];
                 $new_device->cryptoalgo = $_POST['cryptoalgo'];
 
-                print_message("Adding SNMPv3 host: $hostname port: $port");
+                print_message('Adding SNMPv3 host: ' . htmlentities($hostname) . ' port: ' . htmlentities($new_device->port));
             } else {
                 print_error('Unsupported SNMP Version. There was a dropdown menu, how did you reach this error ?');
             }//end if
@@ -148,27 +148,23 @@ $pagetitle[] = 'Add host';
           <div class="col-sm-3">
             <select name="snmpver" id="snmpver" class="form-control input-sm" onChange="changeForm();">
                 <?php
-                $snmpver_list = [ "v1", "v2c", "v3" ];
                 $snmpver_pref = Config::get('snmp.version.0', 'v2c');
+                $snmpver_list = ['v1', 'v2c', 'v3'];
                 foreach ($snmpver_list as $snmpver_item) {
-                    $selected = '';
-                    $snmpver_item == $snmpver_pref ? $selected = 'selected' : '';
-                    echo "<option value=\"" . $snmpver_item ."\"" . $selected . ">" . $snmpver_item. "</option>";
+                    echo "<option value=\"" . $snmpver_item ."\"" . ($snmpver_item == $snmpver_pref ? ' selected' : '') . ">" . $snmpver_item. "</option>";
                 }
                 ?>
 	    </select>
           </div>
           <div class="col-sm-3">
-            <input type="text" name="port" placeholder="port" class="form-control input-sm" value="<?php echo Config::get('snmp.port', 161) ?>">
+            <input type="text" name="port" placeholder="port (blank uses snmp.port)" class="form-control input-sm">
           </div>
           <div class="col-sm-3">
             <select name="transport" id="transport" class="form-control input-sm">
 <?php
 var_dump(Config::get('snmp.transports', ['udp']));
 foreach (Config::get('snmp.transports', 'udp') as $transport) {
-    $selected = '';
-    Config::get('snmp.transports')[0] == $transport ? $selected = 'selected' : ''; 
-    echo "<option value='" . $transport . $selected . "'>" . $transport . '</option>';
+    echo '<option value="' . $transport . '"'. (Config::get('snmp.transports.0') == $transport ? ' selected' : '') . '>' . $transport . '</option>';
 }
 ?>
             </select>
@@ -181,12 +177,8 @@ foreach (Config::get('snmp.transports', 'udp') as $transport) {
 <?php
 
 foreach (PortAssociationMode::getModes() as $mode) {
-    $selected = '';
-    if ($mode == Config::get('default_port_association_mode')) {
-        $selected = 'selected';
-    }
-
-    echo "              <option value=\"$mode\" $selected>$mode</option>\n";
+    $selected = $mode == Config::get('default_port_association_mode') ? ' selected' : '';
+    echo "              <option value=\"$mode\"$selected>$mode</option>\n";
 }
 
 ?>
@@ -202,7 +194,7 @@ foreach (PortAssociationMode::getModes() as $mode) {
           <div class="form-group">
             <label for="community" class="col-sm-3 control-label">Community</label>
             <div class="col-sm-9">
-              <input type="text" name="community" id="community" placeholder="Community" class="form-control input-sm" value="<?php echo Config::get('snmp.community.0') ?>">
+              <input type="text" name="community" id="community" placeholder="Community (blank tries all snmp.community communities)" class="form-control input-sm">
             </div>
           </div>
         </div>
@@ -220,9 +212,7 @@ foreach (PortAssociationMode::getModes() as $mode) {
                   $authlevel_list = [ "noAuthNoPriv", "authNoPriv", "authPriv" ];
                   $authlevel_pref = Config::get('snmp.v3.0.authlevel', 'noAuthNoPriv');
                   foreach ($authlevel_list as $authlevel_item) {
-                      $selected = '';
-                      $authlevel_item == $authlevel_pref ? $selected = 'selected' : '';
-                      echo "<option value=\"" . $authlevel_item. "\" " . $selected . ">" . $authlevel_item. "</option>";
+                      echo "<option value=\"" . $authlevel_item. '"' . ($authlevel_item == $authlevel_pref ? ' selected' : '') . ">" . $authlevel_item. "</option>";
                   }
                   ?>
               </select>
@@ -231,13 +221,13 @@ foreach (PortAssociationMode::getModes() as $mode) {
           <div class="form-group">
             <label for="authname" class="col-sm-3 control-label">Auth User Name</label>
             <div class="col-sm-9">
-              <input type="text" name="authname" id="authname" class="form-control input-sm" autocomplete="off" value="<?php echo Config::get('snmp.v3.0.authname') ?>">
+              <input type="text" name="authname" id="authname" class="form-control input-sm" autocomplete="off">
             </div>
           </div>
           <div class="form-group">
             <label for="authpass" class="col-sm-3 control-label">Auth Password</label>
             <div class="col-sm-9">
-              <input type="text" name="authpass" id="authpass" placeholder="AuthPass" class="form-control input-sm" autocomplete="off" value="<?php echo Config::get('snmp.v3.0.authpass') ?>">
+              <input type="text" name="authpass" id="authpass" placeholder="AuthPass" class="form-control input-sm" autocomplete="off">
             </div>
           </div>
           <div class="form-group">
@@ -247,9 +237,7 @@ foreach (PortAssociationMode::getModes() as $mode) {
                   <?php
                   $algo_pref = Config::get('snmp.v3.0.authalgo');
                   foreach (\LibreNMS\SNMPCapabilities::authAlgorithms() as $algo => $enabled) {
-                      $selected = '';
-                      $algo == $algo_pref ? $selected = 'selected' : '';
-                      echo "<option value=\"$algo\"" . ($enabled ? '' : ' disabled') . " " . $selected . ">$algo</option>";
+                      echo "<option value=\"$algo\"" . ($enabled ? '' : ' disabled') . ($algo == $algo_pref ? ' selected' : '') . ">$algo</option>";
                   }
                   ?>
               </select>
@@ -261,7 +249,7 @@ foreach (PortAssociationMode::getModes() as $mode) {
           <div class="form-group">
             <label for="cryptopass" class="col-sm-3 control-label">Crypto Password</label>
             <div class="col-sm-9">
-              <input type="text" name="cryptopass" id="cryptopass" placeholder="Crypto Password" class="form-control input-sm" autocomplete="off" value="<?php echo Config::get('snmp.v3.0.cryptopass') ?>">
+              <input type="text" name="cryptopass" id="cryptopass" placeholder="Crypto Password" class="form-control input-sm" autocomplete="off">
             </div>
           </div>
           <div class="form-group">
@@ -271,9 +259,7 @@ foreach (PortAssociationMode::getModes() as $mode) {
                   <?php
                   $algo_pref = Config::get('snmp.v3.0.cryptoalgo');
                   foreach (\LibreNMS\SNMPCapabilities::cryptoAlgoritms() as $algo => $enabled) {
-                      $selected = '';
-                      $algo == $algo_pref ? $selected = 'selected' : '';
-                      echo "<option value=\"$algo\"" . ($enabled ? '' : ' disabled') . " ". $selected . ">$algo</option>";
+                      echo "<option value=\"$algo\"" . ($enabled ? '' : ' disabled') . ($algo == $algo_pref ? ' selected' : '') . ">$algo</option>";
                   }
                   ?>
               </select>
