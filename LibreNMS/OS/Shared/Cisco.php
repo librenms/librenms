@@ -777,15 +777,15 @@ class Cisco extends OS implements
                     $dbtype = 'cisco_cbqos_policymap';
                     // Type 1 is not polled, but we need to set RRD ID to somethign unique because it's part of the DB key
                     $rrd_id = 'cbqos-policymap-' . $policyId . '-' . $objectId;
-                    $pm = $policyMaps[$qosObjectIndex];
-                    $title = $pm['cbQosPolicyMapDesc'] ? $pm['cbQosPolicyMapName'] . ' - ' . $pm['cbQosPolicyMapDesc'] : $pm['cbQosPolicyMapName'];
+                    $pm = $policyMaps[$qosObjectIndex] ?? [];
+                    $title = implode(' - ', array_intersect_key(['cbQosPolicyMapName', 'cbQosPolicyMapDesc'], $pm));
                 } elseif ($type == 2) {
                     // Class Map
                     $dbtype = 'cisco_cbqos_classmap';
                     // RRD name matches the original cbqos module
                     $rrd_id = 'port-' . $servicePolicies[$policyId]['cbQosIfIndex'] . '-cbqos-' . $policyId . '-' . $objectId;
-                    $cm = $classMaps[$qosObjectIndex];
-                    $title = $cm['cbQosCMDesc'] ? $cm['cbQosCMName'] . ' - ' . $cm['cbQosCMDesc'] : $cm['cbQosCMName'];
+                    $cm = $classMaps[$qosObjectIndex] ?? [];
+                    $title = implode(' - ', array_intersect_key(['cbQosCMName', 'cbQosCMDesc'], $cm));
 
                     // Fill in the match type
                     if ($cm['cbQosCMInfo'] == 2) {
