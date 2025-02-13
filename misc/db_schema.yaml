@@ -29,7 +29,7 @@ access_points:
     - { Field: nummonclients, Type: smallint, 'Null': false, Extra: '', Default: '0' }
     - { Field: numactbssid, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: nummonbssid, Type: int, 'Null': false, Extra: '', Default: '0' }
-    - { Field: interference, Type: 'smallint unsigned', 'Null': false, Extra: '' }
+    - { Field: interference, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [accesspoint_id], Unique: true, Type: BTREE }
     access_points_deleted_index: { Name: access_points_deleted_index, Columns: [deleted], Unique: false, Type: BTREE }

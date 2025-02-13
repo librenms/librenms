@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('access_points', function (Blueprint $table) {
-            $table->unsignedSmallInteger('interference')->change();
+            $table->unsignedInteger('interference')->change();
         });
     }
 
