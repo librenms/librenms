@@ -4674,30 +4674,6 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchCell\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/polling/cisco-asa-firewall.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbInsert\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 1
-			path: includes/polling/cisco-asa-firewall.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbUpdate\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 1
-			path: includes/polling/cisco-asa-firewall.inc.php
-
-		-
-			message: """
 				#^Call to deprecated function dbDelete\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
 			"""
