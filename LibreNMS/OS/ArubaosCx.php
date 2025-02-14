@@ -83,6 +83,7 @@ class ArubaosCx extends \LibreNMS\OS implements NacPolling, TransceiverDiscovery
                 'serial' => $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrSerialNum'] ?? null,
                 'ddm' => ($data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDiagnostics'] == 1) ?? null,
                 'cable' => $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrCableType'] ?? null,
+                'connector' => $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrConnectorType'] ?? null,
                 'distance' => $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrCableLength'] ?? null,
                 'wavelength' => $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrWavelength'] ?? null,
                 'entity_physical_index' => $ifIndex,
