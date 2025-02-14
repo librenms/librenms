@@ -25,13 +25,15 @@ namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
 use App\Models\PortsNac;
+use App\Models\Transceiver;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Polling\NacPolling;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use SnmpQuery;
 
-class ArubaosCx extends \LibreNMS\OS implements NacPolling
+class ArubaosCx extends \LibreNMS\OS implements NacPolling, TransceiverDiscovery
 {
-    protected ?string $entityVendorTypeMib = 'ARUBAWIRED-NETWORKING-OID';
+    //protected ?string $entityVendorTypeMib = 'ARUBAWIRED-NETWORKING-OID';
 
     public function pollNac()
     {
@@ -67,5 +69,24 @@ class ArubaosCx extends \LibreNMS\OS implements NacPolling
         }
 
         return $nac;
+    }
+
+    public function discoverTransceivers(): Collection
+    {
+        return \SnmpQuery::cache()->walk('ARUBAWIRED-PM-MIB::arubaWiredPmXcvrTable')->mapTable(function ($data, $ifIndex) {
+            return new Transceiver([
+                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
+                'index' => $ifIndex,
+                'type' => $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDescription'] ?? null,
+                'revision' => $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrPartNum'] ?? null,
+                'model' => $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrProductNum'] ?? null,
+                'serial' => $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrSerialNum'] ?? null,
+                'ddm' => ($data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDiagnostics'] == 1) ?? null,
+                'cable' => $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrCableType'] ?? null,
+                'distance' => $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrCableLength'] ?? null,
+                'wavelength' => $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrWavelength'] ?? null,
+                'entity_physical_index' => $ifIndex,
+            ]);
+        });
     }
 }
