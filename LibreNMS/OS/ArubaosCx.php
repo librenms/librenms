@@ -27,8 +27,8 @@ use App\Facades\PortCache;
 use App\Models\PortsNac;
 use App\Models\Transceiver;
 use Illuminate\Support\Collection;
-use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
+use LibreNMS\Interfaces\Polling\NacPolling;
 use SnmpQuery;
 
 class ArubaosCx extends \LibreNMS\OS implements NacPolling, TransceiverDiscovery
