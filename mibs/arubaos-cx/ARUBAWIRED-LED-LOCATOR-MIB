@@ -1,0 +1,134 @@
+--**MOD+************************************************************************
+--* Module:    ARUBAWIRED-LED-LOCATOR-MIB :LED locator MIB file
+--*
+--* (c) Copyright 2023 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-LED-LOCATOR-MIB
+--*
+--**MOD-************************************************************************
+
+ARUBAWIRED-LED-LOCATOR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    DisplayString
+        FROM SNMPv2-TC
+    arubaWiredChassisMIB
+        FROM ARUBAWIRED-CHASSIS-MIB;
+
+arubaWiredLedLocator MODULE-IDENTITY
+    LAST-UPDATED "202306060000Z" -- June 06, 2023
+    ORGANIZATION "HPE/Aruba Networking Division"
+    CONTACT-INFO "Hewlett Packard Company
+                  8000 Foothills Blvd.
+                  Roseville, CA 95747"
+    DESCRIPTION
+        "This MIB module describes management objects that manage
+        locator LEDs."
+
+    REVISION     "202306060000Z" -- June 06, 2023
+    DESCRIPTION  "Initial revision."
+    ::= { arubaWiredChassisMIB 7 }
+
+arubaWiredLedLocatorObjects     OBJECT IDENTIFIER ::= { arubaWiredLedLocator 1 }
+arubaWiredLedLocatorConformance OBJECT IDENTIFIER ::= { arubaWiredLedLocator 2 }
+
+-- **********************************************************************
+-- LED Locator Objects
+-- **********************************************************************
+
+arubaWiredLedLocatorDetails     OBJECT IDENTIFIER ::= { arubaWiredLedLocatorObjects 1 }
+
+arubaWiredLedLocatorTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF ArubaWiredLedLocatorEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This table contains one entry for each settable
+                   locator LED in the system."
+      ::= { arubaWiredLedLocatorDetails 1 }
+
+arubaWiredLedLocatorEntry OBJECT-TYPE
+      SYNTAX      ArubaWiredLedLocatorEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "Information about the LED locator physical entity
+                  table."
+      INDEX       { arubaWiredLedLocatorGroupIndex }
+      ::= { arubaWiredLedLocatorTable 1 }
+
+ArubaWiredLedLocatorEntry ::=
+    SEQUENCE {
+        arubaWiredLedLocatorGroupIndex    Integer32,
+        arubaWiredLedLocatorName          DisplayString,
+        arubaWiredLedLocatorState         DisplayString
+    }
+
+arubaWiredLedLocatorGroupIndex OBJECT-TYPE
+      SYNTAX      Integer32 (1..2147483647)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This variable uniquely identifies the group containing the
+                   LED locator. Group means chassis in the stack and the value
+                   1 MUST be used for non-stacking devices."
+      ::= { arubaWiredLedLocatorEntry 1 }
+
+arubaWiredLedLocatorName OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..40))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Group and name of the locator LED."
+      ::= { arubaWiredLedLocatorEntry 2 }
+
+arubaWiredLedLocatorState OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..20))
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION "Current state of the locator LED. The allowed states which
+                   can be written are on, off, flashing, fast_blink, half_bright.
+                   The other states which are slow_blink and hw_control are read-only"
+      ::= { arubaWiredLedLocatorEntry 3 }
+
+-- **********************************************************************
+-- compliance statements
+-- **********************************************************************
+
+arubaWiredLedLocatorCompliances OBJECT IDENTIFIER
+      ::= { arubaWiredLedLocatorConformance 1 }
+
+arubaWiredLedLocatorGroups      OBJECT IDENTIFIER
+      ::= { arubaWiredLedLocatorConformance 2 }
+
+arubaWiredLedLocatorCompliance MODULE-COMPLIANCE
+      STATUS      current
+      DESCRIPTION "A compliance statement for Aruba led locators."
+      MODULE
+      MANDATORY-GROUPS
+      {
+         arubaWiredLedLocatorTable
+      }
+      GROUP       arubaWiredLedLocatorTableGroup
+      DESCRIPTION "A Collection of Object(s) that display the current
+                   locator LED parameters information."
+
+      ::= { arubaWiredLedLocatorCompliances 1 }
+
+arubaWiredLedLocatorTableGroup OBJECT-GROUP
+      OBJECTS     {
+                    arubaWiredLedLocatorName,
+                    arubaWiredLedLocatorState
+                  }
+      STATUS      current
+      DESCRIPTION "A collection of objects display configuration and
+                   names for the led locator table."
+      ::= { arubaWiredLedLocatorGroups 1 }
+END
