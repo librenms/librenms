@@ -33,7 +33,7 @@ use SnmpQuery;
 
 class ArubaosCx extends \LibreNMS\OS implements NacPolling, TransceiverDiscovery
 {
-    //protected ?string $entityVendorTypeMib = 'ARUBAWIRED-NETWORKING-OID';
+    protected ?string $entityVendorTypeMib = 'ARUBAWIRED-NETWORKING-OID';
 
     public function pollNac()
     {
