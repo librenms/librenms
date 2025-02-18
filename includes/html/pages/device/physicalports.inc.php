@@ -6,28 +6,27 @@
 $columnHeight = 2;
 // Find hardware, model name or systemname for hints
 //echo print_r($device, true);
-$hardware = $device['hardware'] ?? null;
+$hardware = str_replace(" ", "_", strtolower($device['hardware'])) ?? null;
 // Lookup entPhysical storage for more hardware hints
 $level = 0;
 $entPhysical = loopEntPhysical($device, 0, 0);
 // echo print_r($entPhysical, true);
 
 // Deduce hints file from icon name
-$brand = substr(basename($device['icon'] ?? null), 0, -4);
-$filePath = "resources/views/device/hints/{$brand}.hints";
+$brand = strtolower(substr(basename($device['icon'] ?? null), 0, -4));
+$filePath = "resources/views/device/portui/{$brand}/{$hardware}.json";
 // echo getcwd();
-if (file_exists($filePath)) {
-    $line = fastFindLine($filePath, $hardware);
-    if (! empty($line)) {
-        echo "<!-- Found hardware '{$hardware}' in '{$brand}' hints  -->\n";
-        // echo print_r(substr($line, strlen("{$hardware}:")), true);
+if((file_exists($filePath)) && ($hardware) && ($brand)) {
+	echo "<!-- Found hardware '{$hardware}' / '{$brand}' json  -->\n";
+	// echo print_r(substr($line, strlen("{$hardware}:")), true);
 
-        // if json does not decode, the return is false and we catch later
-        $transformedPorts = generateTransformPorts(json_decode(substr(trim($line), strlen($hardware) + 1), true));
-        if (! isset($transformedPorts)) {
-            echo "<!--  Failed to decode json string, is it valid? -->\n";
-        }
-    }
+	// if json does not decode, the return is false and we catch later
+	$transformedPorts = generateTransformPorts(json_decode(file_get_contents($filePath), true));
+	if (! isset($transformedPorts)) {
+		echo "<!--  Failed to decode json string, is it valid? -->\n";
+	} else {
+		echo "<!-- Found hardware '{$hardware}' / '{$brand}' json  -->\n";
+	}
 }
 
 if (! isset($transformedPorts)) {
@@ -35,7 +34,7 @@ if (! isset($transformedPorts)) {
         if (! empty($entPhysical)) {
             echo "<!-- Found entPhysical information -->\n";
         }
-        echo "<!-- No hints found for '{$brand}' model '{$hardware}', auto generating -->\n";
+        echo "<!-- No json found for '{$brand}' model '{$hardware}', auto generating -->\n";
         $transformedPorts = transformPortsAuto($data['ports'], 2, $entPhysical);
     }
 }
@@ -304,22 +303,6 @@ function generateTransformPorts($json, $side = 'front')
     }
 
     return $result;
-}
-
-// Find line in hints file with /prefix/: and return line without prefix
-// This should return a json object
-function fastFindLine($filePath, $prefix)
-{
-    $file = new SplFileObject($filePath);
-    $prefix .= ':';
-    while (! $file->eof()) {
-        $line = $file->fgets();
-        if (strncmp($line, $prefix, strlen($prefix)) === 0) {
-            return $line;
-        }
-    }
-
-    return null;
 }
 
 // If you do not have the ports object indexed by ifName, this transposes it

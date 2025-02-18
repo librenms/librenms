@@ -1,2 +1,0 @@
-6100 48G Class4 PoE 4SFP+ 370W Switch:{"front":[{"height":"2","inverse":"0","block":"0","count":"4","type":"sfp","start":"1\/1\/49"},{"height":"2","inverse":"0","block":"1","count":"48","type":"cu","start":"1\/1\/1"}]}
-6300M 48-port 1GbE and 4-port SFP56 Switch:{"front":[{"height":"2","inverse":"0","block":"0","count":"48","type":"cu","start":"1\/1\/1"},{"height":"2","inverse":"0","block":"1","count":"4","type":"qsfp","start":"1\/1\/49"}]}

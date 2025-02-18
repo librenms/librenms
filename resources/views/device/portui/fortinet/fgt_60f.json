@@ -1,0 +1,44 @@
+{
+  "front": [
+    {
+      "height": "1",
+      "inverse": "0",
+      "block": "0",
+      "count": "5",
+      "type": "cu",
+      "start": "internal1"
+    },
+    {
+      "height": "1",
+      "inverse": "0",
+      "block": "1",
+      "count": "1",
+      "type": "cu",
+      "start": "a"
+    },
+    {
+      "height": "1",
+      "inverse": "0",
+      "block": "2",
+      "count": "1",
+      "type": "cu",
+      "start": "b"
+    },
+    {
+      "height": "1",
+      "inverse": "0",
+      "block": "3",
+      "count": "1",
+      "type": "cu",
+      "start": "dmz"
+    },
+    {
+      "height": "1",
+      "inverse": "0",
+      "block": "4",
+      "count": "2",
+      "type": "cu",
+      "start": "wan1"
+    }
+  ]
+}
