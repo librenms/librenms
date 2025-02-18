@@ -1,7 +1,7 @@
 --**MOD+***********************************************************************
 --* Module:    ARUBAWIRED-MACNOTIFY-MIB.mib
 --*
---* (c) Copyright 2020-2021 Hewlett Packard Enterprise Development LP
+--* (c) Copyright 2020-2021,2023 Hewlett Packard Enterprise Development LP
 --* All Rights Reserved.
 --*
 --* The contents of this software are proprietary and confidential
@@ -22,7 +22,7 @@ ARUBAWIRED-MACNOTIFY-MIB DEFINITIONS ::= BEGIN
       Unsigned32, Integer32, OBJECT-TYPE, MODULE-IDENTITY,
       NOTIFICATION-TYPE
             FROM SNMPv2-SMI
-      MacAddress 
+      MacAddress, DisplayString
             FROM SNMPv2-TC
       OBJECT-GROUP, NOTIFICATION-GROUP, MODULE-COMPLIANCE
         FROM SNMPv2-CONF
@@ -75,7 +75,9 @@ macNotifyDataGroup OBJECT-GROUP
         arubaWiredMacNotifyMacAddress,
         arubaWiredMacNotifyFromPortId,
         arubaWiredMacNotifyToPortId,
-        arubaWiredMacNotifyVlanId
+        arubaWiredMacNotifyVlanId,
+        arubaWiredMacNotifyFromDest,
+        arubaWiredMacNotifyToDest
     }
     STATUS      current
     DESCRIPTION
@@ -132,6 +134,8 @@ macNotifySystemGroup OBJECT-GROUP
 --*    arubaWiredMacNotifyFromPortId is the From Port value
 --*    arubaWiredMacNotifyToPortId is the Port ID
 --*    arubaWiredMacNotifyVlanId is the VLAN ID
+--*    arubaWiredMacNotifyFromDest is the From Dest value for events over tunnel
+--*    arubaWiredMacNotifyToDest is the To Dest value for events over tunnel
 --****************************************************************
 
 macNotifyChangeTable OBJECT-TYPE
@@ -157,7 +161,7 @@ macNotifyChangeTableEntry OBJECT-TYPE
 MacNotifyChangeTableEntry ::=
     SEQUENCE {
          arubaWiredMacNotifyAction
-            Integer32,
+            INTEGER,
          arubaWiredMacNotifyMacAddress
             MacAddress,
          arubaWiredMacNotifyFromPortId
@@ -165,11 +169,15 @@ MacNotifyChangeTableEntry ::=
          arubaWiredMacNotifyToPortId
             Integer32,
          arubaWiredMacNotifyVlanId
-            Integer32
+            Integer32,
+        arubaWiredMacNotifyFromDest
+            DisplayString,
+         arubaWiredMacNotifyToDest
+            DisplayString
     }
 
 arubaWiredMacNotifyAction OBJECT-TYPE
-        SYNTAX      Integer32 {
+        SYNTAX      INTEGER {
                         aged(0),
                         learned(1),
                         moved(2),
@@ -236,6 +244,40 @@ arubaWiredMacNotifyFromPortId  OBJECT-TYPE
                      Aged: VLAN that arubaWiredMacNotifyFromPortId belongs to"
         ::= { macNotifyChangeTableEntry 5 }
 
+    arubaWiredMacNotifyFromDest  OBJECT-TYPE
+        SYNTAX    DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS    current
+        DESCRIPTION "The related from dest address of the
+                     MAC address arubaWiredMacNotifyMacAddress.
+                     Value will be determined by the action
+                     in arubaWiredMacNotifyAction. Below examples
+                     are for events over tunnel, this field will be
+                     empty for all non-tunnel cases.
+                     Action:
+                     Learned: <empty string>
+                     Moved:   The tunnel and dest IP from which the MAC was moved
+                     Removed: The tunnel and dest IP from which the MAC was removed
+                     Aged: The tunnel and dest IP from which the MAC aged"
+        ::= { macNotifyChangeTableEntry 6 }
+
+    arubaWiredMacNotifyToDest  OBJECT-TYPE
+        SYNTAX    DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS    current
+        DESCRIPTION "The related to dest address of the
+                     MAC address arubaWiredMacNotifyMacAddress.
+                     Value will be determined by the action
+                     in arubaWiredMacNotifyAction. Below examples
+                     are for events over tunnel, this field will be
+                     empty for all non-tunnel cases.
+                     Action:
+                     Learned: The tunnel and dest IP on which the MAC was learned
+                     Moved:   The tunnel and dest IP to which the MAC was moved
+                     Removed: <empty string>
+                     Aged: <empty string>"
+        ::= { macNotifyChangeTableEntry 7 }
+
 -- Trap Definition
 
      arubaWiredMacNotifyMacAddressTableChange NOTIFICATION-TYPE
@@ -245,7 +287,9 @@ arubaWiredMacNotifyFromPortId  OBJECT-TYPE
                  arubaWiredMacNotifyMacAddress,
                  arubaWiredMacNotifyFromPortId,
                  arubaWiredMacNotifyToPortId,
-                 arubaWiredMacNotifyVlanId
+                 arubaWiredMacNotifyVlanId,
+                 arubaWiredMacNotifyFromDest,
+                 arubaWiredMacNotifyToDest
               }
         STATUS      current
         DESCRIPTION "The arubaWiredMacNotifyMacAddressTableChange

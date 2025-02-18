@@ -1,0 +1,199 @@
+--**MOD+************************************************************************
+--* Module:    ARUBAWIRED-POWER-STAT-MIB :MODULE MIB file
+--*
+--* (c) Copyright 2023 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-POWER-STAT-MIB
+--*
+--**MOD-************************************************************************
+
+ARUBAWIRED-POWER-STAT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    arubaWiredChassisMIB
+        FROM ARUBAWIRED-CHASSIS-MIB;
+
+arubaWiredPowerStat MODULE-IDENTITY
+    LAST-UPDATED "202307250000Z" -- July 25, 2023
+    ORGANIZATION "HPE/Aruba Networking Division"
+    CONTACT-INFO "Hewlett Packard Company
+                  8000 Foothills Blvd.
+                  Roseville, CA 95747"
+    DESCRIPTION
+        "This MIB module describes power statistics of components."
+
+    REVISION     "202307250000Z"
+    DESCRIPTION  "Modified the MAX-ACCESS of arubaWiredPowerStatPowerConsumedAveragePeriod
+                  to read-write. Modified SYNTAX of arubaWiredPowerStatPowerConsumedAverage
+                  to real, with 2 fractional places (RealDecTwo)"
+
+    REVISION     "202306200000Z" -- June 20, 2023
+    DESCRIPTION  "Initial revision."
+
+    ::= { arubaWiredChassisMIB 8 }
+
+-- *************************************************************
+-- Start of MIB Objects
+-- *************************************************************
+
+arubaWiredPowerStatNotifications OBJECT IDENTIFIER ::= { arubaWiredPowerStat 0 }
+arubaWiredPowerStatObjects       OBJECT IDENTIFIER ::= { arubaWiredPowerStat 1 }
+arubaWiredPowerStatConformance   OBJECT IDENTIFIER ::= { arubaWiredPowerStat 2 }
+
+RealDecTwo ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d-2"
+       STATUS       current
+       DESCRIPTION
+          "Show as real with 2 fractional places"
+       SYNTAX       Integer32
+
+-- **********************************************************************
+--  Power Stat Table
+-- **********************************************************************
+arubaWiredPowerStatSys    OBJECT IDENTIFIER  ::= { arubaWiredPowerStatObjects 0 }
+
+arubaWiredPowerStatTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF ArubaWiredPowerStatEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This table contains one row per component entity."
+      ::= { arubaWiredPowerStatSys 1 }
+
+arubaWiredPowerStatEntry OBJECT-TYPE
+      SYNTAX      ArubaWiredPowerStatEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "Information about component power statistics."
+      INDEX       { arubaWiredPowerStatGroupIndex , arubaWiredPowerStatTypeIndex, arubaWiredPowerStatSlotIndex }
+      ::= { arubaWiredPowerStatTable 1 }
+
+ArubaWiredPowerStatEntry ::=
+    SEQUENCE {
+        arubaWiredPowerStatGroupIndex                   Integer32,
+        arubaWiredPowerStatTypeIndex                    Integer32,
+        arubaWiredPowerStatSlotIndex                    Integer32,
+        arubaWiredPowerStatName                         DisplayString,
+        arubaWiredPowerStatType                         DisplayString,
+        arubaWiredPowerStatPowerConsumed                Integer32,
+        arubaWiredPowerStatPowerConsumedAverage         RealDecTwo,
+        arubaWiredPowerStatPowerConsumedAveragePeriod   Integer32
+    }
+
+arubaWiredPowerStatGroupIndex OBJECT-TYPE
+      SYNTAX      Integer32 (1..2147483647)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This variable uniquely identifies the group containing the
+                   component. Group means chassis in the stack and the value
+                   1 MUST be used for non-modular devices."
+      ::= { arubaWiredPowerStatEntry 1 }
+
+arubaWiredPowerStatTypeIndex OBJECT-TYPE
+      SYNTAX      Integer32 (0..2147483647)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This variable defines the component type such as chassis."
+      ::= { arubaWiredPowerStatEntry 2 }
+
+arubaWiredPowerStatSlotIndex OBJECT-TYPE
+      SYNTAX      Integer32 (1..2147483647)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This variable defines the instance of the component type.
+                   Index values will be between 1 and the maximum
+                   number of components of a given type that exist in the
+                   system."
+      ::= { arubaWiredPowerStatEntry 3 }
+
+arubaWiredPowerStatName OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..20))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Identification of the component for the system."
+      ::= { arubaWiredPowerStatEntry 4 }
+
+arubaWiredPowerStatType OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..20))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Type of component."
+      ::= { arubaWiredPowerStatEntry 5 }
+
+arubaWiredPowerStatPowerConsumed OBJECT-TYPE
+      SYNTAX      Integer32 (0..65536)
+      UNITS       "Watts"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Instantaneous power consumption value which is updated every
+                   5 seconds.  Total power consumption is reported in the
+                   corresponding chassis component of this object."
+      DEFVAL      { 0 }
+      ::= { arubaWiredPowerStatEntry 6 }
+
+arubaWiredPowerStatPowerConsumedAverage OBJECT-TYPE
+      SYNTAX      RealDecTwo
+      UNITS       "Watts"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "In chassis component, an average that is calculated from
+                   total power consumption over a period of time."
+      DEFVAL      { 0 }
+      ::= { arubaWiredPowerStatEntry 7 }
+
+arubaWiredPowerStatPowerConsumedAveragePeriod OBJECT-TYPE
+      SYNTAX      Integer32 (60..3600)
+      UNITS       "seconds"
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION "In chassis component, the period of time to calculate average
+                   power consumption."
+      DEFVAL      { 600 }
+      ::= { arubaWiredPowerStatEntry 8 }
+
+-- **********************************************************************
+-- compliance statements
+-- **********************************************************************
+
+arubaWiredPowerStatCompliances OBJECT IDENTIFIER
+      ::= { arubaWiredPowerStatConformance 1 }
+
+arubaWiredPowerStatGroups      OBJECT IDENTIFIER
+      ::= { arubaWiredPowerStatConformance 2 }
+
+arubaWiredPowerStatTableGroup OBJECT-GROUP
+      OBJECTS     {
+                    arubaWiredPowerStatName,
+                    arubaWiredPowerStatType,
+                    arubaWiredPowerStatPowerConsumed,
+                    arubaWiredPowerStatPowerConsumedAverage,
+                    arubaWiredPowerStatPowerConsumedAveragePeriod
+                  }
+      STATUS      current
+      DESCRIPTION "A collection of objects which contain measurements
+                   of Power Stat table."
+      ::= { arubaWiredPowerStatGroups 1 }
+
+arubaWiredPowerStatCompliance MODULE-COMPLIANCE
+      STATUS      current
+      DESCRIPTION "A compliance statement for Aruba wired Power stat MIB."
+      MODULE
+      MANDATORY-GROUPS
+      {
+         arubaWiredPowerStatTableGroup
+      }
+      ::= { arubaWiredPowerStatCompliances 1 }
+
+END
