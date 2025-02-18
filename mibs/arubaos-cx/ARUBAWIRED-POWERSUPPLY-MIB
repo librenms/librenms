@@ -27,7 +27,7 @@ IMPORTS
         FROM ARUBAWIRED-CHASSIS-MIB;
 
 arubaWiredPowerSupply MODULE-IDENTITY
-    LAST-UPDATED "202305090000Z" -- May 9, 2023
+    LAST-UPDATED "202303280000Z" -- March 28, 2023
     ORGANIZATION "HPE/Aruba Networking Division"
     CONTACT-INFO "Hewlett Packard Company
                   8000 Foothills Blvd.
@@ -35,9 +35,6 @@ arubaWiredPowerSupply MODULE-IDENTITY
     DESCRIPTION
         "This MIB module describes management objects that manage Power
          Supply Units."
-
-    REVISION     "202305090000Z" -- May 9, 2023
-    DESCRIPTION  "Added states in arubaWiredPSUStateEnum."
 
     REVISION     "202303280000Z" -- March 28, 2023
     DESCRIPTION  "Added arubaWiredPSUStateEnum."
@@ -198,20 +195,17 @@ arubaWiredPSUAirflowDirection OBJECT-TYPE
 
 arubaWiredPSUStateEnum OBJECT-TYPE
       SYNTAX      INTEGER {
-                          ok             (1),
-                          faultAbsent    (2),
-                          faultInput     (3),
-                          faultOutput    (4),
-                          faultPOE       (5),
-                          faultNoRecov   (6),
-                          alert          (7),
-                          unknown        (8),
-                          unsupported    (9),
-                          warning        (10),
-                          init           (11),
-                          empty          (12),
-                          faultAirflow   (13),
-                          faultRedundancy(14)
+                          ok          (1),
+                          faultAbsent (2),
+                          faultInput  (3),
+                          faultOutput (4),
+                          faultPOE    (5),
+                          faultNoRecov(6),
+                          alert       (7),
+                          unknown     (8),
+                          unsupported (9),
+                          warning     (10),
+                          init        (11)
                   }
       MAX-ACCESS  read-only
       STATUS      current

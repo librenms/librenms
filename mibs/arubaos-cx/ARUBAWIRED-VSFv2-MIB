@@ -3,7 +3,7 @@
 --**MOD+************************************************************************
 --* Module:    ARUBAWIRED-VSFv2-MIB :VSF MIB file
 --*
---* (c) Copyright 2019-2023 Hewlett Packard Enterprise Development LP
+--* (c) Copyright 2019-2022 Hewlett Packard Enterprise Development LP
 --* All Rights Reserved.
 --*
 --* The contents of this software are proprietary and confidential
@@ -32,16 +32,13 @@ IMPORTS
         FROM ARUBAWIRED-NETWORKING-OID;
 
 arubaWiredVsfv2MIB MODULE-IDENTITY
-    LAST-UPDATED "202305160000Z" -- May 16, 2023
+    LAST-UPDATED "202203030000Z" -- March 03, 2022
     ORGANIZATION "HPE/Aruba Networking Division"
     CONTACT-INFO "Hewlett Packard Company 8000 Foothills Blvd. Roseville,
                   CA 95747"
 
     DESCRIPTION   "This MIB module describes objects used to manage Virtual
                    Switching Framework (VSF) feature."
-
-    REVISION     "202305160000Z" -- May 16, 2023
-    DESCRIPTION  "Added a new object to provide physical entity for members"
 
     REVISION     "202203030000Z" -- March 03, 2022
     DESCRIPTION  "Fixed syntax errors"
@@ -191,8 +188,7 @@ ArubaWiredVsfv2MemberEntry ::=
              arubaWiredVsfv2MemberBootTime             TimeTicks,
              arubaWiredVsfv2MemberBootRomVersion       DisplayString,
              arubaWiredVsfv2MemberTotalMemory          Integer32,
-             arubaWiredVsfv2MemberCurrentUsage         Integer32,
-             arubaWiredVsfv2MemberEntPhysicalIndex     Integer32
+             arubaWiredVsfv2MemberCurrentUsage         Integer32
              }
 
 arubaWiredVsfv2MemberIndex OBJECT-TYPE
@@ -310,14 +306,6 @@ arubaWiredVsfv2MemberCurrentUsage OBJECT-TYPE
     DESCRIPTION "Specifies the current memory (RAM) usage on this
                  VSF stack member."
     ::= { arubaWiredVsfv2MemberEntry 14 }
-
-arubaWiredVsfv2MemberEntPhysicalIndex OBJECT-TYPE
-    SYNTAX      Integer32 (1..2147483647)
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION "This object specifies the entPhysicalTable (rfc2737) index
-                 of the VSF member."
-    ::= { arubaWiredVsfv2MemberEntry 15 }
 
 --*************************************************************
 --*    arubaWiredVsfv2LinkTable
@@ -558,8 +546,7 @@ arubaWiredVsfv2MemberTableGroup OBJECT-GROUP
                arubaWiredVsfv2MemberBootTime,
                arubaWiredVsfv2MemberBootRomVersion,
                arubaWiredVsfv2MemberTotalMemory,
-               arubaWiredVsfv2MemberCurrentUsage,
-               arubaWiredVsfv2MemberEntPhysicalIndex
+               arubaWiredVsfv2MemberCurrentUsage
                }
     STATUS      current
     DESCRIPTION "A collection of Virtual Switching Framework member table

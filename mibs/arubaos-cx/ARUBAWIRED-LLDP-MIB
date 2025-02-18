@@ -1,7 +1,7 @@
 --**MOD+**********************************************************************
 --* Module:    ARUBAWIRED-LLDP-MIB :LLDP MIB file
 --*
---* (c) Copyright 2019-2020,2022 Hewlett Packard Enterprise Development LP
+--* (c) Copyright 2019-2020 Hewlett Packard Enterprise Development LP
 --* All Rights Reserved.
 --*
 --* The contents of this software are proprietary and confidential
@@ -19,7 +19,7 @@ ARUBAWIRED-LLDP-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, Integer32
             FROM SNMPv2-SMI
-    TruthValue
+    TEXTUAL-CONVENTION, TruthValue
         FROM SNMPv2-TC
     MODULE-COMPLIANCE, OBJECT-GROUP
         FROM SNMPv2-CONF
@@ -27,10 +27,12 @@ IMPORTS
             FROM ARUBAWIRED-NETWORKING-OID
     lldpLocPortNum,
     lldpRemTimeMark, lldpRemLocalPortNum, lldpRemIndex
-        FROM LLDP-MIB;
+        FROM LLDP-MIB
+    entPhysicalIndex
+        FROM ENTITY-MIB;
 
 arubaWiredLldpMIB MODULE-IDENTITY
-    LAST-UPDATED "202211240000Z" -- November 24, 2022
+    LAST-UPDATED "202010220000Z" -- October 22, 2020
     ORGANIZATION "HPE/Aruba Networking Division"
 
     CONTACT-INFO "Hewlett Packard Company
@@ -42,9 +44,6 @@ arubaWiredLldpMIB MODULE-IDENTITY
          that manage LLDP information related to Power
          Source Equipment (PSE). This is the MIB module
          related to HPE Aruba LLDP"
-
-    REVISION "202211240000Z" -- November 24, 2022
-    DESCRIPTION "Added arubaWiredLldpMgmtAddrVlanId"
 
     REVISION "202010220000Z" -- October 22, 2020
     DESCRIPTION "Updated arubaWiredLldpXdot3RemPowerTable
@@ -973,7 +972,7 @@ arubaWiredLldpXdot3RemAutoclassRequest OBJECT-TYPE
     ::= { arubaWiredLldpXdot3RemPowerEntry 24 }
 
 arubaWiredLldpXdot3RemPowerDownRequest OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -985,7 +984,7 @@ arubaWiredLldpXdot3RemPowerDownRequest OBJECT-TYPE
     ::= { arubaWiredLldpXdot3RemPowerEntry 25 }
 
 arubaWiredLldpXdot3RemPowerDownTime OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -1006,27 +1005,6 @@ arubaWiredLldpCompliances OBJECT IDENTIFIER ::= { arubaWiredLldpConformance 1 }
 arubaWiredLldpGroups      OBJECT IDENTIFIER ::= { arubaWiredLldpConformance 2 }
 
 -- ------------------------------------------------------------
--- LLDP Scalar Config Entries
--- ------------------------------------------------------------
-
-arubaWiredLldpScalarConfig    OBJECT IDENTIFIER ::= { arubaWiredLldpMIB 3 }
-
--- ------------------------------------------------------------
--- LLDP Scalar Config statements
--- ------------------------------------------------------------
-
-arubaWiredLldpMgmtAddrVlanId OBJECT-TYPE
-    SYNTAX      Integer32 (0..4094)
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-            "Defines the LLDP management VLAN whose IPv4/IPv6 address
-            will be advertised. Value '0' indicates that LLDP management
-            VLAN is not configured."
-    DEFVAL     { 0 }
-    ::= { arubaWiredLldpScalarConfig 1 }
-
--- ------------------------------------------------------------
 -- compliance statements
 -- ------------------------------------------------------------
 
@@ -1038,18 +1016,15 @@ arubaWiredLldpXdot3Compliance MODULE-COMPLIANCE
         MANDATORY-GROUPS { arubaWiredLldpXdot3LocSysGroup,
                            arubaWiredLldpXdot3RemSysGroup
         }
+    GROUP       arubaWiredLldpXdot3LocSysGroup
+    DESCRIPTION "A Collection of Object(s) that display
+                 the local lldp 802.3 poe information."
+
+    GROUP       arubaWiredLldpXdot3RemSysGroup
+    DESCRIPTION "A Collection of Object(s) that display
+                 the remote device lldp 802.3 poe information."
 
     ::= { arubaWiredLldpCompliances 1 }
-
-arubaWiredLldpScalarCompliance MODULE-COMPLIANCE
-    STATUS  current
-    DESCRIPTION
-            "The compliance statement for LLDP scalars."
-    MODULE  -- this module
-        MANDATORY-GROUPS { arubaWiredLldpScalarGroup
-        }
-
-    ::= { arubaWiredLldpCompliances 2 }
 
 -- MIB groupings
 arubaWiredLldpXdot3LocSysGroup OBJECT-GROUP
@@ -1128,14 +1103,4 @@ arubaWiredLldpXdot3RemSysGroup OBJECT-GROUP
             LLDP 802.3 organizational extension for POEP."
 
         ::= { arubaWiredLldpGroups 2 }
-
-arubaWiredLldpScalarGroup OBJECT-GROUP
-        OBJECTS {
-        arubaWiredLldpMgmtAddrVlanId
-        }
-        STATUS      current
-        DESCRIPTION
-             "These objects are used for managing/monitoring
-             LLDP global parameters."
-        ::= { arubaWiredLldpGroups 3 }
 END

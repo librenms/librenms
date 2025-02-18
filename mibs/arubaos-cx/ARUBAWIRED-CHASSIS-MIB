@@ -1,7 +1,7 @@
 --**MOD+************************************************************************
 --* Module:    ARUBAWIRED-CHASSIS-MIB :CHASSIS MIB file
 --*
---* (c) Copyright 2020-2021,2023 Hewlett Packard Enterprise Development LP
+--* (c) Copyright 2020-2021 Hewlett Packard Enterprise Development LP
 --* All Rights Reserved.
 --*
 --* The contents of this software are proprietary and confidential
@@ -23,7 +23,7 @@ IMPORTS
         FROM ARUBAWIRED-NETWORKING-OID;
 
 arubaWiredChassisMIB MODULE-IDENTITY
-    LAST-UPDATED "202306270000Z" -- June 27, 2023
+    LAST-UPDATED "202101110000Z" -- January 11, 2021
     ORGANIZATION "HPE/Aruba Networking Division"
     CONTACT-INFO "Hewlett Packard Company
                   8000 Foothills Blvd.
@@ -31,12 +31,6 @@ arubaWiredChassisMIB MODULE-IDENTITY
     DESCRIPTION
         "This MIB module describes management objects that manage Chassis
          components."
-
-    REVISION     "202306270000Z" -- June 27, 2023
-    DESCRIPTION  "Added Power Stat entry."
-
-    REVISION     "202306060000Z" -- June 6, 2023
-    DESCRIPTION  "Added Led Locator."
 
     REVISION     "202101110000Z" -- January 11, 2021
     DESCRIPTION  "Added module entry."
@@ -57,7 +51,5 @@ arubaWiredTempSensor  OBJECT IDENTIFIER ::= { arubaWiredChassisMIB 3 }
 arubaWiredFanTray     OBJECT IDENTIFIER ::= { arubaWiredChassisMIB 4 }
 arubaWiredFan         OBJECT IDENTIFIER ::= { arubaWiredChassisMIB 5 }
 arubaWiredModule      OBJECT IDENTIFIER ::= { arubaWiredChassisMIB 6 }
-arubaWiredLedLocator  OBJECT IDENTIFIER ::= { arubaWiredChassisMIB 7 }
-arubaWiredPowerStat   OBJECT IDENTIFIER ::= { arubaWiredChassisMIB 8 }
 
 END

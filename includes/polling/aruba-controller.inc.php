@@ -48,7 +48,7 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
                 'nummonclients' => $data['WLSX-WLAN-MIB::wlanAPRadioNumMonitoredClients'] ?? null,
                 'numactbssid' => $data['WLSX-WLAN-MIB::wlanAPRadioNumActiveBSSIDs'] ?? null,
                 'nummonbssid' => $data['WLSX-WLAN-MIB::wlanAPRadioNumMonitoredBSSIDs'] ?? null,
-                'interference' => isset($data['WLSX-WLAN-MIB::wlanAPChInterferenceIndex']) ? ($data['WLSX-WLAN-MIB::wlanAPChInterferenceIndex'] / 600) : null,
+                'interference' => $data['WLSX-WLAN-MIB::wlanAPChInterferenceIndex'] ?? null,
             ]);
 
             Log::debug(<<<DEBUG

@@ -1,7 +1,7 @@
 --**MOD+***********************************************************************
 --* Module:    ARUBAWIRED-MVRP-MIB.mib
 --*
---* (c) Copyright 2017,2023 Hewlett Packard Enterprise Development LP
+--* (c) Copyright 2017 Hewlett Packard Enterprise Development LP
 --* All Rights Reserved.
 --*
 --* The contents of this software are proprietary and confidential
@@ -70,7 +70,7 @@ arubaWiredMvrpGlobalClearStats OBJECT-TYPE
               "Defines the global clear statistics control for MVRP.
               True(1) indicates that MVRP should clear all
               statistic counters related to all ports in the system.
-              A write operation of False(2) leads to a no operation and
+              A write operation of False(0) leads to a no operation and
               a GET request for this object always returns FALSE."
  ::= { arubaWiredMvrpConfig 1 }
 
@@ -184,7 +184,7 @@ arubaWiredMvrpPortStatsClearStats OBJECT-TYPE
              "Clear all statistics parameters corresponding to this port.
               True(1) indicates that MVRP will clear all
               statistic counters related to this port.
-              A write operation of False(2) leads to a no operation and
+              A write operation of False(0) leads to a no operation and
               a GET request for this object always returns FALSE."
 
 ::= { arubaWiredMvrpPortConfigEntry 5 }
