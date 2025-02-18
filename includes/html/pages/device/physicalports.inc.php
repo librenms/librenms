@@ -6,7 +6,7 @@
 $columnHeight = 2;
 // Find hardware, model name or systemname for hints
 //echo print_r($device, true);
-$hardware = str_replace(" ", "_", strtolower($device['hardware'])) ?? null;
+$hardware = str_replace(' ', '_', strtolower($device['hardware'])) ?? null;
 // Lookup entPhysical storage for more hardware hints
 $level = 0;
 $entPhysical = loopEntPhysical($device, 0, 0);
@@ -16,17 +16,17 @@ $entPhysical = loopEntPhysical($device, 0, 0);
 $brand = strtolower(substr(basename($device['icon'] ?? null), 0, -4));
 $filePath = "resources/views/device/portui/{$brand}/{$hardware}.json";
 // echo getcwd();
-if((file_exists($filePath)) && ($hardware) && ($brand)) {
-	echo "<!-- Found hardware '{$hardware}' / '{$brand}' json  -->\n";
-	// echo print_r(substr($line, strlen("{$hardware}:")), true);
+if (file_exists($filePath) && $hardware && $brand) {
+    echo "<!-- Found hardware '{$hardware}' / '{$brand}' json  -->\n";
+    // echo print_r(substr($line, strlen("{$hardware}:")), true);
 
-	// if json does not decode, the return is false and we catch later
-	$transformedPorts = generateTransformPorts(json_decode(file_get_contents($filePath), true));
-	if (! isset($transformedPorts)) {
-		echo "<!--  Failed to decode json string, is it valid? -->\n";
-	} else {
-		echo "<!-- Found hardware '{$hardware}' / '{$brand}' json  -->\n";
-	}
+    // if json does not decode, the return is false and we catch later
+    $transformedPorts = generateTransformPorts(json_decode(file_get_contents($filePath), true));
+    if (! isset($transformedPorts)) {
+        echo "<!--  Failed to decode json string, is it valid? -->\n";
+    } else {
+        echo "<!-- Found hardware '{$hardware}' / '{$brand}' json  -->\n";
+    }
 }
 
 if (! isset($transformedPorts)) {
