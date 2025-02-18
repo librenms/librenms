@@ -341,7 +341,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
 
         // Regex to capture three digit-groups (FPC/PIC/Port) from the ifName
         // e.g., et-0/0/0, et-0/0/0:2.0, et-1/2/3:100
-        if (!preg_match('#-(\d+)/(\d+)/(\d+)#', $ifName, $matches)) {
+        if (! preg_match('#-(\d+)/(\d+)/(\d+)#', $ifName, $matches)) {
             // No match; bail out.
             return [];
         }
