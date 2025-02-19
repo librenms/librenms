@@ -31,6 +31,7 @@ class AuthLog extends Model
 {
     public $timestamps = false;
     protected $table = 'authlog';
+    protected $fillable = ['user', 'address', 'result'];
     protected $casts = [
         'datetime' => 'datetime',
     ];
