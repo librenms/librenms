@@ -777,15 +777,15 @@ class Cisco extends OS implements
                     $dbtype = 'cisco_cbqos_policymap';
                     // Type 1 is not polled, but we need to set RRD ID to somethign unique because it's part of the DB key
                     $rrd_id = 'cbqos-policymap-' . $policyId . '-' . $objectId;
-                    $pm = $policyMaps[$qosObjectIndex];
-                    $title = $pm['cbQosPolicyMapDesc'] ? $pm['cbQosPolicyMapName'] . ' - ' . $pm['cbQosPolicyMapDesc'] : $pm['cbQosPolicyMapName'];
+                    $pm = $policyMaps[$qosObjectIndex] ?? [];
+                    $title = implode(' - ', array_filter(array_intersect_key($pm, ['cbQosPolicyMapName' => true, 'cbQosPolicyMapDesc' => true])));
                 } elseif ($type == 2) {
                     // Class Map
                     $dbtype = 'cisco_cbqos_classmap';
                     // RRD name matches the original cbqos module
                     $rrd_id = 'port-' . $servicePolicies[$policyId]['cbQosIfIndex'] . '-cbqos-' . $policyId . '-' . $objectId;
-                    $cm = $classMaps[$qosObjectIndex];
-                    $title = $cm['cbQosCMDesc'] ? $cm['cbQosCMName'] . ' - ' . $cm['cbQosCMDesc'] : $cm['cbQosCMName'];
+                    $cm = $classMaps[$qosObjectIndex] ?? [];
+                    $title = implode(' - ', array_filter(array_intersect_key($cm, ['cbQosCMName' => true, 'cbQosCMDesc' => true])));
 
                     // Fill in the match type
                     if ($cm['cbQosCMInfo'] == 2) {
@@ -798,10 +798,10 @@ class Cisco extends OS implements
 
                     // Then find the match statements
                     $statements = [];
-                    foreach ($qosObjects[$policyId] as $sqObjectId => $sqObject) {
+                    foreach ($spObjects as $sqObject) {
                         // Find child objects (we are the parent) that are type 3 (match statements)
                         if ($sqObject['cbQosParentObjectsIndex'] == $objectId && $sqObject['cbQosObjectsType'] == 3) {
-                            array_push($statements, $matchStatements[$qosObjects[$policyId][$sqObjectId]['cbQosConfigIndex']]['cbQosMatchStmtName']);
+                            $statements[] = $matchStatements[$sqObject['cbQosConfigIndex']]['cbQosMatchStmtName'];
                         }
                     }
 
