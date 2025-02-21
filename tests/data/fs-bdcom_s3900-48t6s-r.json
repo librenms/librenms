@@ -11,7 +11,7 @@
                     "hardware": null,
                     "features": null,
                     "location": null,
-                    "os": "fs-switch",
+                    "os": "fs-bdcom",
                     "type": "network",
                     "serial": null,
                     "icon": "fs.svg"
