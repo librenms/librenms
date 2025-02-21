@@ -87,6 +87,11 @@ modules:
                     states:
                         - { value: 0, generic: 1, graph: 1, descr: Not-Connected }
                         - { value: 1, generic: 0, graph: 1, descr: Connected }
+                    skip_values:
+                        -
+                          device: hardware
+                          op: '='
+                          value: 'Panorama'
                 -
                     oid: panMgmtPanorama2Connected
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.4.2.{{ $index }}'
@@ -96,6 +101,11 @@ modules:
                     states:
                         - { value: 0, generic: 1, graph: 1, descr: Not-Connected }
                         - { value: 1, generic: 0, graph: 1, descr: Connected }
+                    skip_values:
+                        -
+                          device: hardware
+                          op: '='
+                          value: 'Panorama'
         count:
             data:
                 -
