@@ -839,6 +839,11 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\MuninPlugin::class, 'device_id');
     }
 
+    public function nd(): HasMany
+    {
+        return $this->hasMany(Ipv6Nd::class, 'device_id');
+    }
+
     public function netscalerVservers(): HasMany
     {
         return $this->hasMany(NetscalerVserver::class, 'device_id');
