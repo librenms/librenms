@@ -78,7 +78,7 @@ lnms config:set network_map_vis_options '{
 }'
 ```
 
-An example to override the device dependency map to use a heirarchical layout is below.
+An example to override the device dependency map to use a hierarchical layout is below.
 Note that you can choose to enter the JSON config on one line if you want.
 
 ```bash
