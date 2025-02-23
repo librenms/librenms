@@ -283,6 +283,7 @@ nav:
       - Custom Graphs: Developing/os/Custom-Graphs.md
       - Settings: Developing/os/Settings.md
       - Sensor State Support: Developing/Sensor-State-Support.md
+    - Add Port UI Templates: Developing/Adding-Portui-Templates.md
     - SNMP Traps: Developing/SNMP-Traps.md
     - Dynamic Config: Developing/Dynamic-Config.md
     - Plugin System: Extensions/Plugin-System.md
