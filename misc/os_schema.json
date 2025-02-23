@@ -132,6 +132,9 @@
                 "ospf": {
                     "type": "boolean"
                 },
+                "ospfv3": {
+                    "type": "boolean"
+                },
                 "ucd-diskio": {
                     "type": "boolean"
                 },

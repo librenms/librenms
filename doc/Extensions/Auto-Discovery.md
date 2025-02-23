@@ -155,6 +155,12 @@ Enabled by default.
 
 `$config['autodiscovery']['ospf'] = false;` to disable.
 
+### OSPFv3
+
+Enabled by default.
+
+`$config['autodiscovery']['ospfv3'] = false;` to disable.
+
 ### BGP
 
 Enabled by default.
