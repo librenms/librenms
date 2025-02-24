@@ -44,6 +44,14 @@ abstract class IP
      */
     public static function fromHexString($hex, $ignore_errors = false)
     {
+        // If IP addresses happen to contain only readable ascii, the snmp
+        // tools might represent them by a regular string.
+        // E.g. '!"#$' == 33.34.35.36 or 'ABCD' == 65.66.67.68
+        $len = strlen($hex);
+        if ($len == 4 || $len == 16) {
+            $hex = StringHelpers::asciiToHex($hex);
+        }
+
         $hex = str_replace([' ', '"'], '', $hex);
 
         try {
@@ -53,12 +61,6 @@ abstract class IP
         }
 
         $hex = str_replace([':', '.'], '', $hex);
-
-        // check if hex was incorrectly converted to ascii
-        $len = strlen($hex);
-        if (($len == 4 || $len == 16) && preg_match('/[^0-9a-fA-F]/', $hex)) {
-            $hex = StringHelpers::asciiToHex($hex);
-        }
 
         try {
             if (strlen($hex) == 8) {
