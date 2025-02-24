@@ -53,7 +53,7 @@ if (isset($vars['searchPhrase']) && ! empty($vars['searchPhrase'])) {
     }
 }
 
-$pag = $query->paginate($rowCount);
+$pag = $query->paginate($rowCount, page: $page);
 
 foreach ($pag->items() as $arp) {
     if ($arp->port->ifInErrors_delta > 0 || $arp->port->ifOutErrors_delta > 0) {

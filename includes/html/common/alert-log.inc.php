@@ -172,7 +172,7 @@ $common_output[] = '<div class="form-group"> \
             $(target).collapse(\'toggle\');
             $(this).toggleClass(\'fa-plus fa-minus\');
         });
-        grid.find(".command-alert-details").on("click", function(e) {
+        grid.find(".verbose-alert-details").on("click", function(e) {
             e.preventDefault();
             var alert_log_id = $(this).data(\'alert_log_id\');
             $(\'#alert_log_id\').val(alert_log_id);
@@ -180,6 +180,9 @@ $common_output[] = '<div class="form-group"> \
         });
         grid.find(".incident").each(function () {
             $(this).parent().addClass(\'col-lg-4 col-md-4 col-sm-4 col-xs-4\');
+            if ($(this).parent().parent().find(".alert-status").hasClass(\'label-danger\')){
+                $(this).parent().parent().find(".verbose-alert-details").fadeIn(0);
+            }
             $(this).parent().parent().on("mouseenter", function () {
                 $(this).find(".incident-toggle").fadeIn(200);
                 if ($(this).find(".alert-status").hasClass(\'label-danger\')){
