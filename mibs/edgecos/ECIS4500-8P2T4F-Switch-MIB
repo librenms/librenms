@@ -1,0 +1,329 @@
+-- Industrial Ethernet Switch Enterprise MIB 
+-- Product Name: ECIS4500-8P2T4F
+-- History
+-- Version 1.0
+-- 1. Support System Inventory Info, Event Table and Alarm Trap.
+
+ECIS4500-8P2T4F-Switch-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	  PhysicalIndex, entPhysicalIndex
+			FROM ENTITY-MIB
+	  PhysAddress, RowStatus, TAddress, TEXTUAL-CONVENTION, TruthValue
+			FROM SNMPv2-TC
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32, enterprises, NOTIFICATION-TYPE, enterprises, MODULE-IDENTITY, OBJECT-TYPE 
+              FROM SNMPv2-SMI
+      TEXTUAL-CONVENTION
+              FROM SNMPv2-TC
+      SnmpAdminString
+              FROM SNMP-FRAMEWORK-MIB
+      OwnerString
+              FROM RMON-MIB
+      InetAddressType, InetAddress
+              FROM INET-ADDRESS-MIB
+      MODULE-COMPLIANCE, OBJECT-GROUP
+              FROM SNMPv2-CONF;
+
+-- TEXTUAL-CONVENTIONS --          
+	IvsSystemEventType ::= TEXTUAL-CONVENTION 
+		DISPLAY-HINT	""
+		STATUS			current
+		DESCRIPTION
+			"The event type identifier number."
+		SYNTAX 			INTEGER  { info(0), warning(1), error(2), unknown(3)  } 
+
+	IvsSystemAlarmLevel ::= TEXTUAL-CONVENTION 
+		DISPLAY-HINT	""
+		STATUS			current
+		DESCRIPTION
+			"The alarm level identifier number."
+		SYNTAX 			INTEGER  { ivsAlmLevelMinor(1), ivsAlmLevelMajor(2)} 
+
+	IvsSystemAlarmType ::= TEXTUAL-CONVENTION 
+		DISPLAY-HINT	""
+		STATUS			current
+		DESCRIPTION
+			"The alarm type identifier number."
+		SYNTAX 			INTEGER  { ivsAlmPort1Linkdown(101), ivsAlmPort2Linkdown(102), ivsAlmPort3Linkdown(103), ivsAlmPort4Linkdown(104),
+				ivsAlmPort5Linkdown(105), ivsAlmPort6Linkdown(106), ivsAlmPort7Linkdown(107), ivsAlmPort8Linkdown(108),
+				ivsAlmPort9Linkdown(109), ivsAlmPort10Linkdown(110), ivsAlmPort11Linkdown(111), ivsAlmPort12Linkdown(112),
+				ivsAlmPort13Linkdown(113), ivsAlmPort14Linkdown(114), ivsAlmPowerAlarm(151)} 
+		
+	IvsSystemAlarmState ::= TEXTUAL-CONVENTION 
+		DISPLAY-HINT	""
+		STATUS			current
+		DESCRIPTION
+			"The alarm state number."
+		SYNTAX 			INTEGER  { alarmSet(1), alarmCleared(2), unknown(3)  } 
+
+--
+--
+	org	OBJECT IDENTIFIER
+		::=  {  iso  3  }
+
+	dod	OBJECT IDENTIFIER
+		::=  {  org  6  }
+
+	internet	OBJECT IDENTIFIER
+		::=  {  dod  1  }
+
+	private	OBJECT IDENTIFIER
+		::=  {  internet  4  }
+
+	enterprises	OBJECT IDENTIFIER
+		::=  {  private  1  }
+
+	EdgeCore	OBJECT IDENTIFIER
+		::=  { enterprises 259 } 
+		
+	snmpMgt	OBJECT IDENTIFIER
+		::=  { EdgeCore 10 } 
+		
+	switchMgt	    OBJECT IDENTIFIER
+		::=  { snmpMgt 1 } 
+		
+	isw    OBJECT IDENTIFIER
+		::=  {  switchMgt 48 } 
+		
+	ECIS4500-8P2T4F	MODULE-IDENTITY 
+        LAST-UPDATED "201708110000Z"   
+        ORGANIZATION ""
+        CONTACT-INFO
+               ""
+        DESCRIPTION
+                "The MIB module for managing system inventory inforamtion and event/alarm."
+		::=  { isw 104 } 
+
+--
+--  ------------------------------------------------------------------------------------
+      ivsSysInventory OBJECT IDENTIFIER ::= { ECIS4500-8P2T4F 1 }    
+      
+      invProductModel OBJECT-TYPE
+              SYNTAX      OCTET STRING ( SIZE ( 0 .. 25 ) )
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                "Product Model name."
+              ::= { ivsSysInventory 1 }
+
+      invSwVersion OBJECT-TYPE
+              SYNTAX      OCTET STRING ( SIZE ( 0 .. 20 ) )
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                "System SW version"
+              ::= { ivsSysInventory 2 }
+
+      invSwBuild OBJECT-TYPE
+              SYNTAX      OCTET STRING ( SIZE ( 0 .. 30 ) )
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                "System SW version built date"
+              ::= { ivsSysInventory 3 }
+
+      invPhyMac OBJECT-TYPE
+              SYNTAX      PhysAddress
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                ""
+              ::= { ivsSysInventory 4 }
+
+      invPortCount OBJECT-TYPE
+              SYNTAX      Integer32
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                ""
+              ::= { ivsSysInventory 5 }
+
+--  Monitor (Event)
+--  ------------------------------------------------------------------------------------
+      ivsSysMonitor OBJECT IDENTIFIER ::= { ECIS4500-8P2T4F 2 }
+      
+	  ivsEventTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  IvsEventEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"The Event/Alarm/Log table."
+		::=  { ivsSysMonitor 1 }
+
+	  ivsEventEntry		OBJECT-TYPE
+		SYNTAX		IvsEventEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"An Entry in the Event table."
+		INDEX		{  ivsEventSeqId  }
+		::=  { ivsEventTable 1 }
+
+	  IvsEventEntry  ::=  SEQUENCE {
+		ivsEventSeqId      	Integer32,
+		ivsEventLevel      	IvsSystemEventType,
+		ivsEventTime       	OCTET STRING,
+		ivsEventMessage    	OCTET STRING
+		}
+
+	  ivsEventSeqId	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 65535  ) 
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"This object is used by the event table
+        to identify the row of this table."
+		::=  {  ivsEventEntry  1  }
+
+	  ivsEventLevel	OBJECT-TYPE	
+		SYNTAX			IvsSystemEventType
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"This object indicates the level of event."
+		::=  {  ivsEventEntry  2  }
+
+	  ivsEventTime	OBJECT-TYPE	
+		SYNTAX			OCTET STRING  ( SIZE ( 32  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"This attribute indicates the event occurence time."
+		::=  {  ivsEventEntry  3  }
+
+	  ivsEventMessage	OBJECT-TYPE	
+		SYNTAX			OCTET STRING  ( SIZE ( 40  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"This attribute indicates the event message."
+		::=  {  ivsEventEntry  4  }
+
+--  ------------------------------------------------------------------------------------
+	  ivsTrapGroup		OBJECT IDENTIFIER ::= { ivsSysMonitor 2 }
+	     
+	  ivsTrapAlmVars		OBJECT IDENTIFIER ::= { ivsTrapGroup 1 } 
+	  ivsCurrentAlarmSeqId OBJECT-TYPE 
+	  		SYNTAX 	Integer32  
+	  		MAX-ACCESS		read-only
+	  		STATUS      current
+	  		::= { ivsTrapAlmVars 1 }
+	  
+	  ivsCurrentAlarmState OBJECT-TYPE 
+	  		SYNTAX 	IvsSystemAlarmState  
+	  		MAX-ACCESS		read-only
+	  		STATUS      current
+	  		::= { ivsTrapAlmVars 3 }
+
+	  ivsCurrentAlarmTime  OBJECT-TYPE 
+	  		SYNTAX 	OCTET STRING  
+	  		MAX-ACCESS		read-only
+	  		STATUS      current
+	  		::= { ivsTrapAlmVars 4 }
+--  ------------------------------------------------------------------------------------
+      ivsManagement OBJECT IDENTIFIER ::= { ECIS4500-8P2T4F 3 }
+      
+      ivsManagedFlag OBJECT-TYPE
+              SYNTAX      INTEGER  { un-managed(0), managed(1)  } 
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                "If it is (1)managed, then alarm LED should be in blink status.
+                 If it is (0)un-managed, then alarm LED is normal. Default is (0)un-managed."
+              DEFVAL { 0 }
+              ::= { ivsManagement 1 }
+
+--  ------------------------------------------------------------------------------------  
+
+      ivsTrap OBJECT IDENTIFIER ::= { ECIS4500-8P2T4F 4 }
+      	
+      ivsAlarmTrap OBJECT IDENTIFIER ::= { ivsTrap 1 }
+
+
+      	ivsAlmTrapPort1Linkdown	NOTIFICATION-TYPE
+				OBJECTS			{ ivsCurrentAlarmSeqId, ivsCurrentAlarmState, ivsCurrentAlarmTime }
+				STATUS			current
+				DESCRIPTION		"Device's port 1 link down alarm happens or cleared."
+				::=  {  ivsAlarmTrap  1  }
+
+      	ivsAlmTrapPort2Linkdown	NOTIFICATION-TYPE
+				OBJECTS			{ ivsCurrentAlarmSeqId, ivsCurrentAlarmState, ivsCurrentAlarmTime }
+				STATUS			current
+				DESCRIPTION		"Device's port 2 link down alarm happens or cleared."
+				::=  {  ivsAlarmTrap  2  }
+
+      	ivsAlmTrapPort3Linkdown	NOTIFICATION-TYPE
+				OBJECTS			{ ivsCurrentAlarmSeqId, ivsCurrentAlarmState, ivsCurrentAlarmTime }
+				STATUS			current
+				DESCRIPTION		"Device's port 3 link down alarm happens or cleared."
+				::=  {  ivsAlarmTrap  3  }
+
+      	ivsAlmTrapPort4Linkdown	NOTIFICATION-TYPE
+				OBJECTS			{ ivsCurrentAlarmSeqId, ivsCurrentAlarmState, ivsCurrentAlarmTime }
+				STATUS			current
+				DESCRIPTION		"Device's port 4 link down alarm happens or cleared."
+				::=  {  ivsAlarmTrap  4  }
+
+      	ivsAlmTrapPort5Linkdown	NOTIFICATION-TYPE
+				OBJECTS			{ ivsCurrentAlarmSeqId, ivsCurrentAlarmState, ivsCurrentAlarmTime }
+				STATUS			current
+				DESCRIPTION		"Device's port 5 link down alarm happens or cleared."
+				::=  {  ivsAlarmTrap  5  }
+
+      	ivsAlmTrapPort6Linkdown	NOTIFICATION-TYPE
+				OBJECTS			{ ivsCurrentAlarmSeqId, ivsCurrentAlarmState, ivsCurrentAlarmTime }
+				STATUS			current
+				DESCRIPTION		"Device's port 6 link down alarm happens or cleared."
+				::=  {  ivsAlarmTrap  6  }
+
+      	ivsAlmTrapPort7Linkdown	NOTIFICATION-TYPE
+				OBJECTS			{ ivsCurrentAlarmSeqId, ivsCurrentAlarmState, ivsCurrentAlarmTime }
+				STATUS			current
+				DESCRIPTION		"Device's port 7 link down alarm happens or cleared."
+				::=  {  ivsAlarmTrap  7  }
+
+      	ivsAlmTrapPort8Linkdown	NOTIFICATION-TYPE
+				OBJECTS			{ ivsCurrentAlarmSeqId, ivsCurrentAlarmState, ivsCurrentAlarmTime }
+				STATUS			current
+				DESCRIPTION		"Device's port 8 link down alarm happens or cleared."
+				::=  {  ivsAlarmTrap  8  }
+
+      	ivsAlmTrapPort9Linkdown	NOTIFICATION-TYPE
+				OBJECTS			{ ivsCurrentAlarmSeqId, ivsCurrentAlarmState, ivsCurrentAlarmTime }
+				STATUS			current
+				DESCRIPTION		"Device's port 9 link down alarm happens or cleared."
+				::=  {  ivsAlarmTrap  9  }
+
+      	ivsAlmTrapPort10Linkdown	NOTIFICATION-TYPE
+				OBJECTS			{ ivsCurrentAlarmSeqId, ivsCurrentAlarmState, ivsCurrentAlarmTime }
+				STATUS			current
+				DESCRIPTION		"Device's port 10 link down alarm happens or cleared."
+				::=  {  ivsAlarmTrap  10  }
+
+      	ivsAlmTrapPort11Linkdown	NOTIFICATION-TYPE
+				OBJECTS			{ ivsCurrentAlarmSeqId, ivsCurrentAlarmState, ivsCurrentAlarmTime }
+				STATUS			current
+				DESCRIPTION		"Device's port 11 link down alarm happens or cleared."
+				::=  {  ivsAlarmTrap  11  }
+
+      	ivsAlmTrapPort12Linkdown	NOTIFICATION-TYPE
+				OBJECTS			{ ivsCurrentAlarmSeqId, ivsCurrentAlarmState, ivsCurrentAlarmTime }
+				STATUS			current
+				DESCRIPTION		"Device's port 12 link down alarm happens or cleared."
+				::=  {  ivsAlarmTrap  12  }
+
+      	ivsAlmTrapPort13Linkdown	NOTIFICATION-TYPE
+				OBJECTS			{ ivsCurrentAlarmSeqId, ivsCurrentAlarmState, ivsCurrentAlarmTime }
+				STATUS			current
+				DESCRIPTION		"Device's port 13 link down alarm happens or cleared."
+				::=  {  ivsAlarmTrap  13  }
+
+      	ivsAlmTrapPort14Linkdown	NOTIFICATION-TYPE
+				OBJECTS			{ ivsCurrentAlarmSeqId, ivsCurrentAlarmState, ivsCurrentAlarmTime }
+				STATUS			current
+				DESCRIPTION		"Device's port 14 link down alarm happens or cleared."
+				::=  {  ivsAlarmTrap  14  }
+
+      	ivsAlmTrapPowerAlarm	NOTIFICATION-TYPE
+				OBJECTS			{ ivsCurrentAlarmSeqId, ivsCurrentAlarmState, ivsCurrentAlarmTime }
+				STATUS			current
+				DESCRIPTION		"Device Power Alarm happens/clear! Normally Power1 and Power2 should both work. 
+				               If alarmState is set(1), indicates only one of them works! 
+				               If alarmState is clear(2), indicates alarm disappears!"
+				::=  {  ivsAlarmTrap  15  }
+							
+END

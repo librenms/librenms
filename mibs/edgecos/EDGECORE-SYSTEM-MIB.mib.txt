@@ -1,0 +1,108 @@
+EDGECORE-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+edgecoreSystemMIB MODULE-IDENTITY
+    LAST-UPDATED "202501210000Z"
+    ORGANIZATION "Edgecore Networks"
+    CONTACT-INFO
+        "support@edgecore.com"
+    DESCRIPTION
+        "Custom SYSTEM-MIB for Edgecore devices."
+    ::= { edgecoreMibs 2 }
+
+-- Root OID for Edgecore SYSTEM MIBs
+edgecoreMibs OBJECT IDENTIFIER ::= { enterprises 25923 }
+
+-- System Information Table
+edgecoreSystemTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF EdgecoreSystemEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table containing system-wide information for Edgecore devices."
+    ::= { edgecoreSystemMIB 1 }
+
+edgecoreSystemEntry OBJECT-TYPE
+    SYNTAX EdgecoreSystemEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing system information."
+    INDEX { edgecoreSystemIndex }
+    ::= { edgecoreSystemTable 1 }
+
+EdgecoreSystemEntry ::= SEQUENCE {
+    edgecoreSystemIndex               Integer32,
+    edgecoreSystemName                OCTET STRING,
+    edgecoreSystemDescr               OCTET STRING,
+    edgecoreSystemUptime              Unsigned32,
+    edgecoreSystemContact             OCTET STRING,
+    edgecoreSystemLocation            OCTET STRING,
+    edgecoreSystemServices            Integer32
+}
+
+-- Table Columns
+edgecoreSystemIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Unique index for each system entry."
+    ::= { edgecoreSystemEntry 1 }
+
+edgecoreSystemName OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Name of the system."
+    ::= { edgecoreSystemEntry 2 }
+
+edgecoreSystemDescr OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Description of the system."
+    ::= { edgecoreSystemEntry 3 }
+
+edgecoreSystemUptime OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "System uptime in seconds."
+    ::= { edgecoreSystemEntry 4 }
+
+edgecoreSystemContact OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Contact information for the system administrator."
+    ::= { edgecoreSystemEntry 5 }
+
+edgecoreSystemLocation OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Location of the system."
+    ::= { edgecoreSystemEntry 6 }
+
+edgecoreSystemServices OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Services provided by the system."
+    ::= { edgecoreSystemEntry 7 }
+
+END
