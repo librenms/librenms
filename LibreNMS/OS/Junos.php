@@ -33,6 +33,11 @@ use App\Models\Transceiver;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
@@ -42,7 +47,7 @@ use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\RRD\RrdDefinition;
 use SnmpQuery;
 
-class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling, TransceiverDiscovery
+class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling, TransceiverDiscovery, WirelessRsrpDiscovery, WirelessRsrqDiscovery, WirelessSnrDiscovery, WirelessRssiDiscovery
 {
     use EntityMib {
         EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
@@ -80,6 +85,55 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
 
             $this->enableGraph('junos_jsrx_spu_sessions');
         }
+    }
+
+    public function discoverWirelessRsrp()
+    {
+        $sensors = [];
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'jnxWirelessWANNetworkInfoRSRP', [], 'JUNIPER-WIRELESS-WAN-MIB', 'junos', '-OteQUsb');
+        $oid = '.1.3.6.1.4.1.2636.3.87.1.1.1.1.32.'; // jnxWirelessWANNetworkInfoRSRP
+
+        foreach ($oids as $index => $entry) {
+            $sensors[] = new WirelessSensor('rsrp', $this->getDeviceId(), $oid . $index, 'junos', 0, 'Modem RSRP');
+        }
+        return $sensors;
+    }
+
+
+    public function discoverWirelessRsrq():
+    {
+        $sensors = [];
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'jnxWirelessWANNetworkInfoRSRQ', [], 'JUNIPER-WIRELESS-WAN-MIB', 'junos', '-OteQUsb');
+        $oid = '.1.3.6.1.4.1.2636.3.87.1.1.1.1.33'; // jnxWirelessWANNetworkInfoRSRQ
+
+        foreach ($oids as $index => $entry) {
+            $sensors[] = new WirelessSensor('rsrq', $this->getDeviceId(), $oid . $index, 'junos', 0, 'Modem RSRP');
+        }
+        return $sensors;
+    }
+
+    public function discoverWirelessSnr():
+    {
+        $sensors = [];
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'jnxWirelessWANNetworkInfoSNR', [], 'JUNIPER-WIRELESS-WAN-MIB', 'junos', '-OteQUsb');
+        $oid = '.1.3.6.1.4.1.2636.3.87.1.1.1.1.35'; // jnxWirelessWANNetworkInfoSNR
+
+        foreach ($oids as $index => $entry) {
+            $sensors[] = new WirelessSensor('snr', $this->getDeviceId(), $oid . $index, 'junos', 0, 'Modem SNR');
+        }
+        return $sensors;
+    }
+
+    public function discoverWirelessRssi():
+    {
+        $sensors = [];
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'jnxWirelessWANNetworkInfoRSSI', [], 'JUNIPER-WIRELESS-WAN-MIB', 'junos', '-OteQUsb');
+        $oid = '.1.3.6.1.4.1.2636.3.87.1.1.1.1.37'; // jnxWirelessWANNetworkInfoRSSI
+
+        foreach ($oids as $index => $entry) {
+            $sensors[] = new WirelessSensor('rssi', $this->getDeviceId(), $oid . $index, 'junos', 0, 'Modem RSSI');
+        }
+        return $sensors;
     }
 
     public function discoverSlas(): Collection
