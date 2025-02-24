@@ -1,0 +1,9 @@
+mib: VENTURI-SERVER-SYSTEM-MIB
+modules:
+    os:
+        version: 
+            - VENTURI-SERVER-SYSTEM-MIB::vServerVersion.0
+            - VENTURI-SERVER-SYSTEM-MIB::vServerBuildId.0
+        version_template: '{{ VENTURI-SERVER-SYSTEM-MIB::vServerVersion.0 }}.{{ VENTURI-SERVER-SYSTEM-MIB::vServerBuildId.0 }}'
+        serial: VENTURI-SERVER-SYSTEM-MIB::vServerSerialNumber.0
+        hardware: VENTURI-SERVER-SYSTEM-MIB::vServerType.0
