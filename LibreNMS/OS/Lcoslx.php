@@ -36,6 +36,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
 use LibreNMS\Util\Mac;
+use SnmpQuery;
 
 class Lcoslx extends OS implements
     WirelessFrequencyDiscovery,
@@ -187,7 +188,7 @@ class Lcoslx extends OS implements
     {
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'lcosLXStatusWLANStationEntryPhySignal', [], 'LCOS-LX-MIB');
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'lcosLXStatusWLANStationEntryNetworkName', $data, 'LCOS-LX-MIB');
-        $ipv4addresses = $this->getCacheByIndex('lcosLXStatusWLANStationEntryIPv4Address', 'LCOS-LX-MIB');
+        $ipv4addresses = SnmpQuery::cache()->walk('LCOS-LX-MIB::lcosLXStatusWLANStationEntryIPv4Address')->pluck();
 
         $sensors = [];
         foreach ($data as $index => $entry) {
@@ -221,7 +222,7 @@ class Lcoslx extends OS implements
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'lcosLXStatusWLANStationEntryEffTxRate', [], 'LCOS-LX-MIB');
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'lcosLXStatusWLANStationEntryEffRxRate', $data, 'LCOS-LX-MIB');
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'lcosLXStatusWLANStationEntryNetworkName', $data, 'LCOS-LX-MIB');
-        $ipv4addresses = $this->getCacheByIndex('lcosLXStatusWLANStationEntryIPv4Address', 'LCOS-LX-MIB');
+        $ipv4addresses = SnmpQuery::cache()->walk('LCOS-LX-MIB::lcosLXStatusWLANStationEntryIPv4Address')->pluck();
 
         $sensors = [];
         foreach ($data as $index => $entry) {
@@ -269,7 +270,7 @@ class Lcoslx extends OS implements
     {
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'lcosLXStatusWLANCompetingNetworksEntrySignalLevel', [], 'LCOS-LX-MIB');
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'lcosLXStatusWLANCompetingNetworksEntryInterpointPeerName', $data, 'LCOS-LX-MIB');
-        $bssids = $this->getCacheByIndex('lcosLXStatusWLANCompetingNetworksEntryBssid', 'LCOS-LX-MIB');
+        $bssids = SnmpQuery::cache()->walk('LCOS-LX-MIB::lcosLXStatusWLANCompetingNetworksEntryBssid')->pluck();
 
         $sensors = [];
 
