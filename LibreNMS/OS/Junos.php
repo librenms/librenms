@@ -99,8 +99,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
         return $sensors;
     }
 
-
-    public function discoverWirelessRsrq():
+    public function discoverWirelessRsrq()
     {
         $sensors = [];
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'jnxWirelessWANNetworkInfoRSRQ', [], 'JUNIPER-WIRELESS-WAN-MIB', 'junos', '-OteQUsb');
@@ -112,7 +111,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
         return $sensors;
     }
 
-    public function discoverWirelessSnr():
+    public function discoverWirelessSnr()
     {
         $sensors = [];
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'jnxWirelessWANNetworkInfoSNR', [], 'JUNIPER-WIRELESS-WAN-MIB', 'junos', '-OteQUsb');
@@ -124,7 +123,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
         return $sensors;
     }
 
-    public function discoverWirelessRssi():
+    public function discoverWirelessRssi()
     {
         $sensors = [];
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'jnxWirelessWANNetworkInfoRSSI', [], 'JUNIPER-WIRELESS-WAN-MIB', 'junos', '-OteQUsb');
