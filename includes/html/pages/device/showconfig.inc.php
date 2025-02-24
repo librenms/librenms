@@ -317,7 +317,10 @@ if (Auth::user()->hasGlobalAdmin()) {
     
     // Print "demo1" if the current configuration is gvrp_config
             if ($current_config === "gvrp_config") {
-                echo "demo1";
+                echo "<div class='config'>gvrp config</div>";
+            }
+            if ($current_config === "stp_config") {
+                echo "stp config";
             }
 
     echo '
@@ -430,17 +433,56 @@ if (Auth::user()->hasGlobalAdmin()) {
         echo '
                           </div>';
     }
-    if (! empty($text)) {
+    if (!empty($text)) {
         $language = isset($previous_config) ? 'diff' : Config::getOsSetting($device['os'], 'config_highlighting', 'ios');
         $geshi = new GeSHi(htmlspecialchars_decode($text, ENT_QUOTES | ENT_HTML5), $language);
-        $geshi->enable_line_numbers(GESHI_FANCY_LINE_NUMBERS);
-        $geshi->set_overall_style('color: black;');
-        // $geshi->set_line_style('color: #999999');
+    
+        // Extract command blocks using refined regex
+        preg_match_all('/! (show [^\n]+)(.*?)(?=\n! show|\z)/s', $geshi->source, $matches, PREG_SET_ORDER);
+    
+        $commands = [];
+        foreach ($matches as $match) {
+            $command = trim($match[1]);
+            $details = trim($match[2]);
+            $commands[$command] = $details;
+        }
+    
+        // Debugging the commands array
+        // dd($commands);
+    
+        // Generate the dropdown
         echo '<div class="config">';
-        echo '<input id="linenumbers" class="btn btn-primary" type="submit" value="Hide line numbers"/>';
-        echo $geshi->parse_code();
+        echo '<div class="col-md-4 col-sm-12">';
+    
+        echo '<select id="commandDropdown" class="form-control">';
+        foreach ($commands as $cmd => $details) {
+            echo "<option value=\"" . htmlspecialchars($details) . "\">$cmd</option>";
+        }
+        echo '</select>';
         echo '</div>';
+        echo '<button id="showDetails" class="btn btn-primary">Show Details</button>';
+        echo '<pre id="commandDetails" style="display:none; margin-top: 10px; border: 1px solid #ccc; padding: 10px;"></pre>';
+        echo '</div>';
+    
+        // Add JavaScript to handle dropdown change
+        echo <<<HTML
+    <script>
+    document.getElementById('showDetails').addEventListener('click', function() {
+        var dropdown = document.getElementById('commandDropdown');
+        var details = dropdown.options[dropdown.selectedIndex].value;
+        var detailsBox = document.getElementById('commandDetails');
+        detailsBox.textContent = details;
+        detailsBox.style.display = 'block';
+    });
+    </script>
+    HTML;
     }
+    
+    
+    
+    
+    
+    
     
 } //end if
 

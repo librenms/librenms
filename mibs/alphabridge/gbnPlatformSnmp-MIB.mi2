@@ -168,7 +168,7 @@
         STATUS current
         DESCRIPTION
             "notify index."
-            -- 通告索引
+            -- 通锟斤拷锟斤拷锟斤拷
         ::= { snmpNotifyTypeEntry 1 }
             	
     snmpNotifyTypeName OBJECT-TYPE
@@ -177,7 +177,7 @@
         STATUS current
         DESCRIPTION
             "notify name."
-            -- 通告名称
+            -- 通锟斤拷锟斤拷锟斤拷
         ::= { snmpNotifyTypeEntry 2 }
         
     snmpPrivateNotifyType OBJECT-TYPE
@@ -190,7 +190,7 @@
         STATUS current
         DESCRIPTION
             "notify type."
-            -- 通告类型
+            -- 通锟斤拷锟斤拷锟斤拷
         ::= { snmpNotifyTypeEntry 3 }
 	
     snmpNotifyTypeTarget OBJECT-TYPE
@@ -199,7 +199,7 @@
         STATUS current
         DESCRIPTION
             "notify target."
-            -- 通告目标
+            -- 通锟斤拷目锟斤拷
         ::= { snmpNotifyTypeEntry 4 }
         
      snmpNotifyTypeStatus  OBJECT-TYPE
@@ -212,7 +212,7 @@
         STATUS current
         DESCRIPTION
             "It signifies if the traps with corresponding notify-type can be sent."
-            -- 如果通告对应状态为"enable(1)"表示可以发送此类型的通告，否则不可发送。
+            -- 锟斤拷锟酵拷锟斤拷应状态为"enable(1)"锟斤拷示锟斤拷锟皆凤拷锟酵达拷锟斤拷锟酵碉拷通锟芥，锟斤拷锟津不可凤拷锟酵★拷
         ::= { snmpNotifyTypeEntry 5 }
         
       gbnPlatformOAMSnmpNotifyType       OBJECT IDENTIFIER ::= { gbnPlatformOAMSnmp 3 }
@@ -222,7 +222,7 @@
         DESCRIPTION
             "A private type for traps or informs. It signifies that the SNMPv2 entity
             have just saved the configuration."
-            -- 私有的trap类型。发送此类型的trap表示设备刚才有保存配置文件的操作。
+            -- 私锟叫碉拷trap锟斤拷锟酵★拷锟斤拷锟酵达拷锟斤拷锟酵碉拷trap锟斤拷示锟借备锟秸诧拷锟叫憋拷锟斤拷锟斤拷锟斤拷锟侥硷拷锟侥诧拷锟斤拷锟斤拷
         ::= { gbnPlatformOAMSnmpNotifyType 1 }
  
      snmpTrapSource OBJECT-TYPE
@@ -231,7 +231,7 @@
         STATUS current
         DESCRIPTION
             "the form DAAAAAAAA, where D is the domain and AAAAAAAA is the IP address."
-            -- trap或inform的源地址，格式是协议域id+IP地址，ipv4是2，ipv6是28。
+            -- trap锟斤拷inform锟斤拷源锟斤拷址锟斤拷锟斤拷式锟斤拷协锟斤拷锟斤拷id+IP锟斤拷址锟斤拷ipv4锟斤拷2锟斤拷ipv6锟斤拷28锟斤拷
         ::= { gbnPlatformOAMSnmp 4 } 
 
     snmpRemoteEngineTable OBJECT-TYPE
@@ -265,7 +265,7 @@
         DESCRIPTION
             "The remote engine's id.Note that the engine id can 
             only appear once in the table."
-            -- 远程引擎id。
+            -- 远锟斤拷锟斤拷锟斤拷id锟斤拷
         ::= { snmpRemoteEngineEntry 1 }
           	
     snmpRemoteHostTAddr OBJECT-TYPE
@@ -275,8 +275,8 @@
         DESCRIPTION
             "The ip and port number of remote host.Note that the value including ip and
             port number can only appear once in the table."
-            -- 远程主机ip和端口号,前四位为主机ip后两位为端口号。其值和一个引擎id必须一一对应，
-            -- 不能出现一对多的情况。一个引擎id只能对应一个主机ip和端口号。
+            -- 远锟斤拷锟斤拷锟斤拷ip锟酵端口猴拷,前锟斤拷位为锟斤拷锟斤拷ip锟斤拷锟斤拷位为锟剿口号★拷锟斤拷值锟斤拷一锟斤拷锟斤拷锟斤拷id锟斤拷锟斤拷一一锟斤拷应锟斤拷
+            -- 锟斤拷锟杰筹拷锟斤拷一锟皆讹拷锟斤拷锟斤拷锟斤拷一锟斤拷锟斤拷锟斤拷id只锟杰讹拷应一锟斤拷锟斤拷锟斤拷ip锟酵端口号★拷
         ::= { snmpRemoteEngineEntry 2 }
         
     snmpDeleteRemoteEngineTableRow OBJECT-TYPE
@@ -287,7 +287,7 @@
         STATUS current
         DESCRIPTION
             "You can delete a row by setting the value to 'deleteRow(1)'."
-            -- 设置此对象实例值为1将删除此实例所在行。
+            -- 锟斤拷锟矫此讹拷锟斤拷实锟斤拷值为1锟斤拷删锟斤拷锟斤拷实锟斤拷锟斤拷锟斤拷锟叫★拷
         ::= { snmpRemoteEngineEntry 3 }
               
 --

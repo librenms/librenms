@@ -1,5 +1,5 @@
 os: alphabridge
-text: 'ALPHABRIDGE(tm) Software'
+text: 'Alpha IOS'
 type: network
 icon: alphabridge
 over:
@@ -11,4 +11,5 @@ discovery:
         sysObjectID:
             - .1.3.6.1.4.1.58158.1
             - .1.3.6.1.4.1.58158
+            
 

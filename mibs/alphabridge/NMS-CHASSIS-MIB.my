@@ -252,7 +252,8 @@
 						pci-vc4-EM(55),
 						pci-vc4-FXSO(56),
 						scc-mcard-1721-3slot(57),
-						pci-4UE1(60), 		--PCI 4 port Unframed E1 card 	   
+						-- PCI 4 port Unframed E1 card
+                        pci-4UE1(60),
 						board-msuc(61),
 						board-12GE-COMBO(64),
 						board-MIP(65),
@@ -284,20 +285,20 @@
 						pci-16FastEthernet-100M(254),
 						pci-8FastEthernet-100M(255),
 						pci-4FastEthernet-100M(256),
-						pci_1FastEthernet-100M(257),
-						pci_1GigaEthernet-100M(258),
-						pci_1FastEthernet-1000M(259),
-						pci_1GigaEthernet-1000M(260),
-						pci_1GBIC(261),
-						pci_1STACK(262),
-						pci_8Fiber(263),
-						pci_4GigaEthernet-Combo-1000M(264),
-						pci_4GigaEthernet-SFP-1000M(265),
-						pci_6508-MSU(266),
-						pci_2GigaEthernet-SFP-1000M(267),
-						pci_2GigaEthernet-1000M(268)
+						pci-1FastEthernet-100M(257),
+                        pci-1GigaEthernet-100M(258),
+                        pci-1FastEthernet-1000M(259),
+                        pci-1GigaEthernet-1000M(260),
+						pci-1GBIC(261),
+                        pci-1STACK(262),
+                        pci-8Fiber(263),
+                        pci-4GigaEthernet-Combo-1000M(264),
+                        pci-4GigaEthernet-SFP-1000M(265),
+                        pci-6508-MSU(266),
+                        pci-2GigaEthernet-SFP-1000M(267),
+                        pci-2GigaEthernet-1000M(268)
 					}
-                   ACCESS  read-only
+                   MAX-ACCESS read-only
                    STATUS  mandatory
                    DESCRIPTION
                            "Functional type of this card."
@@ -627,7 +628,7 @@
                     DESCRIPTION
                         "The state of  an auxiliary device."
                     ::= {  nmsAuxEntry 5}        
-           ----------------------------------------------------------------------------add by huhao
+           --add by huhao
      nmssubcardTable OBJECT-TYPE
                    SYNTAX  SEQUENCE OF NmssubcardEntry
                    ACCESS  not-accessible
@@ -821,7 +822,7 @@
                            "Value of chassis humidity."
                    ::= { nmschassis 17 }
                   nmsSysErrorNum OBJECT-TYPE
-                   SYNTAX  INTEGER{      
+                   SYNTAX INTEGER{      
                    		sys_ok(0),
                         err_TLB_modification_exception(1),                                                    
        					load_or_instruction_fetch_TLB_miss_exception (2),       
@@ -834,7 +835,7 @@
         				trap_exception(13),                                                      
         				deadlock_software_exception(16)
         			}
-                   ACCESS  read-only
+                   MAX-ACCESS  read-only
                    STATUS  mandatory
                    DESCRIPTION
                            "Value of sys error number."

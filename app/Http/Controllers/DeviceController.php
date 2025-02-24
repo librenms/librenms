@@ -52,6 +52,7 @@ class DeviceController extends Controller
         'netflow' => \App\Http\Controllers\Device\Tabs\NetflowController::class,
         'qos' => \App\Http\Controllers\Device\Tabs\QosController::class,
         'latency' => \App\Http\Controllers\Device\Tabs\LatencyController::class,
+        'alphabridge' => \App\Http\Controllers\Device\Tabs\alphabridgeController::class,
         'nac' => \App\Http\Controllers\Device\Tabs\NacController::class,
         'notes' => \App\Http\Controllers\Device\Tabs\NotesController::class,
         'edit' => \App\Http\Controllers\Device\Tabs\EditController::class,
@@ -80,6 +81,7 @@ class DeviceController extends Controller
         } else {
             $this->authorize('view', $device);
         }
+        
 
         $alert_class = $device->disabled ? 'alert-info' : ($device->status ? '' : 'alert-danger');
         $parent_id = Vminfo::guessFromDevice($device)->value('device_id');
