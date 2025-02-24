@@ -65,19 +65,15 @@ class Ilert extends Transport
             'Content-Length' => strlen(json_encode($data)),
         ];
 
-        $http_client = Http::client();
-        $http_client->withHeaders($headers);
-        $response = $http_client->post('https://api.ilert.com/api/events', $data);
+        $res = Http::client()
+            ->withHeaders($headers)
+            ->post('https://api.ilert.com/api/events', $data);
 
-        $return_status = $response->status();
-
-        if ($return_status != 202) {
-            var_dump($response);
-
-            return false;
+        if ($res->successful() && $res->status() == '202') {
+            return true;
         }
 
-        return true;
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $data);
     }
 
     public static function configTemplate(): array
