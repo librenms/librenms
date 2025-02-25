@@ -34,11 +34,11 @@ use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
-use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
@@ -96,6 +96,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor('rsrp', $this->getDeviceId(), $oid . $index, 'junos', $index, 'Modem RSRP', null, 1, 1, 'sum', null, -100);
         }
+
         return $sensors;
     }
 
@@ -108,6 +109,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor('rsrq', $this->getDeviceId(), $oid . $index, 'junos', $index, 'Modem RSRQ', null, 1, 1, 'sum', null, -20);
         }
+
         return $sensors;
     }
 
@@ -120,6 +122,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor('snr', $this->getDeviceId(), $oid . $index, 'junos', $index, 'Modem SNR', null, 1, 1, 'sum', null, 0);
         }
+
         return $sensors;
     }
 
@@ -132,6 +135,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor('rssi', $this->getDeviceId(), $oid . $index, 'junos', $index, 'Modem RSSI', null, 1, 1, 'sum', null, -85);
         }
+
         return $sensors;
     }
 
