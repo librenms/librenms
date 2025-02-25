@@ -91,7 +91,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
     {
         $sensors = [];
         $oids = SnmpQuery::walk('JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoRSRP')->table(1);
-        $oid = '.1.3.6.1.4.1.2636.3.87.1.1.1.1.32.'; // jnxWirelessWANNetworkInfoRSRP
+        $oid = '.1.3.6.1.4.1.2636.3.87.1.1.1.1.32'; // jnxWirelessWANNetworkInfoRSRP
 
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor('rsrp', $this->getDeviceId(), $oid . $index, 'junos', $index, 'Modem RSRP', null, 1, 1, 'sum', null, -100);
@@ -104,7 +104,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
     {
         $sensors = [];
         $oids = SnmpQuery::walk('JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoRSRQ')->table(1);
-        $oid = '.1.3.6.1.4.1.2636.3.87.1.1.1.1.33.'; // jnxWirelessWANNetworkInfoRSRQ
+        $oid = '.1.3.6.1.4.1.2636.3.87.1.1.1.1.33'; // jnxWirelessWANNetworkInfoRSRQ
 
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor('rsrq', $this->getDeviceId(), $oid . $index, 'junos', $index, 'Modem RSRQ', null, 1, 1, 'sum', null, -20);
@@ -117,7 +117,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
     {
         $sensors = [];
         $oids = SnmpQuery::walk('JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoSNR')->table(1);
-        $oid = '.1.3.6.1.4.1.2636.3.87.1.1.1.1.35.'; // jnxWirelessWANNetworkInfoSNR
+        $oid = '.1.3.6.1.4.1.2636.3.87.1.1.1.1.35'; // jnxWirelessWANNetworkInfoSNR
 
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor('snr', $this->getDeviceId(), $oid . $index, 'junos', $index, 'Modem SNR', null, 1, 1, 'sum', null, 0);
@@ -130,7 +130,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
     {
         $sensors = [];
         $oids = SnmpQuery::walk('JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoRSSI')->table(1);
-        $oid = '.1.3.6.1.4.1.2636.3.87.1.1.1.1.37.'; // jnxWirelessWANNetworkInfoRSSI
+        $oid = '.1.3.6.1.4.1.2636.3.87.1.1.1.1.37'; // jnxWirelessWANNetworkInfoRSSI
 
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor('rssi', $this->getDeviceId(), $oid . $index, 'junos', $index, 'Modem RSSI', null, 1, 1, 'sum', null, -85);
