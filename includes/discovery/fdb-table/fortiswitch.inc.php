@@ -3,7 +3,7 @@
  * fortiswitch.inc.php
  *
  * Fortinet has special needs:
- * 
+ *
  * BRIDGE-MIB::dot1dTpFdbAddress.142 = STRING: 58:1c:f8:62:f5:2a
  * BRIDGE-MIB::dot1dTpFdbPort.142 = INTEGER: 32769
  * BRIDGE-MIB::dot1dBasePort.29 = INTEGER: 32769
@@ -38,7 +38,7 @@ $macTable = SnmpQuery::hideMib()->walk('BRIDGE-MIB::dot1dTpFdbAddress')->table()
 $portTable = SnmpQuery::hideMib()->walk('BRIDGE-MIB::dot1dTpFdbPort')->table();
 $basePortTable = SnmpQuery::hideMib()->walk('BRIDGE-MIB::dot1dBasePort')->table();
 
-foreach($macTable['dot1dTpFdbAddress'] as $dot1dTpFdbPort => $mac) {
+foreach ($macTable['dot1dTpFdbAddress'] as $dot1dTpFdbPort => $mac) {
     $fdbPort = $portTable['dot1dTpFdbPort'][$dot1dTpFdbPort];
     $dot1dBasePort = array_search($fdbPort, $basePortTable['dot1dBasePort']);
 
