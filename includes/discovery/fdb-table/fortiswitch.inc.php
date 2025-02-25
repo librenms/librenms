@@ -54,7 +54,6 @@ foreach ($macTable['dot1dTpFdbAddress'] as $dot1dTpFdbPort => $mac) {
 
     $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
     Log::debug("vlan $vlan_id mac $mac_address port ($dot1dBasePort) $port_id\n");
-
 }
 
 echo PHP_EOL;
