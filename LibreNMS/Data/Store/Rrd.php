@@ -593,12 +593,13 @@ class Rrd extends BaseDatastore
      * Generates a graph file at $graph_file using $options
      * Graphs are a single command per run, so this just runs rrdtool
      *
-     * @param  string  $options
+     * @param string $options
+     * @param array|null $env
      * @return string
      *
      * @throws RrdGraphException
      */
-    public function graph(string $options, array $env = null): string
+    public function graph(string $options, ?array $env = null): string
     {
         $process = new Process([$this->rrdtool_executable, '-'], $this->rrd_dir, $env);
         $process->setTimeout(300);
