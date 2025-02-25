@@ -10,8 +10,7 @@
  *
  * MAC on index 142 is on fdbPort 32769 which translates to physical port 29
  *
- * Fortinet doesn't give us the VLAN ID. Bug report in 9239914 
- * and 10430993 
+ * Fortinet doesn't give us the VLAN ID. Bug report in 9239914 & 10430993
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +27,7 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  CTNET BV
+ * @copyright  2025 CTNET BV
  * @author     Rudy Broersma <r.broersma@ctnet.nl>
  */
 
@@ -39,18 +38,23 @@ $macTable = SnmpQuery::hideMib()->walk('BRIDGE-MIB::dot1dTpFdbAddress')->table()
 $portTable = SnmpQuery::hideMib()->walk('BRIDGE-MIB::dot1dTpFdbPort')->table();
 $basePortTable = SnmpQuery::hideMib()->walk('BRIDGE-MIB::dot1dBasePort')->table();
 
-foreach($macTable['dot1dTpFdbAddress'] as $dot1dTpFdbPort => $mac_address) {
-  $fdbPort = $portTable['dot1dTpFdbPort'][$dot1dTpFdbPort];
-  $dot1dBasePort = array_search($fdbPort, $basePortTable['dot1dBasePort']);
-  $port_id = PortCache::getIdFromIfIndex($dot1dBasePort);
-  $vlan_id = 0; // Bug 9239914
+foreach($macTable['dot1dTpFdbAddress'] as $dot1dTpFdbPort => $mac) {
+    $fdbPort = $portTable['dot1dTpFdbPort'][$dot1dTpFdbPort];
+    $dot1dBasePort = array_search($fdbPort, $basePortTable['dot1dBasePort']);
 
-  echo "Found MAC: $mac_address on port $dot1dTpFdbPort $fdbPort $dot1dBasePort $port_id\n";
+    $port_id = PortCache::getIdFromIfIndex($dot1dBasePort);
+    $vlan_id = 0; // Bug 9239914
 
-  $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
-  Log::debug("vlan $vlan_id mac $mac_address port ($dot1dBasePort) $port_id\n");
+    $mac_address = Mac::parse($mac)->hex(); // pad zeros and remove colons
+
+    if (strlen($mac_address) != 12) {
+        Log::debug("MAC address padding failed for $mac\n");
+        continue;
+    }
+
+    $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
+    Log::debug("vlan $vlan_id mac $mac_address port ($dot1dBasePort) $port_id\n");
 
 }
-
 
 echo PHP_EOL;
