@@ -94,7 +94,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
         $oid = '.1.3.6.1.4.1.2636.3.87.1.1.1.1.32'; // jnxWirelessWANNetworkInfoRSRP
 
         foreach ($oids as $index => $entry) {
-            $sensors[] = new WirelessSensor('rsrp', $this->getDeviceId(), $oid . $index, 'junos', $index, 'Modem RSRP', null, 1, 1, 'sum', null, -100);
+            $sensors[] = new WirelessSensor('rsrp', $this->getDeviceId(), $oid . $index, 'junos', $index, 'Modem RSRP', null, 1, 1, 'sum', null, null, -100);
         }
 
         return $sensors;
@@ -107,7 +107,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
         $oid = '.1.3.6.1.4.1.2636.3.87.1.1.1.1.33'; // jnxWirelessWANNetworkInfoRSRQ
 
         foreach ($oids as $index => $entry) {
-            $sensors[] = new WirelessSensor('rsrq', $this->getDeviceId(), $oid . $index, 'junos', $index, 'Modem RSRQ', null, 1, 1, 'sum', null, -20);
+            $sensors[] = new WirelessSensor('rsrq', $this->getDeviceId(), $oid . $index, 'junos', $index, 'Modem RSRQ', null, 1, 1, 'sum', null, null, -20);
         }
 
         return $sensors;
@@ -120,7 +120,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
         $oid = '.1.3.6.1.4.1.2636.3.87.1.1.1.1.35'; // jnxWirelessWANNetworkInfoSNR
 
         foreach ($oids as $index => $entry) {
-            $sensors[] = new WirelessSensor('snr', $this->getDeviceId(), $oid . $index, 'junos', $index, 'Modem SNR', null, 1, 1, 'sum', null, 0);
+            $sensors[] = new WirelessSensor('snr', $this->getDeviceId(), $oid . $index, 'junos', $index, 'Modem SNR', null, 1, 1, 'sum', null, null, 0);
         }
 
         return $sensors;
@@ -133,7 +133,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
         $oid = '.1.3.6.1.4.1.2636.3.87.1.1.1.1.37'; // jnxWirelessWANNetworkInfoRSSI
 
         foreach ($oids as $index => $entry) {
-            $sensors[] = new WirelessSensor('rssi', $this->getDeviceId(), $oid . $index, 'junos', $index, 'Modem RSSI', null, 1, 1, 'sum', null, -85);
+            $sensors[] = new WirelessSensor('rssi', $this->getDeviceId(), $oid . $index, 'junos', $index, 'Modem RSSI', null, 1, 1, 'sum', null, null, -85);
         }
 
         return $sensors;
