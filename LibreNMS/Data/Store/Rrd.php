@@ -593,8 +593,8 @@ class Rrd extends BaseDatastore
      * Generates a graph file at $graph_file using $options
      * Graphs are a single command per run, so this just runs rrdtool
      *
-     * @param string $options
-     * @param array|null $env
+     * @param  string  $options
+     * @param  array|null  $env
      * @return string
      *
      * @throws RrdGraphException
