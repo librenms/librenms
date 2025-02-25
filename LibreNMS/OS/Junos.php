@@ -90,7 +90,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
     public function discoverWirelessRsrp()
     {
         $sensors = [];
-        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'jnxWirelessWANNetworkInfoRSRP', [], 'JUNIPER-WIRELESS-WAN-MIB', 'junos', '-OteQUsb');
+        $oids = SnmpQuery::walk('JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoRSRP')->table(1);
         $oid = '.1.3.6.1.4.1.2636.3.87.1.1.1.1.32.'; // jnxWirelessWANNetworkInfoRSRP
 
         foreach ($oids as $index => $entry) {
@@ -103,7 +103,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
     public function discoverWirelessRsrq()
     {
         $sensors = [];
-        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'jnxWirelessWANNetworkInfoRSRQ', [], 'JUNIPER-WIRELESS-WAN-MIB', 'junos', '-OteQUsb');
+        $oids = SnmpQuery::walk('JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoRSRQ')->table(1);
         $oid = '.1.3.6.1.4.1.2636.3.87.1.1.1.1.33.'; // jnxWirelessWANNetworkInfoRSRQ
 
         foreach ($oids as $index => $entry) {
@@ -116,7 +116,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
     public function discoverWirelessSnr()
     {
         $sensors = [];
-        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'jnxWirelessWANNetworkInfoSNR', [], 'JUNIPER-WIRELESS-WAN-MIB', 'junos', '-OteQUsb');
+        $oids = SnmpQuery::walk('JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoSNR')->table(1);
         $oid = '.1.3.6.1.4.1.2636.3.87.1.1.1.1.35.'; // jnxWirelessWANNetworkInfoSNR
 
         foreach ($oids as $index => $entry) {
@@ -129,7 +129,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
     public function discoverWirelessRssi()
     {
         $sensors = [];
-        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'jnxWirelessWANNetworkInfoRSSI', [], 'JUNIPER-WIRELESS-WAN-MIB', 'junos', '-OteQUsb');
+        $oids = SnmpQuery::walk('JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoRSSI')->table(1);
         $oid = '.1.3.6.1.4.1.2636.3.87.1.1.1.1.37.'; // jnxWirelessWANNetworkInfoRSSI
 
         foreach ($oids as $index => $entry) {
