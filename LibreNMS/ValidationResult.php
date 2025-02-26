@@ -54,7 +54,7 @@ class ValidationResult
      * @param  int  $status  The status of this result FAILURE, WARNING, or SUCCESS
      * @param  string|null  $fix  a suggested fix to highlight for the user
      */
-    public function __construct(string $message, int $status, string $fix = null)
+    public function __construct(string $message, int $status, ?string $fix = null)
     {
         $this->message = $message;
         $this->status = $status;
@@ -68,7 +68,7 @@ class ValidationResult
      * @param  string|null  $fix  a suggested fix to highlight for the user
      * @return ValidationResult
      */
-    public static function ok(string $message, string $fix = null): ValidationResult
+    public static function ok(string $message, ?string $fix = null): ValidationResult
     {
         return new self($message, self::SUCCESS, $fix);
     }
@@ -80,7 +80,7 @@ class ValidationResult
      * @param  string|null  $fix  a suggested fix to highlight for the user
      * @return ValidationResult
      */
-    public static function warn(string $message, string $fix = null): ValidationResult
+    public static function warn(string $message, ?string $fix = null): ValidationResult
     {
         return new self($message, self::WARNING, $fix);
     }
@@ -103,7 +103,7 @@ class ValidationResult
      * @param  string|null  $fix  a suggested fix to highlight for the user
      * @return ValidationResult
      */
-    public static function fail(string $message, string $fix = null): ValidationResult
+    public static function fail(string $message, ?string $fix = null): ValidationResult
     {
         return new self($message, self::FAILURE, $fix);
     }
