@@ -476,7 +476,7 @@ This transport will send over the following fields:
 `alertKey` - The alert id.
 `priority` - The priority translated to the iLert priority values of HIGH (Critical) or LOW (Warning or OK)
 
-To customise what is sent to iLert and override or add additional fields, you can create a custom template which outputs the correct information via JSON. As an example:
+To customise what is sent to iLert and override or add additional fields, you can create a custom template which outputs the correct information via JSON. For this to work you **must** send over a summary and details values. As an example:
 
 ```json
 {
