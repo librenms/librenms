@@ -49,7 +49,7 @@ foreach ($macTable['dot1dTpFdbAddress'] as $dot1dTpFdbPort => $mac) {
 
     $mac_address = Mac::parse($mac)->hex(); // pad zeros and remove colons
 
-    if ($port_id == NULL) {
+    if ($port_id == null) {
         Log::debug("No port known for $mac\n");
         continue;
     }
