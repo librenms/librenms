@@ -26,8 +26,8 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
-use LibreNMS\Util\Http;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 class Ilert extends Transport
 {
@@ -49,7 +49,7 @@ class Ilert extends Transport
         $data = [
             'integrationKey' => $this->config['integration-key'],
             'eventType' => $event_type,
-            'alertKey' => (string)$alert_data['alert_id'],
+            'alertKey' => (string) $alert_data['alert_id'],
             'summary' => $alert_data['title'],
             'details' => $alert_data['msg'],
             'priority' => ($alert_data['severity'] == 'Critical') ? 'HIGH' : 'LOW',
