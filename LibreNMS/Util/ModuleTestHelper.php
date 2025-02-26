@@ -239,7 +239,7 @@ class ModuleTestHelper
      *
      * @throws InvalidModuleException
      */
-    public static function findOsWithData($modules = [], string $os_filter = null)
+    public static function findOsWithData($modules = [], ?string $os_filter = null)
     {
         $os_list = [];
 
