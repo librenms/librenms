@@ -317,7 +317,64 @@ tokens to authenticate with GitLab and will store the token in cleartext.
 
 ## Grafana Oncall
 
-Send alerts to Grafana Oncall using a [Formatted Webhook](https://grafana.com/docs/oncall/latest/integrations/webhook/)
+Send alerts to Grafana Oncall via either a Formatted Webhook or Webhook.
+[See the Grafana documentation for both](https://grafana.com/docs/oncall/latest/integrations/webhook/).
+
+There is little difference between the two, but the Formatted Webhook will 
+provide a more friendly view of things by default.
+
+> NOTE: By default Grafana translates acknowledged alerts to resolved alerts.
+> This can be changed by updating the Template settings for the integration you
+> added as follows.
+
+Autoresolution: `{{ payload.get("raw_state", "") != 2 and payload.get("state", "").upper() == "OK" }}`
+
+Auto acknowledge: `{{ payload.get("raw_state", "") == 2 }}`
+
+You will also find additional information is sent as part of the payload to Grafana which 
+can be useful within the templates or routes. If you perform a test of the LibreNMS transport 
+you will be able to see the payload within the Grafana interface.
+
+customise what is sent to Grafana and override or add additional fields, you can create
+a custom template which outputs the correct information via JSON. As an example:
+
+```
+{
+    "message": "Severity: {{ $alert->severity }}\nTimestamp: {{ $alert->timestamp }}\nRule: {{ $alert->title }}\n @foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}\n @endforeach",
+    "number_of_processors": \App\Models\Processors::where('device_id', $alert->device_id)->count(),
+    "title": "{{ $alert->title }}",
+    "link_to_upstream_details": "{{ \LibreNMS\Util\Url::deviceUrl($device) }}",
+}
+```
+If you are using more than one transport for an alert rule and need to customise the output per
+transport then you can do the following:
+
+```
+@if ($alert->transport == 'grafana')
+{
+  "message": "Severity: {{ $alert->severity }}\nTimestamp: {{ $alert->timestamp }}\nRule: {{ $alert->title }}\n @foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}\n @endforeach",
+  "number_of_processors": \App\Models\Processors::where('device_id', $alert->device_id)->count(),
+  "title": "{{ $alert->title }}",
+  "link_to_upstream_details": "{{ \LibreNMS\Util\Url::deviceUrl($device) }}",
+}
+@else
+{{ $alert->title }}
+Severity: {{ $alert->severity }}
+@if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
+Timestamp: {{ $alert->timestamp }}
+Unique-ID: {{ $alert->uid }}
+Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
+@if ($alert->faults) Faults:
+@foreach ($alert->faults as $key => $value)
+  {{ $key }}: {{ $value['string'] }}
+@endforeach
+@endif
+Alert sent to:
+@foreach ($alert->contacts as $key => $value)
+  {{ $value }} <{{ $key }}>
+@endforeach
+@endif
+```
 
 **Example:**
 
@@ -403,6 +460,95 @@ IBM On Call Manager uses the webhook to send the name of the alert rule, along w
   }
 }
 ```
+
+## Ilert
+This integration uses the [iLert Event API](https://api.ilert.com/api-docs/#tag/events) 
+which allows you to use all available iLert parameters such as links, images, comments, etc.
+
+To create an API Alert source, navigate to Alert Sources -> Alerts Sources -> Create a new alert source. Follow the on screen instructions and at the end, you will be able view the integration key which you will need to input into LibreNMS.
+
+This transport will send over the following fields:
+
+`integrationKey` - The integration key you generated earlier.
+`eventType` - The type of alert such as Alerting, Acknowledged or Recovered translated to iLert event types.
+`summary` - The title of the alert.
+`details` - The output from the alert template associated with the rule.
+`alertKey` - The alert id.
+`priority` - The priority translated to the iLert priority values of HIGH (Critical) or LOW (Warning or OK)
+
+To customise what is sent to iLert and override or add additional fields, you can create a custom template which outputs the correct information via JSON. As an example:
+
+```json
+{
+    "summary": "{{ $alert->title }}",
+    "details": "Severity: {{ $alert->severity }}\nTimestamp: {{ $alert->timestamp }}\nRule: {{ $alert->title }}\n @foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}\n @endforeach",
+    "links": [
+        {
+            "href": "{{ route('device', ['device' => $alert->device_id ?: 1]) }}",
+            "text": "{{ $alert->hostname }}"
+        },
+        {
+            "href": "{{ route('device', ['device' => $alert->device_id ?? 1, 'tab' => 'alerts']) }}",
+            "text": "{{ $alert->hostname }} - Alerts"
+        }
+    ],
+    "images": [
+        {
+            "src": "@signedGraphUrl(['device' => $alert->device_id, 'type' => 'device_availability','from' => time() - 43200, 'to' => time()])",
+            "href": "{{ route('device', ['device' => $alert->device_id ?: 1]) }}",
+            "alt": ""
+        }
+    ]
+}
+```
+If you are using more than one transport for an alert rule and need to customise the output per transport then you can do the following:
+
+```
+@if ($alert->transport == 'ilert')
+{
+    "summary": "{{ $alert->title }}",
+    "details": "Severity: {{ $alert->severity }}\nTimestamp: {{ $alert->timestamp }}\nRule: {{ $alert->title }}\n @foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}\n @endforeach",
+    "links": [
+        {
+            "href": "{{ route('device', ['device' => $alert->device_id ?: 1]) }}",
+            "text": "{{ $alert->hostname }}"
+        },
+        {
+            "href": "{{ route('device', ['device' => $alert->device_id ?? 1, 'tab' => 'alerts']) }}",
+            "text": "{{ $alert->hostname }} - Alerts"
+        }
+    ],
+    "images": [
+        {
+            "src": "@signedGraphUrl(['device' => $alert->device_id, 'type' => 'device_availability','from' => time() - 43200, 'to' => time()])",
+            "href": "{{ route('device', ['device' => $alert->device_id ?: 1]) }}",
+            "alt": ""
+        }
+    ]
+}
+@else
+{{ $alert->title }}
+Severity: {{ $alert->severity }}
+@if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
+Timestamp: {{ $alert->timestamp }}
+Unique-ID: {{ $alert->uid }}
+Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
+@if ($alert->faults) Faults:
+@foreach ($alert->faults as $key => $value)
+  {{ $key }}: {{ $value['string'] }}
+@endforeach
+@endif
+Alert sent to:
+@foreach ($alert->contacts as $key => $value)
+  {{ $value }} <{{ $key }}>
+@endforeach
+@endif
+```
+
+| Config               | Example                                                      |
+|----------------------|--------------------------------------------------------------|
+| Integration Key          | il1api012962aba7f1bff64b56a353a19b41c5f6ae57a940123f |
+
 
 ## JIRA
 
@@ -813,7 +959,7 @@ websrv08.dc4.eu.corp.example.net gets shortened to websrv08.dc4.eu.cen).
 - Sensu will reject rules with special characters - the Transport will attempt
 to fix up rule names, but it's best to stick to letters, numbers and spaces
 - The transport only deals in absolutes - it ignores the got worse/got better
-states
+/changed states
 - The agent will buffer alerts, but LibreNMS will not - if your agent is
 offline, alerts will be dropped
 - There is no backchannel between Sensu and LibreNMS - if you make changes in
@@ -1147,15 +1293,19 @@ They can be in international dialling format only.
 
 ## Zenduty
 
-Leveraging LibreNMS<>Zenduty Integration, users can send new LibreNMS 
+Two options are available for ZenDuty support, the first, [native ZenDuty](#native-zenduty)
+is via the API Transport as detailed in official [ZenDuty integration documentation](https://docs.zenduty.com/docs/librenms).
+The other way is by utilising a [native LibreNMS transport](#native-librenms-transport).
+
+### Native ZenDuty
+Leveraging LibreNMS > Zenduty Integration, users can send new LibreNMS 
 alerts to the right team and notify them based on on-call schedules
 via email, SMS, Phone Calls, Slack, Microsoft Teams and mobile push
 notifications. Zenduty provides engineers with detailed context around 
 the LibreNMS alert along with playbooks and a complete incident command
 framework to triage, remediate and resolve incidents with speed.
 
-Create a [LibreNMS
-Integration](https://docs.zenduty.com/docs/librenms) from inside 
+Create a [LibreNMS Integration](https://docs.zenduty.com/docs/librenms) from inside 
 [Zenduty](https://www.zenduty.com), then copy the Webhook URL from Zenduty
 to LibreNMS.
 
@@ -1167,3 +1317,95 @@ For a detailed guide with screenshots, refer to the
 | Config | Example |
 | ------ | ------- |
 | WebHook URL | <https://www.zenduty.com/api/integration/librenms/integration-key/> |
+
+### Native LibreNMS Transport
+This integration uses the [ZenDuty Webhooks](https://zenduty.com/docs/generic-integration/) 
+which allows you to use all available ZenDuty parameters such as URLs, SLA, 
+Escalation Policies, etc.
+
+Follow the instructions in the above link to obtain your Webhook URL and then paste that 
+into the `ZenDuty WebHook` field when setting up the LibreNMS transport.
+
+You can also set the SLA ID and Escalation Policy ID from within the Transport configuration 
+which will be sent with all alerts.
+
+This transport will send over the following fields:
+
+`message` - The alert title
+`alert_type` - The severity of the alert rule, acknowledged or resolved depending on the state of the alert.
+`entity_id` - The alert ID
+`urls` - A link back to the device generating the alert.
+`summary` - The output of the template associated with the alert rule.
+
+To customise what is sent to ZenDuty and override or add additional fields, you can create 
+a custom template which outputs the correct information via JSON. As an example:
+
+```json
+{
+    "message": "{{ $alert->title }}",
+    "payload": {
+        "sysName": "{{ $alert->sysName }}",
+        "Device Type": "{{ $alert->type }}"
+    },
+    "summary": "Severity: {{ $alert->severity }}\nTimestamp: {{ $alert->timestamp }}\nRule: {{ $alert->title }}\n @foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}\n @endforeach",
+    "sla": "ccaf3fd6-db51-4f9f-818b-de42aee54f29",
+    "urls": [
+        {
+            "link_url": "{{ route('device', ['device' => $alert->device_id ?: 1]) }}",
+            "link_text": "{{ $alert->hostname }}"
+        },
+        {
+            "link_url": "{{ route('device', ['device' => $alert->device_id ?? 1, 'tab' => 'alerts']) }}",
+            "link_text": "{{ $alert->hostname }} - Alerts"
+        }
+    ]
+}
+```
+If you are using more than one transport for an alert rule and need to customise the output per 
+transport then you can do the following:
+
+```
+@if ($alert->transport == 'ZenDuty')
+{
+  "message": "{{ $alert->title }}",
+  "payload": {
+    "sysName": "{{ $alert->sysName }}",
+    "Device Type": "{{ $alert->type }}"
+  },
+  "summary": "Severity: {{ $alert->severity }}\nTimestamp: {{ $alert->timestamp }}\nRule: {{ $alert->title }}\n @foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}\n @endforeach",
+  "sla": "ccaf3fd6-db51-4f9f-818b-de42aee54f29",
+  "urls": [
+    {
+      "link_url": "{{ route('device', ['device' => $alert->device_id ?: 1]) }}",
+      "link_text": "{{ $alert->hostname }}"
+    },
+    {
+      "link_url": "{{ route('device', ['device' => $alert->device_id ?? 1, 'tab' => 'alerts']) }}",
+      "link_text": "{{ $alert->hostname }} - Alerts"
+    }
+  ]
+}
+@else
+{{ $alert->title }}
+Severity: {{ $alert->severity }}
+@if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
+Timestamp: {{ $alert->timestamp }}
+Unique-ID: {{ $alert->uid }}
+Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
+@if ($alert->faults) Faults:
+@foreach ($alert->faults as $key => $value)
+  {{ $key }}: {{ $value['string'] }}
+@endforeach
+@endif
+Alert sent to:
+@foreach ($alert->contacts as $key => $value)
+  {{ $value }} <{{ $key }}>
+@endforeach
+@endif
+```
+
+| Config               | Example                                                      |
+|----------------------|--------------------------------------------------------------|
+| WebHook URL          | <https://events.zenduty.com/integration/we8jv/generic/hash/> |
+| SLA ID               | g27u4gr824r-dd32rf2wdedeas-3e2wd223d23                       |
+| Escalation Policy ID | KIJDi23rwnef23-dankjd323r-DSAD£2232fds                        |
