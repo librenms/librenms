@@ -101,8 +101,15 @@ setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstra
 
 ## Install PHP dependencies
 
+Change to the LibreNMS user:
 ```
-sudo -u librenms -i ./scripts/composer_wrapper.php install --no-dev
+su - librenms
+```
+
+Then run the composer wrapper script and exit back to the root user:
+```
+./scripts/composer_wrapper.php install --no-dev
+exit
 ```
 Sometimes when there is a proxy used to gain internet access, the above script may fail. The workaround is to install the `composer` package manually. For a global installation:
 ```
