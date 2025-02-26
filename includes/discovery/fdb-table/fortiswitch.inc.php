@@ -4,11 +4,17 @@
  *
  * Fortinet has special needs:
  *
- * BRIDGE-MIB::dot1dTpFdbAddress.142 = STRING: 58:1c:f8:62:f5:2a
- * BRIDGE-MIB::dot1dTpFdbPort.142 = INTEGER: 32769
- * BRIDGE-MIB::dot1dBasePort.29 = INTEGER: 32769
+ * # diagnose switch mac-address list | grep 00:07:5f:9c:41:af
+ * MAC: 00:07:5f:9c:41:af  VLAN: 128 Trunk: 8FFTF24008005-0(trunk-id 13)
  *
- * MAC on index 142 is on fdbPort 32769 which translates to physical port 29
+ * BRIDGE-MIB::dot1dTpFdbAddress.2 = STRING: 0:7:5f:9c:41:af
+ * BRIDGE-MIB::dot1dTpFdbPort.2 = INTEGER: 32781
+ * BRIDGE-MIB::dot1dBasePort.37 = INTEGER: 32781
+ * BRIDGE-MIB::dot1dBasePortIfIndex.37 = INTEGER: 87
+ * IF-MIB::ifName.87 = STRING: 8FFTF24008005-0
+ *
+ * MAC on index 2 is on dot1dTpFdbPort 32781. 32781 is dot1dBasePort index 37.
+ * dot1dBasePortIfIndex index 37 is interface 87.
  *
  * Fortinet doesn't give us the VLAN ID. Bug report in 9239914 & 10430993
  *
