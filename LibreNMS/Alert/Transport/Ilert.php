@@ -27,6 +27,7 @@ namespace LibreNMS\Alert\Transport;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Util\Http;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
 
 class Ilert extends Transport
 {
@@ -38,27 +39,26 @@ class Ilert extends Transport
     public function deliverAlert(array $alert_data): bool
     {
         if ($alert_data['state'] == AlertState::RECOVERED) {
-            $alert_data['event_type'] = 'RESOLVE';
+            $event_type = 'RESOLVE';
         } elseif ($alert_data['state'] == AlertState::ACKNOWLEDGED) {
-            $alert_data['event_type'] = 'ACCEPT';
+            $event_type = 'ACCEPT';
         } else {
-            $alert_data['event_type'] = 'ALERT';
-        }
-        $opts = '';
-        if (! empty($this->config)) {
-            $opts = $this->config['api-token'];
+            $event_type = 'ALERT';
         }
 
-        return $this->contactILert($alert_data, $opts);
-    }
-
-    public function contactILert($alert_data, $opts): bool
-    {
         $data = [
-            'apiKey' => $opts,
-            'eventType' => $alert_data['event_type'],
-            'summary' => $alert_data['msg'],
+            'integrationKey' => $this->config['integration-key'],
+            'eventType' => $event_type,
+            'alertKey' => (string)$alert_data['alert_id'],
+            'summary' => $alert_data['title'],
+            'details' => $alert_data['msg'],
+            'priority' => ($alert_data['severity'] == 'Critical') ? 'HIGH' : 'LOW',
         ];
+
+        $tmp_msg = json_decode($alert_data['msg'], true);
+        if (isset($tmp_msg['summary']) && isset($tmp_msg['details'])) {
+            $data = array_merge($data, $tmp_msg);
+        }
 
         $headers = [
             'Content-Type' => 'application/json',
@@ -81,14 +81,14 @@ class Ilert extends Transport
         return [
             'config' => [
                 [
-                    'title' => 'API Token',
-                    'name' => 'api-token',
-                    'descr' => 'iLert API Token',
+                    'title' => 'Integration Key',
+                    'name' => 'integration-key',
+                    'descr' => 'iLert Integration Key',
                     'type' => 'text',
                 ],
             ],
             'validation' => [
-                'api-token' => 'required|string',
+                'integration-key' => 'required|string',
             ],
         ];
     }
