@@ -166,5 +166,8 @@ return [
         'HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap' => LibreNMS\Snmptrap\Handlers\HpFault::class,
         'MPLS-LDP-MIB::mplsLdpSessionDown' => LibreNMS\Snmptrap\Handlers\CiscoLdpSesDown::class,
         'MPLS-LDP-MIB::mplsLdpSessionUp' => LibreNMS\Snmptrap\Handlers\CiscoLdpSesUp::class,
+        'HP-ICF-BRIDGE::hpicfBridgeLoopProtectLoopDetectedNotification' => LibreNMS\Snmptrap\Handlers\HpicfBridgeLoopProtectLoopDetectedNotification::class,
+        'HUAWEI-LDT-MIB::hwLdtPortLoopDetect' => LibreNMS\Snmptrap\Handlers\HuaweiLdtPortLoopDetect::class,
+        'HUAWEI-LDT-MIB::hwLdtPortLoopDetectRecovery' => LibreNMS\Snmptrap\Handlers\HuaweiLdtPortLoopDetectRecovery::class,
     ],
 ];
