@@ -1381,9 +1381,6 @@ return [
             'cisco-ace-serverfarms' => [
                 'description' => 'Cisco ACE Serverfarms',
             ],
-            'cisco-asa-firewall' => [
-                'description' => 'Cisco ASA Firewall',
-            ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',
             ],
@@ -1833,7 +1830,7 @@ return [
         ],
         'uptime_warning' => [
             'description' => 'Show Device as warning if Uptime below (seconds)',
-            'help' => 'Shows Device as warning if Uptime is below this value. Default 24h',
+            'help' => 'Shows Device as warning if Uptime is below this value. Custom maps status will reflect this setting. 0 disables warning. Default 24h',
         ],
         'virsh' => [
             'description' => 'Path to virsh',

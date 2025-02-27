@@ -1636,7 +1636,7 @@ tr.search:nth-child(odd) {
 nav.navbar-sticky-top {
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 1000;
   border-bottom-width: 2px;
   border-left-width: 0;
   border-top-width: 0;

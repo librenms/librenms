@@ -1,0 +1,130 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.25049.1.130",
+                    "sysDescr": "Opengear CM8116 24.11.2",
+                    "sysContact": "<private>",
+                    "version": "24.11.2",
+                    "hardware": "CM81xx",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "opengear",
+                    "type": "OOB Management",
+                    "serial": "81162310001039",
+                    "icon": "opengear.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "mempools": {
+        "discovery": {
+            "mempools": [
+                {
+                    "mempool_index": "1",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_class": "system",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Physical memory",
+                    "mempool_perc": 30,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 628137984,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.1",
+                    "mempool_free": 1484742656,
+                    "mempool_free_oid": null,
+                    "mempool_total": 2112880640,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 99
+                },
+                {
+                    "mempool_index": "3",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_class": "virtual",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Virtual memory",
+                    "mempool_perc": 50,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 1050148864,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.3",
+                    "mempool_free": 1062731776,
+                    "mempool_free_oid": null,
+                    "mempool_total": 2112880640,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 95
+                },
+                {
+                    "mempool_index": "6",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_class": "buffers",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Memory buffers",
+                    "mempool_perc": 4,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 82493440,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.6",
+                    "mempool_free": 2030387200,
+                    "mempool_free_oid": null,
+                    "mempool_total": 2112880640,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 0
+                },
+                {
+                    "mempool_index": "7",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_class": "cached",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Cached memory",
+                    "mempool_perc": 16,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 339517440,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.7",
+                    "mempool_free": 1773363200,
+                    "mempool_free_oid": null,
+                    "mempool_total": 2112880640,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 0
+                },
+                {
+                    "mempool_index": "8",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_class": "shared",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Shared memory",
+                    "mempool_perc": 0,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 2179072,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.8",
+                    "mempool_free": 2110701568,
+                    "mempool_free_oid": null,
+                    "mempool_total": 2112880640,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 0
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}
