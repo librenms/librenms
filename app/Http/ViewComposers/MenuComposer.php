@@ -182,6 +182,16 @@ class MenuComposer
                 ];
             }
 
+            if ($routing_count['ospfv3']) {
+                $routing_menu[] = [
+                    [
+                        'url' => 'ospfv3',
+                        'icon' => 'circle-o-notch fa-rotate-180',
+                        'text' => 'OSPFv3 Devices',
+                    ],
+                ];
+            }
+
             if ($routing_count['isis']) {
                 $routing_menu[] = [
                     [
