@@ -29,6 +29,9 @@ that it is owned by the user running the SNMP daemon.
 mkdir -p /var/cache/librenms/
 ```
 
+### MySQL User
+Refer to the [Percona Documentation](https://docs.percona.com/percona-monitoring-and-management/2/setting-up/client/mysql.html#create-a-database-account-for-pmm) for details on how to create a MySQL user with privileges to read the required monitoring data from MySQL / MariaDB.
+
 ### MySQL script
 Unlike most other scripts, the MySQL script requires a configuration
 file `mysql.cnf` in the same directory as the extend or agent script
