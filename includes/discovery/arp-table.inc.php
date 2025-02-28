@@ -24,8 +24,11 @@
  */
 
 use App\Models\Eventlog;
+use App\Models\Ipv6Nd;
 use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Mac;
 
 foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
@@ -38,6 +41,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
 
     $sql = 'SELECT * from `ipv4_mac` WHERE `device_id`=? AND `context_name`=?';
     $existing_data = dbFetchRows($sql, [$device['device_id'], $context_name]);
+    $valid_ipv6_ids = [];
 
     $arp_table = [];
     $insert_data = [];
@@ -88,6 +92,25 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
             }
         }
         echo PHP_EOL;
+
+        if (! empty($data['IP-MIB::ipNetToPhysicalPhysAddress']['ipv6'])) {
+            Log::info('IPv6 ND: ');
+            foreach ($data['IP-MIB::ipNetToPhysicalPhysAddress']['ipv6'] as $ipv6 => $raw_mac) {
+                try {
+                    $ipv6_nd = Ipv6Nd::updateOrCreate([
+                        'port_id' => $port_id,
+                        'device_id' => $device['device_id'],
+                        'mac_address' => Mac::parse($raw_mac)->readable(),
+                        'ipv6_address' => IPv6::fromHexString($ipv6)->uncompressed(),
+                        'context_name' => (string) $context_name,
+                    ]);
+                    echo $ipv6_nd->wasRecentlyCreated ? '+' : ($ipv6_nd->wasChanged() ? 'U' : '.');
+                    $valid_ipv6_ids[] = $ipv6_nd->id;
+                } catch (InvalidIpException $e) {
+                    Log::error($e->getMessage());
+                }
+            }
+        }
     }
 
     unset(
@@ -96,6 +119,11 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
         $ipv4_addresses,
         $data
     );
+
+    Ipv6Nd::where('device_id', $device['device_id'])
+        ->where('context_name', $context_name)
+        ->whereNotIn('id', $valid_ipv6_ids)
+        ->delete();
 
     // add new entries
     if (! empty($insert_data)) {
