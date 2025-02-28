@@ -23,6 +23,7 @@ class Route extends DeviceRelatedModel
         'ciscoIgrp',
         'bbnSpfIgp',
         'ospf',
+        'ospfv3',
         'bgp',
         'idpr',
         'ciscoEigrp',

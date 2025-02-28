@@ -838,6 +838,10 @@
             "default": true,
             "type": "boolean"
         },
+        "autodiscovery.ospfv3": {
+            "default": true,
+            "type": "boolean"
+        },
         "autodiscovery.snmpscan": {
             "default": true,
             "type": "boolean"
@@ -5367,6 +5371,13 @@
         },
         "poller_modules.ospf": {
             "order": 330,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": true,
+            "type": "boolean"
+        },
+        "poller_modules.ospfv3": {
+            "order": 331,
             "group": "poller",
             "section": "poller_modules",
             "default": true,

@@ -158,7 +158,7 @@ configured to be ignored by config options.
 
 `hr-device`: Processor and Memory support via HOST-RESOURCES-MIB.
 
-`discovery-protocols`: Auto discovery module for xDP, OSPF and BGP.
+`discovery-protocols`: Auto discovery module for xDP, OSPF, OSPFv3 and BGP.
 
 `arp-table`: Detection of the ARP table for the device.
 

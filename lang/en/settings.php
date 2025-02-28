@@ -1354,6 +1354,9 @@ return [
             'ospf' => [
                 'description' => 'OSPF',
             ],
+            'ospfv3' => [
+                'description' => 'OSPFv3',
+            ],
             'isis' => [
                 'description' => 'ISIS',
             ],

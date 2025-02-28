@@ -122,6 +122,8 @@ class Stats
             'xdp' => $this->selectTotal('links', ['protocol']),
             'ospf' => $this->selectTotal('ospf_instances', ['ospfVersionNumber']),
             'ospf_links' => $this->selectTotal('ospf_ports', ['ospfIfType']),
+            'ospfv3' => $this->selectTotal('ospfv3_instances', ['ospfv3VersionNumber']),
+            'ospfv3_links' => $this->selectTotal('ospfv3_ports', ['ospfv3IfType']),
             'arch' => $this->selectTotal('packages', ['arch']),
             'pollers' => $this->selectTotal('pollers'),
             'port_type' => $this->selectTotal('ports', ['ifType']),
