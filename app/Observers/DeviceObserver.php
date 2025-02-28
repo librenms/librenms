@@ -134,6 +134,10 @@ class DeviceObserver
         $device->ospfInstances()->delete();
         $device->ospfNbrs()->delete();
         $device->ospfPorts()->delete();
+        $device->ospfv3Areas()->delete();
+        $device->ospfv3Instances()->delete();
+        $device->ospfv3Nbrs()->delete();
+        $device->ospfv3Ports()->delete();
         $device->outages()->delete();
         $device->packages()->delete();
         $device->portsFdb()->delete();
