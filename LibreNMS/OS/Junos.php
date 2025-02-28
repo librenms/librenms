@@ -335,16 +335,46 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
 
     private function findTransceiverEntityByPortName(array $entPhysical, ?string $ifName): array
     {
-        if ($ifName && preg_match('#-(\d+/\d+/\d+)#', $ifName, $matches)) {
-            $expected_tail = ' @ ' . $matches[1];
+        if (! $ifName) {
+            return [];
+        }
 
-            foreach ($entPhysical as $entity) {
-                if (isset($entity['ENTITY-MIB::entPhysicalDescr']) && str_ends_with($entity['ENTITY-MIB::entPhysicalDescr'], $expected_tail)) {
-                    return $entity;
+        // Regex to capture three digit-groups (FPC/PIC/Port) from the ifName
+        // e.g., et-0/0/0, et-0/0/0:2.0, et-1/2/3:100
+        if (! preg_match('#-(\d+)/(\d+)/(\d+)#', $ifName, $matches)) {
+            // No match; bail out.
+            return [];
+        }
+
+        // [0] is the full match, [1..3] are captures
+        [, $fpc, $pic, $port] = $matches;
+
+        // EVO result from QFX5130     - ENTITY-MIB::entPhysicalDescr[75] = QSFP56-DD-400GBASE-DR4 @ /Chassis[0]/Fpc[0]/Pic[0]/Port[0]
+        // non-EVO result from QFX5120 - ENTITY-MIB::entPhysicalDescr[287] = QSFP28-100G-AOC-3M @ 0/0/1
+        $expectedSuffixes = [
+            // Short form, e.g. " @ 0/0/1"
+            ' @ ' . $fpc . '/' . $pic . '/' . $port,
+
+            // Chassis form, e.g. " @ /Chassis[0]/Fpc[0]/Pic[0]/Port[0]"
+            ' @ /Chassis[0]/Fpc[' . $fpc . ']/Pic[' . $pic . ']/Port[' . $port . ']',
+        ];
+
+        // Check if any entity description ends with one of the expected suffixes
+        foreach ($entPhysical as $entity) {
+            if (! isset($entity['ENTITY-MIB::entPhysicalDescr'])) {
+                continue;
+            }
+
+            $descr = $entity['ENTITY-MIB::entPhysicalDescr'];
+
+            foreach ($expectedSuffixes as $suffix) {
+                if (str_ends_with($descr, $suffix)) {
+                    return $entity; // Found a match
                 }
             }
         }
 
+        // Nothing matched
         return [];
     }
 }
