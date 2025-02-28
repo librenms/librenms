@@ -314,7 +314,7 @@ if ($format == 'graph') {
                 <tr>
                     <th data-column-id="status" data-formatter="status" data-width="7px" data-searchable="false"><?php echo $detailed ? 'S.' : 'Status'; ?></th>
                     <th data-column-id="device_id" data-width="5px" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>">Id</th>
-                    <th data-column-id="maintenance" data-width="5px" data-searchable="false" data-formatter="maintenance" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>"><?php echo $detailed ? 'M.' : 'Maintenance'; ?></th>
+                    <th data-column-id="maintenance" data-width="5px" data-searchable="false" data-formatter="maintenance" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>"><?php echo $detailed ? 'Maintenance.' : 'Maintenance'; ?></th>
                     <th data-column-id="icon" data-width="70px" data-searchable="false" data-formatter="icon" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>">Vendor</th>
                     <th data-column-id="hostname" data-order="asc" <?php echo $detailed ? 'data-formatter="device"' : ''; ?>>Device</th>
                     <th data-column-id="metrics" data-width="<?php echo $detailed ? '100px' : '150px'; ?>" data-sortable="false" data-searchable="false" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>">Metrics</th>

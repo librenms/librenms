@@ -1,0 +1,15 @@
+os: alphabridge
+text: 'Alphabridge Olt v2'
+type: network
+icon: alphabridge2
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.8888.1
+            - .1.3.6.1.4.1.8888.1.3.34.1
+            
+
