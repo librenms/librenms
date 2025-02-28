@@ -65,7 +65,7 @@
     <script src="{{ asset('js/mktree.js') }}"></script>
     <script src="{{ asset('js/jquery.bootgrid.min.js') }}"></script>
     <script src="{{ asset('js/handlebars.min.js') }}"></script>
-    <script src="{{ asset('js/pace.min.js') }}"></script>
+    <script data-pace-options='{ "eventLag": { "lagThreshold": 30 } }' src="{{ asset('js/pace.min.js') }}"></script>
     <script src="{{ asset('js/qrcode.min.js') }}"></script>
     <script src="{{ asset('js/select2.min.js') }}"></script>
     <script>
