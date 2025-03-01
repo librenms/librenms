@@ -89,7 +89,7 @@ $added_checks = array_values(array_diff($new_checks, $old_checks));
 $removed_checks = array_values(array_diff($old_checks, $new_checks));
 
 // if we have any check changes, log it
-if (sizeof($added_checks) > 0 || sizeof($removed_checks) > 0) {
+if (count($added_checks) > 0 || count($removed_checks) > 0) {
     $log_message = 'Sneck Check Change:';
     $log_message .= count($added_checks) > 0 ? ' Added ' . json_encode($added_checks) : '';
     $log_message .= count($removed_checks) > 0 ? ' Removed ' . json_encode($added_checks) : '';
@@ -134,25 +134,25 @@ foreach ($new_checks as $check) {
 }
 
 // log any clears
-if (sizeof($cleared) > 0) {
+if (count($cleared) > 0) {
     $log_message = 'Sneck Check Clears: ' . json_encode($cleared);
     Eventlog::log($log_message, $device['device_id'], 'application', Severity::Ok);
 }
 
 // log any warnings
-if (sizeof($warned) > 0) {
+if (count($warned) > 0) {
     $log_message = 'Sneck Check Warns: ' . json_encode($warned);
     Eventlog::log($log_message, $device['device_id'], 'application', Severity::Warning);
 }
 
 // log any alerts
-if (sizeof($alerted) > 0) {
+if (count($alerted) > 0) {
     $log_message = 'Sneck Check Alerts: ' . json_encode($alerted);
     Eventlog::log($log_message, $device['device_id'], 'application', Severity::Error);
 }
 
 // log any unknowns
-if (sizeof($unknowned) > 0) {
+if (count($unknowned) > 0) {
     $log_message = 'Sneck Check Unknowns: ' . json_encode($unknownwed);
     Eventlog::log($log_message, $device['device_id'], 'application', Severity::Unknown);
 }

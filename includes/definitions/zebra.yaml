@@ -2,6 +2,7 @@ os: zebra
 text: ZebraNet
 type: printer
 icon: zebra
+mib_dir: zebra
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:

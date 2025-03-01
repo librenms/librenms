@@ -1317,6 +1317,9 @@ return [
             'ospf' => [
                 'description' => 'OSPF',
             ],
+            'ospfv3' => [
+                'description' => 'OSPFv3',
+            ],
             'isis' => [
                 'description' => 'ISIS',
             ],
@@ -1343,9 +1346,6 @@ return [
             ],
             'cisco-ace-serverfarms' => [
                 'description' => 'Серверные фермы Cisco ACE',
-            ],
-            'cisco-asa-firewall' => [
-                'description' => 'Firewall Cisco ASA',
             ],
             'cisco-cbqos' => [
                 'description' => 'Cisco CBQOS',

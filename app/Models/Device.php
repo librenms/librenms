@@ -869,6 +869,26 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\OspfPort::class, 'device_id');
     }
 
+    public function ospfv3Areas(): HasMany
+    {
+        return $this->hasMany(\App\Models\Ospfv3Area::class, 'device_id');
+    }
+
+    public function ospfv3Instances(): HasMany
+    {
+        return $this->hasMany(\App\Models\Ospfv3Instance::class, 'device_id');
+    }
+
+    public function ospfv3Nbrs(): HasMany
+    {
+        return $this->hasMany(\App\Models\Ospfv3Nbr::class, 'device_id');
+    }
+
+    public function ospfv3Ports(): HasMany
+    {
+        return $this->hasMany(\App\Models\Ospfv3Port::class, 'device_id');
+    }
+
     public function packages(): HasMany
     {
         return $this->hasMany(\App\Models\Package::class, 'device_id', 'device_id');

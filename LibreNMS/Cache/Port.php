@@ -60,7 +60,7 @@ class Port
     }
 
     /**
-     * Get a port from an ifName.
+     * Get a port from an IP address.
      * Must be constrained to a device, when $device is null, use primary device
      */
     public function getByIp(string|IP $ip, ?string $context_name = null, \App\Models\Device|int|null $device = null): ?\App\Models\Port

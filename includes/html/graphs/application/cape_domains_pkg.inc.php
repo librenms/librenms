@@ -26,7 +26,7 @@ foreach ($packages as $index => $package) {
     $packages_int++;
 }
 
-if (sizeof($rrd_list)) {
+if (count($rrd_list)) {
     d_echo('No relevant package RRDs found');
 }
 
