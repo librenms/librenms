@@ -30,6 +30,8 @@ class Transceiver extends PortRelatedModel implements Keyable
         'channels', // number of channels or lanes
     ];
 
+    protected $casts = ['ddm' => 'boolean'];
+
     public function getCompositeKey()
     {
         return $this->index;
