@@ -637,6 +637,9 @@ ln -s /opt/librenms/lnms /usr/bin/lnms
 cp /opt/librenms/misc/lnms-completion.bash /etc/bash_completion.d/
 ```
 
+`lnms config` is the preferred method for [Configuration](../Support/Configuration.md)
+
+
 ## Configure snmpd
 
 ```
