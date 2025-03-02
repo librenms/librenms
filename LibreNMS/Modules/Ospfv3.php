@@ -40,6 +40,7 @@ use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\IP;
 use SnmpQuery;
 
 class Ospfv3 implements Module
