@@ -107,6 +107,25 @@ lnms config:get snmp.community
   ]
 ```
 
+Multi-line configuration items above can be collapsed in to a single line using `| jq -c` to assist with set commands, for example:
+```bash
+lnms config:get snmp.community | jq -c
+["public","testing"]
+```
+
+Alernatively, if leaving multi-line items exactly as returned by `lnms config:get` for easier reading, you can use the following format:
+```bash
+lnms config:set snmp.community \
+'
+[
+    "public",
+    "testing"
+]
+'
+```
+
+
+
 ## Pre-load configuration
 
 This feature is primarily for docker images and other automation.

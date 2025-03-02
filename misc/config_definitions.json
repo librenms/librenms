@@ -6280,6 +6280,9 @@
             "order": 1,
             "type": "integer"
         },
+        "syslog_xlate": {
+            "type": "array"
+        },
         "temp_dir": {
             "type": "directory"
         },
