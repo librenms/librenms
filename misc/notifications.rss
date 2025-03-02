@@ -113,5 +113,10 @@
     <description>The storage table structure has changed and storage_deleted and storage_mib were removed. If you have alert rules that reference those fields, you can remove storage_deleted and change storage_mib to type.</description>
     <pubDate>Fri, 24 Jan 2025 22:00:00 +0000</pubDate>
   </item>
+  <item>
+    <title>cisco-access OS removal</title>
+    <description>We will be merging the cisco-access (C1200/C1300 based devices) OS into the ciscosb OS. This will be done on the 20th of March 2025. If you have any alert rules or groups that reference this old OS then please update them include ciscosb as soon as possible.</description>
+    <pubDate>Sun, 2 Mar 2025 22:00:00 +0000</pubDate>
+  </item>
 </channel>
 </rss>
