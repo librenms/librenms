@@ -38,6 +38,7 @@ class Port extends DeviceRelatedModel
             $port->macAccounting()->delete();
             $port->macs()->delete();
             $port->nac()->delete();
+            $port->nd()->delete();
             $port->ospfNeighbors()->delete();
             $port->ospfPorts()->delete();
             $port->ospfv3Neighbors()->delete();
@@ -377,6 +378,11 @@ class Port extends DeviceRelatedModel
     public function nac(): HasMany
     {
         return $this->hasMany(PortsNac::class, 'port_id');
+    }
+
+    public function nd(): HasMany
+    {
+        return $this->hasMany(Ipv6Nd::class, 'port_id');
     }
 
     public function ospfNeighbors(): HasMany
