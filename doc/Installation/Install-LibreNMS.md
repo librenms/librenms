@@ -739,6 +739,7 @@ of a few other docs to get you going:
 - [Alerting](../Alerting/index.md)
 - [Device Groups](../Extensions/Device-Groups.md)
 - [Auto discovery](../Extensions/Auto-Discovery.md)
+- [High Availability](../Support/High-Availability.md)
 
 ## Closing
 
