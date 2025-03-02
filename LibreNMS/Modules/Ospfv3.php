@@ -179,8 +179,9 @@ class Ospfv3 implements Module
                 ->mapTable(function ($ospf_nbr, $ifIndex, $ospf_instance_id, $ospfv3NbrRtrId) use ($context_name, $os) {
                     // get neighbor port_id
                     // Needs searching by Link-Local addressing, but those do not appear to be indexed.
-                    $ip = $ospf_nbr['ospfv3NbrAddress'];
-                    $ospf_nbr['port_id'] = PortCache::getIdFromIp($ip, $context_name); // search all devices
+                    $ip_raw = $ospf_nbr['ospfv3NbrAddress'];
+                    $ospf_nbr['ospfv3NbrAddress'] = IP::fromHexString($ip_raw, true)->compressed() ?? IP::parse($ip_raw, true)->compressed() ?? $ospf_nbr['ospfv3NbrAddress'];
+                    $ospf_nbr['port_id'] = PortCache::getIdFromIp($ospf_nbr['ospfv3NbrAddress'], $context_name); // search all devices
                     $ospf_nbr['ospfv3_instance_id'] = $ospf_instance_id;
                     $ospf_nbr['ospfv3NbrRtrId'] = long2ip($ospfv3NbrRtrId);
 
