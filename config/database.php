@@ -18,7 +18,7 @@ $sentinelHosts = array_map(function ($entry) {
 
     $query = http_build_query(array_filter([
         'username' => $username ?: null,
-        'password' => $password ?: null
+        'password' => $password ?: null,
     ]));
 
     return 'tcp://' . trim($host) . ':' . (int) $port . ($query ? '?' . $query : '');
@@ -172,7 +172,7 @@ return [
                     'sentinel_password' => env('REDIS_SENTINEL_PASSWORD'),
                     'database' => env('REDIS_SESSION_DB', '0'),
                 ],
-            ]
+            ],
         ]),
 
         'sentinel_cache' => array_merge($sentinelHosts, [
