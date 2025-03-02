@@ -12,6 +12,7 @@ discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.35265.1.176 # MES2424B AC
+            - .1.3.6.1.4.1.35265.1.250 # MES2448B AC
 
 mib_dir: eltexmes24xx
 
