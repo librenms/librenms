@@ -31,7 +31,7 @@ To test if you need `sudo`, first check the user `snmpd` is running as.
 Then test if you can run the extend script as that user without issue.
 
 !!! example
-If `snmpd` is running as `Debian-snmp` and we want to run the extend for proxmox, we check that the following run without error:
+    If `snmpd` is running as `Debian-snmp` and we want to run the extend for proxmox, we check that the following run without error:
 
     ```bash
     sudo -u Debian-snmp /usr/local/bin/proxmox
