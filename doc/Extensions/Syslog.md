@@ -507,7 +507,7 @@ to the syslog server.
 ## Configuration Options
 ### Syslog Clean Up
 
-Default can set set:
+Default can be set:
 
 === "lnms"
     ```bash
