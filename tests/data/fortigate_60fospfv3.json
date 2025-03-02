@@ -7492,7 +7492,7 @@
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "notInService",
                     "context_name": "",
-                    "ifIndex": null
+                    "ifIndex": 2
                 },
                 {
                     "ospf_port_id": "10.0.11.99.0",
@@ -7522,7 +7522,7 @@
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "notInService",
                     "context_name": "",
-                    "ifIndex": null
+                    "ifIndex": 17
                 },
                 {
                     "ospf_port_id": "10.0.21.101.0",
@@ -7552,7 +7552,7 @@
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "notInService",
                     "context_name": "",
-                    "ifIndex": null
+                    "ifIndex": 18
                 },
                 {
                     "ospf_port_id": "10.0.21.17.0",
@@ -7582,7 +7582,7 @@
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "notInService",
                     "context_name": "",
-                    "ifIndex": null
+                    "ifIndex": 31
                 },
                 {
                     "ospf_port_id": "10.150.1.254.0",
@@ -7612,7 +7612,7 @@
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "notInService",
                     "context_name": "",
-                    "ifIndex": null
+                    "ifIndex": 25
                 },
                 {
                     "ospf_port_id": "10.150.12.254.0",
@@ -7642,7 +7642,7 @@
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "notInService",
                     "context_name": "",
-                    "ifIndex": null
+                    "ifIndex": 26
                 },
                 {
                     "ospf_port_id": "10.150.13.254.0",
@@ -7672,7 +7672,7 @@
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "notInService",
                     "context_name": "",
-                    "ifIndex": null
+                    "ifIndex": 28
                 },
                 {
                     "ospf_port_id": "10.150.14.254.0",
@@ -7702,7 +7702,7 @@
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "notInService",
                     "context_name": "",
-                    "ifIndex": null
+                    "ifIndex": 27
                 },
                 {
                     "ospf_port_id": "10.150.2.254.0",
@@ -7732,7 +7732,7 @@
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "notInService",
                     "context_name": "",
-                    "ifIndex": null
+                    "ifIndex": 29
                 },
                 {
                     "ospf_port_id": "10.150.3.254.0",
@@ -7762,7 +7762,7 @@
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "notInService",
                     "context_name": "",
-                    "ifIndex": null
+                    "ifIndex": 20
                 },
                 {
                     "ospf_port_id": "10.150.4.254.0",
@@ -7792,7 +7792,7 @@
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "notInService",
                     "context_name": "",
-                    "ifIndex": null
+                    "ifIndex": 22
                 },
                 {
                     "ospf_port_id": "10.150.5.254.0",
@@ -7822,7 +7822,7 @@
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "notInService",
                     "context_name": "",
-                    "ifIndex": null
+                    "ifIndex": 19
                 },
                 {
                     "ospf_port_id": "10.150.6.254.0",
@@ -7852,7 +7852,7 @@
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "notInService",
                     "context_name": "",
-                    "ifIndex": null
+                    "ifIndex": 23
                 },
                 {
                     "ospf_port_id": "10.150.7.254.0",
@@ -7882,7 +7882,7 @@
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "notInService",
                     "context_name": "",
-                    "ifIndex": null
+                    "ifIndex": 24
                 },
                 {
                     "ospf_port_id": "10.150.8.254.0",
@@ -7912,7 +7912,7 @@
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "notInService",
                     "context_name": "",
-                    "ifIndex": null
+                    "ifIndex": 21
                 },
                 {
                     "ospf_port_id": "10.150.9.254.0",
@@ -7942,7 +7942,7 @@
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "notInService",
                     "context_name": "",
-                    "ifIndex": null
+                    "ifIndex": 30
                 }
             ],
             "ospf_instances": [
@@ -8069,7 +8069,7 @@
                     "ospfv3NbrIfIndex": 2,
                     "ospfv3NbrIfInstId": 0,
                     "ospfv3NbrAddressType": "ipv6",
-                    "ospfv3NbrAddress": "fe80::01d7:0101:98cf:af80",
+                    "ospfv3NbrAddress": "fe80::1d7:101:98cf:af80",
                     "ospfv3NbrRtrId": "10.0.99.11",
                     "ospfv3NbrOptions": 19,
                     "ospfv3NbrPriority": 50,
