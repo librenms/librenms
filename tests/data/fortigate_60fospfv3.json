@@ -8069,7 +8069,7 @@
                     "ospfv3NbrIfIndex": 2,
                     "ospfv3NbrIfInstId": 0,
                     "ospfv3NbrAddressType": "ipv6",
-                    "ospfv3NbrAddress": "fe80::01d7:0101:98cf:af80",
+                    "ospfv3NbrAddress": "fe80::1d7:101:98cf:af80",
                     "ospfv3NbrRtrId": "10.0.99.11",
                     "ospfv3NbrOptions": 19,
                     "ospfv3NbrPriority": 50,
