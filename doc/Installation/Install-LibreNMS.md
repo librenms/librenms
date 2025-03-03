@@ -101,8 +101,13 @@ setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstra
 
 ## Install PHP dependencies
 
+Change to the LibreNMS user:
 ```
 su - librenms
+```
+
+Then run the composer wrapper script and exit back to the root user:
+```
 ./scripts/composer_wrapper.php install --no-dev
 exit
 ```
